@@ -18,7 +18,7 @@ void mrfstr_clear(mrfstr_t str)
 {
     if (str->alloc)
         __mrstr_free(str->data);
-    __mrstr_free(str);
+    __mrstr_free_una(str);
 }
 
 void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)

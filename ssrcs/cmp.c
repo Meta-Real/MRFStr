@@ -40,7 +40,7 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
 
         for (; size; s1block++, s2block++, size--)
             if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
-                return 0;
+                return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }
@@ -96,7 +96,7 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
 
         for (; size; s1block++, s2block++, size--)
             if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
-                return 0;
+                return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }
@@ -151,7 +151,7 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
 
         for (; size; s1block++, s2block++, size--)
             if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
-                return 0;
+                return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }

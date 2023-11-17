@@ -8,7 +8,8 @@
 
 #include <stdint.h>
 
-typedef char *mrfstr_data_t;
+typedef char mrfstr_chr_t;
+typedef mrfstr_chr_t *mrfstr_data_t;
 typedef const mrfstr_data_t mrfstr_data_ct;
 
 typedef uint64_t mrfstr_size_t;
@@ -49,11 +50,19 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src);
 void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src);
 void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
+/* repeat functions */
+
+void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
+
 /* cmp functions */
 
 mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2);
 
 mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2);
 mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
+
+/* contain functions */
+
+mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
 
 #endif /* __MRFSTR__ */

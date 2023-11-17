@@ -3,15 +3,13 @@
     MetaReal Fast String Library
 */
 
-#include <mrfstr.h>
+#include <mrfstr-intern.h>
 #include <immintrin.h>
 #include <pthread.h>
 #include <alloc.h>
 #include <string.h>
 
-#include <stdio.h>
-
-struct __MRFSTR_MEMCMP_T
+struct __MRFSTR_EQUAL_T
 {
     __m512i *str1;
     __m512i *str2;
@@ -19,9 +17,9 @@ struct __MRFSTR_MEMCMP_T
 
     volatile mrfstr_bool_t *res;
 };
-typedef struct __MRFSTR_MEMCMP_T *mrfstr_memcmp_t;
+typedef struct __MRFSTR_EQUAL_T *mrfstr_equal_t;
 
-void *mrfstr_memcmp_threaded(void *args);
+void *mrfstr_equal_threaded(void *args);
 
 mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
 {
@@ -35,7 +33,7 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
     __m512i *s2block = (__m512i*)str2->data;
 
     mrfstr_size_t size = str1->size;
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -47,17 +45,17 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
     volatile mrfstr_bool_t res = MRFSTR_TRUE;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcmp_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_equal_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCMP_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -66,14 +64,14 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
         s1block += size;
         s2block += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcmp_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_equal_threaded, data);
     }
 
     mrfstr_bool_t rres = !memcmp((mrfstr_data_t)s2block, (mrfstr_data_t)s1block, rem);
     if (!rres)
         res = MRFSTR_FALSE;
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 
     return res;
@@ -91,7 +89,7 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
     __m512i *s1block = (__m512i*)str1->data;
     __m512i *s2block = (__m512i*)str2;
 
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -103,17 +101,17 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
     mrfstr_bool_t res = MRFSTR_TRUE;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcmp_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_equal_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCMP_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -122,22 +120,22 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
         s1block += size;
         s2block += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcmp_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_equal_threaded, data);
     }
 
     mrfstr_bool_t rres = !memcmp((mrfstr_data_t)s2block, (mrfstr_data_t)s1block, rem);
     if (!rres)
         res = MRFSTR_FALSE;
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 
     return res;
 }
 
-mrfstr_bool_t mrfstr_nequal_str(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
+mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
-    if (str1->size < size)
+    if (str1->size != size)
         return MRFSTR_FALSE;
 
     if (!size || str1->data == str2)
@@ -146,7 +144,7 @@ mrfstr_bool_t mrfstr_nequal_str(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
     __m512i *s1block = (__m512i*)str1->data;
     __m512i *s2block = (__m512i*)str2;
 
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -158,17 +156,17 @@ mrfstr_bool_t mrfstr_nequal_str(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
     mrfstr_bool_t res = MRFSTR_TRUE;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcmp_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_equal_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCMP_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -177,22 +175,22 @@ mrfstr_bool_t mrfstr_nequal_str(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
         s1block += size;
         s2block += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcmp_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_equal_threaded, data);
     }
 
     mrfstr_bool_t rres = !memcmp((mrfstr_data_ct)s2block, (mrfstr_data_ct)s1block, rem);
     if (!rres)
         res = MRFSTR_FALSE;
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 
     return res;
 }
 
-void *mrfstr_memcmp_threaded(void *args)
+void *mrfstr_equal_threaded(void *args)
 {
-    mrfstr_memcmp_t data = (mrfstr_memcmp_t)args;
+    mrfstr_equal_t data = (mrfstr_equal_t)args;
 
     mrfstr_size_t i;
     while (data->size > 65536)

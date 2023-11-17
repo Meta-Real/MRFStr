@@ -3,21 +3,21 @@
     MetaReal Fast String Library
 */
 
-#include <mrfstr.h>
+#include <mrfstr-intern.h>
 #include <immintrin.h>
 #include <pthread.h>
 #include <alloc.h>
 #include <string.h>
 
-struct __MRFSTR_MEMCPY_T
+struct __MRFSTR_SET_T
 {
     __m512i *src;
     __m512i *dst;
     mrfstr_size_t size;
 };
-typedef struct __MRFSTR_MEMCPY_T *mrfstr_memcpy_t;
+typedef struct __MRFSTR_SET_T *mrfstr_set_t;
 
-void *mrfstr_memcpy_threaded(void *args);
+void *mrfstr_set_threaded(void *args);
 
 void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
 {
@@ -45,7 +45,7 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -60,15 +60,15 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
         return;
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcpy_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_set_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCPY_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -76,13 +76,13 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
         sblock += size;
         dblock += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcpy_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_set_threaded, data);
     }
 
     memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
     dst->size = src->size;
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 }
 
@@ -113,7 +113,7 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -128,15 +128,15 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
         return;
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcpy_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_set_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCPY_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -144,16 +144,16 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
         sblock += size;
         dblock += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcpy_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_set_threaded, data);
     }
 
     memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 }
 
-void mrfstr_nset_str(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
+void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
     if (!size)
     {
@@ -165,12 +165,13 @@ void mrfstr_nset_str(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         return;
     }
 
-    if (dst->alloc <= size)
+    dst->size = size++;
+    if (dst->alloc < size)
     {
         if (dst->alloc)
             __mrstr_free(dst->data);
 
-        dst->alloc = size + 1;
+        dst->alloc = size;
         dst->data = __mrstr_alloc(dst->alloc);
     }
 
@@ -178,9 +179,7 @@ void mrfstr_nset_str(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    dst->size = size;
-
-    if (size <= 25166207)
+    if (size <= MRFSTR_THREAD_LIMIT)
     {
         mrfstr_size_t rem = size & 63;
         size >>= 6;
@@ -193,19 +192,18 @@ void mrfstr_nset_str(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 
         mrfstr_data_t dptr = (mrfstr_data_t)dblock;
         memcpy(dptr, (mrfstr_data_t)sblock, rem);
-        dptr[rem] = '\0';
         return;
     }
 
-    mrfstr_size_t rem = size % 384;
-    size /= 384;
+    mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
+    size /= MRFSTR_THREAD_CHUNK;
 
-    pthread_t threads[6];
+    pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_memcpy_t data;
-    for (i = 0; i < 6; i++)
+    mrfstr_set_t data;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_MEMCPY_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -213,20 +211,19 @@ void mrfstr_nset_str(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         sblock += size;
         dblock += size;
 
-        pthread_create(threads + i, NULL, mrfstr_memcpy_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_set_threaded, data);
     }
 
     mrfstr_data_t dptr = (mrfstr_data_t)dblock;
     memcpy(dptr, (mrfstr_data_t)sblock, rem);
-    dptr[rem] = '\0';
 
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
 }
 
-void *mrfstr_memcpy_threaded(void *args)
+void *mrfstr_set_threaded(void *args)
 {
-    mrfstr_memcpy_t data = (mrfstr_memcpy_t)args;
+    mrfstr_set_t data = (mrfstr_set_t)args;
 
     __m512i block;
     for (; data->size; data->src++, data->dst++, data->size--)

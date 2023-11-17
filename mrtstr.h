@@ -42,7 +42,7 @@ void mrtstr_init_threads(mrtstr_size_t size);
 void mrtstr_load_threads(void (*volatile func)(void*), void *args);
 void mrtstr_free_threads();
 
-#define MRTSTR_LOCK_COUNT 6
+#define MRTSTR_THREAD_COUNT 6
 
 typedef char *mrtstr_data_t;
 typedef const mrtstr_data_t mrtstr_data_ct;
@@ -93,13 +93,13 @@ void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
 void mrtstr_set(mrtstr_t dst, mrtstr_ct src);
 
 void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src);
-void mrtstr_nset_str(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
+void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
 
 /* cmp functions */
 
 void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2);
 
 void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2);
-void mrtstr_nequal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
+void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
 
 #endif /* __MRTSTR__ */

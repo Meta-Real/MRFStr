@@ -11,11 +11,7 @@ mrtstr_t mrtstr_init()
     mrtstr_t str = __mrstr_alloc_una(sizeof(struct __MRTSTR_T));
     str->alloc = 0;
     str->size = 0;
-
-    str->lock = __mrstr_alloc_una(6 * sizeof(mrtstr_lock_t));
-    for (mrtstr_size_t i = 0; i < 6; i++)
-        str->lock[i] = 0;
-
+    str->lock = __mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
     str->mutex = PTHREAD_MUTEX_INITIALIZER;
     return str;
 }

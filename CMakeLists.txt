@@ -20,7 +20,8 @@ add_custom_command(TARGET MRFStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy l
 
 project(MRTStr VERSION 1.0.0)
 
-add_library(MRTStr STATIC srcs/alloc.c tsrcs/thread.c tsrcs/init.c tsrcs/set.c tsrcs/cmp.c)
+add_library(MRTStr STATIC srcs/alloc.c tsrcs/intern.c tsrcs/thread.c
+    tsrcs/init.c tsrcs/set.c tsrcs/cmp.c)
 target_include_directories(MRTStr PUBLIC "heads" PUBLIC ".")
 
 add_custom_command(TARGET MRTStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy libMRTStr.a ..)

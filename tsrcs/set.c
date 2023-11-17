@@ -8,18 +8,20 @@
 #include <immintrin.h>
 #include <string.h>
 
-struct __MRTSTR_MEMCPY_T
+struct __MRTSTR_SET_T
 {
     __m512i *src;
     __m512i *dst;
     mrtstr_size_t size;
 
     mrtstr_lock_t *slock;
+    pthread_mutex_t *smutex;
+
     mrtstr_lock_t *dlock;
 };
-typedef struct __MRTSTR_MEMCPY_T *mrtstr_memcpy_t;
+typedef struct __MRTSTR_SET_T *mrtstr_set_t;
 
-struct __MRTSTR_MEMCPY2_T
+struct __MRTSTR_SET_STR_T
 {
     __m512i *src;
     __m512i *dst;
@@ -27,10 +29,10 @@ struct __MRTSTR_MEMCPY2_T
 
     mrtstr_lock_t *lock;
 };
-typedef struct __MRTSTR_MEMCPY2_T *mrtstr_memcpy2_t;
+typedef struct __MRTSTR_SET_STR_T *mrtstr_set_str_t;
 
-void mrtstr_memcpy_threaded(void *args);
-void mrtstr_memcpy2_threaded(void *args);
+void mrtstr_set_threaded(void *args);
+void mrtstr_set_str_threaded(void *args);
 
 void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
 {
@@ -60,7 +62,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    if (size <= 25166207)
+    if (size <= MRTSTR_THREAD_LIMIT)
     {
         mrtstr_size_t rem = size & 63;
         size >>= 6;
@@ -75,20 +77,21 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
         return;
     }
 
-    mrtstr_size_t rem = size % 384;
-    size /= 384;
+    mrtstr_size_t rem = size % MRTSTR_THREAD_CHUNK;
+    size /= MRTSTR_THREAD_CHUNK;
 
     mrtstr_bit_t i;
     mrtstr_size_t j;
-    mrtstr_memcpy_t data;
+    mrtstr_set_t data;
     if (mrtstr_locked(src) && src->forced)
-        for (i = 0; i < 6; i++)
+        for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
             for (; src->lock[i];);
 
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_MEMCPY_T));
+            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_T));
             data->size = size;
             data->slock = src->lock + i;
+            data->smutex = &src->mutex;
             data->dlock = dst->lock + i;
 
             while (!mrtstr_threads.free_threads && data->size > 65536)
@@ -120,17 +123,18 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
                 sblock += data->size;
                 dblock += data->size;
 
-                src->lock[i]++;
-                dst->lock[i]++;
-                mrtstr_load_threads(mrtstr_memcpy_threaded, data);
+                src->lock[i] = 1;
+                dst->lock[i] = 1;
+                mrtstr_load_threads(mrtstr_set_threaded, data);
             }
         }
     else
-        for (i = 0; i < 6; i++)
+        for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_MEMCPY_T));
+            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_T));
             data->size = size;
             data->slock = src->lock + i;
+            data->smutex = &src->mutex;
             data->dlock = dst->lock + i;
 
             while (!mrtstr_threads.free_threads && data->size > 65536)
@@ -162,14 +166,15 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
                 sblock += data->size;
                 dblock += data->size;
 
-                src->lock[i]++;
-                dst->lock[i]++;
-                mrtstr_load_threads(mrtstr_memcpy_threaded, data);
+                mrtstr_lock_inc(src->lock[i], &src->mutex);
+                dst->lock[i] = 1;
+                mrtstr_load_threads(mrtstr_set_threaded, data);
             }
         }
 
     memcpy((mrtstr_data_t)sblock, (mrtstr_data_ct)dblock, rem);
     dst->size = src->size;
+
     src->forced = MRTSTR_FALSE;
     dst->forced = MRTSTR_TRUE;
 }
@@ -203,7 +208,7 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    if (size <= 25166207)
+    if (size <= MRTSTR_THREAD_LIMIT)
     {
         mrtstr_size_t rem = size & 63;
         size >>= 6;
@@ -218,15 +223,15 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
         return;
     }
 
-    mrtstr_size_t rem = size % 384;
-    size /= 384;
+    mrtstr_size_t rem = size % MRTSTR_THREAD_CHUNK;
+    size /= MRTSTR_THREAD_CHUNK;
 
     mrtstr_size_t j;
     mrtstr_bit_t i;
-    mrtstr_memcpy2_t data;
-    for (i = 0; i < 6; i++)
+    mrtstr_set_str_t data;
+    for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_MEMCPY2_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_STR_T));
         data->size = size;
         data->lock = dst->lock + i;
 
@@ -259,8 +264,8 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
             sblock += data->size;
             dblock += data->size;
 
-            dst->lock[i]++;
-            mrtstr_load_threads(mrtstr_memcpy2_threaded, data);
+            dst->lock[i] = 1;
+            mrtstr_load_threads(mrtstr_set_str_threaded, data);
         }
     }
 
@@ -268,7 +273,7 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     dst->forced = MRTSTR_TRUE;
 }
 
-void mrtstr_nset_str(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
+void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
 {
     for (; mrtstr_locked(dst););
 
@@ -282,22 +287,21 @@ void mrtstr_nset_str(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         return;
     }
 
-    if (dst->alloc <= size)
+    dst->size = size++;
+    if (dst->alloc < size)
     {
         if (dst->alloc)
             __mrstr_free(dst->data);
 
-        dst->alloc = size + 1;
+        dst->alloc = size;
         dst->data = __mrstr_alloc(dst->alloc);
     }
-
-    dst->size = size;
 
     __m512i *sblock = (__m512i*)src;
     __m512i *dblock = (__m512i*)dst->data;
     __m512i block;
 
-    if (size <= 25166207)
+    if (size <= MRTSTR_THREAD_LIMIT)
     {
         mrtstr_size_t rem = size & 63;
         size >>= 6;
@@ -310,19 +314,18 @@ void mrtstr_nset_str(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
 
         mrtstr_data_t dptr = (mrtstr_data_t)dblock;
         memcpy(dptr, (mrtstr_data_t)sblock, rem);
-        dptr[rem] = '\0';
         return;
     }
 
-    mrtstr_size_t rem = size % 384;
-    size /= 384;
+    mrtstr_size_t rem = size % MRTSTR_THREAD_CHUNK;
+    size /= MRTSTR_THREAD_CHUNK;
 
     mrtstr_size_t j;
     mrtstr_bit_t i;
-    mrtstr_memcpy2_t data;
-    for (i = 0; i < 6; i++)
+    mrtstr_set_str_t data;
+    for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_MEMCPY2_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_STR_T));
         data->size = size;
         data->lock = dst->lock + i;
 
@@ -355,20 +358,20 @@ void mrtstr_nset_str(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
             sblock += data->size;
             dblock += data->size;
 
-            dst->lock[i]++;
-            mrtstr_load_threads(mrtstr_memcpy2_threaded, data);
+            dst->lock[i] = 1;
+            mrtstr_load_threads(mrtstr_set_str_threaded, data);
         }
     }
 
     mrtstr_data_t dptr = (mrtstr_data_t)dblock;
     memcpy(dptr, (mrtstr_data_t)sblock, rem);
-    dptr[rem] = '\0';
+
     dst->forced = MRTSTR_TRUE;
 }
 
-void mrtstr_memcpy_threaded(void *args)
+void mrtstr_set_threaded(void *args)
 {
-    mrtstr_memcpy_t data = (mrtstr_memcpy_t)args;
+    mrtstr_set_t data = (mrtstr_set_t)args;
 
     __m512i block;
     for (; data->size; data->src++, data->dst++, data->size--)
@@ -377,15 +380,15 @@ void mrtstr_memcpy_threaded(void *args)
         _mm512_stream_si512(data->dst, block);
     }
 
-    --*data->slock;
-    --*data->dlock;
+    mrtstr_lock_dec(*data->slock, data->smutex);
+    *data->dlock = 0;
 
     __mrstr_free_una(data);
 }
 
-void mrtstr_memcpy2_threaded(void *args)
+void mrtstr_set_str_threaded(void *args)
 {
-    mrtstr_memcpy2_t data = (mrtstr_memcpy2_t)args;
+    mrtstr_set_str_t data = (mrtstr_set_str_t)args;
 
     __m512i block;
     for (; data->size; data->src++, data->dst++, data->size--)
@@ -394,7 +397,7 @@ void mrtstr_memcpy2_threaded(void *args)
         _mm512_stream_si512(data->dst, block);
     }
 
-    --*data->lock;
+    *data->lock = 0;
 
     __mrstr_free_una(data);
 }

@@ -11,6 +11,8 @@
 void *__mrstr_alloc(uint64_t size);
 void *__mrstr_alloc_una(uint64_t size);
 
+void *__mrstr_calloc(uint64_t count, uint64_t unit);
+
 void *__mrstr_realloc(void *block, uint64_t size);
 void *__mrstr_realloc_una(void *block, uint64_t size);
 

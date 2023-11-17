@@ -35,7 +35,7 @@ void mrtstr_load_threads(void (*volatile func)(void*), void *args)
     for (i = 0; i < mrtstr_threads.size; i++)
         if (!THREAD(i).func)
         {
-            lock_dec(mrtstr_threads.free_threads, &mrtstr_threads.mutex);
+            mrtstr_lock_dec(mrtstr_threads.free_threads, &mrtstr_threads.mutex);
 
             THREAD(i).args = args;
             THREAD(i).func = func;
@@ -58,14 +58,13 @@ void mrtstr_free_threads()
 void *mrtstr_thread_main(void *args)
 {
     mrtstr_size_t id = (mrtstr_size_t)args;
-
     while (THREAD(id).open)
         if (THREAD(id).func)
         {
             THREAD(id).func(THREAD(id).args);
             THREAD(id).func = NULL;
 
-            lock_inc(mrtstr_threads.free_threads, &mrtstr_threads.mutex);
+            mrtstr_lock_inc(mrtstr_threads.free_threads, &mrtstr_threads.mutex);
         }
 
     return NULL;

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define SIZE 1000000000
 
@@ -14,16 +15,17 @@ void test_each(char *src)
 
     mrtstr_t a = mrtstr_init();
     mrtstr_realloc(a, SIZE + 1);
-    mrtstr_nset_str(a, src, SIZE);
+    mrtstr_set_nstr(a, src, SIZE);
 
     mrtstr_t b = mrtstr_init();
     b->alloc = SIZE + 1;
     b->size = SIZE;
     b->data = src;
 
-    for (; MRTSTR_LOCKED(a););
+    usleep(100000);
 
     mrtstr_cmpres_t r[100];
+    mrtstr_size_t w = 0;
 
     mrtstr_size_t s = 0;
     clock_t t;
@@ -34,12 +36,10 @@ void test_each(char *src)
         t = clock() - t;
         s += t;
 
-        _sleep(100);
-
         printf("%ld\n", t);
     }
 
-    printf("%lf\n", s / 100.0);
+    printf("%lf, %d\n", s / 100.0, w);
 
     mrtstr_clear(a);
     mrtstr_clear(b);

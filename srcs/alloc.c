@@ -35,6 +35,20 @@ void *__mrstr_alloc_una(uint64_t size)
     return block;
 }
 
+void *__mrstr_calloc(uint64_t count, uint64_t unit)
+{
+    void *block = calloc(count, unit);
+    if (!block)
+    {
+        fprintf(stderr,
+            "MRStr Library, __mrstr_calloc function: Could not allocate %llu bytes from memory",
+            count * unit);
+        abort();
+    }
+
+    return block;
+}
+
 void *__mrstr_realloc(void *block, uint64_t size)
 {
     block = _aligned_realloc(block, size, 64);

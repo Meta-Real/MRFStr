@@ -8,7 +8,10 @@
 
 #include <mrtstr.h>
 
-#define lock_inc(l, m)           \
+#define MRTSTR_THREAD_LIMIT (4194368 * MRTSTR_THREAD_COUNT - 1)
+#define MRTSTR_THREAD_CHUNK (64 * MRTSTR_THREAD_COUNT)
+
+#define mrtstr_lock_inc(l, m)    \
     do                           \
     {                            \
         pthread_mutex_lock(m);   \
@@ -16,7 +19,7 @@
         pthread_mutex_unlock(m); \
     } while (0)
 
-#define lock_dec(l, m)           \
+#define mrtstr_lock_dec(l, m)    \
     do                           \
     {                            \
         pthread_mutex_lock(m);   \
@@ -24,13 +27,6 @@
         pthread_mutex_unlock(m); \
     } while (0)
 
-inline mrtstr_bool_t mrtstr_locked(mrtstr_ct str)
-{
-    mrtstr_size_t i;
-    for (i = 0; i < MRTSTR_LOCK_COUNT; i++)
-        if (str->lock[i])
-            return MRTSTR_TRUE;
-    return MRTSTR_FALSE;
-}
+mrtstr_bool_t mrtstr_locked(mrtstr_ct str);
 
 #endif /* __MRTSTR_INTERN__ */

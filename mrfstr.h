@@ -19,7 +19,11 @@ typedef uint8_t mrfstr_bool_t;
 #define MRFSTR_TRUE 1
 #define MRFSTR_FALSE 0
 
+#define MRFSTR_THREADING 1
+
+#if MRFSTR_THREADING
 #define MRFSTR_THREAD_COUNT 6
+#endif
 
 struct __MRFSTR_T
 {

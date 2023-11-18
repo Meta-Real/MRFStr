@@ -15,6 +15,8 @@ typedef uint8_t mrtstr_bool_t;
 #define MRTSTR_TRUE 1
 #define MRTSTR_FALSE 0
 
+#define MRTSTR_THREAD_COUNT 6
+
 struct __MRTSTR_THREAD_T
 {
     pthread_t id;
@@ -41,8 +43,6 @@ extern mrtstr_threads_t mrtstr_threads;
 void mrtstr_init_threads(mrtstr_size_t size);
 void mrtstr_load_threads(void (*volatile func)(void*), void *args);
 void mrtstr_free_threads();
-
-#define MRTSTR_THREAD_COUNT 6
 
 typedef char *mrtstr_data_t;
 typedef const mrtstr_data_t mrtstr_data_ct;

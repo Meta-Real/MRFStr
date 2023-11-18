@@ -4,21 +4,22 @@
 */
 
 #include <mrfstr-intern.h>
-#include <immintrin.h>
-#include <pthread.h>
 #include <alloc.h>
 #include <string.h>
-#include <stdio.h>
+
+#if MRFSTR_THREADING
+#include <pthread.h>
 
 struct __MRFSTR_REPEAT_CHR_T
 {
-    __m512i *res;
-    __m512i block;
+    mrfstr_simd_block_t *res;
+    mrfstr_simd_block_t block;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_REPEAT_CHR_T *mrfstr_repeat_chr_t;
 
 void *mrfstr_repeat_chr_threaded(void *args);
+#endif
 
 void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
 {
@@ -42,20 +43,23 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
         res->data = __mrstr_alloc(res->alloc);
     }
 
-    __m512i *rblock = (__m512i*)res->data;
-    __m512i block = _mm512_set1_epi8(chr);
+    mrfstr_simd_block_t *rblock = (mrfstr_simd_block_t*)res->data;
+    mrfstr_simd_block_t block = mrfstr_simd_set1_func(chr);
 
+#if MRFSTR_THREADING
     if (count <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = count & 63;
-        count >>= 6;
+#endif
+        mrfstr_size_t rem = count & MRFSTR_SIMD_CHAR_MASK;
+        count >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; count; rblock++, count--)
-            _mm512_stream_si512(rblock, block);
+            mrfstr_simd_stream_func(rblock, block);
 
         mrfstr_data_t rptr = (mrfstr_data_t)rblock;
         memset(rptr, chr, rem);
         rptr[rem] = '\0';
+#if MRFSTR_THREADING
         return;
     }
 
@@ -83,15 +87,18 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
 
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
+#endif
 }
 
+#if MRFSTR_THREADING
 void *mrfstr_repeat_chr_threaded(void *args)
 {
     mrfstr_repeat_chr_t data = (mrfstr_repeat_chr_t)args;
 
     for (; data->size; data->res++, data->size--)
-        _mm512_stream_si512(data->res, data->block);
+        mrfstr_simd_stream_func(data->res, data->block);
 
     __mrstr_free_una(data);
     return NULL;
 }
+#endif

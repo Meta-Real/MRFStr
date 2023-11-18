@@ -4,15 +4,16 @@
 */
 
 #include <mrfstr-intern.h>
-#include <immintrin.h>
-#include <pthread.h>
 #include <alloc.h>
 #include <string.h>
 
+#if MRFSTR_THREADING
+#include <pthread.h>
+
 struct __MRFSTR_EQUAL_T
 {
-    __m512i *str1;
-    __m512i *str2;
+    mrfstr_simd_block_t *str1;
+    mrfstr_simd_block_t *str2;
     mrfstr_size_t size;
 
     volatile mrfstr_bool_t *res;
@@ -20,6 +21,7 @@ struct __MRFSTR_EQUAL_T
 typedef struct __MRFSTR_EQUAL_T *mrfstr_equal_t;
 
 void *mrfstr_equal_threaded(void *args);
+#endif
 
 mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
 {
@@ -29,20 +31,24 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
     if (!str1->size || str1->data == str2->data)
         return MRFSTR_TRUE;
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2->data;
+    mrfstr_simd_block_t *s1block = (mrfstr_simd_block_t*)str1->data;
+    mrfstr_simd_block_t *s2block = (mrfstr_simd_block_t*)str2->data;
 
     mrfstr_size_t size = str1->size;
+
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrfstr_simd_cmpneq_func(*s1block, *s2block))
                 return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
+#if MRFSTR_THREADING
     }
 
     mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
@@ -75,6 +81,7 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
         pthread_join(threads[i], NULL);
 
     return res;
+#endif
 }
 
 mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
@@ -86,19 +93,22 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
     if (!str1->size || str1->data == str2)
         return MRFSTR_TRUE;
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2;
+    mrfstr_simd_block_t *s1block = (mrfstr_simd_block_t*)str1->data;
+    mrfstr_simd_block_t *s2block = (mrfstr_simd_block_t*)str2;
 
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrfstr_simd_cmpneq_func(*s1block, *s2block))
                 return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
+#if MRFSTR_THREADING
     }
 
     mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
@@ -131,6 +141,7 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
         pthread_join(threads[i], NULL);
 
     return res;
+#endif
 }
 
 mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
@@ -141,19 +152,22 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
     if (!size || str1->data == str2)
         return MRFSTR_TRUE;
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2;
+    mrfstr_simd_block_t *s1block = (mrfstr_simd_block_t*)str1->data;
+    mrfstr_simd_block_t *s2block = (mrfstr_simd_block_t*)str2;
 
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrfstr_simd_cmpneq_func(*s1block, *s2block))
                 return MRFSTR_FALSE;
 
         return !memcmp((mrfstr_data_ct)s1block, (mrfstr_data_ct)s2block, rem);
+#if MRFSTR_THREADING
     }
 
     mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
@@ -186,8 +200,10 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
         pthread_join(threads[i], NULL);
 
     return res;
+#endif
 }
 
+#if MRFSTR_THREADING
 void *mrfstr_equal_threaded(void *args)
 {
     mrfstr_equal_t data = (mrfstr_equal_t)args;
@@ -202,7 +218,7 @@ void *mrfstr_equal_threaded(void *args)
         }
 
         for (i = 0; i < 65536; data->str1++, data->str2++, i++)
-            if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+            if (mrfstr_simd_cmpneq_func(*data->str1, *data->str2))
             {
                 *data->res = MRFSTR_FALSE;
 
@@ -220,7 +236,7 @@ void *mrfstr_equal_threaded(void *args)
     }
 
     for (; data->size; data->str1++, data->str2++, data->size--)
-        if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+        if (mrfstr_simd_cmpneq_func(*data->str1, *data->str2))
         {
             *data->res = MRFSTR_FALSE;
 
@@ -231,3 +247,4 @@ void *mrfstr_equal_threaded(void *args)
     __mrstr_free_una(data);
     return NULL;
 }
+#endif

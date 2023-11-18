@@ -1,97 +1,13 @@
 import timeit
 
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
+a = "H" * 1073741824
+s = 0
+for i in range(100):
+    t = timeit.default_timer()
+    'h' in a
+    t = timeit.default_timer() - t
+    print(t)
 
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
+    s += t
 
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
-
-s = timeit.default_timer()
-a = "H" * 4000000000
-print(timeit.default_timer() - s)
+print(f"avg: {s / 100}")

@@ -4,20 +4,22 @@
 */
 
 #include <mrfstr-intern.h>
-#include <immintrin.h>
-#include <pthread.h>
 #include <alloc.h>
 #include <string.h>
 
+#if MRFSTR_THREADING
+#include <pthread.h>
+
 struct __MRFSTR_SET_T
 {
-    __m512i *src;
-    __m512i *dst;
+    mrfstr_simd_block_t *src;
+    mrfstr_simd_block_t *dst;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_SET_T *mrfstr_set_t;
 
 void *mrfstr_set_threaded(void *args);
+#endif
 
 void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
 {
@@ -41,22 +43,21 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
         dst->data = __mrstr_alloc(dst->alloc);
     }
 
-    __m512i *sblock = (__m512i*)src->data;
-    __m512i *dblock = (__m512i*)dst->data;
-    __m512i block;
+    mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src->data;
+    mrfstr_simd_block_t *dblock = (mrfstr_simd_block_t*)dst->data;
 
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-        {
-            block = _mm512_stream_load_si512(sblock);
-            _mm512_stream_si512(dblock, block);
-        }
+            mrfstr_simd_stream_func(dblock, *sblock);
 
         memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
+#if MRFSTR_THREADING
         return;
     }
 
@@ -84,6 +85,7 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
 
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
+#endif
 }
 
 void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
@@ -109,22 +111,21 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
         dst->data = __mrstr_alloc(dst->alloc);
     }
 
-    __m512i *sblock = (__m512i*)src;
-    __m512i *dblock = (__m512i*)dst->data;
-    __m512i block;
+    mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;
+    mrfstr_simd_block_t *dblock = (mrfstr_simd_block_t*)dst->data;
 
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-        {
-            block = _mm512_stream_load_si512(sblock);
-            _mm512_stream_si512(dblock, block);
-        }
+            mrfstr_simd_stream_func(dblock, *sblock);
 
         memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
+#if MRFSTR_THREADING
         return;
     }
 
@@ -151,6 +152,7 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
 
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
+#endif
 }
 
 void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
@@ -175,23 +177,22 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         dst->data = __mrstr_alloc(dst->alloc);
     }
 
-    __m512i *sblock = (__m512i*)src;
-    __m512i *dblock = (__m512i*)dst->data;
-    __m512i block;
+    mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;
+    mrfstr_simd_block_t *dblock = (mrfstr_simd_block_t*)dst->data;
 
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-        {
-            block = _mm512_stream_load_si512(sblock);
-            _mm512_stream_si512(dblock, block);
-        }
+            mrfstr_simd_stream_func(dblock, *sblock);
 
         mrfstr_data_t dptr = (mrfstr_data_t)dblock;
         memcpy(dptr, (mrfstr_data_t)sblock, rem);
+#if MRFSTR_THREADING
         return;
     }
 
@@ -219,19 +220,18 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         pthread_join(threads[i], NULL);
+#endif
 }
 
+#if MRFSTR_THREADING
 void *mrfstr_set_threaded(void *args)
 {
     mrfstr_set_t data = (mrfstr_set_t)args;
 
-    __m512i block;
     for (; data->size; data->src++, data->dst++, data->size--)
-    {
-        block = _mm512_stream_load_si512(data->src);
-        _mm512_stream_si512(data->dst, block);
-    }
+        mrfstr_simd_stream_func(data->dst, *data->src);
 
     __mrstr_free_una(data);
     return NULL;
 }
+#endif

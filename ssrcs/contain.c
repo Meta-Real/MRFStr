@@ -4,15 +4,16 @@
 */
 
 #include <mrfstr-intern.h>
-#include <immintrin.h>
-#include <pthread.h>
 #include <alloc.h>
 #include <string.h>
 
+#if MRFSTR_THREADING
+#include <pthread.h>
+
 struct __MRFSTR_CONTAIN_T
 {
-    __m512i *str;
-    __m512i chr;
+    mrfstr_simd_block_t *str;
+    mrfstr_simd_block_t chr;
     mrfstr_size_t size;
 
     volatile mrfstr_bool_t *res;
@@ -20,26 +21,31 @@ struct __MRFSTR_CONTAIN_T
 typedef struct __MRFSTR_CONTAIN_T *mrfstr_contain_t;
 
 void *mrfstr_contain_threaded(void *args);
+#endif
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
 {
     if (!str->size)
         return MRFSTR_FALSE;
 
-    __m512i *sblock = (__m512i*)str->data;
-    __m512i cblock = _mm512_set1_epi8(chr);
+    mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)str->data;
+    mrfstr_simd_block_t cblock = mrfstr_simd_set1_func(chr);
 
     mrfstr_size_t size = str->size;
+
+#if MRFSTR_THREADING
     if (size <= MRFSTR_THREAD_LIMIT)
     {
-        mrfstr_size_t rem = size & 63;
-        size >>= 6;
+#endif
+        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
+        size >>= MRFSTR_SIMD_CHAR_SHIFT;
 
         for (; size; sblock++, size--)
-            if (_mm512_cmpeq_epi8_mask(*sblock, cblock))
+            if (mrfstr_simd_cmpeq_mask_func(*sblock, cblock))
                 return MRFSTR_TRUE;
 
         return memchr((mrfstr_data_ct)sblock, chr, rem) != NULL;
+#if MRFSTR_THREADING
     }
 
     mrfstr_size_t rem = size % MRFSTR_THREAD_CHUNK;
@@ -70,8 +76,10 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
         pthread_join(threads[i], NULL);
 
     return res;
+#endif
 }
 
+#if MRFSTR_THREADING
 void *mrfstr_contain_threaded(void *args)
 {
     mrfstr_contain_t data = (mrfstr_contain_t)args;
@@ -86,7 +94,7 @@ void *mrfstr_contain_threaded(void *args)
         }
 
         for (i = 0; i < 65536; data->str++, i++)
-            if (_mm512_cmpeq_epi8_mask(*data->str, data->chr))
+            if (mrfstr_simd_cmpeq_mask_func(*data->str, data->chr))
             {
                 *data->res = MRFSTR_TRUE;
 
@@ -104,7 +112,7 @@ void *mrfstr_contain_threaded(void *args)
     }
 
     for (; data->size; data->str++, data->size--)
-        if (_mm512_cmpeq_epi8_mask(*data->str, data->chr))
+        if (mrfstr_simd_cmpeq_mask_func(*data->str, data->chr))
         {
             *data->res = MRFSTR_TRUE;
 
@@ -115,3 +123,4 @@ void *mrfstr_contain_threaded(void *args)
     __mrstr_free_una(data);
     return NULL;
 }
+#endif

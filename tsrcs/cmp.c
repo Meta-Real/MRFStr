@@ -5,13 +5,12 @@
 
 #include <mrtstr-intern.h>
 #include <alloc.h>
-#include <immintrin.h>
 #include <string.h>
 
 struct __MRTSTR_EQUAL_T
 {
-    __m512i *str1;
-    __m512i *str2;
+    mrtstr_simd_block_t *str1;
+    mrtstr_simd_block_t *str2;
     mrtstr_size_t size;
 
     mrtstr_lock_t *s1lock;
@@ -26,8 +25,8 @@ typedef struct __MRTSTR_EQUAL_T *mrtstr_equal_t;
 
 struct __MRTSTR_EQUAL_STR_T
 {
-    __m512i *str1;
-    __m512i *str2;
+    mrtstr_simd_block_t *str1;
+    mrtstr_simd_block_t *str2;
     mrtstr_size_t size;
 
     mrtstr_lock_t *s1lock;
@@ -79,17 +78,17 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
         return;
     }
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2->data;
+    mrtstr_simd_block_t *s1block = (mrtstr_simd_block_t*)str1->data;
+    mrtstr_simd_block_t *s2block = (mrtstr_simd_block_t*)str2->data;
 
     mrtstr_size_t size = str1->size;
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & 63;
-        size >>= 6;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
+        size >>= MRTSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
             {
                 res->res = MRTSTR_FALSE;
                 return;
@@ -120,7 +119,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                 while (!mrtstr_threads.free_threads && data->size > 65536)
                 {
                     for (j = 0; j < 65536; s1block++, s2block++, j++)
-                        if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                        if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                         {
                             res->res = MRTSTR_FALSE;
 
@@ -134,7 +133,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                 if (data->size <= 65536)
                 {
                     for (; data->size; s1block++, s2block++, data->size--)
-                        if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                        if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                         {
                             res->res = MRTSTR_FALSE;
 
@@ -168,7 +167,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                 while (!mrtstr_threads.free_threads && data->size > 65536)
                 {
                     for (j = 0; j < 65536; s1block++, s2block++, j++)
-                        if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                        if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                         {
                             res->res = MRTSTR_FALSE;
 
@@ -182,7 +181,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                 if (data->size <= 65536)
                 {
                     for (; data->size; s1block++, s2block++, data->size--)
-                        if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                        if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                         {
                             res->res = MRTSTR_FALSE;
 
@@ -217,7 +216,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -231,7 +230,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -263,7 +262,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -275,7 +274,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -324,16 +323,16 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
         return;
     }
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2;
+    mrtstr_simd_block_t *s1block = (mrtstr_simd_block_t*)str1->data;
+    mrtstr_simd_block_t *s2block = (mrtstr_simd_block_t*)str2;
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & 63;
-        size >>= 6;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
+        size >>= MRTSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
             {
                 res->res = MRTSTR_FALSE;
                 return;
@@ -361,7 +360,7 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -375,7 +374,7 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -406,7 +405,7 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -418,7 +417,7 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -464,16 +463,16 @@ void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2
         return;
     }
 
-    __m512i *s1block = (__m512i*)str1->data;
-    __m512i *s2block = (__m512i*)str2;
+    mrtstr_simd_block_t *s1block = (mrtstr_simd_block_t*)str1->data;
+    mrtstr_simd_block_t *s2block = (mrtstr_simd_block_t*)str2;
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & 63;
-        size >>= 6;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
+        size >>= MRTSTR_SIMD_CHAR_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
-            if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+            if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
             {
                 res->res = MRTSTR_FALSE;
                 return;
@@ -501,7 +500,7 @@ void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -515,7 +514,7 @@ void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
 
@@ -546,7 +545,7 @@ void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2
             while (!mrtstr_threads.free_threads && data->size > 65536)
             {
                 for (j = 0; j < 65536; s1block++, s2block++, j++)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -558,7 +557,7 @@ void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2
             if (data->size <= 65536)
             {
                 for (; data->size; s1block++, s2block++, data->size--)
-                    if (_mm512_cmpneq_epi64_mask(*s1block, *s2block))
+                    if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
                     {
                         res->res = MRTSTR_FALSE;
                         return;
@@ -605,7 +604,7 @@ void mrtstr_equal_threaded(void *args)
         }
 
         for (i = 0; i < 65536; data->str1++, data->str2++, i++)
-            if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+            if (mrtstr_simd_cmpneq_func(*data->str1, *data->str2))
             {
                 data->res->res = MRTSTR_FALSE;
 
@@ -631,7 +630,7 @@ void mrtstr_equal_threaded(void *args)
     }
 
     for (; data->size; data->str1++, data->str2++, data->size--)
-        if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+        if (mrtstr_simd_cmpneq_func(*data->str1, *data->str2))
         {
             data->res->res = MRTSTR_FALSE;
 
@@ -667,7 +666,7 @@ void mrtstr_equal_str_threaded(void *args)
         }
 
         for (i = 0; i < 65536; data->str1++, data->str2++, i++)
-            if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+            if (mrtstr_simd_cmpneq_func(*data->str1, *data->str2))
             {
                 data->res->res = MRTSTR_FALSE;
 
@@ -691,7 +690,7 @@ void mrtstr_equal_str_threaded(void *args)
     }
 
     for (; data->size; data->str1++, data->str2++, data->size--)
-        if (_mm512_cmpneq_epi64_mask(*data->str1, *data->str2))
+        if (mrtstr_simd_cmpneq_func(*data->str1, *data->str2))
         {
             data->res->res = MRTSTR_FALSE;
 

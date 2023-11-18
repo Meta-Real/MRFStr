@@ -3,12 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 #define SIZE 1073741824
 
 int main()
 {
+    char *st = _aligned_malloc(SIZE + 1, 64);
+    memset(st, 'T', SIZE);
+    st[SIZE] = '\0';
+
     mrfstr_t a = mrfstr_init();
     mrfstr_realloc(a, SIZE + 1);
 
@@ -17,7 +20,7 @@ int main()
     for (int i = 0; i < 100; i++)
     {
         t = clock();
-        mrfstr_repeat_chr(a, 'H', SIZE);
+        mrfstr_set_nstr(a, st, SIZE);
         t = clock() - t;
         s += t;
 
@@ -27,5 +30,6 @@ int main()
     printf("%lf\n", s / 100.0);
 
     mrfstr_clear(a);
+    _aligned_free(st);
     return 0;
 }

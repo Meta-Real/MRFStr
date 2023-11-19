@@ -10,7 +10,7 @@
 #if MRFSTR_THREADING
 #include <pthread.h>
 
-struct __MRFSTR_CONTAIN_T
+struct __MRFSTR_CONTAIN_CHR_T
 {
     mrfstr_simd_block_t *str;
     mrfstr_simd_block_t chr;
@@ -18,9 +18,9 @@ struct __MRFSTR_CONTAIN_T
 
     volatile mrfstr_bool_t *res;
 };
-typedef struct __MRFSTR_CONTAIN_T *mrfstr_contain_t;
+typedef struct __MRFSTR_CONTAIN_CHR_T *mrfstr_contain_chr_t;
 
-void *mrfstr_contain_threaded(void *args);
+void *mrfstr_contain_chr_threaded(void *args);
 #endif
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
@@ -55,17 +55,17 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
 
     pthread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_bit_t i;
-    mrfstr_contain_t data;
+    mrfstr_contain_chr_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_CONTAIN_T));
+        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_CONTAIN_CHR_T));
         data->str = sblock;
         data->chr = cblock;
         data->size = size;
         data->res = &res;
 
         sblock += size;
-        pthread_create(threads + i, NULL, mrfstr_contain_threaded, data);
+        pthread_create(threads + i, NULL, mrfstr_contain_chr_threaded, data);
     }
 
     mrfstr_bool_t rres = memchr((mrfstr_data_t)sblock, chr, rem) != NULL;
@@ -80,9 +80,9 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
 }
 
 #if MRFSTR_THREADING
-void *mrfstr_contain_threaded(void *args)
+void *mrfstr_contain_chr_threaded(void *args)
 {
-    mrfstr_contain_t data = (mrfstr_contain_t)args;
+    mrfstr_contain_chr_t data = (mrfstr_contain_chr_t)args;
 
     mrfstr_size_t i;
     while (data->size > 65536)

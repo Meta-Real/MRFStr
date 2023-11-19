@@ -353,6 +353,5 @@ void mrtstr_set_str_threaded(void *args)
         mrtstr_simd_stream_func(data->dst, *data->src);
 
     *data->lock = 0;
-
     __mrstr_free_una(data);
 }

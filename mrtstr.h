@@ -44,7 +44,8 @@ void mrtstr_init_threads(mrtstr_size_t size);
 void mrtstr_load_threads(void (*volatile func)(void*), void *args);
 void mrtstr_free_threads();
 
-typedef char *mrtstr_data_t;
+typedef char mrtstr_chr_t;
+typedef mrtstr_chr_t *mrtstr_data_t;
 typedef const mrtstr_data_t mrtstr_data_ct;
 
 typedef uint8_t mrtstr_bit_t;
@@ -66,14 +67,14 @@ typedef const mrtstr_t mrtstr_ct;
 typedef uint8_t mrtstr_rbit_t;
 typedef volatile mrtstr_rbit_t mrtstr_rlock_t;
 
-struct __MRTSTR_CMPRES_T
+struct __MRTSTR_BRES_T
 {
     volatile mrtstr_bool_t res;
 
     mrtstr_rlock_t lock;
     pthread_mutex_t mutex;
 };
-typedef struct __MRTSTR_CMPRES_T mrtstr_cmpres_t;
+typedef struct __MRTSTR_BRES_T mrtstr_bres_t;
 
 /* init functions */
 
@@ -95,11 +96,19 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src);
 void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src);
 void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
 
+/* repeat functions */
+
+void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count);
+
 /* cmp functions */
 
-void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2);
+void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2);
 
-void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2);
-void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
+void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2);
+void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
+
+/* contain functions */
+
+void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr);
 
 #endif /* __MRTSTR__ */

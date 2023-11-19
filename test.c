@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <mrfstr.h>
+#include <mrtstr.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -8,19 +8,20 @@
 
 int main()
 {
-    char *st = _aligned_malloc(SIZE + 1, 64);
-    memset(st, 'T', SIZE);
-    st[SIZE] = '\0';
+    mrtstr_init_threads(7);
 
-    mrfstr_t a = mrfstr_init();
-    mrfstr_realloc(a, SIZE + 1);
+    mrtstr_t a = mrtstr_init();
+    mrtstr_realloc(a, SIZE + 1);
+    mrtstr_repeat_chr(a, 'K', SIZE);
 
-    mrfstr_size_t s = 0;
+    mrtstr_bres_t r[100];
+
+    mrtstr_size_t s = 0;
     clock_t t;
     for (int i = 0; i < 100; i++)
     {
         t = clock();
-        mrfstr_set_nstr(a, st, SIZE);
+        mrtstr_contain_chr(r + i, a, 'W');
         t = clock() - t;
         s += t;
 
@@ -29,7 +30,7 @@ int main()
 
     printf("%lf\n", s / 100.0);
 
-    mrfstr_clear(a);
-    _aligned_free(st);
+    mrtstr_clear(a);
+    mrtstr_free_threads();
     return 0;
 }

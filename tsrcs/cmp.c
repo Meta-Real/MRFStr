@@ -19,7 +19,7 @@ struct __MRTSTR_EQUAL_T
     mrtstr_lock_t *s2lock;
     pthread_mutex_t *s2mutex;
 
-    mrtstr_cmpres_t *res;
+    mrtstr_bres_t *res;
 };
 typedef struct __MRTSTR_EQUAL_T *mrtstr_equal_t;
 
@@ -32,7 +32,7 @@ struct __MRTSTR_EQUAL_STR_T
     mrtstr_lock_t *s1lock;
     pthread_mutex_t *s1mutex;
 
-    mrtstr_cmpres_t *res;
+    mrtstr_bres_t *res;
 };
 typedef struct __MRTSTR_EQUAL_STR_T *mrtstr_equal_str_t;
 
@@ -61,7 +61,7 @@ typedef struct __MRTSTR_EQUAL_STR_T *mrtstr_equal_str_t;
 void mrtstr_equal_threaded(void *args);
 void mrtstr_equal_str_threaded(void *args);
 
-void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
+void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
 {
     res->lock = 0;
     res->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -305,7 +305,7 @@ void mrtstr_equal(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_ct str2)
     str2->forced = MRTSTR_FALSE;
 }
 
-void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
+void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
 {
     res->lock = 0;
     res->mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -446,7 +446,7 @@ void mrtstr_equal_str(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
     str1->forced = MRTSTR_FALSE;
 }
 
-void mrtstr_equal_nstr(mrtstr_cmpres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size)
+void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size)
 {
     res->lock = 0;
     res->mutex = PTHREAD_MUTEX_INITIALIZER;

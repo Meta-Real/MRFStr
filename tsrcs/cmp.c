@@ -36,26 +36,26 @@ struct __MRTSTR_EQUAL_STR_T
 };
 typedef struct __MRTSTR_EQUAL_STR_T *mrtstr_equal_str_t;
 
-#define init_equal_struct                                          \
-    do                                                             \
-    {                                                              \
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_EQUAL_T)); \
-        data->size = size;                                         \
-        data->s1lock = str1->lock + i;                             \
-        data->s1mutex = &str1->mutex;                              \
-        data->s2lock = str2->lock + i;                             \
-        data->s2mutex = &str2->mutex;                              \
-        data->res = res;                                           \
+#define init_equal_struct                                    \
+    do                                                       \
+    {                                                        \
+        data = mrstr_alloc(sizeof(struct __MRTSTR_EQUAL_T)); \
+        data->size = size;                                   \
+        data->s1lock = str1->lock + i;                       \
+        data->s1mutex = &str1->mutex;                        \
+        data->s2lock = str2->lock + i;                       \
+        data->s2mutex = &str2->mutex;                        \
+        data->res = res;                                     \
     } while (0)
 
-#define init_equal_str_struct                                          \
-    do                                                                 \
-    {                                                                  \
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_EQUAL_STR_T)); \
-        data->size = size;                                             \
-        data->s1lock = str1->lock + i;                                 \
-        data->s1mutex = &str1->mutex;                                  \
-        data->res = res;                                               \
+#define init_equal_str_struct                                    \
+    do                                                           \
+    {                                                            \
+        data = mrstr_alloc(sizeof(struct __MRTSTR_EQUAL_STR_T)); \
+        data->size = size;                                       \
+        data->s1lock = str1->lock + i;                           \
+        data->s1mutex = &str1->mutex;                            \
+        data->res = res;                                         \
     } while (0)
 
 void mrtstr_equal_threaded(void *args);
@@ -123,7 +123,7 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                         {
                             res->res = MRTSTR_FALSE;
 
-                            __mrstr_free_una(data);
+                            mrstr_free(data);
                             return;
                         }
 
@@ -137,11 +137,11 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                         {
                             res->res = MRTSTR_FALSE;
 
-                            __mrstr_free_una(data);
+                            mrstr_free(data);
                             return;
                         }
 
-                    __mrstr_free_una(data);
+                    mrstr_free(data);
                 }
                 else
                 {
@@ -171,7 +171,7 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                         {
                             res->res = MRTSTR_FALSE;
 
-                            __mrstr_free_una(data);
+                            mrstr_free(data);
                             return;
                         }
 
@@ -185,11 +185,11 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                         {
                             res->res = MRTSTR_FALSE;
 
-                            __mrstr_free_una(data);
+                            mrstr_free(data);
                             return;
                         }
 
-                    __mrstr_free_una(data);
+                    mrstr_free(data);
                 }
                 else
                 {
@@ -220,7 +220,7 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
@@ -234,11 +234,11 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -280,7 +280,7 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -364,7 +364,7 @@ void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
@@ -378,11 +378,11 @@ void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -423,7 +423,7 @@ void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -504,7 +504,7 @@ void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, 
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
@@ -518,11 +518,11 @@ void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, 
                     {
                         res->res = MRTSTR_FALSE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -563,7 +563,7 @@ void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, 
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -599,7 +599,7 @@ void mrtstr_equal_threaded(void *args)
             mrtstr_lock_dec(*data->s2lock, data->s2mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
@@ -612,7 +612,7 @@ void mrtstr_equal_threaded(void *args)
                 mrtstr_lock_dec(*data->s2lock, data->s2mutex);
                 mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
                 return;
             }
 
@@ -625,7 +625,7 @@ void mrtstr_equal_threaded(void *args)
         mrtstr_lock_dec(*data->s2lock, data->s2mutex);
         mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-        __mrstr_free_una(data);
+        mrstr_free(data);
         return;
     }
 
@@ -638,7 +638,7 @@ void mrtstr_equal_threaded(void *args)
             mrtstr_lock_dec(*data->s2lock, data->s2mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
@@ -646,7 +646,7 @@ void mrtstr_equal_threaded(void *args)
     mrtstr_lock_dec(*data->s2lock, data->s2mutex);
     mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
 }
 
 void mrtstr_equal_str_threaded(void *args)
@@ -661,7 +661,7 @@ void mrtstr_equal_str_threaded(void *args)
             mrtstr_lock_dec(*data->s1lock, data->s1mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
@@ -673,7 +673,7 @@ void mrtstr_equal_str_threaded(void *args)
                 mrtstr_lock_dec(*data->s1lock, data->s1mutex);
                 mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
                 return;
             }
 
@@ -685,7 +685,7 @@ void mrtstr_equal_str_threaded(void *args)
         mrtstr_lock_dec(*data->s1lock, data->s1mutex);
         mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-        __mrstr_free_una(data);
+        mrstr_free(data);
         return;
     }
 
@@ -697,12 +697,12 @@ void mrtstr_equal_str_threaded(void *args)
             mrtstr_lock_dec(*data->s1lock, data->s1mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
     mrtstr_lock_dec(*data->s1lock, data->s1mutex);
     mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
 }

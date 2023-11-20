@@ -37,10 +37,10 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
     if (res->alloc <= count)
     {
         if (res->alloc)
-            __mrstr_free(res->data);
+            mrstr_mm_free(res->data);
 
         res->alloc = count + 1;
-        res->data = __mrstr_alloc(res->alloc);
+        res->data = mrstr_mm_alloc(res->alloc, MRFSTR_SIMD_OFF);
     }
 
     mrfstr_simd_block_t *rblock = (mrfstr_simd_block_t*)res->data;
@@ -71,7 +71,7 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
     mrfstr_repeat_chr_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_REPEAT_CHR_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_REPEAT_CHR_T));
         data->res = rblock;
         data->block = block;
         data->size = count;
@@ -98,7 +98,7 @@ void *mrfstr_repeat_chr_threaded(void *args)
     for (; data->size; data->res++, data->size--)
         mrfstr_simd_stream_func(data->res, data->block);
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
     return NULL;
 }
 #endif

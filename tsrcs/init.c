@@ -9,17 +9,17 @@
 
 mrtstr_t mrtstr_init()
 {
-    mrtstr_t str = __mrstr_alloc_una(sizeof(struct __MRTSTR_T));
+    mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
     str->size = 0;
     str->alloc = 0;
-    str->lock = __mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
+    str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
     pthread_mutex_init(&str->mutex, NULL);
     return str;
 }
 
 mrtstr_t mrtstr_init2(mrtstr_data_t data)
 {
-    mrtstr_t str = __mrstr_alloc_una(sizeof(struct __MRTSTR_T));
+    mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
 
     if (data)
     {
@@ -33,14 +33,14 @@ mrtstr_t mrtstr_init2(mrtstr_data_t data)
         str->alloc = 0;
     }
 
-    str->lock = __mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
+    str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
     pthread_mutex_init(&str->mutex, NULL);
     return str;
 }
 
 mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
 {
-    mrtstr_t str = __mrstr_alloc_una(sizeof(struct __MRTSTR_T));
+    mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
 
     if (data)
     {
@@ -54,7 +54,7 @@ mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
         str->alloc = 0;
     }
 
-    str->lock = __mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
+    str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
     pthread_mutex_init(&str->mutex, NULL);
     return str;
 }
@@ -64,10 +64,10 @@ void mrtstr_clear(mrtstr_t str)
     for (; mrtstr_locked(str););
 
     if (str->alloc)
-        __mrstr_free(str->data);
+        mrstr_mm_free(str->data);
 
-    __mrstr_free_una((void*)str->lock);
-    __mrstr_free_una(str);
+    mrstr_free((void*)str->lock);
+    mrstr_free(str);
 }
 
 void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size)
@@ -80,7 +80,7 @@ void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size)
     if (!size)
     {
         if (str->alloc)
-            __mrstr_free(str->data);
+            mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
@@ -89,12 +89,12 @@ void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(size);
+        str->data = mrstr_mm_alloc(size, MRTSTR_SIMD_OFF);
         str->alloc = size;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRTSTR_SIMD_OFF);
     str->alloc = size;
 
     if (size <= str->size)
@@ -113,12 +113,12 @@ void mrtstr_expand(mrtstr_t str, mrtstr_size_t size)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(size);
+        str->data = mrstr_mm_alloc(size, MRTSTR_SIMD_OFF);
         str->alloc = size;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRTSTR_SIMD_OFF);
     str->alloc = size;
 }
 
@@ -131,13 +131,13 @@ void mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(add);
+        str->data = mrstr_mm_alloc(add, MRTSTR_SIMD_OFF);
         str->alloc = add;
         return;
     }
 
     str->alloc += add;
-    str->data = __mrstr_realloc(str->data, str->alloc);
+    str->data = mrstr_mm_realloc(str->data, str->alloc, MRTSTR_SIMD_OFF);
 }
 
 void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size)
@@ -149,14 +149,14 @@ void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size)
 
     if (!size)
     {
-        __mrstr_free(str->data);
+        mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRTSTR_SIMD_OFF);
     str->alloc = size;
 
     if (size <= str->size)
@@ -175,7 +175,7 @@ void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
 
     if (sub >= str->alloc)
     {
-        __mrstr_free(str->data);
+        mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
@@ -183,7 +183,7 @@ void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
     }
 
     str->alloc -= sub;
-    str->data = __mrstr_realloc(str->data, str->alloc);
+    str->data = mrstr_mm_realloc(str->data, str->alloc, MRTSTR_SIMD_OFF);
 
     if (str->alloc <= str->size)
     {

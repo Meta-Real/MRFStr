@@ -37,10 +37,10 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src->data;
@@ -69,7 +69,7 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     mrfstr_set_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -105,10 +105,10 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;
@@ -137,7 +137,7 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     mrfstr_set_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -171,10 +171,10 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;
@@ -204,7 +204,7 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     mrfstr_set_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_SET_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_SET_T));
         data->src = sblock;
         data->dst = dblock;
         data->size = size;
@@ -231,7 +231,7 @@ void *mrfstr_set_threaded(void *args)
     for (; data->size; data->src++, data->dst++, data->size--)
         mrfstr_simd_stream_func(data->dst, *data->src);
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
     return NULL;
 }
 #endif

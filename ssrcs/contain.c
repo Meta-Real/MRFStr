@@ -58,7 +58,7 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
     mrfstr_contain_chr_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_CONTAIN_CHR_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_CONTAIN_CHR_T));
         data->str = sblock;
         data->chr = cblock;
         data->size = size;
@@ -89,7 +89,7 @@ void *mrfstr_contain_chr_threaded(void *args)
     {
         if (*data->res)
         {
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return NULL;
         }
 
@@ -98,7 +98,7 @@ void *mrfstr_contain_chr_threaded(void *args)
             {
                 *data->res = MRFSTR_TRUE;
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
                 return NULL;
             }
 
@@ -107,7 +107,7 @@ void *mrfstr_contain_chr_threaded(void *args)
 
     if (*data->res)
     {
-        __mrstr_free_una(data);
+        mrstr_free(data);
         return NULL;
     }
 
@@ -116,11 +116,11 @@ void *mrfstr_contain_chr_threaded(void *args)
         {
             *data->res = MRFSTR_TRUE;
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return NULL;
         }
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
     return NULL;
 }
 #endif

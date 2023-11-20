@@ -61,7 +61,7 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
     mrfstr_equal_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -121,7 +121,7 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
     mrfstr_equal_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -180,7 +180,7 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
     mrfstr_equal_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRFSTR_EQUAL_T));
+        data = mrstr_alloc(sizeof(struct __MRFSTR_EQUAL_T));
         data->str1 = s1block;
         data->str2 = s2block;
         data->size = size;
@@ -213,7 +213,7 @@ void *mrfstr_equal_threaded(void *args)
     {
         if (!*data->res)
         {
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return NULL;
         }
 
@@ -222,7 +222,7 @@ void *mrfstr_equal_threaded(void *args)
             {
                 *data->res = MRFSTR_FALSE;
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
                 return NULL;
             }
 
@@ -231,7 +231,7 @@ void *mrfstr_equal_threaded(void *args)
 
     if (!*data->res)
     {
-        __mrstr_free_una(data);
+        mrstr_free(data);
         return NULL;
     }
 
@@ -240,11 +240,11 @@ void *mrfstr_equal_threaded(void *args)
         {
             *data->res = MRFSTR_FALSE;
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return NULL;
         }
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
     return NULL;
 }
 #endif

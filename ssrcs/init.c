@@ -3,13 +3,13 @@
     MetaReal Fast String Library
 */
 
-#include <mrfstr.h>
+#include <mrfstr-intern.h>
 #include <alloc.h>
 #include <string.h>
 
 mrfstr_t mrfstr_init()
 {
-    mrfstr_t str = __mrstr_alloc_una(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
     str->alloc = 0;
     str->size = 0;
     return str;
@@ -17,7 +17,7 @@ mrfstr_t mrfstr_init()
 
 mrfstr_t mrfstr_init2(mrfstr_data_t data)
 {
-    mrfstr_t str = __mrstr_alloc_una(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
 
     if (!data)
     {
@@ -34,7 +34,7 @@ mrfstr_t mrfstr_init2(mrfstr_data_t data)
 
 mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
 {
-    mrfstr_t str = __mrstr_alloc_una(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
 
     if (!data)
     {
@@ -52,8 +52,8 @@ mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
 void mrfstr_clear(mrfstr_t str)
 {
     if (str->alloc)
-        __mrstr_free(str->data);
-    __mrstr_free_una(str);
+        mrstr_mm_free(str->data);
+    mrstr_free(str);
 }
 
 void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
@@ -64,7 +64,7 @@ void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
     if (!size)
     {
         if (str->alloc)
-            __mrstr_free(str->data);
+            mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
@@ -73,19 +73,19 @@ void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(size);
+        str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
         str->alloc = size;
         return;
     }
 
     if (size > str->alloc)
     {
-        str->data = __mrstr_realloc(str->data, size);
+        str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
         str->alloc = size;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
     str->alloc = size;
 
     if (size <= str->size)
@@ -102,12 +102,12 @@ void mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(size);
+        str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
         str->alloc = size;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
     str->alloc = size;
 }
 
@@ -118,13 +118,13 @@ void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
 
     if (!str->alloc)
     {
-        str->data = __mrstr_alloc(add);
+        str->data = mrstr_mm_alloc(add, MRFSTR_SIMD_OFF);
         str->alloc = add;
         return;
     }
 
     str->alloc += add;
-    str->data = __mrstr_realloc(str->data, str->alloc);
+    str->data = mrstr_mm_realloc(str->data, str->alloc, MRFSTR_SIMD_OFF);
 }
 
 void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
@@ -134,14 +134,14 @@ void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
 
     if (!size)
     {
-        __mrstr_free(str->data);
+        mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
         return;
     }
 
-    str->data = __mrstr_realloc(str->data, size);
+    str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
     str->alloc = size;
 
     if (size <= str->size)
@@ -158,7 +158,7 @@ void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
 
     if (sub >= str->alloc)
     {
-        __mrstr_free(str->data);
+        mrstr_mm_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
@@ -166,7 +166,7 @@ void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
     }
 
     str->alloc -= sub;
-    str->data = __mrstr_realloc(str->data, str->alloc);
+    str->data = mrstr_mm_realloc(str->data, str->alloc, MRFSTR_SIMD_OFF);
 
     if (str->alloc <= str->size)
     {

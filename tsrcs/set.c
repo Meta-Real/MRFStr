@@ -51,10 +51,10 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRTSTR_SIMD_OFF);
     }
 
     mrtstr_simd_block_t *sblock = (mrtstr_simd_block_t*)src->data;
@@ -83,7 +83,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
         {
             for (; src->lock[i];);
 
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_T));
+            data = mrstr_alloc(sizeof(struct __MRTSTR_SET_T));
             data->size = size;
             data->slock = src->lock + i;
             data->smutex = &src->mutex;
@@ -102,7 +102,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
                 for (; data->size; sblock++, dblock++, data->size--)
                     mrtstr_simd_stream_func(dblock, *sblock);
 
-                __mrstr_free(data);
+                mrstr_free(data);
             }
             else
             {
@@ -120,7 +120,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
     else
         for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_T));
+            data = mrstr_alloc(sizeof(struct __MRTSTR_SET_T));
             data->size = size;
             data->slock = src->lock + i;
             data->smutex = &src->mutex;
@@ -139,7 +139,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
                 for (; data->size; sblock++, dblock++, data->size--)
                     mrtstr_simd_stream_func(dblock, *sblock);
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -181,10 +181,10 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRTSTR_SIMD_OFF);
     }
 
     mrtstr_simd_block_t *sblock = (mrtstr_simd_block_t*)src;
@@ -210,7 +210,7 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     mrtstr_set_str_t data;
     for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_STR_T));
+        data = mrstr_alloc(sizeof(struct __MRTSTR_SET_STR_T));
         data->size = size;
         data->lock = dst->lock + i;
 
@@ -227,7 +227,7 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
             for (; data->size; sblock++, dblock++, data->size--)
                 mrtstr_simd_stream_func(dblock, *sblock);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
         }
         else
         {
@@ -264,10 +264,10 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            __mrstr_free(dst->data);
+            mrstr_mm_free(dst->data);
 
         dst->alloc = size;
-        dst->data = __mrstr_alloc(dst->alloc);
+        dst->data = mrstr_mm_alloc(dst->alloc, MRTSTR_SIMD_OFF);
     }
 
     mrtstr_simd_block_t *sblock = (mrtstr_simd_block_t*)src;
@@ -294,7 +294,7 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
     mrtstr_set_str_t data;
     for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
     {
-        data = __mrstr_alloc_una(sizeof(struct __MRTSTR_SET_STR_T));
+        data = mrstr_alloc(sizeof(struct __MRTSTR_SET_STR_T));
         data->size = size;
         data->lock = dst->lock + i;
 
@@ -311,7 +311,7 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
             for (; data->size; sblock++, dblock++, data->size--)
                 mrtstr_simd_stream_func(dblock, *sblock);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
         }
         else
         {
@@ -342,7 +342,7 @@ void mrtstr_set_threaded(void *args)
     mrtstr_lock_dec(*data->slock, data->smutex);
     *data->dlock = 0;
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
 }
 
 void mrtstr_set_str_threaded(void *args)
@@ -353,5 +353,5 @@ void mrtstr_set_str_threaded(void *args)
         mrtstr_simd_stream_func(data->dst, *data->src);
 
     *data->lock = 0;
-    __mrstr_free_una(data);
+    mrstr_free(data);
 }

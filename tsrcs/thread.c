@@ -14,7 +14,7 @@ void *mrtstr_thread_main(void *args);
 
 void mrtstr_init_threads(mrtstr_size_t size)
 {
-    mrtstr_threads.threads = __mrstr_alloc_una(size * sizeof(mrtstr_thread_t));
+    mrtstr_threads.threads = mrstr_alloc(size * sizeof(mrtstr_thread_t));
     for (mrtstr_size_t i = 0; i < size; i++)
     {
         THREAD(i).func = NULL;
@@ -52,7 +52,7 @@ void mrtstr_free_threads()
     for (i = 0; i < mrtstr_threads.size; i++)
         pthread_join(THREAD(i).id, NULL);
 
-    __mrstr_free_una(mrtstr_threads.threads);
+    mrstr_free(mrtstr_threads.threads);
 }
 
 void *mrtstr_thread_main(void *args)

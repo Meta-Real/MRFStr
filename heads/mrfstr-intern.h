@@ -13,12 +13,13 @@
 
 typedef __m512i mrfstr_simd_block_t;
 
+#define MRFSTR_SIMD_OFF 64
 #define MRFSTR_SIMD_MASK 63
 #define MRFSTR_SIMD_SHIFT 6
 
 #if MRFSTR_THREADING
 #define MRFSTR_THREAD_LIMIT (4194368 * MRFSTR_THREAD_COUNT - 1)
-#define MRFSTR_THREAD_CHUNK (64 * MRFSTR_THREAD_COUNT)
+#define MRFSTR_THREAD_CHUNK (MRFSTR_SIMD_OFF * MRFSTR_THREAD_COUNT)
 #endif
 
 #define mrfstr_simd_set1_func _mm512_set1_epi8
@@ -31,12 +32,13 @@ typedef __m512i mrfstr_simd_block_t;
 
 typedef __m256i mrfstr_simd_block_t;
 
+#define MRFSTR_SIMD_OFF 32
 #define MRFSTR_SIMD_MASK 31
 #define MRFSTR_SIMD_SHIFT 5
 
 #if MRFSTR_THREADING
 #define MRFSTR_THREAD_LIMIT (2097184 * MRFSTR_THREAD_COUNT - 1)
-#define MRFSTR_THREAD_CHUNK (32 * MRFSTR_THREAD_COUNT)
+#define MRFSTR_THREAD_CHUNK (MRFSTR_SIMD_OFF * MRFSTR_THREAD_COUNT)
 #endif
 
 #define mrfstr_simd_set1_func _mm256_set1_epi8
@@ -48,12 +50,13 @@ typedef __m256i mrfstr_simd_block_t;
 
 typedef __m128i mrfstr_simd_block_t;
 
+#define MRFSTR_SIMD_OFF 16
 #define MRFSTR_SIMD_MASK 15
 #define MRFSTR_SIMD_SHIFT 4
 
 #if MRFSTR_THREADING
 #define MRFSTR_THREAD_LIMIT (1048592 * MRFSTR_THREAD_COUNT - 1)
-#define MRFSTR_THREAD_CHUNK (16 * MRFSTR_THREAD_COUNT)
+#define MRFSTR_THREAD_CHUNK (MRFSTR_SIMD_OFF * MRFSTR_THREAD_COUNT)
 #endif
 
 #define mrfstr_simd_set1_func _mm_set1_epi8

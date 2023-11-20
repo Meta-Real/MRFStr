@@ -68,7 +68,7 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
         {
             for (; str->lock[i];);
 
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_CONTAIN_CHR_T));
+            data = mrstr_alloc(sizeof(struct __MRTSTR_CONTAIN_CHR_T));
             data->chr = block;
             data->size = size;
             data->lock = str->lock + i;
@@ -82,7 +82,7 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
                     {
                         res->res = MRTSTR_TRUE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
@@ -96,11 +96,11 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
                     {
                         res->res = MRTSTR_TRUE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -115,7 +115,7 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
     else
         for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
-            data = __mrstr_alloc_una(sizeof(struct __MRTSTR_CONTAIN_CHR_T));
+            data = mrstr_alloc(sizeof(struct __MRTSTR_CONTAIN_CHR_T));
             data->chr = block;
             data->size = size;
             data->lock = str->lock + i;
@@ -129,7 +129,7 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
                     {
                         res->res = MRTSTR_TRUE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
@@ -143,11 +143,11 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
                     {
                         res->res = MRTSTR_TRUE;
 
-                        __mrstr_free_una(data);
+                        mrstr_free(data);
                         return;
                     }
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
             }
             else
             {
@@ -179,7 +179,7 @@ void mrtstr_contain_chr_threaded(void *args)
             mrtstr_lock_dec(*data->lock, data->mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
@@ -191,7 +191,7 @@ void mrtstr_contain_chr_threaded(void *args)
                 mrtstr_lock_dec(*data->lock, data->mutex);
                 mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-                __mrstr_free_una(data);
+                mrstr_free(data);
                 return;
             }
 
@@ -203,7 +203,7 @@ void mrtstr_contain_chr_threaded(void *args)
         mrtstr_lock_dec(*data->lock, data->mutex);
         mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-        __mrstr_free_una(data);
+        mrstr_free(data);
         return;
     }
 
@@ -215,12 +215,12 @@ void mrtstr_contain_chr_threaded(void *args)
             mrtstr_lock_dec(*data->lock, data->mutex);
             mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-            __mrstr_free_una(data);
+            mrstr_free(data);
             return;
         }
 
     mrtstr_lock_dec(*data->lock, data->mutex);
     mrtstr_lock_dec(data->res->lock, &data->res->mutex);
 
-    __mrstr_free_una(data);
+    mrstr_free(data);
 }

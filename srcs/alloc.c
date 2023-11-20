@@ -7,27 +7,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void *__mrstr_alloc(uint64_t size)
-{
-    void *block = _aligned_malloc(size, 64);
-    if (!block)
-    {
-        fprintf(stderr,
-            "MRStr Library, __mrstr_alloc function: Could not allocate %llu bytes from memory",
-            size);
-        abort();
-    }
-
-    return block;
-}
-
-void *__mrstr_alloc_una(uint64_t size)
+ptr_t mrstr_alloc(mrstr_size_t size)
 {
     void *block = malloc(size);
     if (!block)
     {
         fprintf(stderr,
-            "MRStr Library, __mrstr_alloc_una function: Could not allocate %llu bytes from memory",
+            "MRStr Library, mrstr_alloc function: Could not allocate %llu bytes from memory",
             size);
         abort();
     }
@@ -35,13 +21,27 @@ void *__mrstr_alloc_una(uint64_t size)
     return block;
 }
 
-void *__mrstr_calloc(uint64_t count, uint64_t unit)
+ptr_t mrstr_mm_alloc(mrstr_size_t size, mrstr_size_t off)
+{
+    void *block = malloc(size);
+    if (!block)
+    {
+        fprintf(stderr,
+            "MRStr Library, mrstr_mm_alloc function: Could not allocate %llu bytes from memory",
+            size);
+        abort();
+    }
+
+    return block;
+}
+
+ptr_t mrstr_calloc(mrstr_size_t count, mrstr_size_t unit)
 {
     void *block = calloc(count, unit);
     if (!block)
     {
         fprintf(stderr,
-            "MRStr Library, __mrstr_calloc function: Could not allocate %llu bytes from memory",
+            "MRStr Library, mrstr_calloc function: Could not allocate %llu bytes from memory",
             count * unit);
         abort();
     }
@@ -49,27 +49,13 @@ void *__mrstr_calloc(uint64_t count, uint64_t unit)
     return block;
 }
 
-void *__mrstr_realloc(void *block, uint64_t size)
-{
-    block = _aligned_realloc(block, size, 64);
-    if (!block)
-    {
-        fprintf(stderr,
-            "MRStr Library, __mrstr_realloc function: Could not allocate %llu bytes from memory",
-            size);
-        abort();
-    }
-
-    return block;
-}
-
-void *__mrstr_realloc_una(void *block, uint64_t size)
+ptr_t mrstr_realloc(ptr_t block, mrstr_size_t size)
 {
     block = realloc(block, size);
     if (!block)
     {
         fprintf(stderr,
-            "MRStr Library, __mrstr_realloc_una function: Could not allocate %llu bytes from memory",
+            "MRStr Library, mrstr_realloc function: Could not allocate %llu bytes from memory",
             size);
         abort();
     }
@@ -77,12 +63,26 @@ void *__mrstr_realloc_una(void *block, uint64_t size)
     return block;
 }
 
-void __mrstr_free(void *block)
+ptr_t mrstr_mm_realloc(ptr_t block, mrstr_size_t size, mrstr_size_t off)
 {
-    _aligned_free(block);
+    block = realloc(block, size);
+    if (!block)
+    {
+        fprintf(stderr,
+            "MRStr Library, mrstr_mm_realloc function: Could not allocate %llu bytes from memory",
+            size);
+        abort();
+    }
+
+    return block;
 }
 
-void __mrstr_free_una(void *block)
+void mrstr_free(ptr_t block)
+{
+    free(block);
+}
+
+void mrstr_mm_free(ptr_t block)
 {
     free(block);
 }

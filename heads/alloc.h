@@ -8,15 +8,18 @@
 
 #include <stdint.h>
 
-void *__mrstr_alloc(uint64_t size);
-void *__mrstr_alloc_una(uint64_t size);
+typedef uint64_t mrstr_size_t;
+typedef void *ptr_t;
 
-void *__mrstr_calloc(uint64_t count, uint64_t unit);
+ptr_t mrstr_alloc(mrstr_size_t size);
+ptr_t mrstr_mm_alloc(mrstr_size_t size, mrstr_size_t off);
 
-void *__mrstr_realloc(void *block, uint64_t size);
-void *__mrstr_realloc_una(void *block, uint64_t size);
+ptr_t mrstr_calloc(mrstr_size_t count, mrstr_size_t unit);
 
-void __mrstr_free(void *block);
-void __mrstr_free_una(void *block);
+ptr_t mrstr_realloc(ptr_t block, mrstr_size_t size);
+ptr_t mrstr_mm_realloc(ptr_t block, mrstr_size_t size, mrstr_size_t off);
+
+void mrstr_free(ptr_t block);
+void mrstr_mm_free(ptr_t block);
 
 #endif /* __MRSTR_ALLOC__ */

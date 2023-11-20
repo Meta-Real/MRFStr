@@ -24,7 +24,7 @@ void mrtstr_init_threads(mrtstr_size_t size)
 
     mrtstr_threads.size = size;
     mrtstr_threads.free_threads = size;
-    mrtstr_threads.mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&mrtstr_threads.mutex, NULL);
 }
 
 void mrtstr_load_threads(void (*volatile func)(void*), void *args)

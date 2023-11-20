@@ -40,8 +40,8 @@ mrfstr_bool_t mrfstr_equal(mrfstr_ct str1, mrfstr_ct str2)
     if (size <= MRFSTR_THREAD_LIMIT)
     {
 #endif
-        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
-        size >>= MRFSTR_SIMD_CHAR_SHIFT;
+        mrfstr_size_t rem = size & MRFSTR_SIMD_MASK;
+        size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrfstr_simd_cmpneq_func(*s1block, *s2block))
@@ -100,8 +100,8 @@ mrfstr_bool_t mrfstr_equal_str(mrfstr_ct str1, mrfstr_data_ct str2)
     if (size <= MRFSTR_THREAD_LIMIT)
     {
 #endif
-        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
-        size >>= MRFSTR_SIMD_CHAR_SHIFT;
+        mrfstr_size_t rem = size & MRFSTR_SIMD_MASK;
+        size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrfstr_simd_cmpneq_func(*s1block, *s2block))
@@ -159,8 +159,8 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
     if (size <= MRFSTR_THREAD_LIMIT)
     {
 #endif
-        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
-        size >>= MRFSTR_SIMD_CHAR_SHIFT;
+        mrfstr_size_t rem = size & MRFSTR_SIMD_MASK;
+        size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrfstr_simd_cmpneq_func(*s1block, *s2block))

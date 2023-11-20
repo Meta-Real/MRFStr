@@ -37,8 +37,8 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
     if (size <= MRFSTR_THREAD_LIMIT)
     {
 #endif
-        mrfstr_size_t rem = size & MRFSTR_SIMD_CHAR_MASK;
-        size >>= MRFSTR_SIMD_CHAR_SHIFT;
+        mrfstr_size_t rem = size & MRFSTR_SIMD_MASK;
+        size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; sblock++, size--)
             if (mrfstr_simd_cmpeq_mask_func(*sblock, cblock))

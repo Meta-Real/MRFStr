@@ -48,8 +48,8 @@ void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count)
 
     if (count <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = count & MRTSTR_SIMD_CHAR_MASK;
-        count >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = count & MRTSTR_SIMD_MASK;
+        count >>= MRTSTR_SIMD_SHIFT;
 
         for (; count; rblock++, count--)
             mrtstr_simd_stream_func(rblock, block);

@@ -27,7 +27,7 @@ void mrtstr_contain_chr_threaded(void *args);
 void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
 {
     res->lock = 0;
-    res->mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&res->mutex, NULL);
 
     if (!str->size)
     {
@@ -41,8 +41,8 @@ void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
     mrtstr_size_t size = str->size;
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, size--)
             if (mrtstr_simd_cmpeq_mask_func(*sblock, block))

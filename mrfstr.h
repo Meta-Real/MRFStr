@@ -37,6 +37,9 @@ typedef const mrfstr_t mrfstr_ct;
 /* init functions */
 
 mrfstr_t mrfstr_init();
+mrfstr_t mrfstr_init2(mrfstr_data_t data);
+mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size);
+
 void mrfstr_clear(mrfstr_t str);
 
 void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size);
@@ -46,6 +49,8 @@ void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add);
 
 void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size);
 void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
+
+void mrfstr_swap(mrfstr_t str1, mrfstr_t str2);
 
 /* set functions */
 
@@ -68,5 +73,10 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
 /* contain functions */
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
+
+/* util functions */
+
+mrfstr_data_t mrfstr_get_data(mrfstr_ct str);
+mrfstr_size_t mrfstr_get_size(mrfstr_ct str);
 
 #endif /* __MRFSTR__ */

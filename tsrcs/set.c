@@ -62,8 +62,8 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
             mrtstr_simd_stream_func(dblock, *sblock);
@@ -192,8 +192,8 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
             mrtstr_simd_stream_func(dblock, *sblock);
@@ -275,8 +275,8 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
             mrtstr_simd_stream_func(dblock, *sblock);

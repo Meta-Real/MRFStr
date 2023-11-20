@@ -79,6 +79,9 @@ typedef struct __MRTSTR_BRES_T mrtstr_bres_t;
 /* init functions */
 
 mrtstr_t mrtstr_init();
+mrtstr_t mrtstr_init2(mrtstr_data_t data);
+mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size);
+
 void mrtstr_clear(mrtstr_t str);
 
 void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size);
@@ -88,6 +91,8 @@ void mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add);
 
 void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size);
 void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
+
+void mrtstr_swap(mrtstr_ct str1, mrtstr_ct str2);
 
 /* set functions */
 
@@ -110,5 +115,14 @@ void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, 
 /* contain functions */
 
 void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr);
+
+/* util functions */
+
+mrtstr_data_t mrtstr_get_data(mrtstr_ct str);
+mrtstr_size_t mrtstr_get_size(mrtstr_ct str);
+
+mrtstr_bool_t mrtstr_locked(mrtstr_ct str);
+
+mrtstr_bool_t mrtstr_bres_extract(mrtstr_bres_t *res);
 
 #endif /* __MRTSTR__ */

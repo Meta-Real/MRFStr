@@ -64,7 +64,7 @@ void mrtstr_equal_str_threaded(void *args);
 void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
 {
     res->lock = 0;
-    res->mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&res->mutex, NULL);
 
     if (str1->size != str2->size)
     {
@@ -84,8 +84,8 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
     mrtstr_size_t size = str1->size;
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
@@ -308,7 +308,7 @@ void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2)
 void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
 {
     res->lock = 0;
-    res->mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&res->mutex, NULL);
 
     mrtstr_size_t size = strlen(str2);
     if (str1->size != size)
@@ -328,8 +328,8 @@ void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrtstr_simd_cmpneq_func(*s1block, *s2block))
@@ -449,7 +449,7 @@ void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2)
 void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size)
 {
     res->lock = 0;
-    res->mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&res->mutex, NULL);
 
     if (str1->size != size)
     {
@@ -468,8 +468,8 @@ void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, 
 
     if (size <= MRTSTR_THREAD_LIMIT)
     {
-        mrtstr_size_t rem = size & MRTSTR_SIMD_CHAR_MASK;
-        size >>= MRTSTR_SIMD_CHAR_SHIFT;
+        mrtstr_size_t rem = size & MRTSTR_SIMD_MASK;
+        size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; s1block++, s2block++, size--)
             if (mrtstr_simd_cmpneq_func(*s1block, *s2block))

@@ -28,7 +28,6 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }
@@ -96,7 +95,6 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }
@@ -162,7 +160,6 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }

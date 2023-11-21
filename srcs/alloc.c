@@ -23,7 +23,7 @@ ptr_t mrstr_alloc(mrstr_size_t size)
 
 ptr_t mrstr_mm_alloc(mrstr_size_t size, mrstr_size_t off)
 {
-    void *block = malloc(size);
+    void *block = __mingw_aligned_malloc(size, off);
     if (!block)
     {
         fprintf(stderr,
@@ -65,7 +65,7 @@ ptr_t mrstr_realloc(ptr_t block, mrstr_size_t size)
 
 ptr_t mrstr_mm_realloc(ptr_t block, mrstr_size_t size, mrstr_size_t off)
 {
-    block = realloc(block, size);
+    block = __mingw_aligned_realloc(block, size, off);
     if (!block)
     {
         fprintf(stderr,
@@ -84,5 +84,5 @@ void mrstr_free(ptr_t block)
 
 void mrstr_mm_free(ptr_t block)
 {
-    free(block);
+    __mingw_aligned_free(block);
 }

@@ -28,7 +28,6 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
         if (!res->size)
             return;
 
-        *res->data = '\0';
         res->size = 0;
         return;
     }

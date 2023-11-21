@@ -42,7 +42,6 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }
@@ -172,7 +171,6 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }
@@ -255,7 +253,6 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         if (!dst->size)
             return;
 
-        *dst->data = '\0';
         dst->size = 0;
         return;
     }

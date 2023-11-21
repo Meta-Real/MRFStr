@@ -78,15 +78,15 @@ void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
         return;
     }
 
-    if (size > str->alloc)
+    str->alloc = size;
+    if (!str->size)
     {
-        str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
-        str->alloc = size;
+        mrstr_mm_free(str->data);
+        str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
         return;
     }
 
     str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
-    str->alloc = size;
 
     if (size <= str->size)
     {
@@ -107,8 +107,15 @@ void mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
         return;
     }
 
-    str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
     str->alloc = size;
+    if (!str->size)
+    {
+        mrstr_mm_free(str->data);
+        str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
+        return;
+    }
+
+    str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
 }
 
 void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
@@ -124,6 +131,13 @@ void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
     }
 
     str->alloc += add;
+    if (!str->size)
+    {
+        mrstr_mm_free(str->data);
+        str->data = mrstr_mm_alloc(str->alloc, MRFSTR_SIMD_OFF);
+        return;
+    }
+
     str->data = mrstr_mm_realloc(str->data, str->alloc, MRFSTR_SIMD_OFF);
 }
 

@@ -11,8 +11,11 @@ int main()
     mrtstr_init_threads(7);
 
     mrtstr_t a = mrtstr_init();
+    mrtstr_realloc(a, SIZE / 4);
     mrtstr_realloc(a, SIZE + 1);
     mrtstr_repeat_chr(a, 'K', SIZE);
+
+    for (; mrtstr_locked(a););
 
     mrtstr_bres_t r[100];
 

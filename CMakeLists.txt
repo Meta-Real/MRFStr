@@ -14,10 +14,10 @@ set(CMAKE_C_FLAGS_RELEASE "-O3")
 project(MRFStr VERSION 1.0.0)
 
 add_library(MRFStr STATIC srcs/alloc.c
-    ssrcs/init.c ssrcs/set.c
-    ssrcs/repeat.c
-    ssrcs/cmp.c ssrcs/contain.c
-    ssrcs/util.c)
+    fsrcs/init.c fsrcs/set.c
+    fsrcs/repeat.c
+    fsrcs/cmp.c fsrcs/contain.c
+    fsrcs/util.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 
 add_custom_command(TARGET MRFStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy libMRFStr.a ..)

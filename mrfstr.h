@@ -40,15 +40,22 @@ mrfstr_t mrfstr_init();
 mrfstr_t mrfstr_init2(mrfstr_data_t data);
 mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size);
 
+void mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size);
+void mrfstr_free(mrfstr_t str);
 void mrfstr_clear(mrfstr_t str);
 
 void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size);
+void mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size);
 
 void mrfstr_expand(mrfstr_t str, mrfstr_size_t size);
+void mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size);
 void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add);
+void mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add);
 
 void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size);
+void mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size);
 void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
+void mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
 
 void mrfstr_swap(mrfstr_t str1, mrfstr_t str2);
 

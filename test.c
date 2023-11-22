@@ -11,8 +11,7 @@ int main()
     mrtstr_init_threads(7);
 
     mrtstr_t a = mrtstr_init();
-    mrtstr_realloc(a, SIZE / 4);
-    mrtstr_realloc(a, SIZE + 1);
+    mrtstr_alloc(a, SIZE + 1);
     mrtstr_repeat_chr(a, 'K', SIZE);
 
     for (; mrtstr_locked(a););
@@ -33,7 +32,7 @@ int main()
 
     printf("%lf\n", s / 100.0);
 
-    mrtstr_clear(a);
+    mrtstr_free(a);
     mrtstr_free_threads();
     return 0;
 }

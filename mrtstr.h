@@ -82,15 +82,22 @@ mrtstr_t mrtstr_init();
 mrtstr_t mrtstr_init2(mrtstr_data_t data);
 mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size);
 
+void mrtstr_alloc(mrtstr_t str, mrtstr_size_t size);
+void mrtstr_free(mrtstr_t str);
 void mrtstr_clear(mrtstr_t str);
 
 void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size);
+void mrtstr_clear_realloc(mrtstr_t str, mrtstr_size_t size);
 
 void mrtstr_expand(mrtstr_t str, mrtstr_size_t size);
+void mrtstr_clear_expand(mrtstr_t str, mrtstr_size_t size);
 void mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add);
+void mrtstr_clear_expand_add(mrtstr_t str, mrtstr_size_t add);
 
 void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size);
+void mrtstr_clear_shrink(mrtstr_t str, mrtstr_size_t size);
 void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
+void mrtstr_clear_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
 
 void mrtstr_swap(mrtstr_ct str1, mrtstr_ct str2);
 

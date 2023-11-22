@@ -49,11 +49,25 @@ mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
     return str;
 }
 
-void mrfstr_clear(mrfstr_t str)
+void mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size)
+{
+    if (!size)
+        return;
+
+    str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
+    str->alloc = size;
+}
+
+void mrfstr_free(mrfstr_t str)
 {
     if (str->alloc)
         mrstr_mm_free(str->data);
     mrstr_free(str);
+}
+
+void mrfstr_clear(mrfstr_t str)
+{
+    str->size = 0;
 }
 
 void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
@@ -95,6 +109,22 @@ void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
     }
 }
 
+void mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size)
+{
+    str->size = 0;
+    if (size == str->alloc)
+        return;
+
+    if (str->alloc)
+        mrstr_mm_free(str->data);
+
+    str->alloc = size;
+    if (!size)
+        return;
+
+    str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
+}
+
 void mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
 {
     if (size == str->alloc)
@@ -118,6 +148,19 @@ void mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
     str->data = mrstr_mm_realloc(str->data, size, MRFSTR_SIMD_OFF);
 }
 
+void mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size)
+{
+    str->size = 0;
+    if (size == str->size)
+        return;
+
+    if (str->alloc)
+        mrstr_mm_free(str->data);
+
+    str->alloc = size;
+    str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
+}
+
 void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
 {
     if (!add)
@@ -139,6 +182,19 @@ void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
     }
 
     str->data = mrstr_mm_realloc(str->data, str->alloc, MRFSTR_SIMD_OFF);
+}
+
+void mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add)
+{
+    str->size = 0;
+    if (!add)
+        return;
+
+    if (str->alloc)
+        mrstr_mm_free(str->data);
+
+    str->alloc += add;
+    str->data = mrstr_mm_alloc(str->alloc, MRFSTR_SIMD_OFF);
 }
 
 void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
@@ -165,6 +221,22 @@ void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
     }
 }
 
+void mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size)
+{
+    str->size = 0;
+    if (size == str->alloc)
+        return;
+
+    if (str->alloc)
+        mrstr_mm_free(str->data);
+
+    str->alloc = size;
+    if (!size)
+        return;
+
+    str->data = mrstr_mm_alloc(size, MRFSTR_SIMD_OFF);
+}
+
 void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
 {
     if (!sub)
@@ -187,6 +259,25 @@ void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
         str->size = str->alloc - 1;
         str->data[str->size] = '\0';
     }
+}
+
+void mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
+{
+    str->size = 0;
+    if (!sub)
+        return;
+
+    if (str->alloc)
+        mrstr_mm_free(str->data);
+
+    if (str->alloc <= sub)
+    {
+        str->alloc = 0;
+        return;
+    }
+
+    str->alloc -= sub;
+    str->data = mrstr_mm_alloc(str->alloc, MRFSTR_SIMD_OFF);
 }
 
 void mrfstr_swap(mrfstr_t str1, mrfstr_t str2)

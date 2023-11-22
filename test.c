@@ -34,5 +34,6 @@ int main()
 
     mrtstr_free(a);
     mrtstr_free_threads();
+    printf("END\n");
     return 0;
 }

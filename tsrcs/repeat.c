@@ -36,10 +36,10 @@ void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count)
     if (res->alloc <= count)
     {
         if (res->alloc)
-            mrstr_mm_free(res->data);
+            mrstr_free(res->data);
 
         res->alloc = count + 1;
-        res->data = mrstr_mm_alloc(res->alloc, MRTSTR_SIMD_OFF);
+        res->data = mrstr_alloc(res->alloc);
     }
 
     mrtstr_simd_block_t *rblock = (mrtstr_simd_block_t*)res->data;

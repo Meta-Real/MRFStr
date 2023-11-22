@@ -36,10 +36,10 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            mrstr_mm_free(dst->data);
+            mrstr_free(dst->data);
 
         dst->alloc = size;
-        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
+        dst->data = mrstr_alloc(dst->alloc);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src->data;
@@ -103,10 +103,10 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            mrstr_mm_free(dst->data);
+            mrstr_free(dst->data);
 
         dst->alloc = size;
-        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
+        dst->data = mrstr_alloc(dst->alloc);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;
@@ -168,10 +168,10 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     if (dst->alloc < size)
     {
         if (dst->alloc)
-            mrstr_mm_free(dst->data);
+            mrstr_free(dst->data);
 
         dst->alloc = size;
-        dst->data = mrstr_mm_alloc(dst->alloc, MRFSTR_SIMD_OFF);
+        dst->data = mrstr_alloc(dst->alloc);
     }
 
     mrfstr_simd_block_t *sblock = (mrfstr_simd_block_t*)src;

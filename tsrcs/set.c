@@ -65,7 +65,7 @@ void mrtstr_set(mrtstr_t dst, mrtstr_ct src)
         size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrtstr_simd_stream_func(dblock, *sblock);
+            mrtstr_simd_store_func(dblock, *sblock);
 
         memcpy((mrtstr_data_t)dblock, (mrtstr_data_t)sblock, rem);
         return;
@@ -194,7 +194,7 @@ void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
         size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrtstr_simd_stream_func(dblock, *sblock);
+            mrtstr_simd_store_func(dblock, *sblock);
 
         memcpy((mrtstr_data_t)dblock, (mrtstr_data_t)sblock, rem);
         return;
@@ -276,7 +276,7 @@ void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         size >>= MRTSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrtstr_simd_stream_func(dblock, *sblock);
+            mrtstr_simd_store_func(dblock, *sblock);
 
         mrtstr_data_t dptr = (mrtstr_data_t)dblock;
         memcpy(dptr, (mrtstr_data_t)sblock, rem);

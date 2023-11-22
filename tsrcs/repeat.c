@@ -51,10 +51,10 @@ void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count)
         count >>= MRTSTR_SIMD_SHIFT;
 
         for (; count; rblock++, count--)
-            mrtstr_simd_stream_func(rblock, block);
+            mrtstr_simd_store_func(rblock, block);
 
         mrtstr_data_t rptr = (mrtstr_data_t)rblock;
-        memset(rptr, rem, chr);
+        memset(rptr, chr, rem);
         rptr[rem] = '\0';
         return;
     }

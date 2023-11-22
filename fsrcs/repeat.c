@@ -53,7 +53,7 @@ void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
         count >>= MRFSTR_SIMD_SHIFT;
 
         for (; count; rblock++, count--)
-            mrfstr_simd_stream_func(rblock, block);
+            mrfstr_simd_store_func(rblock, block);
 
         mrfstr_data_t rptr = (mrfstr_data_t)rblock;
         memset(rptr, chr, rem);

@@ -53,7 +53,7 @@ void mrfstr_set(mrfstr_t dst, mrfstr_ct src)
         size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrfstr_simd_stream_func(dblock, *sblock);
+            mrfstr_simd_store_func(dblock, *sblock);
 
         memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
 #if MRFSTR_THREADING
@@ -120,7 +120,7 @@ void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
         size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrfstr_simd_stream_func(dblock, *sblock);
+            mrfstr_simd_store_func(dblock, *sblock);
 
         memcpy((mrfstr_data_t)dblock, (mrfstr_data_t)sblock, rem);
 #if MRFSTR_THREADING
@@ -185,7 +185,7 @@ void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         size >>= MRFSTR_SIMD_SHIFT;
 
         for (; size; sblock++, dblock++, size--)
-            mrfstr_simd_stream_func(dblock, *sblock);
+            mrfstr_simd_store_func(dblock, *sblock);
 
         mrfstr_data_t dptr = (mrfstr_data_t)dblock;
         memcpy(dptr, (mrfstr_data_t)sblock, rem);

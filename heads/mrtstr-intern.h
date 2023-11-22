@@ -20,7 +20,8 @@ typedef __m512i mrtstr_simd_block_t;
 #define MRTSTR_THREAD_CHUNK (64 * MRTSTR_THREAD_COUNT)
 
 #define mrtstr_simd_set1_func _mm512_set1_epi8
-#define mrtstr_simd_stream_func _mm512_storeu_si512
+#define mrtstr_simd_stream_func _mm512_stream_si512
+#define mrtstr_simd_store_func _mm512_store_si512
 #define mrtstr_simd_cmpneq_func _mm512_cmpneq_epi64_mask
 #define mrtstr_simd_cmpeq_mask_func _mm512_cmpeq_epi8_mask
 
@@ -36,7 +37,8 @@ typedef __m256i mrtstr_simd_block_t;
 #define MRTSTR_THREAD_CHUNK (32 * MRTSTR_THREAD_COUNT)
 
 #define mrtstr_simd_set1_func _mm256_set1_epi8
-#define mrtstr_simd_stream_func _mm256_storeu_si256
+#define mrtstr_simd_stream_func _mm256_stream_si256
+#define mrtstr_simd_store_func _mm256_store_si256
 #define mrtstr_simd_cmpneq_func(x, y) (~_mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y)))
 #define mrtstr_simd_cmpeq_mask_func(x, y) _mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y))
 
@@ -51,7 +53,8 @@ typedef __m128i mrtstr_simd_block_t;
 #define MRTSTR_THREAD_CHUNK (16 * MRTSTR_THREAD_COUNT)
 
 #define mrtstr_simd_set1_func _mm_set1_epi8
-#define mrtstr_simd_stream_func _mm_storeu_si128
+#define mrtstr_simd_stream_func _mm_stream_si128
+#define mrtstr_simd_store_func _mm_store_si128
 #define mrtstr_simd_cmpneq_func(x, y) (~_mm_movemask_epi8(_mm_cmpeq_epi8(x, y)))
 #define mrtstr_simd_cmpeq_mask_func(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
 

@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr.h>
+#include <stddef.h>
 
 mrfstr_data_t mrfstr_get_data(mrfstr_ct str)
 {

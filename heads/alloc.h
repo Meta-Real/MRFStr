@@ -6,9 +6,7 @@
 #ifndef __MRSTR_ALLOC__
 #define __MRSTR_ALLOC__
 
-#include <stdint.h>
-
-typedef uint64_t mrstr_size_t;
+typedef unsigned long long mrstr_size_t;
 typedef void *ptr_t;
 
 ptr_t mrstr_alloc(mrstr_size_t size);

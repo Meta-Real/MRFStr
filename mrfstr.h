@@ -6,15 +6,13 @@
 #ifndef __MRFSTR__
 #define __MRFSTR__
 
-#include <stdint.h>
-
 typedef char mrfstr_chr_t;
 typedef mrfstr_chr_t *mrfstr_data_t;
 typedef const mrfstr_data_t mrfstr_data_ct;
 
-typedef uint64_t mrfstr_size_t;
-typedef uint8_t mrfstr_bit_t;
-typedef uint8_t mrfstr_bool_t;
+typedef unsigned long long mrfstr_size_t;
+typedef unsigned char mrfstr_bit_t;
+typedef unsigned char mrfstr_bool_t;
 
 #define MRFSTR_TRUE 1
 #define MRFSTR_FALSE 0

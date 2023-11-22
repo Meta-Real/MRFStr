@@ -7,10 +7,9 @@
 #define __MRTSTR__
 
 #include <pthread.h>
-#include <stdint.h>
 
-typedef uint64_t mrtstr_size_t;
-typedef uint8_t mrtstr_bool_t;
+typedef unsigned long long mrtstr_size_t;
+typedef unsigned char mrtstr_bool_t;
 
 #define MRTSTR_TRUE 1
 #define MRTSTR_FALSE 0
@@ -48,7 +47,7 @@ typedef char mrtstr_chr_t;
 typedef mrtstr_chr_t *mrtstr_data_t;
 typedef const mrtstr_data_t mrtstr_data_ct;
 
-typedef uint8_t mrtstr_bit_t;
+typedef unsigned char mrtstr_bit_t;
 typedef volatile mrtstr_bit_t mrtstr_lock_t;
 
 struct __MRTSTR_T
@@ -64,7 +63,7 @@ struct __MRTSTR_T
 typedef struct __MRTSTR_T *mrtstr_t;
 typedef const mrtstr_t mrtstr_ct;
 
-typedef uint8_t mrtstr_rbit_t;
+typedef unsigned char mrtstr_rbit_t;
 typedef volatile mrtstr_rbit_t mrtstr_rlock_t;
 
 struct __MRTSTR_BRES_T

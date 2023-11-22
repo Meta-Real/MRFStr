@@ -3,7 +3,7 @@
     MetaReal Fast String Library
 */
 
-#include <mrfstr-intern.h>
+#include <mrfstr.h>
 #include <alloc.h>
 #include <string.h>
 

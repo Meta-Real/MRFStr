@@ -7,8 +7,6 @@
 #include <alloc.h>
 #include <string.h>
 
-#include <stdio.h>
-
 struct __MRTSTR_CONTAIN_CHR_T
 {
     mrtstr_simd_block_t *str;

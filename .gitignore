@@ -1,6 +1,7 @@
 .*
 *.a
 *.exe
+*.out
 
 build
 

@@ -67,4 +67,6 @@ typedef __m128i mrfstr_simd_block_t;
 #endif
 #endif
 
+void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+
 #endif /* __MRFSTR_INTERN__ */

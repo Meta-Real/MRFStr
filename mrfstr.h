@@ -14,6 +14,16 @@ typedef unsigned long long mrfstr_size_t;
 typedef unsigned char mrfstr_bit_t;
 typedef unsigned char mrfstr_bool_t;
 
+struct __MRFSTR_FILE_T
+{
+    void *handle;
+    void *map;
+
+    mrfstr_data_t data;
+    mrfstr_size_t size;
+};
+typedef struct __MRFSTR_FILE_T mrfstr_file_t;
+
 #define MRFSTR_TRUE 1
 #define MRFSTR_FALSE 0
 
@@ -78,6 +88,19 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
 /* contain functions */
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
+
+/* file functions */
+
+mrfstr_file_t mrfstr_openfile_read(mrfstr_data_ct path);
+mrfstr_file_t mrfstr_openfile_write(mrfstr_data_ct path, mrfstr_size_t size);
+void mrfstr_closefile(mrfstr_file_t *file);
+
+void mrfstr_transfer(mrfstr_file_t *dst, mrfstr_file_t *src);
+
+/* io functions */
+
+void mrfstr_import(mrfstr_t str, mrfstr_file_t *file);
+void mrfstr_export(mrfstr_file_t *file, mrfstr_t str);
 
 /* util functions */
 

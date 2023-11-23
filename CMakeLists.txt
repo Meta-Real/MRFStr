@@ -13,10 +13,11 @@ set(CMAKE_C_FLAGS_RELEASE "-O3")
 
 project(MRFStr VERSION 1.0.0)
 
-add_library(MRFStr STATIC srcs/alloc.c
+add_library(MRFStr STATIC srcs/alloc.c fsrcs/intern.c
     fsrcs/init.c fsrcs/set.c
     fsrcs/repeat.c
     fsrcs/cmp.c fsrcs/contain.c
+    fsrcs/file.c fsrcs/io.c
     fsrcs/util.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 

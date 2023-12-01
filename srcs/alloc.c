@@ -9,47 +9,45 @@
 
 ptr_t mrstr_alloc(mrstr_size_t size)
 {
-    void *block = malloc(size);
-    if (!block)
-    {
-        fprintf(stderr,
-            "MRStr Library, mrstr_alloc function: Could not allocate %llu bytes from memory",
-            size);
-        abort();
-    }
-
-    return block;
+    return malloc(size);
 }
 
 ptr_t mrstr_calloc(mrstr_size_t count, mrstr_size_t unit)
 {
-    void *block = calloc(count, unit);
-    if (!block)
-    {
-        fprintf(stderr,
-            "MRStr Library, mrstr_calloc function: Could not allocate %llu bytes from memory",
-            count * unit);
-        abort();
-    }
-
-    return block;
+    return calloc(count, unit);
 }
 
 ptr_t mrstr_realloc(ptr_t block, mrstr_size_t size)
 {
-    block = realloc(block, size);
-    if (!block)
-    {
-        fprintf(stderr,
-            "MRStr Library, mrstr_realloc function: Could not allocate %llu bytes from memory",
-            size);
-        abort();
-    }
-
-    return block;
+    return realloc(block, size);
 }
 
 void mrstr_free(ptr_t block)
 {
     free(block);
+}
+
+ptr_t mrstr_aligned_alloc(mrstr_size_t size, mrstr_size_t align)
+{
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    return _aligned_malloc(size, align);
+#else
+    return NULL;
+#endif
+}
+
+ptr_t mrstr_aligned_realloc(ptr_t block, mrstr_size_t size, mrstr_size_t align)
+{
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    return _aligned_realloc(block, size, align);
+#else
+    return NULL;
+#endif
+}
+
+void mrstr_aligned_free(ptr_t block)
+{
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    _aligned_free(block);
+#endif
 }

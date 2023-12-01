@@ -14,16 +14,6 @@ typedef unsigned long long mrfstr_size_t;
 typedef unsigned char mrfstr_bit_t;
 typedef unsigned char mrfstr_bool_t;
 
-struct __MRFSTR_FILE_T
-{
-    void *handle;
-    void *map;
-
-    mrfstr_data_t data;
-    mrfstr_size_t size;
-};
-typedef struct __MRFSTR_FILE_T mrfstr_file_t;
-
 #define MRFSTR_TRUE 1
 #define MRFSTR_FALSE 0
 
@@ -42,41 +32,48 @@ struct __MRFSTR_T
 typedef struct __MRFSTR_T *mrfstr_t;
 typedef const mrfstr_t mrfstr_ct;
 
+enum __MRFSTR_RES_ENUM
+{
+    MRFSTR_RES_NOERROR,
+    MRFSTR_RES_MEM_ERROR
+};
+typedef unsigned char mrfstr_res_enum_t;
+
 /* init functions */
 
 mrfstr_t mrfstr_init();
 mrfstr_t mrfstr_init2(mrfstr_data_t data);
 mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size);
 
-void mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size);
 void mrfstr_free(mrfstr_t str);
 void mrfstr_clear(mrfstr_t str);
 
-void mrfstr_realloc(mrfstr_t str, mrfstr_size_t size);
-void mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_realloc(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size);
 
-void mrfstr_expand(mrfstr_t str, mrfstr_size_t size);
-void mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size);
-void mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add);
-void mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add);
+mrfstr_res_enum_t mrfstr_expand(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add);
+mrfstr_res_enum_t mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add);
 
-void mrfstr_shrink(mrfstr_t str, mrfstr_size_t size);
-void mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size);
-void mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
-void mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
+mrfstr_res_enum_t mrfstr_shrink(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
+mrfstr_res_enum_t mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub);
 
 void mrfstr_swap(mrfstr_t str1, mrfstr_t str2);
 
 /* set functions */
 
-void mrfstr_set(mrfstr_t dst, mrfstr_ct src);
+mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src);
 
-void mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src);
-void mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src);
+mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
 /* repeat functions */
 
-void mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
+mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
 
 /* cmp functions */
 
@@ -89,18 +86,9 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
 
-/* file functions */
+/* reverse functions */
 
-mrfstr_file_t mrfstr_openfile_read(mrfstr_data_ct path);
-mrfstr_file_t mrfstr_openfile_write(mrfstr_data_ct path, mrfstr_size_t size);
-void mrfstr_closefile(mrfstr_file_t *file);
-
-void mrfstr_transfer(mrfstr_file_t *dst, mrfstr_file_t *src);
-
-/* io functions */
-
-void mrfstr_import(mrfstr_t str, mrfstr_file_t *file);
-void mrfstr_export(mrfstr_file_t *file, mrfstr_t str);
+void mrfstr_reverse(mrfstr_t res, mrfstr_ct str);
 
 /* util functions */
 

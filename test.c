@@ -4,27 +4,34 @@
 #include <string.h>
 #include <time.h>
 
+#define SIZE (1024 * 1024 * 1024)
+#define COUNT 200
+
 int main()
 {
-    mrfstr_file_t f1 = mrfstr_openfile_read("test");
-    mrfstr_file_t f2 = mrfstr_openfile_write("test1", f1.size);
+    mrfstr_t a = mrfstr_init();
+    mrfstr_repeat_chr(a, 'w', SIZE);
 
-    mrfstr_size_t s = 0, i;
-    clock_t t;
-    for (i = 0; i < 100;)
+    //char *s = _aligned_malloc(SIZE + 1, 64);
+    //memset(s, 'w', SIZE);
+    //s[SIZE] = '\0';
+
+    size_t t = 0;
+    clock_t q = clock();
+    for (mrfstr_bit_t i = 0; i < COUNT; i++)
     {
-        t = clock();
-        mrfstr_transfer(&f2, &f1);
-        t = clock() - t;
+        clock_t o = clock();
+        mrfstr_contain_chr(a, 'e');
+        o = clock() - o;
+        t += o;
 
-        printf("test%llu: %ld milliseconds\n", ++i, t);
+        printf("%ld\n", o);
     }
+    printf("%ld\n", clock() - q);
 
-    printf("avg time: %lf milliseconds\n", s / 100.0);
+    printf("AVG: %lf\n", (double)t / COUNT);
 
-    mrfstr_closefile(&f1);
-    mrfstr_closefile(&f2);
-
-    printf("END\n");
+    mrfstr_free(a);
+    //_aligned_free(s);
     return 0;
 }

@@ -5,7 +5,9 @@
 ## MRTStr (MetaReal Threaded String Library) version 1.0.0
 
 MRTStr (MetaReal Threaded String Library) is a library for manipulating, comparing, searching, matching, and classifying strings in C. It's optimized and utilizes all of the power of the CPU. So, MRTStr functions are much faster than the standard string C ones.
+
 The raison d'etre of the MRTStr is for search engines, NLP systems, databases, and file compressors to run as quickly as possible.
+
 MRTStr is asynchronous, meaning that the function calls don't necessarily imply the end of the procedure. To keep things simple, the MRTStr library provides all the essential instructions to avoid program malfunction. So, the programmer usually would not have to interact with the implemented data structures to cause errors accidentally.
 
 ### MRTStr Functions

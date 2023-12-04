@@ -35,7 +35,9 @@ mrtstr_t mrtstr_init2(mrtstr_data_t data)
 ```
 
 It initializes the MRTStr data structure according to the *data*.
+
 The *data* pointer must be aligned and valid or NULL.
+
 The function won't copy the *data*.
 
 ```c
@@ -43,8 +45,11 @@ mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
 ```
 
 It initializes the MRTStr data structure according to the *data* and its *size*. The function design is to avoid the ``strlen`` function call (present in the ``mrtstr_init2`` function).
+
 The *data* pointer must be aligned and valid or NULL.
+
 The function won't copy the *data*.
+
 The *size* must equal the size of the *data*.
 
 ```c
@@ -52,7 +57,9 @@ mrtstr_res_enum_t mrtstr_alloc(mrtstr_t str, mrtstr_size_t size)
 ```
 
 It allocates the *str* according to the *size*. The function returns an error if the process fails.
+
 The *str* pointer must be valid.
+
 The *str* must be initialized and empty.
 
 ```c
@@ -60,5 +67,7 @@ void mrtstr_free(mrtstr_t str)
 ```
 
 It deallocates the *str* and its data.
+
 The *str* pointer must be valid.
+
 The *str* must be initialized.

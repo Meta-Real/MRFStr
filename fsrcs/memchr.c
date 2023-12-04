@@ -38,18 +38,17 @@ typedef __m128i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_cmp(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
 
 #else
-#define MRFSTR_MEMCHR_NOSIMD
 
 typedef unsigned long long mrfstr_memchr_simd_t;
 #define MRFSTR_MEMCHR_SIMD_SIZE 8
 #define MRFSTR_MEMCHR_SIMD_SHIFT 3
 
-#define mrfstr_memchr_set(x, y)                                     \
-    do                                                              \
-    {                                                               \
-        x = y;                                                      \
-        for (mrfstr_bit_t i = 1; i < MRFSTR_CONTAIN_SIMD_SIZE; i++) \
-            x = x << 8 | y;                                         \
+#define mrfstr_memchr_set(x, y)                                    \
+    do                                                             \
+    {                                                              \
+        x = y;                                                     \
+        for (mrfstr_bit_t i = 1; i < MRFSTR_MEMCHR_SIMD_SIZE; i++) \
+            x = x << 8 | y;                                        \
     } while (0)
 
 #define mrfstr_memchr_load(x) *x
@@ -63,8 +62,8 @@ typedef unsigned long long mrfstr_memchr_simd_t;
 #if MRFSTR_THREADING
 #include <pthread.h>
 
-#define MRFSTR_MEMCHR_TLIMIT (65536 * MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT - 1)
 #define MRFSTR_MEMCHR_TCHK (MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
+#define MRFSTR_MEMCHR_TLIMIT (65536 * MRFSTR_MEMCHR_TCHK - 1)
 
 struct __MRFSTR_MEMCHR_T
 {

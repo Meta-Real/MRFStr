@@ -14,9 +14,6 @@ mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
 
     if (!src->size)
     {
-        if (!dst->size)
-            return MRFSTR_RES_NOERROR;
-
         dst->size = 0;
         return MRFSTR_RES_NOERROR;
     }
@@ -42,9 +39,6 @@ mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     mrfstr_size_t size = strlen(src);
     if (!size)
     {
-        if (!dst->size)
-            return MRFSTR_RES_NOERROR;
-
         dst->size = 0;
         return MRFSTR_RES_NOERROR;
     }
@@ -69,9 +63,6 @@ mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_
 {
     if (!size)
     {
-        if (!dst->size)
-            return MRFSTR_RES_NOERROR;
-
         dst->size = 0;
         return MRFSTR_RES_NOERROR;
     }

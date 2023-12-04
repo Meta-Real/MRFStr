@@ -1,27 +1,27 @@
 #include <stdio.h>
-#include <mrfstr.h>
+#include <mrtstr.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 #define SIZE (1024 * 1024 * 1024)
-#define COUNT 200
+#define COUNT 100
 
 int main()
 {
-    mrfstr_t a = mrfstr_init();
-    mrfstr_repeat_chr(a, 'w', SIZE);
+    mrtstr_init_threads(6);
 
-    //char *s = _aligned_malloc(SIZE + 1, 64);
-    //memset(s, 'w', SIZE);
-    //s[SIZE] = '\0';
+    mrtstr_t a = mrtstr_init();
+    mrtstr_alloc(a, SIZE + 1);
+
+    mrtstr_bres_t r[COUNT];
 
     size_t t = 0;
     clock_t q = clock();
-    for (mrfstr_bit_t i = 0; i < COUNT; i++)
+    for (mrtstr_bit_t i = 0; i < COUNT; i++)
     {
         clock_t o = clock();
-        mrfstr_contain_chr(a, 'e');
+        mrtstr_repeat_chr(a, 'W', SIZE);
         o = clock() - o;
         t += o;
 
@@ -31,7 +31,7 @@ int main()
 
     printf("AVG: %lf\n", (double)t / COUNT);
 
-    mrfstr_free(a);
-    //_aligned_free(s);
+    mrtstr_free(a);
+    mrtstr_free_threads();
     return 0;
 }

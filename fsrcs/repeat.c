@@ -11,9 +11,6 @@ mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_
 {
     if (!count)
     {
-        if (!res->size)
-            return MRFSTR_RES_NOERROR;
-
         res->size = 0;
         return MRFSTR_RES_NOERROR;
     }

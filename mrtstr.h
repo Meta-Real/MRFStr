@@ -40,7 +40,6 @@ typedef struct __MRTSTR_THREADS_T mrtstr_threads_t;
 extern mrtstr_threads_t mrtstr_threads;
 
 void mrtstr_init_threads(mrtstr_size_t size);
-void mrtstr_load_threads(void (*volatile func)(void*), void *args);
 void mrtstr_free_threads();
 
 typedef char mrtstr_chr_t;
@@ -63,6 +62,13 @@ struct __MRTSTR_T
 typedef struct __MRTSTR_T *mrtstr_t;
 typedef const mrtstr_t mrtstr_ct;
 
+enum __MRTSTR_RES_ENUM
+{
+    MRTSTR_RES_NOERROR,
+    MRTSTR_RES_MEM_ERROR
+};
+typedef unsigned char mrtstr_res_enum_t;
+
 typedef unsigned char mrtstr_rbit_t;
 typedef volatile mrtstr_rbit_t mrtstr_rlock_t;
 
@@ -81,35 +87,35 @@ mrtstr_t mrtstr_init();
 mrtstr_t mrtstr_init2(mrtstr_data_t data);
 mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size);
 
-void mrtstr_alloc(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_alloc(mrtstr_t str, mrtstr_size_t size);
 void mrtstr_free(mrtstr_t str);
 void mrtstr_clear(mrtstr_t str);
 
-void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size);
-void mrtstr_clear_realloc(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_realloc(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_clear_realloc(mrtstr_t str, mrtstr_size_t size);
 
-void mrtstr_expand(mrtstr_t str, mrtstr_size_t size);
-void mrtstr_clear_expand(mrtstr_t str, mrtstr_size_t size);
-void mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add);
-void mrtstr_clear_expand_add(mrtstr_t str, mrtstr_size_t add);
+mrtstr_res_enum_t mrtstr_expand(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_clear_expand(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add);
+mrtstr_res_enum_t mrtstr_clear_expand_add(mrtstr_t str, mrtstr_size_t add);
 
-void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size);
-void mrtstr_clear_shrink(mrtstr_t str, mrtstr_size_t size);
-void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
-void mrtstr_clear_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
+mrtstr_res_enum_t mrtstr_shrink(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_clear_shrink(mrtstr_t str, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
+mrtstr_res_enum_t mrtstr_clear_shrink_sub(mrtstr_t str, mrtstr_size_t sub);
 
 void mrtstr_swap(mrtstr_ct str1, mrtstr_ct str2);
 
 /* set functions */
 
-void mrtstr_set(mrtstr_t dst, mrtstr_ct src);
+mrtstr_res_enum_t mrtstr_set(mrtstr_t dst, mrtstr_ct src);
 
-void mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src);
-void mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src);
+mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
 
 /* repeat functions */
 
-void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count);
+mrtstr_res_enum_t mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count);
 
 /* cmp functions */
 

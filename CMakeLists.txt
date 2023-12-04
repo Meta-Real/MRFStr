@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -30,6 +30,7 @@ install(FILES mrfstr.h DESTINATION include)
 project(MRTStr VERSION 1.0.0)
 
 add_library(MRTStr STATIC srcs/alloc.c tsrcs/thread.c
+    tsrcs/memcpy.c tsrcs/memcmp.c tsrcs/memchr.c tsrcs/memset.c
     tsrcs/init.c tsrcs/set.c
     tsrcs/repeat.c
     tsrcs/cmp.c tsrcs/contain.c

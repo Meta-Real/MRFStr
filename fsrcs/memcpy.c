@@ -25,13 +25,6 @@ typedef __m256i mrfstr_memcpy_simd_t;
 #define mrfstr_memcpy_load _mm256_loadu_si256
 #define mrfstr_memcpy_store _mm256_stream_si256
 
-typedef __m512i mrfstr_memcmp_simd_t;
-#define MRFSTR_MEMCMP_SIMD_SIZE 64
-#define MRFSTR_MEMCMP_SIMD_SHIFT 6
-
-#define mrfstr_memcmp_load _mm256_loadu_si256
-#define mrfstr_memcmp_cmp(x, y) _mm512_cmpneq_epi64_mask
-
 #elif defined(__SSE2__)
 
 typedef __m128i mrfstr_memcpy_simd_t;
@@ -54,8 +47,8 @@ typedef mrfstr_chr_t mrfstr_memcpy_simd_t;
 #if MRFSTR_THREADING
 #include <pthread.h>
 
-#define MRFSTR_MEMCPY_TLIMIT (65536 * MRFSTR_MEMCPY_SIMD_SIZE * MRFSTR_THREAD_COUNT - 1)
 #define MRFSTR_MEMCPY_TCHK (MRFSTR_MEMCPY_SIMD_SIZE * MRFSTR_THREAD_COUNT)
+#define MRFSTR_MEMCPY_TLIMIT (65536 * MRFSTR_MEMCPY_TCHK - 1)
 
 struct __MRFSTR_MEMCPY_T
 {

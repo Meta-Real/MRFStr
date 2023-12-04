@@ -7,110 +7,31 @@
 #include <alloc.h>
 #include <string.h>
 
-struct __MRTSTR_REPEAT_CHR_T
-{
-    mrtstr_simd_block_t *res;
-    mrtstr_simd_block_t block;
-    mrtstr_size_t size;
-
-    mrtstr_lock_t *lock;
-};
-typedef struct __MRTSTR_REPEAT_CHR_T *mrtstr_repeat_chr_t;
-
-void mrtstr_repeat_chr_threaded(void *args);
-
-void mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count)
+mrtstr_res_enum_t mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count)
 {
     for (; mrtstr_locked(res););
 
     if (!count)
     {
         if (!res->size)
-            return;
+            return MRTSTR_RES_NOERROR;
 
         res->size = 0;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     res->size = count;
     if (res->alloc <= count)
     {
         if (res->alloc)
-            mrstr_free(res->data);
+            mrstr_aligned_free(res->data);
 
         res->alloc = count + 1;
-        res->data = mrstr_alloc(res->alloc);
+        res->data = mrstr_aligned_alloc(res->alloc, MRTSTR_SIMD_SIZE);
+        if (!res->data)
+            return MRTSTR_RES_MEM_ERROR;
     }
 
-    mrtstr_simd_block_t *rblock = (mrtstr_simd_block_t*)res->data;
-    mrtstr_simd_block_t block = mrtstr_simd_set1_func(chr);
-
-    if (count <= MRTSTR_THREAD_LIMIT)
-    {
-        mrtstr_size_t rem = count & MRTSTR_SIMD_MASK;
-        count >>= MRTSTR_SIMD_SHIFT;
-
-        for (; count; rblock++, count--)
-            mrtstr_simd_store_func(rblock, block);
-
-        mrtstr_data_t rptr = (mrtstr_data_t)rblock;
-        memset(rptr, chr, rem);
-        rptr[rem] = '\0';
-        return;
-    }
-
-    mrtstr_size_t rem = count % MRTSTR_THREAD_CHUNK;
-    count /= MRTSTR_THREAD_CHUNK;
-
-    mrtstr_size_t j;
-    mrtstr_bit_t i;
-    mrtstr_repeat_chr_t data;
-    for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
-    {
-        data = mrstr_alloc(sizeof(struct __MRTSTR_REPEAT_CHR_T));
-        data->block = block;
-        data->size = count;
-        data->lock = res->lock + i;
-
-        while (!mrtstr_threads.free_threads && data->size > 65536)
-        {
-            for (j = 0; j < 65536; rblock++, j++)
-                mrtstr_simd_stream_func(rblock, block);
-
-            data->size -= 65536;
-        }
-
-        if (data->size <= 65536)
-        {
-            for (; data->size; rblock++, data->size--)
-                mrtstr_simd_stream_func(rblock, block);
-
-            mrstr_free(data);
-        }
-        else
-        {
-            data->res = rblock;
-            rblock += data->size;
-
-            res->lock[i] = 1;
-            mrtstr_load_threads(mrtstr_repeat_chr_threaded, data);
-        }
-    }
-
-    mrtstr_data_t rptr = (mrtstr_data_t)rblock;
-    memset(rptr, chr, rem);
-    rptr[rem] = '\0';
-
-    res->forced = MRTSTR_TRUE;
-}
-
-void mrtstr_repeat_chr_threaded(void *args)
-{
-    mrtstr_repeat_chr_t data = (mrtstr_repeat_chr_t)args;
-
-    for (; data->size; data->res++, data->size--)
-        mrtstr_simd_stream_func(data->res, data->block);
-
-    *data->lock = 0;
-    mrstr_free(data);
+    mrtstr_memset(res, chr, count);
+    return MRTSTR_RES_NOERROR;
 }

@@ -13,7 +13,8 @@ typedef __m512i mrfstr_memcmp_simd_t;
 #define MRFSTR_MEMCMP_SIMD_SIZE 64
 #define MRFSTR_MEMCMP_SIMD_SHIFT 6
 
-#define mrfstr_memcmp_load _mm512_loadu_si512
+#define mrfstr_memcmp_load _mm512_stream_load_si512
+#define mrfstr_memcmp_loadu _mm512_loadu_si512
 #define mrfstr_memcmp_cmp _mm512_cmpneq_epi64_mask
 
 #elif defined(__AVX__) && defined(__AVX2__)
@@ -22,7 +23,8 @@ typedef __m256i mrfstr_memcmp_simd_t;
 #define MRFSTR_MEMCMP_SIMD_SIZE 32
 #define MRFSTR_MEMCMP_SIMD_SHIFT 5
 
-#define mrfstr_memcmp_load _mm256_loadu_si256
+#define mrfstr_memcmp_load _mm256_stream_load_si256
+#define mrfstr_memcmp_loadu _mm256_loadu_si256
 #define mrfstr_memcmp_cmp(x, y) (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(x, y)))
 
 #elif defined(__SSE2__)
@@ -31,7 +33,8 @@ typedef __m128i mrfstr_memcmp_simd_t;
 #define MRFSTR_MEMCMP_SIMD_SIZE 16
 #define MRFSTR_MEMCMP_SIMD_SHIFT 4
 
-#define mrfstr_memcmp_load _mm_loadu_si128
+#define mrfstr_memcmp_load _mm_stream_load_si128
+#define mrfstr_memcmp_loadu _mm_loadu_si128
 
 #ifdef __SSE4_1__
 #define mrfstr_memcmp_cmp(x, y) (~_mm_movemask_epi8(_mm_cmpeq_epi64(x, y)))
@@ -46,6 +49,7 @@ typedef unsigned long long mrfstr_memcmp_simd_t;
 #define MRFSTR_MEMCMP_SIMD_SIZE 8
 
 #define mrfstr_memcmp_load(x) *x
+#define mrfstr_memcmp_loadu mrfstr_memcmp_load
 #define mrfstr_memcmp_cmp(x, y) x != y
 
 #endif
@@ -55,8 +59,8 @@ typedef unsigned long long mrfstr_memcmp_simd_t;
 #if MRFSTR_THREADING
 #include <pthread.h>
 
-#define MRFSTR_MEMCMP_TLIMIT (65536 * MRFSTR_MEMCMP_SIMD_SIZE * MRFSTR_THREAD_COUNT - 1)
 #define MRFSTR_MEMCMP_TCHK (MRFSTR_MEMCMP_SIMD_SIZE * MRFSTR_THREAD_COUNT)
+#define MRFSTR_MEMCMP_TLIMIT (65536 * MRFSTR_MEMCMP_TCHK - 1)
 
 struct __MRFSTR_MEMCMP_T
 {
@@ -90,7 +94,7 @@ mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_siz
         for (; size; s1block++, s2block++, size--)
         {
             block1 = mrfstr_memcmp_load(s1block);
-            block2 = mrfstr_memcmp_load(s2block);
+            block2 = mrfstr_memcmp_loadu(s2block);
             if (mrfstr_memcmp_cmp(block1, block2))
                 return MRFSTR_FALSE;
         }
@@ -151,7 +155,7 @@ void *mrfstr_memcmp_threaded(void *args)
         for (i = 0; i < 65536; data->str1++, data->str2++, i++)
         {
             block1 = mrfstr_memcmp_load(data->str1);
-            block2 = mrfstr_memcmp_load(data->str2);
+            block2 = mrfstr_memcmp_loadu(data->str2);
             if (mrfstr_memcmp_cmp(block1, block2))
             {
                 *data->res = MRFSTR_FALSE;
@@ -173,7 +177,7 @@ void *mrfstr_memcmp_threaded(void *args)
     for (; data->size; data->str1++, data->str2++, data->size--)
     {
         block1 = mrfstr_memcmp_load(data->str1);
-        block2 = mrfstr_memcmp_load(data->str2);
+        block2 = mrfstr_memcmp_loadu(data->str2);
         if (mrfstr_memcmp_cmp(block1, block2))
         {
             *data->res = MRFSTR_FALSE;

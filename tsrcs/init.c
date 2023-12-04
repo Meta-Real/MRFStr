@@ -59,13 +59,17 @@ mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
     return str;
 }
 
-void mrtstr_alloc(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_alloc(mrtstr_t str, mrtstr_size_t size)
 {
     if (!size)
-        return;
+        return MRTSTR_RES_NOERROR;
 
-    str->data = mrstr_alloc(size);
+    str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+    if (!str->data)
+        return MRTSTR_RES_MEM_ERROR;
+
     str->alloc = size;
+    return MRTSTR_RES_NOERROR;
 }
 
 void mrtstr_free(mrtstr_t str)
@@ -73,7 +77,7 @@ void mrtstr_free(mrtstr_t str)
     for (; mrtstr_locked(str););
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     mrstr_free((void*)str->lock);
     mrstr_free(str);
@@ -85,162 +89,193 @@ void mrtstr_clear(mrtstr_t str)
     str->size = 0;
 }
 
-void mrtstr_realloc(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_realloc(mrtstr_t str, mrtstr_size_t size)
 {
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     for (; mrtstr_locked(str););
 
     if (!size)
     {
         if (str->alloc)
-            mrstr_free(str->data);
+            mrstr_aligned_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     if (!str->alloc)
     {
-        str->data = mrstr_alloc(size);
+        str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+        if (!str->data)
+            return MRTSTR_RES_MEM_ERROR;
+
         str->alloc = size;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     str->alloc = size;
     if (!str->size)
     {
-        mrstr_free(str->data);
-        str->data = mrstr_alloc(size);
-        return;
+        mrstr_aligned_free(str->data);
+        str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+        return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
     }
 
-    str->data = mrstr_realloc(str->data, size);
+    ptr_t block = mrstr_aligned_realloc(str->data, size, MRTSTR_SIMD_SIZE);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
 
+    str->data = block;
     if (size <= str->size)
     {
         str->size = size - 1;
         str->data[str->size] = '\0';
     }
+
+    return MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_clear_realloc(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_clear_realloc(mrtstr_t str, mrtstr_size_t size)
 {
     for (; mrtstr_locked(str););
 
     str->size = 0;
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     str->alloc = size;
     if (!size)
-        return;
+        return MRTSTR_RES_NOERROR;
 
-    str->data = mrstr_alloc(size);
+    str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+    return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
 }
 
-void mrtstr_expand(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_expand(mrtstr_t str, mrtstr_size_t size)
 {
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     for (; mrtstr_locked(str););
 
     if (!str->alloc)
     {
-        str->data = mrstr_alloc(size);
+        str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+        if (!str->data)
+            return MRTSTR_RES_MEM_ERROR;
+
         str->alloc = size;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     str->alloc = size;
     if (!str->size)
     {
-        mrstr_free(str->data);
-        str->data = mrstr_alloc(size);
-        return;
+        mrstr_aligned_free(str->data);
+        str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+        return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
     }
 
-    str->data = mrstr_realloc(str->data, size);
+    ptr_t block = mrstr_aligned_realloc(str->data, size, MRTSTR_SIMD_SIZE);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
+
+    str->data = block;
+    return MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_clear_expand(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_clear_expand(mrtstr_t str, mrtstr_size_t size)
 {
     for (; mrtstr_locked(str););
 
     str->size = 0;
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     str->alloc = size;
-    str->data = mrstr_alloc(size);
+    str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+    return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
 }
 
-void mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add)
+mrtstr_res_enum_t mrtstr_expand_add(mrtstr_t str, mrtstr_size_t add)
 {
     if (!add)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     for (; mrtstr_locked(str););
 
     if (!str->alloc)
     {
-        str->data = mrstr_alloc(add);
+        str->data = mrstr_aligned_alloc(add, MRTSTR_SIMD_SIZE);
+        if (!str->data)
+            return MRTSTR_RES_MEM_ERROR;
+
         str->alloc = add;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     str->alloc += add;
     if (!str->size)
     {
-        mrstr_free(str->data);
-        str->data = mrstr_alloc(str->alloc);
-        return;
+        mrstr_aligned_free(str->data);
+        str->data = mrstr_aligned_alloc(str->alloc, MRTSTR_SIMD_SIZE);
+        return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
     }
 
-    str->data = mrstr_realloc(str->data, str->alloc);
+    ptr_t block = mrstr_realloc(str->data, str->alloc);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
+
+    str->data = block;
+    return MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_clear_expand_add(mrtstr_t str, mrtstr_size_t add)
+mrtstr_res_enum_t mrtstr_clear_expand_add(mrtstr_t str, mrtstr_size_t add)
 {
     for (; mrtstr_locked(str););
 
     str->size = 0;
     if (!add)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     str->alloc += add;
-    str->data = mrstr_alloc(str->alloc);
+    str->data = mrstr_aligned_alloc(str->alloc, MRTSTR_SIMD_SIZE);
+    return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
 }
 
-void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_shrink(mrtstr_t str, mrtstr_size_t size)
 {
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     for (; mrtstr_locked(str););
 
     if (!size)
     {
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
-    str->data = mrstr_realloc(str->data, size);
+    ptr_t block = mrstr_aligned_realloc(str->data, size, MRTSTR_SIMD_SIZE);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
+
+    str->data = block;
     str->alloc = size;
 
     if (size <= str->size)
@@ -248,71 +283,84 @@ void mrtstr_shrink(mrtstr_t str, mrtstr_size_t size)
         str->size = size - 1;
         str->data[str->size] = '\0';
     }
+
+    return MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_clear_shrink(mrtstr_t str, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_clear_shrink(mrtstr_t str, mrtstr_size_t size)
 {
     for (; mrtstr_locked(str););
 
     str->size = 0;
     if (size == str->alloc)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     str->alloc = size;
     if (!size)
-        return;
+        return MRTSTR_RES_NOERROR;
 
-    str->data = mrstr_alloc(size);
+    str->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
+    return str->data ? MRTSTR_RES_NOERROR : MRTSTR_RES_MEM_ERROR;
 }
 
-void mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
+mrtstr_res_enum_t mrtstr_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
 {
     if (!sub)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     for (; mrtstr_locked(str););
 
     if (sub >= str->alloc)
     {
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
         str->alloc = 0;
         str->size = 0;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     str->alloc -= sub;
-    str->data = mrstr_realloc(str->data, str->alloc);
+    ptr_t block = mrstr_aligned_realloc(str->data, str->alloc, MRTSTR_SIMD_SIZE);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
 
+    str->data = block;
     if (str->alloc <= str->size)
     {
         str->size = str->alloc - 1;
         str->data[str->size] = '\0';
     }
+
+    return MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_clear_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
+mrtstr_res_enum_t mrtstr_clear_shrink_sub(mrtstr_t str, mrtstr_size_t sub)
 {
     for (; mrtstr_locked(str););
 
     str->size = 0;
     if (!sub)
-        return;
+        return MRTSTR_RES_NOERROR;
 
     if (str->alloc)
-        mrstr_free(str->data);
+        mrstr_aligned_free(str->data);
 
     if (str->alloc <= sub)
     {
         str->alloc = 0;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     str->alloc -= sub;
-    str->data = mrstr_alloc(str->alloc);
+    ptr_t block = mrstr_aligned_alloc(str->alloc, MRTSTR_SIMD_SIZE);
+    if (!block)
+        return MRTSTR_RES_MEM_ERROR;
+
+    str->data = block;
+    return MRTSTR_RES_NOERROR;
 }
 
 void mrtstr_swap(mrtstr_ct str1, mrtstr_ct str2)

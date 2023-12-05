@@ -10,6 +10,9 @@
 mrfstr_t mrfstr_init()
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    if (!str)
+        return NULL;
+
     str->alloc = 0;
     str->size = 0;
     return str;
@@ -18,6 +21,8 @@ mrfstr_t mrfstr_init()
 mrfstr_t mrfstr_init2(mrfstr_data_t data)
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    if (!str)
+        return NULL;
 
     if (!data)
     {
@@ -35,6 +40,8 @@ mrfstr_t mrfstr_init2(mrfstr_data_t data)
 mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    if (!str)
+        return NULL;
 
     if (!data)
     {
@@ -82,9 +89,11 @@ mrfstr_res_enum_t mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
     if (!size)
     {
         if (str->alloc)
+        {
             mrstr_aligned_free(str->data);
+            str->alloc = 0;
+        }
 
-        str->alloc = 0;
         str->size = 0;
         return MRFSTR_RES_NOERROR;
     }

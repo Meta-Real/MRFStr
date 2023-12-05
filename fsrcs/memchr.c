@@ -38,22 +38,27 @@ typedef __m128i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_cmp(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
 
 #else
+#define MRFSTR_MEMCHR_NOSIMD
 
 typedef unsigned long long mrfstr_memchr_simd_t;
 #define MRFSTR_MEMCHR_SIMD_SIZE 8
 #define MRFSTR_MEMCHR_SIMD_SHIFT 3
 
-#define mrfstr_memchr_set(x, y)                                    \
-    do                                                             \
-    {                                                              \
-        x = y;                                                     \
-        for (mrfstr_bit_t i = 1; i < MRFSTR_MEMCHR_SIMD_SIZE; i++) \
-            x = x << 8 | y;                                        \
+#define mrfstr_memchr_set(x, y) \
+    do                          \
+    {                           \
+        x = y | (y << 8);       \
+        x |= (x << 16);         \
+        x |= (x << 32);         \
     } while (0)
 
 #define mrfstr_memchr_load(x) *x
-#define mrfstr_memchr_cmp(x, y) \
-    ((x ^ y) - 0x01010101010101010ULL) & ~(x ^ y) & 0x8080808080808080LL
+#define mrfstr_memchr_cmp(r, x, y)                                    \
+    do                                                                \
+    {                                                                 \
+        x ^= y;                                                       \
+        r = (x - 0x1010101010101010ULL) & ~x & 0x8080808080808080ULL; \
+    } while (0)
 
 #endif
 
@@ -92,14 +97,23 @@ mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t 
         size >>= MRFSTR_MEMCHR_SIMD_SHIFT;
 
         mrfstr_memchr_simd_t block;
+#ifdef MRFSTR_MEMCHR_NOSIMD
+        mrfstr_bool_t rres;
+#endif
         for (; size; sblock++, size--)
         {
             block = mrfstr_memchr_load(sblock);
+
+#ifdef MRFSTR_MEMCHR_NOSIMD
+            mrfstr_memchr_cmp(rres, block, cblock);
+            if (rres)
+#else
             if (mrfstr_memchr_cmp(block, cblock))
+#endif
                 return MRFSTR_TRUE;
         }
 
-        return memchr((mrfstr_data_ct)sblock, chr, rem) != NULL;
+        return memchr(sblock, chr, rem) != NULL;
 #if MRFSTR_THREADING
     }
 
@@ -114,23 +128,59 @@ mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t 
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
         data = mrstr_alloc(sizeof(struct __MRFSTR_MEMCHR_T));
+        if (!data)
+            goto rem;
+
         data->str = sblock;
         data->chr = cblock;
         data->size = size;
         data->res = &res;
 
         sblock += size;
-        pthread_create(threads + i, NULL, mrfstr_memchr_threaded, data);
+        if (pthread_create(threads + i, NULL, mrfstr_memchr_threaded, data))
+        {
+            sblock -= size;
+
+            mrstr_free(data);
+            goto rem;
+        }
     }
 
-    mrfstr_bool_t rres = memchr((mrfstr_data_t)sblock, chr, rem) != NULL;
-    if (rres)
+    if (memchr(sblock, chr, rem))
         res = MRFSTR_TRUE;
 
-    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
-        pthread_join(threads[i], NULL);
-
+ret:
+    while (i)
+        pthread_join(threads[--i], NULL);
     return res;
+
+rem:
+    size *= MRFSTR_THREAD_COUNT - i;
+
+    mrfstr_memchr_simd_t block;
+#ifdef MRFSTR_MEMCHR_NOSIMD
+    mrfstr_bool_t rres;
+#endif
+    for (; size; sblock++, size--)
+    {
+        block = mrfstr_memchr_load(sblock);
+
+#ifdef MRFSTR_MEMCHR_NOSIMD
+        mrfstr_memchr_cmp(rres, block, cblock);
+        if (rres)
+#else
+        if (mrfstr_memchr_cmp(block, cblock))
+#endif
+        {
+            res = MRFSTR_TRUE;
+            goto ret;
+        }
+    }
+
+    if (memchr(sblock, chr, rem))
+        res = MRFSTR_TRUE;
+
+    goto ret;
 #endif
 }
 
@@ -141,6 +191,9 @@ void *mrfstr_memchr_threaded(void *args)
 
     mrfstr_size_t i;
     mrfstr_memchr_simd_t block;
+#ifdef MRFSTR_MEMCHR_NOSIMD
+    mrfstr_bool_t rres;
+#endif
     while (data->size > 65536)
     {
         if (*data->res)
@@ -152,7 +205,13 @@ void *mrfstr_memchr_threaded(void *args)
         for (i = 0; i < 65536; data->str++, i++)
         {
             block = mrfstr_memchr_load(data->str);
+
+#ifdef MRFSTR_MEMCHR_NOSIMD
+            mrfstr_memchr_cmp(rres, block, data->chr);
+            if (rres)
+#else
             if (mrfstr_memchr_cmp(block, data->chr))
+#endif
             {
                 *data->res = MRFSTR_TRUE;
 
@@ -173,7 +232,13 @@ void *mrfstr_memchr_threaded(void *args)
     for (; data->size; data->str++, data->size--)
     {
         block = mrfstr_memchr_load(data->str);
+
+#ifdef MRFSTR_MEMCHR_NOSIMD
+        mrfstr_memchr_cmp(rres, block, data->chr);
+        if (rres)
+#else
         if (mrfstr_memchr_cmp(block, data->chr))
+#endif
         {
             *data->res = MRFSTR_TRUE;
 

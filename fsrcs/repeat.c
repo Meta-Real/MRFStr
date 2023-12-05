@@ -5,7 +5,6 @@
 
 #include <mrfstr-intern.h>
 #include <alloc.h>
-#include <string.h>
 
 mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
 {
@@ -28,5 +27,6 @@ mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_
     }
 
     mrfstr_memset(res->data, chr, count);
+    res->data[count] = '\0';
     return MRFSTR_RES_NOERROR;
 }

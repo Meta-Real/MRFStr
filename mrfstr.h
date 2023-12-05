@@ -88,7 +88,7 @@ mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
 
 /* reverse functions */
 
-void mrfstr_reverse(mrfstr_t res, mrfstr_ct str);
+mrfstr_res_enum_t mrfstr_reverse(mrfstr_t res, mrfstr_ct str);
 
 /* util functions */
 

@@ -4,8 +4,6 @@
 */
 
 #include <mrfstr-intern.h>
-#include <alloc.h>
-#include <string.h>
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr)
 {

@@ -9,9 +9,6 @@
 
 mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
 {
-    if (dst == src)
-        return MRFSTR_RES_NOERROR;
-
     if (!src->size)
     {
         dst->size = 0;
@@ -21,7 +18,7 @@ mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     mrfstr_size_t size = src->size + 1;
     if (dst->alloc < size)
     {
-        if (dst->alloc && dst->data != src->data)
+        if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
         dst->alloc = size;
@@ -31,14 +28,12 @@ mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     }
 
     mrfstr_memcpy(dst->data, src->data, size);
+    dst->size = src->size;
     return MRFSTR_RES_NOERROR;
 }
 
 mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
 {
-    if (dst->data == src)
-        return MRFSTR_RES_NOERROR;
-
     mrfstr_size_t size = strlen(src);
     if (!size)
     {
@@ -49,7 +44,7 @@ mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     dst->size = size++;
     if (dst->alloc < size)
     {
-        if (dst->alloc && dst->data != src)
+        if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
         dst->alloc = size;
@@ -64,9 +59,6 @@ mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
 
 mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-    if (dst->data == src)
-        return MRFSTR_RES_NOERROR;
-
     if (!size)
     {
         dst->size = 0;

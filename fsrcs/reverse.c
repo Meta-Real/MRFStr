@@ -7,24 +7,7 @@
 #include <alloc.h>
 #include <string.h>
 
-#if defined(__AVX512F__) && defined(__AVX512VBMI__)
-
-typedef __m512i mrfstr_rev_simd_t;
-#define MRFSTR_REV_SIMD_SIZE 128
-
-#define mrfstr_init_revidx                   \
-    const __m512i revidx = _mm512_set_epi64( \
-    0x0001020304050607, 0x08090a0b0c0d0e0f,  \
-    0x1011121314151617, 0x18191a1b1c1d1e1f,  \
-    0x2021222324252627, 0x28292a2b2c2d2e2f,  \
-    0x3031323334353637, 0x38393a3b3c3d3e3f)
-
-#define mrfstr_rev_perm(x, y) x = _mm512_permutexvar_epi8(revidx, _mm512_stream_load_si512(y))
-#define mrfstr_rev_permu(x, y) x = _mm512_permutexvar_epi8(revidx, _mm512_loadu_si512(y))
-#define mrfstr_rev_store _mm512_stream_si512
-#define mrfstr_rev_storeu _mm512_storeu_si512
-
-#elif defined(__AVX512F__) && defined(__AVX512BW__)
+#if defined(__AVX512F__) && defined(__AVX512BW__)
 
 typedef __m512i mrfstr_rev_simd_t;
 #define MRFSTR_REV_SIMD_SIZE 128
@@ -38,11 +21,11 @@ typedef __m512i mrfstr_rev_simd_t;
                                                                      \
     const __m512i revidx2 = _mm512_set_epi64(1, 0, 3, 2, 5, 4, 7, 6) \
 
-#define mrfstr_rev_perm(x, y)                                          \
-    do                                                                 \
-    {                                                                  \
-        x = _mm512_shuffle_epi8(_mm512_stream_load_si512(y), revidx1); \
-        x = _mm512_permutexvar_epi64(revidx2, x);                      \
+#define mrfstr_rev_perm(x, y)                                   \
+    do                                                          \
+    {                                                           \
+        x = _mm512_shuffle_epi8(_mm512_load_si512(y), revidx1); \
+        x = _mm512_permutexvar_epi64(revidx2, x);               \
     } while (0)
 #define mrfstr_rev_permu(x, y)                                   \
     do                                                           \
@@ -51,10 +34,10 @@ typedef __m512i mrfstr_rev_simd_t;
         x = _mm512_permutexvar_epi64(revidx2, x);                \
     } while (0)
 
-#define mrfstr_rev_store _mm512_stream_si512
+#define mrfstr_rev_store _mm512_store_si512
 #define mrfstr_rev_storeu _mm512_storeu_si512
 
-#elif defined(__AVX__) && defined(__AVX2__)
+#elif defined(__AVlX__) && defined(__AVX2__)
 
 typedef __m256i mrfstr_rev_simd_t;
 #define MRFSTR_REV_SIMD_SIZE 64
@@ -64,11 +47,11 @@ typedef __m256i mrfstr_rev_simd_t;
         0x0001020304050607, 0x08090a0b0c0d0e0f, \
         0x0001020304050607, 0x08090a0b0c0d0e0f)
 
-#define mrfstr_rev_perm(x, y)                                         \
-    do                                                                \
-    {                                                                 \
-        x = _mm256_shuffle_epi8(_mm256_stream_load_si256(y), revidx); \
-        x = _mm256_permute2x128_si256(x, x, 1);                       \
+#define mrfstr_rev_perm(x, y)                                  \
+    do                                                         \
+    {                                                          \
+        x = _mm256_shuffle_epi8(_mm256_load_si256(y), revidx); \
+        x = _mm256_permute2x128_si256(x, x, 1);                \
     } while (0)
 #define mrfstr_rev_permu(x, y)                                  \
     do                                                          \
@@ -90,7 +73,7 @@ typedef __m128i mrfstr_rev_simd_t;
         0x00010203, 0x04050607,           \
         0x08090a0b, 0x0c0d0e0f)
 
-#define mrfstr_rev_perm(x, y) x = _mm_shuffle_epi8(_mm_stream_load_si128(y), revidx)
+#define mrfstr_rev_perm(x, y) x = _mm_shuffle_epi8(_mm_load_si128(y), revidx)
 #define mrfstr_rev_permu(x, y) x = _mm_shuffle_epi8(_mm_loadu_si128(y), revidx)
 
 #define mrfstr_rev_store _mm_store_si128
@@ -117,10 +100,10 @@ typedef unsigned long long mrfstr_rev_simd_t;
 #include <pthread.h>
 
 #define MRFSTR_REV_TCHK (MRFSTR_REV_SIMD_SIZE * MRFSTR_THREAD_COUNT)
-#define MRFSTR_REV_TLIMIT (65536 * MRFSTR_REV_TCHK - 1)
+#define MRFSTR_REV_TLIMIT (0x10000 * MRFSTR_REV_TCHK - 1)
 
 #define MRFSTR_REV2_TCHK (MRFSTR_REV2_SIMD_SIZE * MRFSTR_THREAD_COUNT)
-#define MRFSTR_REV2_TLIMIT (65536 * MRFSTR_REV2_TCHK - 1)
+#define MRFSTR_REV2_TLIMIT (0x10000 * MRFSTR_REV2_TCHK - 1)
 
 struct __MRFSTR_REV_T
 {

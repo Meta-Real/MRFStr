@@ -34,7 +34,7 @@ add_library(MRTStr STATIC srcs/alloc.c tsrcs/thread.c
     tsrcs/init.c tsrcs/set.c
     tsrcs/repeat.c
     tsrcs/cmp.c tsrcs/contain.c
-    tsrcs/util.c)
+    tsrcs/util.c tsrcs/bres.c)
 target_include_directories(MRTStr PUBLIC "heads" PUBLIC ".")
 
 add_custom_command(TARGET MRTStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy libMRTStr.a ..)

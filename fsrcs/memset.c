@@ -40,18 +40,16 @@ typedef __m128i mrfstr_memset_simd_t;
 typedef mrfstr_chr_t mrfstr_memset_simd_t;
 #define MRFSTR_MEMSET_SIMD_SIZE 1
 
-#define mrfstr_memset_set(x) x
-
 #endif
 
+#ifndef MRFSTR_MEMSET_NOSIMD
 #define MRFSTR_MEMSET_SIMD_MASK (MRFSTR_MEMSET_SIMD_SIZE - 1)
 
 #define mrfstr_memset_sub(r, c, s)     \
-    do                                 \
-    {                                  \
-        for (; s; r++, s--)            \
-            mrfstr_memset_store(r, c); \
-    } while (0)
+    for (; s; r++, s--)                \
+        mrfstr_memset_store(r, block)
+
+#endif
 
 #if MRFSTR_THREADING
 #include <pthread.h>
@@ -67,7 +65,7 @@ typedef mrfstr_chr_t mrfstr_memset_simd_t;
 struct __MRFSTR_MEMSET_T
 {
     mrfstr_memset_simd_t *res;
-    mrfstr_memset_simd_t chr;
+    mrfstr_chr_t chr;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_MEMSET_T *mrfstr_memset_t;
@@ -77,19 +75,21 @@ void *mrfstr_memset_threaded(void *args);
 
 void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
+#if !defined(MRFSTR_MEMSET_NOSIMD) || MRFSTR_THREADING
     mrfstr_memset_simd_t *rblock = (mrfstr_memset_simd_t*)res;
-    mrfstr_memset_simd_t block = mrfstr_memset_set(chr);
+#endif
 
 #if MRFSTR_THREADING
     if (size <= MRFSTR_MEMSET_TLIMIT)
     {
 #endif
 #ifdef MRFSTR_MEMSET_NOSIMD
-        memset(rblock, block, size);
+        memset(res, chr, size);
 #else
         mrfstr_size_t rem = size & MRFSTR_MEMSET_SIMD_MASK;
         size >>= MRFSTR_MEMSET_SIMD_SHIFT;
 
+        mrfstr_memset_simd_t block = mrfstr_memset_set(chr);
         mrfstr_memset_sub(rblock, block, size);
         memset(rblock, chr, rem);
 #endif
@@ -110,7 +110,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
             goto rem;
 
         data->res = rblock;
-        data->chr = block;
+        data->chr = chr;
         data->size = size;
 
         rblock += size;
@@ -134,12 +134,14 @@ ret:
 rem:
     size *= MRFSTR_THREAD_COUNT - i;
 
-#ifdef MRFSTR_MEMCPY_NOSIMD
+#ifdef MRFSTR_MEMSET_NOSIMD
     memset(rblock, chr, size + rem);
 #else
+    mrfstr_memset_simd_t block = mrfstr_memset_set(chr);
     mrfstr_memset_sub(rblock, block, size);
     memset(rblock, chr, rem);
 #endif
+
     goto ret;
 #endif
 }
@@ -152,7 +154,8 @@ void *mrfstr_memset_threaded(void *args)
 #ifdef MRFSTR_MEMSET_NOSIMD
     memset(data->res, data->chr, data->size);
 #else
-    mrfstr_memset_sub(data->res, data->chr, data->size);
+    mrfstr_memset_simd_t block = mrfstr_memset_set(data->chr);
+    mrfstr_memset_sub(data->res, block, data->size);
 #endif
 
     mrstr_free(data);

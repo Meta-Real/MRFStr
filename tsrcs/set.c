@@ -23,7 +23,7 @@ mrtstr_res_enum_t mrtstr_set(mrtstr_t dst, mrtstr_ct src)
     mrtstr_size_t size = src->size + 1;
     if (dst->alloc < size)
     {
-        if (dst->alloc)
+        if (dst->alloc && dst->data != src->data)
             mrstr_aligned_free(dst->data);
 
         dst->alloc = size;
@@ -54,7 +54,7 @@ mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     dst->size = size++;
     if (dst->alloc < size)
     {
-        if (dst->alloc)
+        if (dst->alloc && dst->data != src)
             mrstr_aligned_free(dst->data);
 
         dst->alloc = size;

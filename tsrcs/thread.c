@@ -12,22 +12,28 @@ mrtstr_threads_t mrtstr_threads = {};
 
 void *mrtstr_thread_main(void *args);
 
-void mrtstr_init_threads(mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_init_threads(mrtstr_size_t size)
 {
     mrtstr_threads.threads = mrstr_alloc(size * sizeof(mrtstr_thread_t));
+    if (!mrtstr_threads.threads)
+        return MRTSTR_RES_MEM_ERROR;
+
     for (mrtstr_size_t i = 0; i < size; i++)
     {
         THREAD(i).func = NULL;
         THREAD(i).open = MRTSTR_TRUE;
-        pthread_create(&THREAD(i).id, NULL, mrtstr_thread_main, (void*)i);
+        if (pthread_create(&THREAD(i).id, NULL, mrtstr_thread_main, (void*)i))
+            return MRTSTR_RES_THREAD_ERROR;
     }
 
     mrtstr_threads.size = size;
     mrtstr_threads.free_threads = size;
-    pthread_mutex_init(&mrtstr_threads.mutex, NULL);
+
+    return pthread_mutex_init(&mrtstr_threads.mutex, NULL) ? 
+        MRTSTR_RES_THREAD_ERROR : MRTSTR_RES_NOERROR;
 }
 
-void mrtstr_load_threads(void (*volatile func)(void*), void *args)
+void mrtstr_load_threads(void (*func)(void*), void *args)
 {
     for (; !mrtstr_threads.free_threads;);
 
@@ -53,6 +59,10 @@ void mrtstr_free_threads()
         pthread_join(THREAD(i).id, NULL);
 
     mrstr_free(mrtstr_threads.threads);
+
+    pthread_mutex_lock(&mrtstr_threads.mutex);
+    pthread_mutex_unlock(&mrtstr_threads.mutex);
+    pthread_mutex_destroy(&mrtstr_threads.mutex);
 }
 
 void *mrtstr_thread_main(void *args)

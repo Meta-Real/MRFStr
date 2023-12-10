@@ -10,16 +10,33 @@
 mrtstr_t mrtstr_init()
 {
     mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
+    if (!str)
+        return NULL;
+
     str->size = 0;
     str->alloc = 0;
     str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
-    pthread_mutex_init(&str->mutex, NULL);
+    if (!str->lock)
+    {
+        mrstr_free(str);
+        return NULL;
+    }
+
+    if (pthread_mutex_init(&str->mutex, NULL))
+    {
+        mrstr_free((void*)str->lock);
+        mrstr_free(str);
+        return NULL;
+    }
+
     return str;
 }
 
 mrtstr_t mrtstr_init2(mrtstr_data_t data)
 {
     mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
+    if (!str)
+        return NULL;
 
     if (data)
     {
@@ -34,13 +51,27 @@ mrtstr_t mrtstr_init2(mrtstr_data_t data)
     }
 
     str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
-    pthread_mutex_init(&str->mutex, NULL);
+    if (!str->lock)
+    {
+        mrstr_free(str);
+        return NULL;
+    }
+
+    if (pthread_mutex_init(&str->mutex, NULL))
+    {
+        mrstr_free((void*)str->lock);
+        mrstr_free(str);
+        return NULL;
+    }
+
     return str;
 }
 
 mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
 {
     mrtstr_t str = mrstr_alloc(sizeof(struct __MRTSTR_T));
+    if (!str)
+        return NULL;
 
     if (data)
     {
@@ -55,7 +86,19 @@ mrtstr_t mrtstr_init3(mrtstr_data_t data, mrtstr_size_t size)
     }
 
     str->lock = mrstr_calloc(MRTSTR_THREAD_COUNT, sizeof(mrtstr_lock_t));
-    pthread_mutex_init(&str->mutex, NULL);
+    if (!str->lock)
+    {
+        mrstr_free(str);
+        return NULL;
+    }
+
+    if (pthread_mutex_init(&str->mutex, NULL))
+    {
+        mrstr_free((void*)str->lock);
+        mrstr_free(str);
+        return NULL;
+    }
+
     return str;
 }
 
@@ -80,6 +123,11 @@ void mrtstr_free(mrtstr_t str)
         mrstr_aligned_free(str->data);
 
     mrstr_free((void*)str->lock);
+
+    pthread_mutex_lock(&str->mutex);
+    pthread_mutex_unlock(&str->mutex);
+    pthread_mutex_destroy(&str->mutex);
+
     mrstr_free(str);
 }
 

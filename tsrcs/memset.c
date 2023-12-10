@@ -40,19 +40,24 @@ typedef __m128i mrtstr_memset_simd_t;
 typedef mrtstr_chr_t mrtstr_memset_simd_t;
 #define MRTSTR_MEMSET_SIMD_SIZE 1
 
-#define mrtstr_memset_set(x) x
+#endif
+
+#ifndef MRTSTR_MEMSET_NOSIMD
+#define MRTSTR_MEMSET_SIMD_MASK (MRTSTR_MEMSET_SIMD_SIZE - 1)
+
+#define mrtstr_memset_sub(r, c, s)     \
+    for (; s; r++, s--)                \
+        mrtstr_memset_store(r, c)
 
 #endif
 
-#define MRTSTR_MEMSET_SIMD_MASK (MRTSTR_MEMSET_SIMD_SIZE - 1)
-
 #define MRTSTR_MEMSET_TCHK (MRTSTR_MEMSET_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMSET_TLIMIT (65536 * MRTSTR_MEMSET_TCHK - 1)
+#define MRTSTR_MEMSET_TLIMIT (0x10000 * MRTSTR_MEMSET_TCHK - 1)
 
 struct __MRTSTR_MEMSET_T
 {
     mrtstr_memset_simd_t *str;
-    mrtstr_memset_simd_t block;
+    mrtstr_memset_simd_t chr;
     mrtstr_size_t size;
 
     mrtstr_lock_t *lock;
@@ -64,23 +69,18 @@ void mrtstr_memset_threaded(void *args);
 void mrtstr_memset(mrtstr_t str, mrtstr_chr_t chr, mrtstr_size_t size)
 {
     mrtstr_memset_simd_t *rblock = (mrtstr_memset_simd_t*)str->data;
-    mrtstr_memset_simd_t block = mrtstr_memset_set(chr);
 
     if (size <= MRTSTR_MEMSET_TLIMIT)
     {
 #ifdef MRTSTR_MEMSET_NOSIMD
         memset(rblock, chr, size);
-        rblock[size] = '\0';
 #else
         mrtstr_size_t rem = size & MRTSTR_MEMSET_SIMD_MASK;
         size >>= MRTSTR_MEMSET_SIMD_SHIFT;
 
-        for (; size; rblock++, size--)
-            mrtstr_memset_store(rblock, block);
-
-        mrtstr_data_t rptr = (mrtstr_data_t)rblock;
-        memset(rptr, chr, rem);
-        rptr[rem] = '\0';
+        mrtstr_memset_simd_t block = mrtstr_memset_set(chr);
+        mrtstr_memset_sub(rblock, block, size);
+        memset(rblock, chr, rem);
 #endif
         return;
     }
@@ -91,26 +91,34 @@ void mrtstr_memset(mrtstr_t str, mrtstr_chr_t chr, mrtstr_size_t size)
     mrtstr_size_t j;
     mrtstr_bit_t i;
     mrtstr_memset_t data;
+#ifndef MRTSTR_MEMSET_NOSIMD
+    mrtstr_memset_simd_t block = mrtstr_memset_set(chr);
+#endif
     for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
     {
         data = mrstr_alloc(sizeof(struct __MRTSTR_MEMSET_T));
-        data->block = block;
+        if (!data)
+            goto rem;
+
+#ifdef MRTSTR_MEMSET_NOSIMD
+        data->chr = chr;
+#else
+        data->chr = block;
+#endif
         data->size = size;
         data->lock = str->lock + i;
 
-        while (!mrtstr_threads.free_threads && data->size > 65536)
+        while (!mrtstr_threads.free_threads && data->size > 0x10000)
         {
-            for (j = 0; j < 65536; rblock++, j++)
+            for (j = 0; j < 0x10000; rblock++, j++)
                 mrtstr_memset_store(rblock, block);
 
-            data->size -= 65536;
+            data->size -= 0x10000;
         }
 
-        if (data->size <= 65536)
+        if (data->size <= 0x10000)
         {
-            for (; data->size; rblock++, data->size--)
-                mrtstr_memset_store(rblock, block);
-
+            mrtstr_memset_sub(rblock, block, data->size);
             mrstr_free(data);
         }
         else
@@ -123,11 +131,23 @@ void mrtstr_memset(mrtstr_t str, mrtstr_chr_t chr, mrtstr_size_t size)
         }
     }
 
-    mrtstr_data_t rptr = (mrtstr_data_t)rblock;
-    memset(rptr, chr, rem);
-    rptr[rem] = '\0';
+    memset(rblock, chr, rem);
 
+ret:
     str->forced = MRTSTR_TRUE;
+    return;
+
+rem:
+    size *= MRTSTR_THREAD_COUNT - i;
+
+#ifdef MRTSTR_MEMSET_NOSIMD
+    memset(rblock, chr, size + rem);
+#else
+    mrtstr_memset_sub(rblock, block, size);
+    memset(rblock, chr, rem);
+#endif
+
+    goto ret;
 }
 
 void mrtstr_memset_threaded(void *args)
@@ -135,10 +155,9 @@ void mrtstr_memset_threaded(void *args)
     mrtstr_memset_t data = (mrtstr_memset_t)args;
 
 #ifdef MRTSTR_MEMSET_NOSIMD
-    memset(data->res, data->block, data->size);
+    memset(data->res, data->chr, data->size);
 #else
-    for (; data->size; data->str++, data->size--)
-        mrtstr_memset_store(data->str, data->block);
+    mrtstr_memset_sub(data->str, data->chr, data->size);
 #endif
 
     *data->lock = 0;

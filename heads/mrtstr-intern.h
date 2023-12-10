@@ -35,7 +35,7 @@
         pthread_mutex_unlock(m); \
     } while (0)
 
-void mrtstr_load_threads(void (*volatile func)(void*), void *args);
+void mrtstr_load_threads(void (*func)(void*), void *args);
 
 void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size);
 void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);

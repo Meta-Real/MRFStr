@@ -33,5 +33,6 @@ mrtstr_res_enum_t mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_
     }
 
     mrtstr_memset(res, chr, count);
+    res->data[count] = '\0';
     return MRTSTR_RES_NOERROR;
 }

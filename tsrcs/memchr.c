@@ -14,7 +14,7 @@ typedef __m512i mrtstr_memchr_simd_t;
 #define MRTSTR_MEMCHR_SIMD_SHIFT 6
 
 #define mrtstr_memchr_set(x, y) x = _mm512_set1_epi8(y)
-#define mrtstr_memchr_load _mm512_stream_load_si512
+#define mrtstr_memchr_load _mm512_load_si512
 #define mrtstr_memchr_cmp _mm512_cmpeq_epi8_mask
 
 #elif defined(__AVX__) && defined(__AVX2__)
@@ -24,7 +24,7 @@ typedef __m256i mrtstr_memchr_simd_t;
 #define MRTSTR_MEMCHR_SIMD_SHIFT 5
 
 #define mrtstr_memchr_set(x, y) x = _mm256_set1_epi8(y)
-#define mrtstr_memchr_load _mm256_stream_load_si256
+#define mrtstr_memchr_load _mm256_load_si256
 #define mrtstr_memchr_cmp(x, y) _mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y))
 
 #elif defined(__SSE2__)
@@ -34,7 +34,7 @@ typedef __m128i mrtstr_memchr_simd_t;
 #define MRTSTR_MEMCHR_SIMD_SHIFT 4
 
 #define mrtstr_memchr_set(x, y) x = _mm_set1_epi8(y)
-#define mrtstr_memchr_load _mm_stream_load_si128
+#define mrtstr_memchr_load _mm_load_si128
 #define mrtstr_memchr_cmp(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
 
 #else
@@ -44,24 +44,46 @@ typedef unsigned long long mrtstr_memchr_simd_t;
 #define MRTSTR_MEMCHR_SIMD_SIZE 8
 #define MRTSTR_MEMCHR_SIMD_SHIFT 3
 
-#define mrtstr_memchr_set(x, y)                                    \
-    do                                                             \
-    {                                                              \
-        x = y;                                                     \
-        for (mrtstr_bit_t i = 1; i < MRTSTR_MEMCHR_SIMD_SIZE; i++) \
-            x = x << 8 | y;                                        \
+#define mrtstr_memchr_set(x, y) \
+    do                          \
+    {                           \
+        x = y | (y << 8);       \
+        x |= (x << 16);         \
+        x |= (x << 32);         \
     } while (0)
 
 #define mrtstr_memchr_load(x) *x
-#define mrtstr_memchr_cmp(x, y) \
-    ((x ^ y) - 0x01010101010101010ULL) & ~(x ^ y) & 0x8080808080808080LL
+#define mrtstr_memchr_cmp(r, x, y)                                    \
+    do                                                                \
+    {                                                                 \
+        x ^= y;                                                       \
+        r = (x - 0x1010101010101010ULL) & ~x & 0x8080808080808080ULL; \
+    } while (0)
 
 #endif
 
 #define MRTSTR_MEMCHR_SIMD_MASK (MRTSTR_MEMCHR_SIMD_SIZE - 1)
 
 #define MRTSTR_MEMCHR_TCHK (MRTSTR_MEMCHR_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMCHR_TLIMIT (65536 * MRTSTR_MEMCHR_TCHK - 1)
+#define MRTSTR_MEMCHR_TLIMIT (0x10000 * MRTSTR_MEMCHR_TCHK - 1)
+
+#define mrtstr_memchr_init                                    \
+    do                                                        \
+    {                                                         \
+        data = mrstr_alloc(sizeof(struct __MRTSTR_MEMCHR_T)); \
+        if (!data)                                            \
+        {                                                     \
+            if (!i)                                           \
+                goto single;                                  \
+            goto rem;                                         \
+        }                                                     \
+                                                              \
+        data->chr = cblock;                                   \
+        data->size = size;                                    \
+        data->lock = str->lock + i;                           \
+        data->mutex = &str->mutex;                            \
+        data->res = res;                                      \
+    } while (0)
 
 struct __MRTSTR_MEMCHR_T
 {
@@ -81,19 +103,29 @@ void mrtstr_memchr_threaded(void *args);
 void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_size_t size)
 {
     mrtstr_memchr_simd_t *sblock = (mrtstr_memchr_simd_t*)str->data;
-    mrtstr_memchr_simd_t block;
-    mrtstr_memchr_set(block, chr);
+    mrtstr_memchr_simd_t cblock;
+    mrtstr_memchr_set(cblock, chr);
 
     if (size <= MRTSTR_MEMCHR_TLIMIT)
     {
+single:
         mrtstr_size_t rem = size & MRTSTR_MEMCHR_SIMD_MASK;
         size >>= MRTSTR_MEMCHR_SIMD_SHIFT;
 
-        mrtstr_memchr_simd_t tblock;
+        mrtstr_memchr_simd_t block;
+#ifdef MRTSTR_MEMCHR_NOSIMD
+        mrtstr_bool_t rres;
+#endif
         for (; size; sblock++, size--)
         {
-            tblock = mrtstr_memchr_load(sblock);
-            if (mrtstr_memchr_cmp(tblock, block))
+            block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+            mrtstr_memchr_cmp(rres, block, cblock);
+            if (rres)
+#else
+            if (mrtstr_memchr_cmp(block, cblock))
+#endif
             {
                 res->res = MRTSTR_TRUE;
                 return;
@@ -111,48 +143,57 @@ void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_s
 
     mrtstr_bit_t i;
     mrtstr_size_t j;
-    mrtstr_memchr_simd_t tblock;
+    mrtstr_memchr_simd_t block;
+#ifdef MRTSTR_MEMCHR_NOSIMD
+    mrtstr_bool_t rres;
+#endif
     mrtstr_memchr_t data;
     if (mrtstr_locked(str) && str->forced)
         for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
             for (; str->lock[i];);
+            mrtstr_memchr_init;
 
-            data = mrstr_alloc(sizeof(struct __MRTSTR_MEMCHR_T));
-            data->chr = block;
-            data->size = size;
-            data->lock = str->lock + i;
-            data->mutex = &str->mutex;
-            data->res = res;
-
-            while (!mrtstr_threads.free_threads && data->size > 65536)
+            while (!mrtstr_threads.free_threads && data->size > 0x10000)
             {
-                for (j = 0; j < 65536; sblock++, j++)
+                for (j = 0; j < 0x10000; sblock++, j++)
                 {
-                    tblock = mrtstr_memchr_load(sblock);
-                    if (mrtstr_memchr_cmp(tblock, block))
+                    block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+                    mrtstr_memchr_cmp(rres, block, cblock);
+                    if (rres)
+#else
+                    if (mrtstr_memchr_cmp(block, cblock))
+#endif
                     {
                         res->res = MRTSTR_TRUE;
 
                         mrstr_free(data);
-                        return;
+                        break;
                     }
                 }
 
-                data->size -= 65536;
+                data->size -= 0x10000;
             }
 
-            if (data->size <= 65536)
+            if (data->size <= 0x10000)
             {
                 for (; data->size; sblock++, data->size--)
                 {
-                    tblock = mrtstr_memchr_load(sblock);
-                    if (mrtstr_memchr_cmp(tblock, block))
+                    block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+                    mrtstr_memchr_cmp(rres, block, cblock);
+                    if (rres)
+#else
+                    if (mrtstr_memchr_cmp(block, cblock))
+#endif
                     {
                         res->res = MRTSTR_TRUE;
 
                         mrstr_free(data);
-                        return;
+                        break;
                     }
                 }
 
@@ -171,41 +212,48 @@ void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_s
     else
         for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
         {
-            data = mrstr_alloc(sizeof(struct __MRTSTR_MEMCHR_T));
-            data->chr = block;
-            data->size = size;
-            data->lock = str->lock + i;
-            data->mutex = &str->mutex;
-            data->res = res;
+            mrtstr_memchr_init;
 
-            while (!mrtstr_threads.free_threads && data->size > 65536)
+            while (!mrtstr_threads.free_threads && data->size > 0x10000)
             {
-                for (j = 0; j < 65536; sblock++, j++)
+                for (j = 0; j < 0x10000; sblock++, j++)
                 {
-                    tblock = mrtstr_memchr_load(sblock);
-                    if (mrtstr_memchr_cmp(tblock, block))
+                    block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+                    mrtstr_memchr_cmp(rres, block, cblock);
+                    if (rres)
+#else
+                    if (mrtstr_memchr_cmp(block, cblock))
+#endif
                     {
                         res->res = MRTSTR_TRUE;
 
                         mrstr_free(data);
-                        return;
+                        break;
                     }
                 }
 
-                data->size -= 65536;
+                data->size -= 0x10000;
             }
 
-            if (data->size <= 65536)
+            if (data->size <= 0x10000)
             {
                 for (; data->size; sblock++, data->size--)
                 {
-                    tblock = mrtstr_memchr_load(sblock);
-                    if (mrtstr_memchr_cmp(tblock, block))
+                    block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+                    mrtstr_memchr_cmp(rres, block, cblock);
+                    if (rres)
+#else
+                    if (mrtstr_memchr_cmp(block, cblock))
+#endif
                     {
                         res->res = MRTSTR_TRUE;
 
                         mrstr_free(data);
-                        return;
+                        break;
                     }
                 }
 
@@ -222,11 +270,63 @@ void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_s
             }
         }
 
-    mrtstr_data_t rres = memchr(sblock, chr, rem);
-    if (!rres)
-        res->res = MRTSTR_FALSE;
+ret:
+    if (!res->res && memchr(sblock, chr, rem))
+        res->res = MRTSTR_TRUE;
 
     str->forced = MRTSTR_FALSE;
+    return;
+
+rem:
+    size *= MRTSTR_THREAD_COUNT - i;
+
+    while (size >= 0x10000)
+    {
+        if (res->res)
+            goto ret;
+
+        for (j = 0; j < 0x10000; sblock++, j++)
+        {
+            block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+            mrtstr_memchr_cmp(rres, block, cblock);
+            if (rres)
+#else
+            if (mrtstr_memchr_cmp(block, cblock))
+#endif
+            {
+                res->res = MRTSTR_TRUE;
+                goto ret;
+            }
+        }
+
+        size -= 0x10000;
+    }
+
+    if (res->res)
+        goto ret;
+
+    for (; size; sblock++, size--)
+    {
+        block = mrtstr_memchr_load(sblock);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+        mrtstr_memchr_cmp(rres, block, cblock);
+        if (rres)
+#else
+        if (mrtstr_memchr_cmp(block, cblock))
+#endif
+        {
+            res->res = MRTSTR_TRUE;
+            goto ret;
+        }
+    }
+
+    if (memchr(sblock, chr, rem))
+        res->res = MRTSTR_TRUE;
+
+    goto ret;
 }
 
 void mrtstr_memchr_threaded(void *args)
@@ -235,7 +335,10 @@ void mrtstr_memchr_threaded(void *args)
 
     mrtstr_size_t i;
     mrtstr_memchr_simd_t block;
-    while (data->size > 65536)
+#ifdef MRTSTR_MEMCHR_NOSIMD
+    mrtstr_bool_t rres;
+#endif
+    while (data->size > 0x10000)
     {
         if (data->res->res)
         {
@@ -246,10 +349,16 @@ void mrtstr_memchr_threaded(void *args)
             return;
         }
 
-        for (i = 0; i < 65536; data->str++, i++)
+        for (i = 0; i < 0x10000; data->str++, i++)
         {
             block = mrtstr_memchr_load(data->str);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+            mrtstr_memchr_cmp(rres, block, data->chr);
+            if (rres)
+#else
             if (mrtstr_memchr_cmp(block, data->chr))
+#endif
             {
                 data->res->res = MRTSTR_TRUE;
 
@@ -261,7 +370,7 @@ void mrtstr_memchr_threaded(void *args)
             }
         }
 
-        data->size -= 65536;
+        data->size -= 0x10000;
     }
 
     if (data->res->res)
@@ -276,7 +385,13 @@ void mrtstr_memchr_threaded(void *args)
     for (; data->size; data->str++, data->size--)
     {
         block = mrtstr_memchr_load(data->str);
+
+#ifdef MRTSTR_MEMCHR_NOSIMD
+        mrtstr_memchr_cmp(rres, block, data->chr);
+        if (rres)
+#else
         if (mrtstr_memchr_cmp(block, data->chr))
+#endif
         {
             data->res->res = MRTSTR_TRUE;
 

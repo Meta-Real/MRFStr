@@ -7,16 +7,14 @@
 #include <alloc.h>
 #include <string.h>
 
-void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
+mrtstr_res_enum_t mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
 {
-    res->lock = 0;
-    pthread_mutex_init(&res->mutex, NULL);
-
     if (!str->size)
     {
         res->res = MRTSTR_FALSE;
-        return;
+        return MRTSTR_RES_NOERROR;
     }
 
     mrtstr_memchr(res, str, chr, str->size);
+    return MRTSTR_RES_NOERROR;
 }

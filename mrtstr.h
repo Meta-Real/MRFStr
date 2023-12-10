@@ -20,7 +20,7 @@ struct __MRTSTR_THREAD_T
 {
     pthread_t id;
 
-    void (*volatile func)(void*);
+    void (*func)(void*);
     void *args;
 
     volatile mrtstr_bool_t open;
@@ -37,9 +37,17 @@ struct __MRTSTR_THREADS_T
 };
 typedef struct __MRTSTR_THREADS_T mrtstr_threads_t;
 
+enum __MRTSTR_RES_ENUM
+{
+    MRTSTR_RES_NOERROR,
+    MRTSTR_RES_MEM_ERROR,
+    MRTSTR_RES_THREAD_ERROR,
+};
+typedef unsigned char mrtstr_res_enum_t;
+
 extern mrtstr_threads_t mrtstr_threads;
 
-void mrtstr_init_threads(mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_init_threads(mrtstr_size_t size);
 void mrtstr_free_threads();
 
 typedef char mrtstr_chr_t;
@@ -62,13 +70,6 @@ struct __MRTSTR_T
 typedef struct __MRTSTR_T *mrtstr_t;
 typedef const mrtstr_t mrtstr_ct;
 
-enum __MRTSTR_RES_ENUM
-{
-    MRTSTR_RES_NOERROR,
-    MRTSTR_RES_MEM_ERROR
-};
-typedef unsigned char mrtstr_res_enum_t;
-
 typedef unsigned char mrtstr_rbit_t;
 typedef volatile mrtstr_rbit_t mrtstr_rlock_t;
 
@@ -80,6 +81,11 @@ struct __MRTSTR_BRES_T
     pthread_mutex_t mutex;
 };
 typedef struct __MRTSTR_BRES_T mrtstr_bres_t;
+
+mrtstr_res_enum_t mrtstr_init_bres(mrtstr_bres_t *bres);
+void mrtstr_free_bres(mrtstr_bres_t *bres);
+
+mrtstr_bool_t mrtstr_extract_bres(mrtstr_bres_t *bres);
 
 /* init functions */
 
@@ -119,14 +125,14 @@ mrtstr_res_enum_t mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_
 
 /* cmp functions */
 
-void mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2);
+mrtstr_res_enum_t mrtstr_equal(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2);
 
-void mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2);
-void mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_equal_str(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2);
+mrtstr_res_enum_t mrtstr_equal_nstr(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrtstr_size_t size);
 
 /* contain functions */
 
-void mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr);
+mrtstr_res_enum_t mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr);
 
 /* util functions */
 
@@ -134,7 +140,5 @@ mrtstr_data_t mrtstr_get_data(mrtstr_ct str);
 mrtstr_size_t mrtstr_get_size(mrtstr_ct str);
 
 mrtstr_bool_t mrtstr_locked(mrtstr_ct str);
-
-mrtstr_bool_t mrtstr_bres_extract(mrtstr_bres_t *res);
 
 #endif /* __MRTSTR__ */

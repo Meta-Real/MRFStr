@@ -62,10 +62,8 @@ typedef unsigned long long mrtstr_memchr_simd_t;
 
 #endif
 
+#define MRTSTR_MEMCMP_FACTOR (MRTSTR_SIMD_SIZE / MRTSTR_MEMCHR_SIMD_SIZE)
 #define MRTSTR_MEMCHR_SIMD_MASK (MRTSTR_MEMCHR_SIMD_SIZE - 1)
-
-#define MRTSTR_MEMCHR_TCHK (MRTSTR_MEMCHR_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMCHR_TLIMIT (0x10000 * MRTSTR_MEMCHR_TCHK - 1)
 
 #define mrtstr_memchr_init                                    \
     do                                                        \
@@ -106,7 +104,7 @@ void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_s
     mrtstr_memchr_simd_t cblock;
     mrtstr_memchr_set(cblock, chr);
 
-    if (size <= MRTSTR_MEMCHR_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 single:
         mrtstr_size_t rem = size & MRTSTR_MEMCHR_SIMD_MASK;
@@ -138,8 +136,8 @@ single:
 
     res->res = MRTSTR_FALSE;
 
-    mrtstr_size_t rem = size % MRTSTR_MEMCHR_TCHK;
-    size /= MRTSTR_MEMCHR_TCHK;
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size = size / MRTSTR_SIMD_TCHK * MRTSTR_MEMCMP_FACTOR;
 
     mrtstr_bit_t i;
     mrtstr_size_t j;

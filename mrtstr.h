@@ -119,6 +119,8 @@ mrtstr_res_enum_t mrtstr_set(mrtstr_t dst, mrtstr_ct src);
 mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src);
 mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size);
 
+mrtstr_res_enum_t mrtstr_set_chr(mrtstr_t dst, mrtstr_chr_t src);
+
 /* repeat functions */
 
 mrtstr_res_enum_t mrtstr_repeat_chr(mrtstr_t res, mrtstr_chr_t chr, mrtstr_size_t count);
@@ -140,5 +142,10 @@ mrtstr_data_t mrtstr_get_data(mrtstr_ct str);
 mrtstr_size_t mrtstr_get_size(mrtstr_ct str);
 
 mrtstr_bool_t mrtstr_locked(mrtstr_ct str);
+
+mrtstr_chr_t mrtstr_get_chr(mrtstr_ct str, mrtstr_size_t idx);
+void mrtstr_modify_chr(mrtstr_ct str, mrtstr_chr_t chr, mrtstr_size_t idx);
+
+void mrtstr_print(mrtstr_ct str);
 
 #endif /* __MRTSTR__ */

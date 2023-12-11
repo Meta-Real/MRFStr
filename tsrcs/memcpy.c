@@ -12,6 +12,10 @@
 typedef __m512i mrtstr_memcpy_simd_t;
 #define MRTSTR_MEMCPY_SIMD_SIZE 64
 #define MRTSTR_MEMCPY_SIMD_SHIFT 6
+#define MRTSTR_MEMCPY_MOVSIZE 4
+
+#define mrtstr_memcpy_load _mm512_loadu_si512
+#define mrtstr_memcpy_store _mm512_stream_si512
 
 #define mrtstr_memcpy_define mrtstr_memcpy_simd_t \
     block1, block2, block3, block4
@@ -19,43 +23,25 @@ typedef __m512i mrtstr_memcpy_simd_t;
 #define mrtstr_memcpy_proc(x, y)          \
     do                                    \
     {                                     \
-        block1 = _mm512_loadu_si512(y++); \
-        block2 = _mm512_loadu_si512(y++); \
-        block3 = _mm512_loadu_si512(y++); \
-        block4 = _mm512_loadu_si512(y++); \
-        _mm512_stream_si512(x++, block1); \
-        _mm512_stream_si512(x++, block2); \
-        _mm512_stream_si512(x++, block3); \
-        _mm512_stream_si512(x++, block4); \
+        block1 = mrtstr_memcpy_load(y++); \
+        block2 = mrtstr_memcpy_load(y++); \
+        block3 = mrtstr_memcpy_load(y++); \
+        block4 = mrtstr_memcpy_load(y++); \
+        mrtstr_memcpy_store(x++, block1); \
+        mrtstr_memcpy_store(x++, block2); \
+        mrtstr_memcpy_store(x++, block3); \
+        mrtstr_memcpy_store(x++, block4); \
     } while (0)
-
-#define mrtstr_memcpy_sub(x, y, s)            \
-    do                                        \
-    {                                         \
-        for (; s >= 4; s -= 4)                \
-            mrtstr_memcpy_proc(x, y);         \
-                                              \
-        while (s--)                           \
-        {                                     \
-            block1 = _mm512_loadu_si512(y++); \
-            _mm512_stream_si512(x++, block1); \
-        }                                     \
-    } while (0)
-
-#define mrtstr_memcpy_waitsub                                     \
-    while (!mrtstr_threads.free_threads && data->size >= 0x10000) \
-    {                                                             \
-        for (j = 0; j < 0x10000; j += 4)                          \
-            mrtstr_memcpy_proc(sblock, dblock);                   \
-                                                                  \
-        data->size -= 0x10000;                                    \
-    }
 
 #elif defined(__AVX__)
 
 typedef __m256i mrtstr_memcpy_simd_t;
 #define MRTSTR_MEMCPY_SIMD_SIZE 32
 #define MRTSTR_MEMCPY_SIMD_SHIFT 5
+#define MRTSTR_MEMCPY_MOVSIZE 8
+
+#define mrtstr_memcpy_load _mm256_loadu_si256
+#define mrtstr_memcpy_store _mm256_stream_si256
 
 #define mrtstr_memcpy_define mrtstr_memcpy_simd_t \
     block1, block2, block3, block4, \
@@ -64,51 +50,33 @@ typedef __m256i mrtstr_memcpy_simd_t;
 #define mrtstr_memcpy_proc(x, y)          \
     do                                    \
     {                                     \
-        block1 = _mm256_loadu_si256(y++); \
-        block2 = _mm256_loadu_si256(y++); \
-        block3 = _mm256_loadu_si256(y++); \
-        block4 = _mm256_loadu_si256(y++); \
-        block5 = _mm256_loadu_si256(y++); \
-        block6 = _mm256_loadu_si256(y++); \
-        block7 = _mm256_loadu_si256(y++); \
-        block8 = _mm256_loadu_si256(y++); \
-        _mm256_stream_si256(x++, block1); \
-        _mm256_stream_si256(x++, block2); \
-        _mm256_stream_si256(x++, block3); \
-        _mm256_stream_si256(x++, block4); \
-        _mm256_stream_si256(x++, block5); \
-        _mm256_stream_si256(x++, block6); \
-        _mm256_stream_si256(x++, block7); \
-        _mm256_stream_si256(x++, block8); \
+        block1 = mrtstr_memcpy_load(y++); \
+        block2 = mrtstr_memcpy_load(y++); \
+        block3 = mrtstr_memcpy_load(y++); \
+        block4 = mrtstr_memcpy_load(y++); \
+        block5 = mrtstr_memcpy_load(y++); \
+        block6 = mrtstr_memcpy_load(y++); \
+        block7 = mrtstr_memcpy_load(y++); \
+        block8 = mrtstr_memcpy_load(y++); \
+        mrtstr_memcpy_store(x++, block1); \
+        mrtstr_memcpy_store(x++, block2); \
+        mrtstr_memcpy_store(x++, block3); \
+        mrtstr_memcpy_store(x++, block4); \
+        mrtstr_memcpy_store(x++, block5); \
+        mrtstr_memcpy_store(x++, block6); \
+        mrtstr_memcpy_store(x++, block7); \
+        mrtstr_memcpy_store(x++, block8); \
     } while (0)
-
-#define mrtstr_memcpy_sub(x, y, s)            \
-    do                                        \
-    {                                         \
-        for (; s >= 8; s -= 8)                \
-            mrtstr_memcpy_proc(x, y);         \
-                                              \
-        while (s--)                           \
-        {                                     \
-            block1 = _mm256_loadu_si256(y++); \
-            _mm256_stream_si256(x++, block1); \
-        }                                     \
-    } while (0)
-
-#define mrtstr_memcpy_waitsub                                     \
-    while (!mrtstr_threads.free_threads && data->size >= 0x10000) \
-    {                                                             \
-        for (j = 0; j < 0x10000; j += 8)                          \
-            mrtstr_memcpy_proc(sblock, dblock);                   \
-                                                                  \
-        data->size -= 0x10000;                                    \
-    }
 
 #elif defined(__SSE2__)
 
 typedef __m128i mrtstr_memcpy_simd_t;
 #define MRTSTR_MEMCPY_SIMD_SIZE 16
 #define MRTSTR_MEMCPY_SIMD_SHIFT 4
+#define MRTSTR_MEMCPY_MOVSIZE 16
+
+#define mrtstr_memcpy_load _mm_loadu_si128
+#define mrtstr_memcpy_store _mm_stream_si128
 
 #define mrtstr_memcpy_define mrtstr_memcpy_simd_t \
     block01, block02, block03, block04, \
@@ -116,70 +84,47 @@ typedef __m128i mrtstr_memcpy_simd_t;
     block09, block10, block11, block12, \
     block13, block14, block15, block16
 
-#define mrtstr_memcpy_proc(x, y)        \
-    do                                  \
-    {                                   \
-        block01 = _mm_loadu_si128(y++); \
-        block02 = _mm_loadu_si128(y++); \
-        block03 = _mm_loadu_si128(y++); \
-        block04 = _mm_loadu_si128(y++); \
-        block05 = _mm_loadu_si128(y++); \
-        block06 = _mm_loadu_si128(y++); \
-        block07 = _mm_loadu_si128(y++); \
-        block08 = _mm_loadu_si128(y++); \
-        block09 = _mm_loadu_si128(y++); \
-        block10 = _mm_loadu_si128(y++); \
-        block11 = _mm_loadu_si128(y++); \
-        block12 = _mm_loadu_si128(y++); \
-        block13 = _mm_loadu_si128(y++); \
-        block14 = _mm_loadu_si128(y++); \
-        block15 = _mm_loadu_si128(y++); \
-        block16 = _mm_loadu_si128(y++); \
-        _mm_stream_si128(x++, block01); \
-        _mm_stream_si128(x++, block02); \
-        _mm_stream_si128(x++, block03); \
-        _mm_stream_si128(x++, block04); \
-        _mm_stream_si128(x++, block05); \
-        _mm_stream_si128(x++, block06); \
-        _mm_stream_si128(x++, block07); \
-        _mm_stream_si128(x++, block08); \
-        _mm_stream_si128(x++, block09); \
-        _mm_stream_si128(x++, block10); \
-        _mm_stream_si128(x++, block11); \
-        _mm_stream_si128(x++, block12); \
-        _mm_stream_si128(x++, block13); \
-        _mm_stream_si128(x++, block14); \
-        _mm_stream_si128(x++, block15); \
-        _mm_stream_si128(x++, block16); \
+#define mrtstr_memcpy_proc(x, y)           \
+    do                                     \
+    {                                      \
+        block01 = mrtstr_memcpy_load(y++); \
+        block02 = mrtstr_memcpy_load(y++); \
+        block03 = mrtstr_memcpy_load(y++); \
+        block04 = mrtstr_memcpy_load(y++); \
+        block05 = mrtstr_memcpy_load(y++); \
+        block06 = mrtstr_memcpy_load(y++); \
+        block07 = mrtstr_memcpy_load(y++); \
+        block08 = mrtstr_memcpy_load(y++); \
+        block09 = mrtstr_memcpy_load(y++); \
+        block10 = mrtstr_memcpy_load(y++); \
+        block11 = mrtstr_memcpy_load(y++); \
+        block12 = mrtstr_memcpy_load(y++); \
+        block13 = mrtstr_memcpy_load(y++); \
+        block14 = mrtstr_memcpy_load(y++); \
+        block15 = mrtstr_memcpy_load(y++); \
+        block16 = mrtstr_memcpy_load(y++); \
+        mrtstr_memcpy_store(x++, block01); \
+        mrtstr_memcpy_store(x++, block02); \
+        mrtstr_memcpy_store(x++, block03); \
+        mrtstr_memcpy_store(x++, block04); \
+        mrtstr_memcpy_store(x++, block05); \
+        mrtstr_memcpy_store(x++, block06); \
+        mrtstr_memcpy_store(x++, block07); \
+        mrtstr_memcpy_store(x++, block08); \
+        mrtstr_memcpy_store(x++, block09); \
+        mrtstr_memcpy_store(x++, block10); \
+        mrtstr_memcpy_store(x++, block11); \
+        mrtstr_memcpy_store(x++, block12); \
+        mrtstr_memcpy_store(x++, block13); \
+        mrtstr_memcpy_store(x++, block14); \
+        mrtstr_memcpy_store(x++, block15); \
+        mrtstr_memcpy_store(x++, block16); \
     } while (0)
-
-#define mrtstr_memcpy_sub(x, y, s)          \
-    do                                      \
-    {                                       \
-        for (; s >= 16; s -= 16)            \
-            mrtstr_memcpy_proc(x, y);       \
-                                            \
-        while (s--)                         \
-        {                                   \
-            block01 = _mm_loadu_si128(y++); \
-            _mm_stream_si128(x++, block01); \
-        }                                   \
-    } while (0)
-
-#define mrtstr_memcpy_waitsub                                     \
-    while (!mrtstr_threads.free_threads && data->size >= 0x10000) \
-    {                                                             \
-        for (j = 0; j < 0x10000; j += 16)                         \
-            mrtstr_memcpy_proc(sblock, dblock);                   \
-                                                                  \
-        data->size -= 0x10000;                                    \
-    }
 
 #else
 #define MRTSTR_MEMCPY_NOSIMD
 
 typedef mrtstr_chr_t mrtstr_memcpy_simd_t;
-#define MRTSTR_MEMCPY_SIMD_SIZE 1
 
 #define mrtstr_memcpy_sub memcpy
 #define mrtstr_memcpy_waitsub                                     \
@@ -195,10 +140,30 @@ typedef mrtstr_chr_t mrtstr_memcpy_simd_t;
 
 #ifndef MRTSTR_MEMCPY_NOSIMD
 #define MRTSTR_MEMCPY_SIMD_MASK (MRTSTR_MEMCPY_SIMD_SIZE - 1)
-#endif
 
-#define MRTSTR_MEMCPY_TCHK (MRTSTR_MEMCPY_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMCPY_TLIMIT (0x10000 * MRTSTR_MEMCPY_TCHK - 1)
+#define mrtstr_memcpy_sub(x, y, s)                                     \
+    do                                                                 \
+    {                                                                  \
+        for (; s >= MRTSTR_MEMCPY_MOVSIZE; s -= MRTSTR_MEMCPY_MOVSIZE) \
+            mrtstr_memcpy_proc(x, y);                                  \
+                                                                       \
+        while (s--)                                                    \
+        {                                                              \
+            block1 = mrtstr_memcpy_load(x++);                          \
+            mrtstr_memcpy_store(y++, block1);                          \
+        }                                                              \
+    } while (0)
+
+#define mrtstr_memcpy_waitsub                                     \
+    while (!mrtstr_threads.free_threads && data->size >= 0x10000) \
+    {                                                             \
+        for (j = 0; j < 0x10000; j += MRTSTR_MEMCPY_MOVSIZE)      \
+            mrtstr_memcpy_proc(sblock, dblock);                   \
+                                                                  \
+        data->size -= 0x10000;                                    \
+    }
+
+#endif
 
 struct __MRTSTR_MEMCPY_T
 {
@@ -231,7 +196,7 @@ void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size)
     mrtstr_memcpy_simd_t *dblock = (mrtstr_memcpy_simd_t*)dst->data;
     mrtstr_memcpy_simd_t *sblock = (mrtstr_memcpy_simd_t*)src->data;
 
-    if (size <= MRTSTR_MEMCPY_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 #ifdef MRTSTR_MEMCPY_NOSIMD
         memcpy(dst->data, src->data, size);
@@ -246,8 +211,13 @@ void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size)
         return;
     }
 
-    mrtstr_size_t rem = size % MRTSTR_MEMCPY_TCHK;
-    size /= MRTSTR_MEMCPY_TCHK;
+#ifdef MRTSTR_MEMCPY_NOSIMD
+    mrtstr_bit_t rem = size % MRTSTR_THREAD_COUNT;
+    size /= MRTSTR_THREAD_COUNT;
+#else
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size /= MRTSTR_SIMD_TCHK;
+#endif
 
     mrtstr_bit_t i;
 #ifndef MRTSTR_MEMCPY_NOSIMD
@@ -322,14 +292,16 @@ void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size)
             }
         }
 
-ret:
     memcpy(sblock, dblock, rem);
 
+ret:
     src->forced = MRTSTR_FALSE;
     dst->forced = MRTSTR_TRUE;
     return;
 
 rem:
+    size = (MRTSTR_THREAD_COUNT - i) * size + rem;
+
 #ifdef MRTSTR_MEMCPY_NOSIMD
     memcpy(dblock, sblock, size);
 #else
@@ -346,15 +318,17 @@ rem:
 #endif
     }
 
+    memcpy(dblock, sblock, rem);
     goto ret;
 
 rem2:
     size *= MRTSTR_THREAD_COUNT - i;
 
 #ifdef MRTSTR_MEMCPY_NOSIMD
-    memcpy(dblock, sblock, size);
+    memcpy(dblock, sblock, size + rem);
 #else
     mrtstr_memcpy_sub(dblock, sblock, size);
+    memcpy(sblock, dblock, rem);
 #endif
 
     goto ret;
@@ -365,7 +339,7 @@ void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
     mrtstr_memcpy_simd_t *dblock = (mrtstr_memcpy_simd_t*)dst->data;
     mrtstr_memcpy_simd_t *sblock = (mrtstr_memcpy_simd_t*)src;
 
-    if (size <= MRTSTR_MEMCPY_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 #ifdef MRTSTR_MEMCPY_NOSIMD
         memcpy(dst->data, src, size);
@@ -380,8 +354,13 @@ void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         return;
     }
 
-    mrtstr_size_t rem = size % MRTSTR_MEMCPY_TCHK;
-    size /= MRTSTR_MEMCPY_TCHK;
+#ifdef MRTSTR_MEMCPY_NOSIMD
+    mrtstr_bit_t rem = size % MRTSTR_THREAD_COUNT;
+    size /= MRTSTR_THREAD_COUNT;
+#else
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size /= MRTSTR_SIMD_TCHK;
+#endif
 
     mrtstr_bit_t i;
 #ifndef MRTSTR_MEMCPY_NOSIMD
@@ -418,9 +397,9 @@ void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         }
     }
 
-ret:
     memcpy(sblock, dblock, rem);
 
+ret:
     dst->forced = MRTSTR_TRUE;
     return;
 
@@ -428,9 +407,10 @@ rem:
     size *= MRTSTR_THREAD_COUNT - i;
 
 #ifdef MRTSTR_MEMCPY_NOSIMD
-    memcpy(dblock, sblock, size);
+    memcpy(dblock, sblock, size + rem);
 #else
     mrtstr_memcpy_sub(dblock, sblock, size);
+    memcpy(sblock, dblock, rem);
 #endif
 
     goto ret;

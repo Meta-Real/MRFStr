@@ -95,3 +95,24 @@ mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_
     mrtstr_memcpy2(dst, src, size);
     return MRTSTR_RES_NOERROR;
 }
+
+mrtstr_res_enum_t mrtstr_set_chr(mrtstr_t dst, mrtstr_chr_t src)
+{
+    for (; mrtstr_locked(dst););
+
+    dst->size = 1;
+    if (dst->alloc < 2)
+    {
+        if (dst->alloc)
+            mrstr_aligned_free(dst->data);
+
+        dst->alloc = 2;
+        dst->data = mrstr_aligned_alloc(2, MRTSTR_SIMD_SIZE);
+        if (!dst->data)
+            return MRTSTR_RES_MEM_ERROR;
+    }
+
+    *dst->data = src;
+    dst->data[1] = '\0';
+    return MRTSTR_RES_NOERROR;
+}

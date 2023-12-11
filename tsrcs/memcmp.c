@@ -49,12 +49,11 @@ typedef unsigned long long mrtstr_memcmp_simd_t;
 
 #endif
 
+#define MRTSTR_MEMCMP_FACTOR (MRTSTR_SIMD_SIZE / MRTSTR_MEMCMP_SIMD_SIZE)
+
 #ifndef MRTSTR_MEMCMP_NOSIMD
 #define MRTSTR_MEMCMP_SIMD_MASK (MRTSTR_MEMCMP_SIMD_SIZE - 1)
 #endif
-
-#define MRTSTR_MEMCMP_TCHK (MRTSTR_MEMCMP_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMCMP_TLIMIT (0x10000 * MRTSTR_MEMCMP_TCHK - 1)
 
 #define mrtstr_memcmp_proc(x, y, p, f)         \
     do                                         \
@@ -209,7 +208,7 @@ void mrtstr_memcmp(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2, mrtstr_si
     mrtstr_memcmp_simd_t *s1block = (mrtstr_memcmp_simd_t*)str1->data;
     mrtstr_memcmp_simd_t *s2block = (mrtstr_memcmp_simd_t*)str2->data;
 
-    if (size <= MRTSTR_MEMCMP_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 single:
 #ifdef MRTSTR_MEMCMP_NOSIMD
@@ -227,8 +226,8 @@ single:
 
     res->res = MRTSTR_TRUE;
 
-    mrtstr_size_t rem = size % MRTSTR_MEMCMP_TCHK;
-    size /= MRTSTR_MEMCMP_TCHK;
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size = size / MRTSTR_SIMD_TCHK * MRTSTR_MEMCMP_FACTOR;
 
     mrtstr_bit_t i;
     mrtstr_size_t j;
@@ -347,7 +346,7 @@ void mrtstr_memcmp2(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrt
     mrtstr_memcmp_simd_t *s1block = (mrtstr_memcmp_simd_t*)str1->data;
     mrtstr_memcmp_simd_t *s2block = (mrtstr_memcmp_simd_t*)str2;
 
-    if (size <= MRTSTR_MEMCMP_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 #ifdef MRTSTR_MEMCMP_NOSIMD
         res->res = !memcmp(s1block, s2block, size);
@@ -364,8 +363,8 @@ void mrtstr_memcmp2(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_data_ct str2, mrt
 
     res->res = MRTSTR_TRUE;
 
-    mrtstr_size_t rem = size % MRTSTR_MEMCMP_TCHK;
-    size /= MRTSTR_MEMCMP_TCHK;
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size = size / MRTSTR_SIMD_TCHK * MRTSTR_MEMCMP_FACTOR;
 
     mrtstr_bit_t i;
     mrtstr_size_t j;

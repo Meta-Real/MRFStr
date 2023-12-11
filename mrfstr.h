@@ -71,6 +71,8 @@ mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src);
 mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src);
 mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
+mrfstr_res_enum_t mrfstr_set_chr(mrfstr_t dst, mrfstr_chr_t src);
+
 /* repeat functions */
 
 mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
@@ -94,5 +96,10 @@ mrfstr_res_enum_t mrfstr_reverse(mrfstr_t res, mrfstr_ct str);
 
 mrfstr_data_t mrfstr_get_data(mrfstr_ct str);
 mrfstr_size_t mrfstr_get_size(mrfstr_ct str);
+
+mrfstr_chr_t mrfstr_get_chr(mrfstr_ct str, mrfstr_size_t idx);
+void mrfstr_modify_chr(mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx);
+
+void mrfstr_print(mrfstr_ct str);
 
 #endif /* __MRFSTR__ */

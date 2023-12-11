@@ -51,9 +51,6 @@ typedef mrtstr_chr_t mrtstr_memset_simd_t;
 
 #endif
 
-#define MRTSTR_MEMSET_TCHK (MRTSTR_MEMSET_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_MEMSET_TLIMIT (0x10000 * MRTSTR_MEMSET_TCHK - 1)
-
 struct __MRTSTR_MEMSET_T
 {
     mrtstr_memset_simd_t *str;
@@ -70,7 +67,7 @@ void mrtstr_memset(mrtstr_t str, mrtstr_chr_t chr, mrtstr_size_t size)
 {
     mrtstr_memset_simd_t *rblock = (mrtstr_memset_simd_t*)str->data;
 
-    if (size <= MRTSTR_MEMSET_TLIMIT)
+    if (size <= MRTSTR_SIMD_TLIMIT)
     {
 #ifdef MRTSTR_MEMSET_NOSIMD
         memset(rblock, chr, size);
@@ -85,8 +82,8 @@ void mrtstr_memset(mrtstr_t str, mrtstr_chr_t chr, mrtstr_size_t size)
         return;
     }
 
-    mrtstr_size_t rem = size % MRTSTR_MEMSET_TCHK;
-    size /= MRTSTR_MEMSET_TCHK;
+    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    size /= MRTSTR_SIMD_TCHK;
 
     mrtstr_size_t j;
     mrtstr_bit_t i;

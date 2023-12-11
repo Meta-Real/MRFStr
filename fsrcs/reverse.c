@@ -37,7 +37,7 @@ typedef __m512i mrfstr_rev_simd_t;
 #define mrfstr_rev_store _mm512_store_si512
 #define mrfstr_rev_storeu _mm512_storeu_si512
 
-#elif defined(__AVlX__) && defined(__AVX2__)
+#elif defined(__AVX__) && defined(__AVX2__)
 
 typedef __m256i mrfstr_rev_simd_t;
 #define MRFSTR_REV_SIMD_SIZE 64
@@ -119,7 +119,7 @@ void *mrfstr_rev2_threaded(void *args);
 
 mrfstr_res_enum_t mrfstr_reverse(mrfstr_t res, mrfstr_ct str)
 {
-    if (res->alloc && res->data == str->data)
+    if (res == str)
     {
         if (res->size <= 1)
             return MRFSTR_RES_NOERROR;

@@ -10,6 +10,7 @@
 
 typedef unsigned long long mrtstr_size_t;
 typedef unsigned char mrtstr_bool_t;
+typedef unsigned char mrtstr_bit_t;
 
 #define MRTSTR_TRUE 1
 #define MRTSTR_FALSE 0
@@ -30,9 +31,9 @@ typedef struct __MRTSTR_THREAD_T mrtstr_thread_t;
 struct __MRTSTR_THREADS_T
 {
     mrtstr_thread_t *threads;
-    mrtstr_size_t size;
+    mrtstr_bit_t size;
 
-    volatile mrtstr_size_t free_threads;
+    volatile mrtstr_bit_t free_threads;
     pthread_mutex_t mutex;
 };
 typedef struct __MRTSTR_THREADS_T mrtstr_threads_t;
@@ -47,14 +48,13 @@ typedef unsigned char mrtstr_res_enum_t;
 
 extern mrtstr_threads_t mrtstr_threads;
 
-mrtstr_res_enum_t mrtstr_init_threads(mrtstr_size_t size);
+mrtstr_res_enum_t mrtstr_init_threads(mrtstr_bit_t size);
 void mrtstr_free_threads();
 
 typedef char mrtstr_chr_t;
 typedef mrtstr_chr_t *mrtstr_data_t;
 typedef const mrtstr_data_t mrtstr_data_ct;
 
-typedef unsigned char mrtstr_bit_t;
 typedef volatile mrtstr_bit_t mrtstr_lock_t;
 
 struct __MRTSTR_T

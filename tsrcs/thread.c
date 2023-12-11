@@ -8,36 +8,54 @@
 
 #define THREAD(i) mrtstr_threads.threads[i]
 
-mrtstr_threads_t mrtstr_threads = {};
-
 void *mrtstr_thread_main(void *args);
 
-mrtstr_res_enum_t mrtstr_init_threads(mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_init_threads(mrtstr_bit_t size)
 {
     mrtstr_threads.threads = mrstr_alloc(size * sizeof(mrtstr_thread_t));
     if (!mrtstr_threads.threads)
         return MRTSTR_RES_MEM_ERROR;
 
-    for (mrtstr_size_t i = 0; i < size; i++)
+    for (mrtstr_bit_t i = 0; i < size; i++)
     {
         THREAD(i).func = NULL;
         THREAD(i).open = MRTSTR_TRUE;
-        if (pthread_create(&THREAD(i).id, NULL, mrtstr_thread_main, (void*)i))
+        if (pthread_create(&THREAD(i).id, NULL, mrtstr_thread_main, (void*)(uintptr_t)i))
+        {
+            while (i--)
+            {
+                THREAD(i).open = MRTSTR_FALSE;
+                pthread_join(THREAD(i).id, NULL);
+            }
+
+            mrstr_free(mrtstr_threads.threads);
             return MRTSTR_RES_THREAD_ERROR;
+        }
     }
 
     mrtstr_threads.size = size;
     mrtstr_threads.free_threads = size;
 
-    return pthread_mutex_init(&mrtstr_threads.mutex, NULL) ? 
-        MRTSTR_RES_THREAD_ERROR : MRTSTR_RES_NOERROR;
+    if (pthread_mutex_init(&mrtstr_threads.mutex, NULL))
+    {
+        while (size--)
+        {
+            THREAD(size).open = MRTSTR_FALSE;
+            pthread_join(THREAD(size).id, NULL);
+        }
+
+        mrstr_free(mrtstr_threads.threads);
+        return MRTSTR_RES_THREAD_ERROR;
+    }
+
+    return MRTSTR_RES_NOERROR;
 }
 
 void mrtstr_load_threads(void (*func)(void*), void *args)
 {
     for (; !mrtstr_threads.free_threads;);
 
-    mrtstr_size_t i;
+    mrtstr_bit_t i;
     for (i = 0; i < mrtstr_threads.size; i++)
         if (!THREAD(i).func)
         {
@@ -51,7 +69,7 @@ void mrtstr_load_threads(void (*func)(void*), void *args)
 
 void mrtstr_free_threads()
 {
-    mrtstr_size_t i;
+    mrtstr_bit_t i;
     for (i = 0; i < mrtstr_threads.size; i++)
         THREAD(i).open = MRTSTR_FALSE;
 
@@ -67,7 +85,7 @@ void mrtstr_free_threads()
 
 void *mrtstr_thread_main(void *args)
 {
-    mrtstr_size_t id = (mrtstr_size_t)args;
+    mrtstr_bit_t id = (mrtstr_bit_t)(uintptr_t)args;
     while (THREAD(id).open)
         if (THREAD(id).func)
         {

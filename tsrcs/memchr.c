@@ -104,10 +104,11 @@ void mrtstr_memchr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr, mrtstr_s
     mrtstr_memchr_simd_t cblock;
     mrtstr_memchr_set(cblock, chr);
 
+    mrtstr_size_t rem;
     if (size <= MRTSTR_SIMD_TLIMIT)
     {
 single:
-        mrtstr_size_t rem = size & MRTSTR_MEMCHR_SIMD_MASK;
+        rem = size & MRTSTR_MEMCHR_SIMD_MASK;
         size >>= MRTSTR_MEMCHR_SIMD_SHIFT;
 
         mrtstr_memchr_simd_t block;
@@ -136,7 +137,7 @@ single:
 
     res->res = MRTSTR_FALSE;
 
-    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    rem = size % MRTSTR_SIMD_TCHK;
     size = size / MRTSTR_SIMD_TCHK * MRTSTR_MEMCMP_FACTOR;
 
     mrtstr_bit_t i;

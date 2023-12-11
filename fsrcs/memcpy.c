@@ -155,8 +155,10 @@ typedef mrfstr_chr_t mrfstr_memcpy_simd_t;
 
 #ifdef MRFSTR_MEMCPY_NOSIMD
 #define MRFSTR_MEMCPY_TLIMIT (0x80000 * MRFSTR_THREAD_COUNT - 1)
+#define MRFSTR_MEMCPY_SLIMIT (0x8000 - 1)
 #else
 #define MRFSTR_MEMCPY_TLIMIT (0x10000 * MRFSTR_MEMCPY_TCHK - 1)
+#define MRFSTR_MEMCPY_SLIMIT (0x1000 * MRFSTR_MEMCPY_SIMD_SIZE - 1)
 #endif
 
 struct __MRFSTR_MEMCPY_T
@@ -172,6 +174,25 @@ void *mrfstr_memcpy_threaded(void *args);
 
 void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
+    if (size <= MRFSTR_MEMCPY_SLIMIT)
+    {
+        memcpy(dst, src, size);
+        return;
+    }
+
+#ifndef MRFSTR_MEMCPY_NOSIMD
+    mrfstr_bit_t align = (uintptr_t)dst & MRFSTR_MEMCPY_SIMD_MASK;
+    if (align)
+    {
+        align = MRFSTR_MEMCPY_SIMD_SIZE - align;
+        memcpy(dst, src, align);
+
+        dst += align;
+        src += align;
+        size -= align;
+    }
+#endif
+
 #if !defined(MRFSTR_MEMCPY_NOSIMD) || defined(MRFSTR_THREADING)
     mrfstr_memcpy_simd_t *dblock = (mrfstr_memcpy_simd_t*)dst;
     mrfstr_memcpy_simd_t *sblock = (mrfstr_memcpy_simd_t*)src;

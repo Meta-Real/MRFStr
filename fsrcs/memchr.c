@@ -69,6 +69,7 @@ typedef unsigned long long mrfstr_memchr_simd_t;
 
 #define MRFSTR_MEMCHR_TCHK (MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCHR_TLIMIT (0x10000 * MRFSTR_MEMCHR_TCHK - 1)
+#define MRFSTR_MEMCHR_SLIMIT (0x1000 * MRFSTR_MEMCHR_SIMD_SIZE - 1)
 
 struct __MRFSTR_MEMCHR_T
 {
@@ -85,16 +86,33 @@ void *mrfstr_memchr_threaded(void *args);
 
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
+    if (size <= MRFSTR_MEMCHR_SLIMIT)
+        return !memchr(str, chr, size);
+
+#ifndef MRFSTR_MEMCHR_NOSIMD
+    mrfstr_bit_t align = (uintptr_t)str & MRFSTR_MEMCHR_SIMD_MASK;
+    if (align)
+    {
+        align = MRFSTR_MEMCHR_SIMD_SIZE - align;
+        if (memchr(str, chr, align))
+            return MRFSTR_TRUE;
+
+        str += align;
+        size -= align;
+    }
+#endif
+
     mrfstr_memchr_simd_t *sblock = (mrfstr_memchr_simd_t*)str;
     mrfstr_memchr_simd_t cblock;
     mrfstr_memchr_set(cblock, chr);
 
+    mrfstr_size_t rem;
 #if MRFSTR_THREADING
     if (size <= MRFSTR_MEMCHR_TLIMIT)
     {
 single:
 #endif
-        mrfstr_size_t rem = size & MRFSTR_MEMCHR_SIMD_MASK;
+        rem = size & MRFSTR_MEMCHR_SIMD_MASK;
         size >>= MRFSTR_MEMCHR_SIMD_SHIFT;
 
         mrfstr_memchr_simd_t block;
@@ -118,7 +136,7 @@ single:
 #if MRFSTR_THREADING
     }
 
-    mrfstr_size_t rem = size % MRFSTR_MEMCHR_TCHK;
+    rem = size % MRFSTR_MEMCHR_TCHK;
     size /= MRFSTR_MEMCHR_TCHK;
 
     volatile mrfstr_bool_t res = MRFSTR_FALSE;

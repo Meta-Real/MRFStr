@@ -8,7 +8,7 @@
 
 typedef char mrfstr_chr_t;
 typedef mrfstr_chr_t *mrfstr_data_t;
-typedef const mrfstr_data_t mrfstr_data_ct;
+typedef const mrfstr_chr_t *mrfstr_data_ct;
 
 typedef unsigned long long mrfstr_size_t;
 typedef unsigned char mrfstr_bit_t;
@@ -73,7 +73,13 @@ mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_
 
 mrfstr_res_enum_t mrfstr_set_chr(mrfstr_t dst, mrfstr_chr_t src);
 
+/* concat functions */
+
+mrfstr_res_enum_t mrfstr_concat(mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2);
+
 /* repeat functions */
+
+mrfstr_res_enum_t mrfstr_repeat(mrfstr_t res, mrfstr_ct str, mrfstr_size_t count);
 
 mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
 

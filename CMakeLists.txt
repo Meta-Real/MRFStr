@@ -7,7 +7,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -march=native")
+set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
 set(CMAKE_C_FLAGS_DEBUG "-g")
 set(CMAKE_C_FLAGS_RELEASE "-O3")
 
@@ -16,7 +16,7 @@ project(MRFStr VERSION 1.0.0)
 add_library(MRFStr STATIC srcs/alloc.c
     fsrcs/memcpy.c fsrcs/memcmp.c fsrcs/memchr.c fsrcs/memset.c
     fsrcs/init.c fsrcs/set.c
-    fsrcs/repeat.c
+    fsrcs/concat.c fsrcs/repeat.c
     fsrcs/cmp.c fsrcs/contain.c
     fsrcs/reverse.c
     fsrcs/util.c)

@@ -58,8 +58,10 @@ typedef mrfstr_chr_t mrfstr_memset_simd_t;
 
 #ifdef MRFSTR_MEMSET_NOSIMD
 #define MRFSTR_MEMSET_TLIMIT (0x80000 * MRFSTR_THREAD_COUNT - 1)
+#define MRFSTR_MEMSET_SLIMIT (0x8000 * MRFSTR_MEMSET_SIMD_SIZE - 1)
 #else
 #define MRFSTR_MEMSET_TLIMIT (0x10000 * MRFSTR_MEMSET_TCHK - 1)
+#define MRFSTR_MEMSET_SLIMIT (0x1000 * MRFSTR_MEMSET_SIMD_SIZE - 1)
 #endif
 
 struct __MRFSTR_MEMSET_T
@@ -75,6 +77,24 @@ void *mrfstr_memset_threaded(void *args);
 
 void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
+    if (size <= MRFSTR_MEMSET_SLIMIT)
+    {
+        memset(res, chr, size);
+        return;
+    }
+
+#ifndef MRFSTR_MEMSET_NOSIMD
+    mrfstr_bit_t align = (uintptr_t)res & MRFSTR_MEMSET_SIMD_MASK;
+    if (align)
+    {
+        align = MRFSTR_MEMSET_SIMD_SIZE - align;
+        memset(res, chr, align);
+
+        res += align;
+        size -= align;
+    }
+#endif
+
 #if !defined(MRFSTR_MEMSET_NOSIMD) || MRFSTR_THREADING
     mrfstr_memset_simd_t *rblock = (mrfstr_memset_simd_t*)res;
 #endif

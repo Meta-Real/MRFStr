@@ -337,6 +337,7 @@ ret2:
     return MRFSTR_RES_NOERROR;
 
 rem2:
+    do {} while (0);
     mrfstr_init_revidx;
 
     mrfstr_rev_simd_t block;

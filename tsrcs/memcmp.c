@@ -208,13 +208,14 @@ void mrtstr_memcmp(mrtstr_bres_t *res, mrtstr_ct str1, mrtstr_ct str2, mrtstr_si
     mrtstr_memcmp_simd_t *s1block = (mrtstr_memcmp_simd_t*)str1->data;
     mrtstr_memcmp_simd_t *s2block = (mrtstr_memcmp_simd_t*)str2->data;
 
+    mrtstr_size_t rem;
     if (size <= MRTSTR_SIMD_TLIMIT)
     {
 single:
 #ifdef MRTSTR_MEMCMP_NOSIMD
         res->res = !memcmp(s1block, s2block, size);
 #else
-        mrtstr_size_t rem = size & MRTSTR_MEMCMP_SIMD_MASK;
+        rem = size & MRTSTR_MEMCMP_SIMD_MASK;
         size >>= MRTSTR_MEMCMP_SIMD_SHIFT;
 
         mrtstr_memcmp_simd_t block1, block2;
@@ -226,7 +227,7 @@ single:
 
     res->res = MRTSTR_TRUE;
 
-    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
+    rem = size % MRTSTR_SIMD_TCHK;
     size = size / MRTSTR_SIMD_TCHK * MRTSTR_MEMCMP_FACTOR;
 
     mrtstr_bit_t i;

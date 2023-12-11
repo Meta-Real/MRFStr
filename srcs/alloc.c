@@ -47,7 +47,7 @@ ptr_t mrstr_aligned_realloc(ptr_t block, mrstr_size_t size, mrstr_size_t align)
 
 void mrstr_aligned_free(ptr_t block)
 {
-#if defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     _aligned_free(block);
 #endif
 }

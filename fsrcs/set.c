@@ -16,19 +16,18 @@ mrfstr_res_enum_t mrfstr_set(
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_size_t size = src->size + 1;
-    if (dst->alloc < size)
+    if (dst->alloc < src->size)
     {
         if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
-        dst->alloc = size;
+        dst->alloc = src->size;
         dst->data = mrstr_aligned_alloc(dst->alloc, MRFSTR_SIMD_SIZE);
         if (!dst->data)
             return MRFSTR_RES_MEM_ERROR;
     }
 
-    mrfstr_memcpy(dst->data, src->data, size);
+    mrfstr_memcpy(dst->data, src->data, src->size);
     dst->size = src->size;
     return MRFSTR_RES_NOERROR;
 }
@@ -43,7 +42,7 @@ mrfstr_res_enum_t mrfstr_set_str(
         return MRFSTR_RES_NOERROR;
     }
 
-    dst->size = size++;
+    dst->size = size;
     if (dst->alloc < size)
     {
         if (dst->alloc)
@@ -69,7 +68,7 @@ mrfstr_res_enum_t mrfstr_set_nstr(
         return MRFSTR_RES_NOERROR;
     }
 
-    dst->size = size++;
+    dst->size = size;
     if (dst->alloc < size)
     {
         if (dst->alloc)
@@ -88,19 +87,15 @@ mrfstr_res_enum_t mrfstr_set_nstr(
 mrfstr_res_enum_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src)
 {
-    dst->size = 1;
-    if (dst->alloc < 2)
+    if (!dst->alloc)
     {
-        if (dst->alloc)
-            mrstr_aligned_free(dst->data);
-
-        dst->alloc = 2;
-        dst->data = mrstr_aligned_alloc(2, MRFSTR_SIMD_SIZE);
+        dst->alloc = 1;
+        dst->data = mrstr_aligned_alloc(1, MRFSTR_SIMD_SIZE);
         if (!dst->data)
             return MRFSTR_RES_MEM_ERROR;
     }
 
     *dst->data = src;
-    dst->data[1] = '\0';
+    dst->size = 1;
     return MRFSTR_RES_NOERROR;
 }

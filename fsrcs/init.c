@@ -128,10 +128,7 @@ mrfstr_res_enum_t mrfstr_realloc(
 
     str->data = block;
     if (size <= str->size)
-    {
         str->size = size - 1;
-        str->data[str->size] = '\0';
-    }
 
     return MRFSTR_RES_NOERROR;
 }
@@ -271,10 +268,7 @@ mrfstr_res_enum_t mrfstr_shrink(
     str->alloc = size;
 
     if (size <= str->size)
-    {
         str->size = size - 1;
-        str->data[str->size] = '\0';
-    }
 
     return MRFSTR_RES_NOERROR;
 }
@@ -318,10 +312,7 @@ mrfstr_res_enum_t mrfstr_shrink_sub(
         return MRFSTR_RES_MEM_ERROR;
 
     if (str->alloc <= str->size)
-    {
         str->size = str->alloc - 1;
-        str->data[str->size] = '\0';
-    }
 
     return MRFSTR_RES_NOERROR;
 }

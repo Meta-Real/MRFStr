@@ -39,7 +39,7 @@ void mrfstr_print(
     if (!str->size)
         return;
 
-    fputs(str->data, stdout);
+    fwrite(str->data, 1, str->size, stdout);
 }
 
 void mrfstr_n_print(

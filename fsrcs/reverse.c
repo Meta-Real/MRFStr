@@ -239,13 +239,13 @@ rem:
     if (!str->size)
         return MRFSTR_RES_NOERROR;
 
-    if (res->alloc <= str->size)
+    if (res->alloc < str->size)
     {
         if (res->alloc && res->data != str->data)
             mrstr_aligned_free(res->data);
 
-        res->alloc = str->size + 1;
-        res->data = mrstr_aligned_alloc(res->alloc, MRFSTR_SIMD_SIZE);
+        res->alloc = str->size;
+        res->data = mrstr_aligned_alloc(str->size, MRFSTR_SIMD_SIZE);
         if (!res->data)
             return MRFSTR_RES_MEM_ERROR;
     }
@@ -258,7 +258,6 @@ rem:
         for (; sptr > str->data; rptr++)
             *rptr = *--sptr;
 
-        res->data[res->size] = '\0';
         return MRFSTR_RES_NOERROR;
     }
 
@@ -279,7 +278,6 @@ rem:
         }
 
         sblock++;
-        res->data[res->size] = '\0';
         if ((mrfstr_data_t)sblock == str->data)
             return MRFSTR_RES_NOERROR;
 
@@ -330,8 +328,6 @@ ret2:
         for (; sptr > str->data; rptr++)
             *rptr = *--sptr;
     }
-
-    res->data[res->size] = '\0';
 
     while (i)
         pthread_join(threads[--i], NULL);

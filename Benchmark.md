@@ -4,7 +4,7 @@
 
 ```python
 a = '0' * (1024 * 1024 * 1024) # 1GB
-b = a[:-1]
+b = a[:]
 ```
 
 * **Python:** 261.20 milliseconds (3.828 GB/s)

@@ -117,7 +117,8 @@ void *mrfstr_rev_threaded(void *args);
 void *mrfstr_rev2_threaded(void *args);
 #endif
 
-mrfstr_res_enum_t mrfstr_reverse(mrfstr_t res, mrfstr_ct str)
+mrfstr_res_enum_t mrfstr_reverse(
+    mrfstr_t res, mrfstr_ct str)
 {
     if (res == str)
     {

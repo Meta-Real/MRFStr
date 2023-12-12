@@ -206,7 +206,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 #ifdef MRFSTR_MEMCPY_NOSIMD
         memcpy(dst, src, size);
 #else
-        mrfstr_size_t rem = size & MRFSTR_MEMCPY_SIMD_MASK;
+        mrfstr_bit_t rem = size & MRFSTR_MEMCPY_SIMD_MASK;
         size >>= MRFSTR_MEMCPY_SIMD_SHIFT;
 
         mrfstr_memcpy_sub(dblock, sblock, size);

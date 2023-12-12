@@ -7,7 +7,8 @@
 #include <alloc.h>
 #include <string.h>
 
-mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
+mrfstr_res_enum_t mrfstr_set(
+    mrfstr_t dst, mrfstr_ct src)
 {
     if (!src->size)
     {
@@ -32,7 +33,8 @@ mrfstr_res_enum_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
+mrfstr_res_enum_t mrfstr_set_str(
+    mrfstr_t dst, mrfstr_data_ct src)
 {
     mrfstr_size_t size = strlen(src);
     if (!size)
@@ -57,7 +59,9 @@ mrfstr_res_enum_t mrfstr_set_str(mrfstr_t dst, mrfstr_data_ct src)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_set_nstr(
+    mrfstr_t dst, mrfstr_data_ct src,
+    mrfstr_size_t size)
 {
     if (!size)
     {
@@ -81,7 +85,8 @@ mrfstr_res_enum_t mrfstr_set_nstr(mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_chr(mrfstr_t dst, mrfstr_chr_t src)
+mrfstr_res_enum_t mrfstr_set_chr(
+    mrfstr_t dst, mrfstr_chr_t src)
 {
     dst->size = 1;
     if (dst->alloc < 2)

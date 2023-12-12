@@ -5,7 +5,6 @@
 
 #include <alloc.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 ptr_t mrstr_alloc(mrstr_size_t size)
 {

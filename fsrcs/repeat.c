@@ -7,7 +7,9 @@
 #include <alloc.h>
 #include <string.h>
 
-mrfstr_res_enum_t mrfstr_repeat(mrfstr_t res, mrfstr_ct str, mrfstr_size_t count)
+mrfstr_res_enum_t mrfstr_repeat(
+    mrfstr_t res, mrfstr_ct str,
+    mrfstr_size_t count)
 {
     if (str->size == 1)
         return mrfstr_repeat_chr(res, *str->data, count);
@@ -105,7 +107,9 @@ mrfstr_res_enum_t mrfstr_repeat(mrfstr_t res, mrfstr_ct str, mrfstr_size_t count
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_repeat_chr(mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
+mrfstr_res_enum_t mrfstr_repeat_chr(
+    mrfstr_t res, mrfstr_chr_t chr,
+    mrfstr_size_t count)
 {
     if (!count)
     {

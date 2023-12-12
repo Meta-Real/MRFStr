@@ -18,7 +18,8 @@ mrfstr_t mrfstr_init()
     return str;
 }
 
-mrfstr_t mrfstr_init2(mrfstr_data_t data)
+mrfstr_t mrfstr_init2(
+    mrfstr_data_t data)
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
     if (!str)
@@ -37,7 +38,8 @@ mrfstr_t mrfstr_init2(mrfstr_data_t data)
     return str;
 }
 
-mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
+mrfstr_t mrfstr_init3(
+    mrfstr_data_t data, mrfstr_size_t size)
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
     if (!str)
@@ -56,7 +58,8 @@ mrfstr_t mrfstr_init3(mrfstr_data_t data, mrfstr_size_t size)
     return str;
 }
 
-mrfstr_res_enum_t mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_alloc(
+    mrfstr_t str,  mrfstr_size_t size)
 {
     if (!size)
         return MRFSTR_RES_NOERROR;
@@ -69,19 +72,22 @@ mrfstr_res_enum_t mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size)
     return MRFSTR_RES_NOERROR;
 }
 
-void mrfstr_free(mrfstr_t str)
+void mrfstr_free(
+    mrfstr_t str)
 {
     if (str->alloc)
         mrstr_aligned_free(str->data);
     mrstr_free(str);
 }
 
-void mrfstr_clear(mrfstr_t str)
+void mrfstr_clear(
+    mrfstr_t str)
 {
     str->size = 0;
 }
 
-mrfstr_res_enum_t mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_realloc(
+    mrfstr_t str, mrfstr_size_t size)
 {
     if (size == str->alloc)
         return MRFSTR_RES_NOERROR;
@@ -130,7 +136,8 @@ mrfstr_res_enum_t mrfstr_realloc(mrfstr_t str, mrfstr_size_t size)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_clear_realloc(
+    mrfstr_t str, mrfstr_size_t size)
 {
     str->size = 0;
     if (size == str->alloc)
@@ -147,7 +154,8 @@ mrfstr_res_enum_t mrfstr_clear_realloc(mrfstr_t str, mrfstr_size_t size)
     return str->data ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
-mrfstr_res_enum_t mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_expand(
+    mrfstr_t str, mrfstr_size_t size)
 {
     if (size == str->alloc)
         return MRFSTR_RES_NOERROR;
@@ -178,7 +186,8 @@ mrfstr_res_enum_t mrfstr_expand(mrfstr_t str, mrfstr_size_t size)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_clear_expand(
+    mrfstr_t str, mrfstr_size_t size)
 {
     str->size = 0;
     if (size == str->size)
@@ -192,7 +201,8 @@ mrfstr_res_enum_t mrfstr_clear_expand(mrfstr_t str, mrfstr_size_t size)
     return str->data ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
-mrfstr_res_enum_t mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
+mrfstr_res_enum_t mrfstr_expand_add(
+    mrfstr_t str, mrfstr_size_t add)
 {
     if (!add)
         return MRFSTR_RES_NOERROR;
@@ -223,7 +233,8 @@ mrfstr_res_enum_t mrfstr_expand_add(mrfstr_t str, mrfstr_size_t add)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add)
+mrfstr_res_enum_t mrfstr_clear_expand_add(
+    mrfstr_t str, mrfstr_size_t add)
 {
     str->size = 0;
     if (!add)
@@ -237,7 +248,8 @@ mrfstr_res_enum_t mrfstr_clear_expand_add(mrfstr_t str, mrfstr_size_t add)
     return str->data ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
-mrfstr_res_enum_t mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_shrink(
+    mrfstr_t str, mrfstr_size_t size)
 {
     if (size == str->alloc)
         return MRFSTR_RES_NOERROR;
@@ -267,7 +279,8 @@ mrfstr_res_enum_t mrfstr_shrink(mrfstr_t str, mrfstr_size_t size)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size)
+mrfstr_res_enum_t mrfstr_clear_shrink(
+    mrfstr_t str, mrfstr_size_t size)
 {
     str->size = 0;
     if (size == str->alloc)
@@ -284,7 +297,8 @@ mrfstr_res_enum_t mrfstr_clear_shrink(mrfstr_t str, mrfstr_size_t size)
     return str->data ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
-mrfstr_res_enum_t mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
+mrfstr_res_enum_t mrfstr_shrink_sub(
+    mrfstr_t str, mrfstr_size_t sub)
 {
     if (!sub)
         return MRFSTR_RES_NOERROR;
@@ -312,7 +326,8 @@ mrfstr_res_enum_t mrfstr_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
+mrfstr_res_enum_t mrfstr_clear_shrink_sub(
+    mrfstr_t str, mrfstr_size_t sub)
 {
     str->size = 0;
     if (!sub)
@@ -332,7 +347,8 @@ mrfstr_res_enum_t mrfstr_clear_shrink_sub(mrfstr_t str, mrfstr_size_t sub)
     return str->data ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
-void mrfstr_swap(mrfstr_t str1, mrfstr_t str2)
+void mrfstr_swap(
+    mrfstr_t str1, mrfstr_t str2)
 {
     if (str1 == str2)
         return;

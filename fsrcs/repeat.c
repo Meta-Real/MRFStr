@@ -43,12 +43,13 @@ mrfstr_res_enum_t mrfstr_repeat(mrfstr_t res, mrfstr_ct str, mrfstr_size_t count
 
     if (res == str)
     {
-        mrfstr_size_t size = res->size;
-        res->size *= count;
+        mrfstr_size_t size = res->size * count;
+        if (size / count != res->size)
+            return MRFSTR_RES_OVERFLOW_ERROR;
 
-        if (res->alloc <= res->size)
+        if (res->alloc <= size)
         {
-            res->alloc = res->size + 1;
+            res->alloc = size + 1;
             ptr_t block = mrstr_aligned_realloc(res->data, res->alloc, MRFSTR_SIMD_SIZE);
             if (!block)
                 return MRFSTR_RES_MEM_ERROR;
@@ -57,46 +58,50 @@ mrfstr_res_enum_t mrfstr_repeat(mrfstr_t res, mrfstr_ct str, mrfstr_size_t count
         }
 
         // We can do better
-        while (size <= res->size - size)
+        while (res->size <= size - res->size)
         {
-            mrfstr_memcpy(res->data + size, res->data, size);
-            size <<= 1;
+            mrfstr_memcpy(res->data + res->size, res->data, res->size);
+            res->size <<= 1;
         }
 
-        size = res->size - size;
-        if (size)
-            mrfstr_memcpy(res->data + size, res->data, size);
+        res->size = size - res->size;
+        if (res->size)
+            mrfstr_memcpy(res->data + res->size, res->data, res->size);
 
-        res->data[res->size] = '\0';
+        res->data[size] = '\0';
+        res->size = size;
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_size_t size = str->size;
-    res->size = size * count;
+    mrfstr_size_t size = str->size * count;
+    if (size / count != str->size)
+        return MRFSTR_RES_OVERFLOW_ERROR;
 
-    if (res->alloc <= res->size)
+    res->size = str->size;
+    if (res->alloc <= size)
     {
         if (res->alloc)
             mrstr_aligned_free(res->data);
 
-        res->alloc = res->size + 1;
+        res->alloc = size + 1;
         res->data = mrstr_aligned_alloc(res->alloc, MRFSTR_SIMD_SIZE);
         if (!res->data)
             return MRFSTR_RES_MEM_ERROR;
     }
 
     // We can do better
-    while (size <= res->size - size)
+    while (res->size <= size - res->size)
     {
-        mrfstr_memcpy(res->data + size, res->data, size);
-        size <<= 1;
+        mrfstr_memcpy(res->data + res->size, res->data, res->size);
+        res->size <<= 1;
     }
 
-    size = res->size - size;
-    if (size)
-        mrfstr_memcpy(res->data + size, res->data, size);
+    res->size = size - res->size;
+    if (res->size)
+        mrfstr_memcpy(res->data + res->size, res->data, res->size);
 
-    res->data[res->size] = '\0';
+    res->data[size] = '\0';
+    res->size = size;
     return MRFSTR_RES_NOERROR;
 }
 

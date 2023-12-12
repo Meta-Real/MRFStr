@@ -34,6 +34,9 @@ mrfstr_res_enum_t mrfstr_concat(mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2)
         }
 
         mrfstr_size_t size = res->size + str2->size;
+        if (size < res->size)
+            return MRFSTR_RES_OVERFLOW_ERROR;
+
         if (res->alloc <= size)
         {
             res->alloc = size + 1;
@@ -56,13 +59,17 @@ mrfstr_res_enum_t mrfstr_concat(mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2)
         return MRFSTR_RES_NOERROR;
     }
 
-    res->size = str1->size + str2->size;
-    if (res->alloc <= res->size)
+    mrfstr_size_t size = str1->size + str2->size;
+    if (size < str1->size)
+        return MRFSTR_RES_OVERFLOW_ERROR;
+
+    res->size = size++;
+    if (res->alloc < size)
     {
         if (res->alloc)
             mrstr_aligned_free(res->data);
 
-        res->alloc = res->size + 1;
+        res->alloc = size;
         res->data = mrstr_aligned_alloc(res->alloc, MRFSTR_SIMD_SIZE);
         if (!res->data)
             return MRFSTR_RES_MEM_ERROR;

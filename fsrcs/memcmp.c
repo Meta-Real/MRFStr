@@ -53,6 +53,8 @@ typedef unsigned long long mrfstr_memcmp_simd_t;
 #define MRFSTR_MEMCMP_SIMD_MASK (MRFSTR_MEMCMP_SIMD_SIZE - 1)
 #endif
 
+#define MRFSTR_MEMCMP_SLIMIT (0x100 * MRFSTR_MEMCMP_SIMD_SIZE - 1)
+
 #define mrfstr_memcmp_sub(x, y)                \
     do                                         \
     {                                          \
@@ -70,7 +72,6 @@ typedef unsigned long long mrfstr_memcmp_simd_t;
 
 #define MRFSTR_MEMCMP_TCHK (MRFSTR_MEMCMP_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCMP_TLIMIT (0x10000 * MRFSTR_MEMCMP_TCHK - 1)
-#define MRFSTR_MEMCMP_SLIMIT (0x1000 * MRFSTR_MEMCMP_SIMD_SIZE - 1)
 
 #define mrfstr_memcmp_tsub(x, y)               \
     do                                         \

@@ -42,8 +42,11 @@ typedef mrfstr_chr_t mrfstr_memset_simd_t;
 
 #endif
 
-#ifndef MRFSTR_MEMSET_NOSIMD
+#ifdef MRFSTR_MEMSET_NOSIMD
+#define MRFSTR_MEMSET_SLIMIT (0x800 * MRFSTR_MEMSET_SIMD_SIZE - 1)
+#else
 #define MRFSTR_MEMSET_SIMD_MASK (MRFSTR_MEMSET_SIMD_SIZE - 1)
+#define MRFSTR_MEMSET_SLIMIT (0x100 * MRFSTR_MEMSET_SIMD_SIZE - 1)
 
 #define mrfstr_memset_sub(r, c, s)     \
     for (; s; r++, s--)                \
@@ -58,10 +61,8 @@ typedef mrfstr_chr_t mrfstr_memset_simd_t;
 
 #ifdef MRFSTR_MEMSET_NOSIMD
 #define MRFSTR_MEMSET_TLIMIT (0x80000 * MRFSTR_THREAD_COUNT - 1)
-#define MRFSTR_MEMSET_SLIMIT (0x8000 * MRFSTR_MEMSET_SIMD_SIZE - 1)
 #else
 #define MRFSTR_MEMSET_TLIMIT (0x10000 * MRFSTR_MEMSET_TCHK - 1)
-#define MRFSTR_MEMSET_SLIMIT (0x1000 * MRFSTR_MEMSET_SIMD_SIZE - 1)
 #endif
 
 struct __MRFSTR_MEMSET_T

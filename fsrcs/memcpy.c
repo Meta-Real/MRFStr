@@ -144,8 +144,11 @@ typedef mrfstr_chr_t mrfstr_memcpy_simd_t;
 
 #endif
 
-#ifndef MRFSTR_MEMCPY_NOSIMD
+#ifdef MRFSTR_MEMCPY_NOSIMD
+#define MRFSTR_MEMCPY_SLIMIT (0x800 - 1)
+#else
 #define MRFSTR_MEMCPY_SIMD_MASK (MRFSTR_MEMCPY_SIMD_SIZE - 1)
+#define MRFSTR_MEMCPY_SLIMIT (0x100 * MRFSTR_MEMCPY_SIMD_SIZE - 1)
 #endif
 
 #if MRFSTR_THREADING
@@ -155,10 +158,8 @@ typedef mrfstr_chr_t mrfstr_memcpy_simd_t;
 
 #ifdef MRFSTR_MEMCPY_NOSIMD
 #define MRFSTR_MEMCPY_TLIMIT (0x80000 * MRFSTR_THREAD_COUNT - 1)
-#define MRFSTR_MEMCPY_SLIMIT (0x8000 - 1)
 #else
 #define MRFSTR_MEMCPY_TLIMIT (0x10000 * MRFSTR_MEMCPY_TCHK - 1)
-#define MRFSTR_MEMCPY_SLIMIT (0x1000 * MRFSTR_MEMCPY_SIMD_SIZE - 1)
 #endif
 
 struct __MRFSTR_MEMCPY_T

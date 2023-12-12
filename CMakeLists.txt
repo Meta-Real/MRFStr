@@ -17,7 +17,7 @@ add_library(MRFStr STATIC srcs/alloc.c
     fsrcs/memcpy.c fsrcs/memcmp.c fsrcs/memchr.c fsrcs/memset.c
     fsrcs/init.c fsrcs/set.c
     fsrcs/concat.c fsrcs/repeat.c
-    fsrcs/cmp.c fsrcs/contain.c
+    fsrcs/cmp.c fsrcs/contain.c fsrcs/find.c
     fsrcs/reverse.c
     fsrcs/util.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")

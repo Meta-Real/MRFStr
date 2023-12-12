@@ -17,6 +17,8 @@ typedef __m512i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_load _mm512_load_si512
 #define mrfstr_memchr_cmp _mm512_cmpeq_epi8_mask
 
+#define mrfstr_memchr2_cmp(r, x, y) r = _mm512_cmpeq_epi8_mask(x, y)
+
 #elif defined(__AVX__) && defined(__AVX2__)
 
 typedef __m256i mrfstr_memchr_simd_t;
@@ -27,6 +29,8 @@ typedef __m256i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_load _mm256_load_si256
 #define mrfstr_memchr_cmp(x, y) _mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y))
 
+#define mrfstr_memchr2_cmp(r, x, y) r = _mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y))
+
 #elif defined(__SSE2__)
 
 typedef __m128i mrfstr_memchr_simd_t;
@@ -36,6 +40,8 @@ typedef __m128i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_set(x, y) x = _mm_set1_epi8(y)
 #define mrfstr_memchr_load _mm_load_si128
 #define mrfstr_memchr_cmp(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
+
+#define mrfstr_memchr2_cmp(r, x, y) r = _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
 
 #else
 #define MRFSTR_MEMCHR_NOSIMD
@@ -60,16 +66,18 @@ typedef unsigned long long mrfstr_memchr_simd_t;
         r = (x - 0x1010101010101010ULL) & ~x & 0x8080808080808080ULL; \
     } while (0)
 
+#define mrfstr_memchr2_cmp mrfstr_memchr_cmp
+
 #endif
 
 #define MRFSTR_MEMCHR_SIMD_MASK (MRFSTR_MEMCHR_SIMD_SIZE - 1)
+#define MRFSTR_MEMCHR_SLIMIT (0x100 * MRFSTR_MEMCHR_SIMD_SIZE - 1)
 
 #if MRFSTR_THREADING
 #include <pthread.h>
 
 #define MRFSTR_MEMCHR_TCHK (MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCHR_TLIMIT (0x10000 * MRFSTR_MEMCHR_TCHK - 1)
-#define MRFSTR_MEMCHR_SLIMIT (0x1000 * MRFSTR_MEMCHR_SIMD_SIZE - 1)
 
 struct __MRFSTR_MEMCHR_T
 {
@@ -81,8 +89,35 @@ struct __MRFSTR_MEMCHR_T
 };
 typedef struct __MRFSTR_MEMCHR_T *mrfstr_memchr_t;
 
+struct __MRFSTR_MEMCHR2_T
+{
+    mrfstr_memchr_simd_t *str;
+    mrfstr_memchr_simd_t chr;
+    mrfstr_size_t size;
+    mrfstr_idx_t start;
+
+    volatile mrfstr_idx_t *res;
+    pthread_mutex_t *mutex;
+};
+typedef struct __MRFSTR_MEMCHR2_T *mrfstr_memchr2_t;
+
 void *mrfstr_memchr_threaded(void *args);
+void *mrfstr_memchr2_threaded(void *args);
 #endif
+
+mrfstr_idx_t bsf(mrfstr_size_t bits)
+{
+#ifdef __GNUC__
+    return __builtin_ctzll(bits);
+#elif defined(_MSC_VER)
+    mrfstr_idx_t idx;
+    _BitScanForward64(&idx, bits);
+    return idx;
+#else
+#error Undefined BSF
+    return bits;
+#endif
+}
 
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -237,6 +272,172 @@ rem:
 #endif
 }
 
+mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    if (size <= MRFSTR_MEMCHR_SLIMIT)
+    {
+        mrfstr_data_t ptr = memchr(str, chr, size);
+        return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
+    }
+
+#ifndef MRFSTR_MEMCHR_NOSIMD
+    mrfstr_bit_t align = (uintptr_t)str & MRFSTR_MEMCHR_SIMD_MASK;
+    if (align)
+    {
+        align = MRFSTR_MEMCHR_SIMD_SIZE - align;
+        mrfstr_data_t ptr = memchr(str, chr, align);
+        if (ptr)
+            return (mrfstr_idx_t)(ptr - str);
+
+        str += align;
+        size -= align;
+    }
+#endif
+
+    mrfstr_memchr_simd_t *sblock = (mrfstr_memchr_simd_t*)str;
+    mrfstr_memchr_simd_t cblock;
+    mrfstr_memchr_set(cblock, chr);
+
+    mrfstr_size_t rem;
+#if MRFSTR_THREADING
+    if (size <= MRFSTR_MEMCHR_TLIMIT)
+    {
+single:
+#endif
+        rem = size & MRFSTR_MEMCHR_SIMD_MASK;
+        size >>= MRFSTR_MEMCHR_SIMD_SHIFT;
+
+        mrfstr_memchr_simd_t block;
+        mrfstr_size_t rres;
+        for (; size; sblock++, size--)
+        {
+            block = mrfstr_memchr_load(sblock);
+
+            mrfstr_memchr2_cmp(rres, block, cblock);
+            if (rres)
+                return (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(rres);
+        }
+
+        mrfstr_data_t ptr = memchr(sblock, chr, rem);
+        return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
+#if MRFSTR_THREADING
+    }
+
+    rem = size % MRFSTR_MEMCHR_TCHK;
+    size /= MRFSTR_MEMCHR_TCHK;
+
+    volatile mrfstr_idx_t res = MRFSTR_INVIDX;
+    pthread_mutex_t mutex;
+    if (pthread_mutex_init(&mutex, NULL))
+        goto single;
+
+    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_bit_t i;
+    mrfstr_memchr2_t data;
+    mrfstr_data_t ptr;
+    for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
+    {
+        data = mrstr_alloc(sizeof(struct __MRFSTR_MEMCHR2_T));
+        if (!data)
+        {
+            if (!i)
+                goto single;
+            goto rem;
+        }
+
+        data->str = sblock;
+        data->chr = cblock;
+        data->size = size;
+        data->start = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str;
+        data->res = &res;
+        data->mutex = &mutex;
+
+        sblock += size;
+        if (pthread_create(threads + i, NULL, mrfstr_memchr2_threaded, data))
+        {
+            sblock -= size;
+            mrstr_free(data);
+
+            if (!i)
+                goto single;
+            goto rem;
+        }
+    }
+
+    ptr = memchr(sblock, chr, rem);
+    if (ptr)
+    {
+        pthread_mutex_lock(&mutex);
+        if (res == MRFSTR_INVIDX)
+            res = (mrfstr_idx_t)(ptr - str);
+        pthread_mutex_unlock(&mutex);
+    }
+
+ret:
+    while (i)
+        pthread_join(threads[--i], NULL);
+    return res;
+
+rem:
+    size *= MRFSTR_THREAD_COUNT - i;
+
+    mrfstr_size_t j;
+    mrfstr_memchr_simd_t block;
+    mrfstr_size_t rres;
+    while (size >= 0x10000)
+    {
+        if (res != MRFSTR_INVIDX)
+            goto ret;
+
+        for (j = 0; j < 0x10000; sblock++, j++)
+        {
+            block = mrfstr_memchr_load(sblock);
+
+            mrfstr_memchr2_cmp(rres, block, cblock);
+            if (rres)
+            {
+                pthread_mutex_lock(&mutex);
+                if (res != MRFSTR_INVIDX)
+                    res = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(rres);
+                pthread_mutex_unlock(&mutex);
+                goto ret;
+            }
+        }
+
+        size -= 0x10000;
+    }
+
+    if (res != MRFSTR_INVIDX)
+        goto ret;
+
+    for (; size; sblock++, size--)
+    {
+        block = mrfstr_memchr_load(sblock);
+
+        mrfstr_memchr2_cmp(rres, block, cblock);
+        if (rres)
+        {
+            pthread_mutex_lock(&mutex);
+            if (res != MRFSTR_INVIDX)
+                res = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(rres);
+            pthread_mutex_unlock(&mutex);
+            goto ret;
+        }
+    }
+
+    ptr = memchr(sblock, chr, rem);
+    if (ptr)
+    {
+        pthread_mutex_lock(&mutex);
+        if (res != MRFSTR_INVIDX)
+            res = (mrfstr_idx_t)(ptr - str);
+        pthread_mutex_unlock(&mutex);
+    }
+
+    goto ret;
+#endif
+}
+
 #if MRFSTR_THREADING
 void *mrfstr_memchr_threaded(void *args)
 {
@@ -294,6 +495,70 @@ void *mrfstr_memchr_threaded(void *args)
 #endif
         {
             *data->res = MRFSTR_TRUE;
+
+            mrstr_free(data);
+            return NULL;
+        }
+    }
+
+    mrstr_free(data);
+    return NULL;
+}
+
+void *mrfstr_memchr2_threaded(void *args)
+{
+    mrfstr_memchr2_t data = (mrfstr_memchr2_t)args;
+    mrfstr_data_t sptr = (mrfstr_data_t)data->str;
+
+    mrfstr_size_t i, rres;
+    mrfstr_memchr_simd_t block;
+    while (data->size >= 0x10000)
+    {
+        if (*data->res < data->start)
+        {
+            mrstr_free(data);
+            return NULL;
+        }
+
+        for (i = 0; i < 0x10000; data->str++, i++)
+        {
+            block = mrfstr_memchr_load(data->str);
+
+            mrfstr_memchr2_cmp(rres, block, data->chr);
+            if (rres)
+            {
+                pthread_mutex_lock(data->mutex);
+                if (*data->res > data->start)
+                    *data->res = (mrfstr_idx_t)data->str - (mrfstr_idx_t)sptr +
+                        data->start + bsf(rres);
+                pthread_mutex_unlock(data->mutex);
+
+                mrstr_free(data);
+                return NULL;
+            }
+        }
+
+        data->size -= 0x10000;
+    }
+
+    if (*data->res < data->start)
+    {
+        mrstr_free(data);
+        return NULL;
+    }
+
+    for (; data->size; data->str++, data->size--)
+    {
+        block = mrfstr_memchr_load(data->str);
+
+        mrfstr_memchr2_cmp(rres, block, data->chr);
+        if (rres)
+        {
+            pthread_mutex_lock(data->mutex);
+            if (*data->res > data->start)
+                *data->res = (mrfstr_idx_t)data->str - (mrfstr_idx_t)sptr +
+                    data->start + bsf(rres);
+            pthread_mutex_unlock(data->mutex);
 
             mrstr_free(data);
             return NULL;

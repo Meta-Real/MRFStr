@@ -13,9 +13,12 @@ typedef const mrfstr_chr_t *mrfstr_data_ct;
 typedef unsigned long long mrfstr_size_t;
 typedef unsigned char mrfstr_bit_t;
 typedef unsigned char mrfstr_bool_t;
+typedef unsigned long long mrfstr_idx_t;
 
 #define MRFSTR_TRUE 1
 #define MRFSTR_FALSE 0
+
+#define MRFSTR_INVIDX ((mrfstr_idx_t)-1)
 
 #define MRFSTR_THREADING 1
 
@@ -35,7 +38,8 @@ typedef const mrfstr_t mrfstr_ct;
 enum __MRFSTR_RES_ENUM
 {
     MRFSTR_RES_NOERROR,
-    MRFSTR_RES_MEM_ERROR
+    MRFSTR_RES_MEM_ERROR,
+    MRFSTR_RES_OVERFLOW_ERROR
 };
 typedef unsigned char mrfstr_res_enum_t;
 
@@ -93,6 +97,12 @@ mrfstr_bool_t mrfstr_equal_nstr(mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size
 /* contain functions */
 
 mrfstr_bool_t mrfstr_contain_chr(mrfstr_ct str, mrfstr_chr_t chr);
+mrfstr_bool_t mrfstr_n_contain_chr(mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+/* find functions */
+
+mrfstr_idx_t mrfstr_find_chr(mrfstr_ct str, mrfstr_chr_t chr);
+mrfstr_idx_t mrfstr_n_find_chr(mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* reverse functions */
 

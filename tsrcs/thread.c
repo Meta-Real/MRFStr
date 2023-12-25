@@ -8,9 +8,12 @@
 
 #define THREAD(i) mrtstr_threads.threads[i]
 
+mrtstr_threads_t mrtstr_threads;
+
 void *mrtstr_thread_main(void *args);
 
-mrtstr_res_enum_t mrtstr_init_threads(mrtstr_bit_t size)
+mrtstr_res_enum_t mrtstr_init_threads(
+    mrtstr_bit_t size)
 {
     mrtstr_threads.threads = mrstr_alloc(size * sizeof(mrtstr_thread_t));
     if (!mrtstr_threads.threads)

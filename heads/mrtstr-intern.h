@@ -19,9 +19,6 @@
 #define MRTSTR_SIMD_SIZE 8
 #endif
 
-#define MRTSTR_SIMD_TCHK (MRTSTR_SIMD_SIZE * MRTSTR_THREAD_COUNT)
-#define MRTSTR_SIMD_TLIMIT (0x10000 * MRTSTR_SIMD_TCHK - 1)
-
 #define mrtstr_lock_inc(l, m)    \
     do                           \
     {                            \

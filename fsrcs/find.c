@@ -8,21 +8,21 @@
 mrfstr_idx_t mrfstr_find_chr(
     mrfstr_ct str, mrfstr_chr_t chr)
 {
-    if (!str->size)
+    if (!MRFSTR_SIZE(str))
         return MRFSTR_INVIDX;
 
-    return mrfstr_memchr2(str->data, chr, str->size);
+    return mrfstr_memchr2(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
 }
 
 mrfstr_idx_t mrfstr_n_find_chr(
     mrfstr_ct str, mrfstr_chr_t chr,
     mrfstr_size_t size)
 {
-    if (!str->size)
+    if (size > MRFSTR_SIZE(str))
+        size = MRFSTR_SIZE(str);
+
+    if (!MRFSTR_SIZE(str))
         return MRFSTR_INVIDX;
 
-    if (size > str->size)
-        size = str->size;
-
-    return mrfstr_memchr2(str->data, chr, size);
+    return mrfstr_memchr2(MRFSTR_DATA(str), chr, size);
 }

@@ -6,7 +6,8 @@
 #include <mrtstr-intern.h>
 #include <stdio.h>
 
-mrtstr_data_t mrtstr_get_data(mrtstr_ct str)
+mrtstr_data_t mrtstr_get_data(
+    mrtstr_ct str)
 {
     if (!str->size)
         return NULL;
@@ -16,12 +17,14 @@ mrtstr_data_t mrtstr_get_data(mrtstr_ct str)
     return str->data;
 }
 
-mrtstr_size_t mrtstr_get_size(mrtstr_ct str)
+mrtstr_size_t mrtstr_get_size(
+    mrtstr_ct str)
 {
     return str->size;
 }
 
-mrtstr_bool_t mrtstr_locked(mrtstr_ct str)
+mrtstr_bool_t mrtstr_locked(
+    mrtstr_ct str)
 {
     mrtstr_bit_t i;
     for (i = 0; i < MRTSTR_THREAD_COUNT; i++)
@@ -30,7 +33,8 @@ mrtstr_bool_t mrtstr_locked(mrtstr_ct str)
     return MRTSTR_FALSE;
 }
 
-mrtstr_chr_t mrtstr_get_chr(mrtstr_ct str, mrtstr_size_t idx)
+mrtstr_chr_t mrtstr_get_chr(
+    mrtstr_ct str, mrtstr_size_t idx)
 {
     if (!str->forced)
         return str->data[idx];
@@ -44,7 +48,8 @@ mrtstr_chr_t mrtstr_get_chr(mrtstr_ct str, mrtstr_size_t idx)
     return str->data[idx];
 }
 
-void mrtstr_modify_chr(mrtstr_ct str, mrtstr_chr_t chr, mrtstr_size_t idx)
+void mrtstr_modify_chr(
+    mrtstr_ct str, mrtstr_chr_t chr, mrtstr_size_t idx)
 {
     mrtstr_size_t part = (idx / MRTSTR_SIMD_SIZE) /
         (str->size / (MRTSTR_SIMD_SIZE * MRTSTR_THREAD_COUNT));
@@ -58,11 +63,12 @@ void mrtstr_modify_chr(mrtstr_ct str, mrtstr_chr_t chr, mrtstr_size_t idx)
     str->data[idx] = chr;
 }
 
-void mrtstr_print(mrtstr_ct str)
+void mrtstr_print(
+    mrtstr_ct str)
 {
     if (!str->size)
         return;
 
     for (; mrtstr_locked(str););
-    fputs(str->data, stdout);
+    fwrite(str->data, 1, str->size, stdout);
 }

@@ -126,6 +126,10 @@ typedef __m128i mrtstr_memcpy_simd_t;
 
 typedef mrtstr_chr_t mrtstr_memcpy_simd_t;
 
+#define MRTSTR_MEMCPY_TCHK MRTSTR_THREAD_COUNT
+#define MRTSTR_MEMCPY_TLIMIT (0x80000 * MRTSTR_MEMCPY_TCHK - 1)
+#define MRTSTR_MEMCPY_SLIMIT (0x800 * MRTSTR_MEMCPY_SIMD_SIZE - 1)
+
 #define mrtstr_memcpy_sub memcpy
 #define mrtstr_memcpy_waitsub                                     \
     while (!mrtstr_threads.free_threads && data->size >= 0x10000) \
@@ -140,6 +144,10 @@ typedef mrtstr_chr_t mrtstr_memcpy_simd_t;
 
 #ifndef MRTSTR_MEMCPY_NOSIMD
 #define MRTSTR_MEMCPY_SIMD_MASK (MRTSTR_MEMCPY_SIMD_SIZE - 1)
+
+#define MRTSTR_MEMCPY_TCHK (MRTSTR_MEMCPY_SIMD_SIZE * MRTSTR_THREAD_COUNT)
+#define MRTSTR_MEMCPY_TLIMIT (0x10000 * MRTSTR_MEMCPY_TCHK - 1)
+#define MRTSTR_MEMCPY_SLIMIT (0x100 * MRTSTR_MEMCPY_SIMD_SIZE - 1)
 
 #define mrtstr_memcpy_sub(x, y, s)                                     \
     do                                                                 \
@@ -193,10 +201,16 @@ void mrtstr_memcpy2_threaded(void *args);
 
 void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size)
 {
+    if (size <= MRTSTR_MEMCPY_SLIMIT)
+    {
+        memcpy(dst->data, src->data, size);
+        return;
+    }
+
     mrtstr_memcpy_simd_t *dblock = (mrtstr_memcpy_simd_t*)dst->data;
     mrtstr_memcpy_simd_t *sblock = (mrtstr_memcpy_simd_t*)src->data;
 
-    if (size <= MRTSTR_SIMD_TLIMIT)
+    if (size <= MRTSTR_MEMCPY_TLIMIT)
     {
 #ifdef MRTSTR_MEMCPY_NOSIMD
         memcpy(dst->data, src->data, size);
@@ -211,13 +225,8 @@ void mrtstr_memcpy(mrtstr_t dst, mrtstr_ct src, mrtstr_size_t size)
         return;
     }
 
-#ifdef MRTSTR_MEMCPY_NOSIMD
-    mrtstr_bit_t rem = size % MRTSTR_THREAD_COUNT;
-    size /= MRTSTR_THREAD_COUNT;
-#else
-    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
-    size /= MRTSTR_SIMD_TCHK;
-#endif
+    mrtstr_size_t rem = size % MRTSTR_MEMCPY_TCHK;
+    size /= MRTSTR_MEMCPY_TCHK;
 
     mrtstr_bit_t i;
 #ifndef MRTSTR_MEMCPY_NOSIMD
@@ -336,10 +345,16 @@ rem2:
 
 void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
 {
+    if (size <= MRTSTR_MEMCPY_SLIMIT)
+    {
+        memcpy(dst->data, src, size);
+        return;
+    }
+
     mrtstr_memcpy_simd_t *dblock = (mrtstr_memcpy_simd_t*)dst->data;
     mrtstr_memcpy_simd_t *sblock = (mrtstr_memcpy_simd_t*)src;
 
-    if (size <= MRTSTR_SIMD_TLIMIT)
+    if (size <= MRTSTR_MEMCPY_TLIMIT)
     {
 #ifdef MRTSTR_MEMCPY_NOSIMD
         memcpy(dst->data, src, size);
@@ -354,13 +369,8 @@ void mrtstr_memcpy2(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
         return;
     }
 
-#ifdef MRTSTR_MEMCPY_NOSIMD
-    mrtstr_bit_t rem = size % MRTSTR_THREAD_COUNT;
-    size /= MRTSTR_THREAD_COUNT;
-#else
-    mrtstr_size_t rem = size % MRTSTR_SIMD_TCHK;
-    size /= MRTSTR_SIMD_TCHK;
-#endif
+    mrtstr_size_t rem = size % MRTSTR_MEMCPY_TCHK;
+    size /= MRTSTR_MEMCPY_TCHK;
 
     mrtstr_bit_t i;
 #ifndef MRTSTR_MEMCPY_NOSIMD

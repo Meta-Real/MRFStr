@@ -172,7 +172,7 @@ mrfstr_res_enum_t mrfstr_reverse(
         mrfstr_size_t size = res->size / MRFSTR_REV_TCHK;
 
         pthread_t threads[MRFSTR_THREAD_COUNT];
-        mrfstr_bit_t i;
+        mrfstr_byte_t i;
         mrfstr_rev_t data;
         for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         {
@@ -294,7 +294,7 @@ rem:
     mrfstr_size_t size = res->size / MRFSTR_REV2_TCHK;
 
     pthread_t threads[MRFSTR_THREAD_COUNT];
-    mrfstr_bit_t i;
+    mrfstr_byte_t i;
     mrfstr_rev_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {

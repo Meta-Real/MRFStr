@@ -7,16 +7,12 @@
 #include <alloc.h>
 #include <string.h>
 
-#ifdef __AVX512F__
-
-typedef __m512i mrfstr_memcpy_simd_t;
-#define MRFSTR_MEMCPY_SIMD_SIZE 64
-#define MRFSTR_MEMCPY_SIMD_SHIFT 6
+#if MRFSTR_SIMD_SIZE == 64
 
 #define mrfstr_memcpy_sub(x, y, s)            \
     do                                        \
     {                                         \
-        mrfstr_memcpy_simd_t                  \
+        mrfstr_simd_t                         \
             block1, block2, block3, block4;   \
                                               \
         for (; s >= 4; s -= 4)                \
@@ -38,16 +34,12 @@ typedef __m512i mrfstr_memcpy_simd_t;
         }                                     \
     } while (0)
 
-#elif defined(__AVX__)
-
-typedef __m256i mrfstr_memcpy_simd_t;
-#define MRFSTR_MEMCPY_SIMD_SIZE 32
-#define MRFSTR_MEMCPY_SIMD_SHIFT 5
+#elif MRFSTR_SIMD_SIZE == 32
 
 #define mrfstr_memcpy_sub(x, y, s)            \
     do                                        \
     {                                         \
-        mrfstr_memcpy_simd_t                  \
+        mrfstr_simd_t                         \
             block1, block2, block3, block4,   \
             block5, block6, block7, block8;   \
                                               \
@@ -78,16 +70,12 @@ typedef __m256i mrfstr_memcpy_simd_t;
         }                                     \
     } while (0)
 
-#elif defined(__SSE2__)
-
-typedef __m128i mrfstr_memcpy_simd_t;
-#define MRFSTR_MEMCPY_SIMD_SIZE 16
-#define MRFSTR_MEMCPY_SIMD_SHIFT 4
+#elif MRFSTR_SIMD_SIZE == 16
 
 #define mrfstr_memcpy_sub(x, y, s)              \
     do                                          \
     {                                           \
-        mrfstr_memcpy_simd_t                    \
+        mrfstr_simd_t                           \
             block01, block02, block03, block04, \
             block05, block06, block07, block08, \
             block09, block10, block11, block12, \
@@ -136,36 +124,15 @@ typedef __m128i mrfstr_memcpy_simd_t;
         }                                       \
     } while (0)
 
-#else
-#define MRFSTR_MEMCPY_NOSIMD
-
-typedef mrfstr_chr_t mrfstr_memcpy_simd_t;
-#define MRFSTR_MEMCPY_SIMD_SIZE 1
-
-#endif
-
-#ifdef MRFSTR_MEMCPY_NOSIMD
-#define MRFSTR_MEMCPY_SLIMIT (0x800 - 1)
-#else
-#define MRFSTR_MEMCPY_SIMD_MASK (MRFSTR_MEMCPY_SIMD_SIZE - 1)
-#define MRFSTR_MEMCPY_SLIMIT (0x100 * MRFSTR_MEMCPY_SIMD_SIZE - 1)
 #endif
 
 #if MRFSTR_THREADING
 #include <pthread.h>
 
-#define MRFSTR_MEMCPY_TCHK (MRFSTR_MEMCPY_SIMD_SIZE * MRFSTR_THREAD_COUNT)
-
-#ifdef MRFSTR_MEMCPY_NOSIMD
-#define MRFSTR_MEMCPY_TLIMIT (0x80000 * MRFSTR_THREAD_COUNT - 1)
-#else
-#define MRFSTR_MEMCPY_TLIMIT (0x10000 * MRFSTR_MEMCPY_TCHK - 1)
-#endif
-
 struct __MRFSTR_MEMCPY_T
 {
-    mrfstr_memcpy_simd_t *src;
-    mrfstr_memcpy_simd_t *dst;
+    mrfstr_simd_t *src;
+    mrfstr_simd_t *dst;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_MEMCPY_T *mrfstr_memcpy_t;
@@ -175,17 +142,17 @@ void *mrfstr_memcpy_threaded(void *args);
 
 void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-    if (size <= MRFSTR_MEMCPY_SLIMIT)
+    if (size < MRFSTR_SIMD_SLIMIT)
     {
         memcpy(dst, src, size);
         return;
     }
 
-#ifndef MRFSTR_MEMCPY_NOSIMD
-    mrfstr_bit_t align = (uintptr_t)dst & MRFSTR_MEMCPY_SIMD_MASK;
+#ifndef MRFSTR_NOSIMD
+    mrfstr_byte_t align = (uintptr_t)dst & MRFSTR_SIMD_MASK;
     if (align)
     {
-        align = MRFSTR_MEMCPY_SIMD_SIZE - align;
+        align = MRFSTR_SIMD_SIZE - align;
         memcpy(dst, src, align);
 
         dst += align;
@@ -194,20 +161,20 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_MEMCPY_NOSIMD) || defined(MRFSTR_THREADING)
-    mrfstr_memcpy_simd_t *dblock = (mrfstr_memcpy_simd_t*)dst;
-    mrfstr_memcpy_simd_t *sblock = (mrfstr_memcpy_simd_t*)src;
+#if !defined(MRFSTR_NOSIMD) || defined(MRFSTR_THREADING)
+    mrfstr_simd_t *dblock = (mrfstr_simd_t*)dst;
+    mrfstr_simd_t *sblock = (mrfstr_simd_t*)src;
 #endif
 
 #if MRFSTR_THREADING
-    if (size <= MRFSTR_MEMCPY_TLIMIT)
+    if (size < MRFSTR_SIMD_TLIMIT)
     {
 #endif
-#ifdef MRFSTR_MEMCPY_NOSIMD
+#ifdef MRFSTR_NOSIMD
         memcpy(dst, src, size);
 #else
-        mrfstr_bit_t rem = size & MRFSTR_MEMCPY_SIMD_MASK;
-        size >>= MRFSTR_MEMCPY_SIMD_SHIFT;
+        mrfstr_byte_t rem = size & MRFSTR_SIMD_MASK;
+        size >>= MRFSTR_SIMD_SHIFT;
 
         mrfstr_memcpy_sub(dblock, sblock, size);
         memcpy(dblock, sblock, rem);
@@ -216,11 +183,16 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         return;
     }
 
-    mrfstr_size_t rem = size % MRFSTR_MEMCPY_TCHK;
-    size /= MRFSTR_MEMCPY_TCHK;
+#ifdef MRFSTR_NOSIMD
+    mrfstr_byte_t rem = size % MRFSTR_THREAD_COUNT;
+    size /= MRFSTR_THREAD_COUNT;
+#else
+    mrfstr_short_t rem = size % MRFSTR_SIMD_TCHK;
+    size /= MRFSTR_SIMD_TCHK;
+#endif
 
     pthread_t threads[MRFSTR_THREAD_COUNT];
-    mrfstr_bit_t i;
+    mrfstr_byte_t i;
     mrfstr_memcpy_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
     {
@@ -255,7 +227,7 @@ ret:
 rem:
     size *= MRFSTR_THREAD_COUNT - i;
 
-#ifdef MRFSTR_MEMCPY_NOSIMD
+#ifdef MRFSTR_NOSIMD
     memcpy(dblock, sblock, size + rem);
 #else
     mrfstr_memcpy_sub(dblock, sblock, size);
@@ -270,7 +242,7 @@ void *mrfstr_memcpy_threaded(void *args)
 {
     mrfstr_memcpy_t data = args;
 
-#ifdef MRFSTR_MEMCPY_NOSIMD
+#ifdef MRFSTR_NOSIMD
     memcpy(data->dst, data->src, data->size);
 #else
     mrfstr_memcpy_sub(data->dst, data->src, data->size);

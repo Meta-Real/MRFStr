@@ -13,11 +13,12 @@ set(CMAKE_C_FLAGS_RELEASE "-O3")
 
 project(MRFStr VERSION 1.0.0)
 
-add_library(MRFStr STATIC srcs/alloc.c
+add_library(MRFStr STATIC
     fsrcs/memcpy.c fsrcs/memcmp.c fsrcs/memchr.c fsrcs/memset.c
     fsrcs/init.c fsrcs/set.c
     fsrcs/concat.c fsrcs/repeat.c
-    fsrcs/reverse.c fsrcs/replace.c
+#    fsrcs/reverse.c
+    fsrcs/replace.c
     fsrcs/cmp.c fsrcs/contain.c fsrcs/find.c
     fsrcs/util.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
@@ -29,7 +30,7 @@ install(FILES mrfstr.h DESTINATION include)
 
 project(MRTStr VERSION 1.0.0)
 
-add_library(MRTStr STATIC srcs/alloc.c tsrcs/thread.c
+add_library(MRTStr STATIC tsrcs/thread.c
     tsrcs/memcpy.c tsrcs/memcmp.c tsrcs/memchr.c tsrcs/memset.c
     tsrcs/init.c tsrcs/set.c
     tsrcs/repeat.c

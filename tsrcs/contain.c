@@ -7,7 +7,9 @@
 #include <alloc.h>
 #include <string.h>
 
-mrtstr_res_enum_t mrtstr_contain_chr(mrtstr_bres_t *res, mrtstr_ct str, mrtstr_chr_t chr)
+mrtstr_res_enum_t mrtstr_contain_chr(
+    mrtstr_bres_t *res,
+    mrtstr_ct str, mrtstr_chr_t chr)
 {
     if (!str->size)
     {

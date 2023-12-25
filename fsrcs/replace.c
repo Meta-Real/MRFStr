@@ -6,73 +6,76 @@
 #include <mrfstr-intern.h>
 #include <alloc.h>
 
-#if defined(__AVX512F__) && defined(__AVX512BW__)
+#if MRFSTR_SIMD_SIZE == 64 && defined(__AVX512BW__)
 
 typedef __m512i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 64
 #define MRFSTR_REPL_SIMD_SHIFT 6
 
 #define mrfstr_repl_set _mm512_set1_epi8
-#define mrfstr_repl_load _mm512_load_si512
-#define mrfstr_repl_cmp _mm512_cmpeq_epi8_mask
+#define mrfstr_repl_loadu _mm512_loadu_si512
+#define mrfstr_repl_cmpeq _mm512_cmpeq_epi8_mask
 #define mrfstr_repl_store _mm512_mask_storeu_epi8
 
 #elif defined(__AVX__) && defined(__AVX2__)
+#define MRFSTR_NOAVX512
 
 typedef __m256i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 32
 #define MRFSTR_REPL_SIMD_SHIFT 5
 
 #define mrfstr_repl_set _mm256_set1_epi8
-#define mrfstr_repl_load _mm256_load_si256
-#define mrfstr_repl_cmp(x, y) _mm256_movemask_epi8(_mm256_cmpeq_epi8(x, y))
-#define mrfstr_repl_store _mm256_mask_storeu_epi8
+#define mrfstr_repl_loadu _mm256_loadu_si256
+#define mrfstr_repl_cmpeq _mm256_cmpeq_epi8
+#define mrfstr_repl_store(r, x, y, c) _mm256_store_si256((r), _mm256_blendv_epi8((x), (y), (c)))
 
 #elif defined(__SSE2__)
+#define MRFSTR_NOAVX512
 
 typedef __m128i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 16
 #define MRFSTR_REPL_SIMD_SHIFT 4
 
 #define mrfstr_repl_set _mm_set1_epi8
-#define mrfstr_repl_load _mm_load_si128
-#define mrfstr_repl_cmp(x, y) _mm_movemask_epi8(_mm_cmpeq_epi8(x, y))
-#define mrfstr_repl_store _mm_mask_storeu_epi8
+#define mrfstr_repl_loadu _mm_loadu_si128
+#define mrfstr_repl_cmpeq _mm_cmpeq_epi8
+#define mrfstr_repl_store(r, x, y, c) _mm_store_si128((r), _mm_blendv_epi8((x), (y), (c)))
 
 #else
 #error 64-bit Replace Not Implemented Yet
 #endif
 
 #define MRFSTR_REPL_SIMD_MASK (MRFSTR_REPL_SIMD_SIZE - 1)
+#define MRFSTR_REPL_SLIMIT (0x100 * MRFSTR_REPL_SIMD_SIZE)
 
-#define mrfstr_repl_sub(r, o, n, s)            \
-    do                                         \
-    {                                          \
-        mrfstr_repl_simd_t block;              \
-        mrfstr_size_t rres;                    \
-        for (; s; r++, s--)                    \
-        {                                      \
-            block = mrfstr_repl_load(r);       \
-            rres = mrfstr_repl_cmp(block, o);  \
-            if (rres)                          \
-                mrfstr_repl_store(r, rres, n); \
-        }                                      \
+#define mrfstr_repl_sub(r, o, n, s)             \
+    do                                          \
+    {                                           \
+        mrfstr_repl_simd_t block;               \
+        mrfstr_size_t cres;                     \
+        for (; s; r++, s--)                     \
+        {                                       \
+            block = mrfstr_repl_loadu(r);       \
+            cres = mrfstr_repl_cmpeq(block, o); \
+            if (cres)                           \
+                mrfstr_repl_store(r, cres, n);  \
+        }                                       \
     } while (0)
 
-#define mrfstr_repl_rem                             \
-    do                                              \
-    {                                               \
-        mrfstr_data_t rptr = (mrfstr_data_t)rblock; \
-        for (; rem; rptr++, rem--)                  \
-            if (*rptr == old)                       \
-                *rptr = new;                        \
+#define mrfstr_repl_rem               \
+    do                                \
+    {                                 \
+        rptr = (mrfstr_data_t)rblock; \
+        for (; rem; rptr++, rem--)    \
+            if (*rptr == old)         \
+                *rptr = new;          \
     } while (0)
 
 #if MRFSTR_THREADING
 #include <pthread.h>
 
 #define MRFSTR_REPL_TCHK (MRFSTR_REPL_SIMD_SIZE * MRFSTR_THREAD_COUNT)
-#define MRFSTR_REPL_TLIMIT (0x10000 * MRFSTR_REPL_TCHK - 1)
+#define MRFSTR_REPL_TLIMIT (0x10000 * MRFSTR_REPL_TCHK)
 
 struct __MRFSTR_REPL_T
 {
@@ -86,41 +89,100 @@ typedef struct __MRFSTR_REPL_T *mrfstr_repl_t;
 void *mrfstr_repl_threaded(void *args);
 #endif
 
-mrfstr_res_enum_t mrfstr_replace(
+void mrfstr_replace(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new)
 {
-    if (!str->size)
+    if (MRFSTR_SIZE(str) <= MRFSTR_REPL_SLIMIT)
     {
-        res->size = 0;
-        return MRFSTR_RES_NOERROR;
+        mrfstr_chr_t chr;
+        mrfstr_short_t i;
+        if (res == str)
+        {
+            for (i = 0; i < MRFSTR_SIZE(str); i++)
+            {
+                chr = MRFSTR_DATA(res)[i];
+                if (chr == old)
+                    chr = new;
+            }
+
+            return;
+        }
+
+        for (i = 0; i < MRFSTR_SIZE(str); i++)
+        {
+            chr = MRFSTR_DATA(str)[i];
+            MRFSTR_DATA(res)[i] = chr == old ? new : chr;
+        }
+
+        return;
+    }
+
+    if (!MRFSTR_SIZE(str))
+    {
+        mrstr_free(MRFSTR_DATA(res));
+
+        MRFSTR_DATA(res) = NULL;
+        MRFSTR_SIZE(res) = 0;
+        return;
     }
 
     if (res == str)
     {
-        mrfstr_repl_simd_t *rblock = (mrfstr_repl_simd_t*)res->data;
+        mrstr_size_t size = MRFSTR_SIZE(res);
+        mrfstr_data_t rptr = MRFSTR_DATA(res);
+
+        mrfstr_byte_t align = (uintptr_t)MRFSTR_DATA(res) & MRFSTR_REPL_SIMD_SIZE;
+        if (align)
+        {
+            align = MRFSTR_REPL_SIMD_SIZE - align;
+            size -= align;
+
+            for (; align; rptr++, align--)
+                if (*rptr == old)
+                    *rptr = new;
+        }
+
+        mrfstr_repl_simd_t *rblock = (mrfstr_repl_simd_t*)rptr;
         mrfstr_repl_simd_t oblock = mrfstr_repl_set(old);
         mrfstr_repl_simd_t nblock = mrfstr_repl_set(new);
 
 #if MRFSTR_THREADING
-        if (res->size <= MRFSTR_REPL_TLIMIT)
+        if (MRFSTR_SIZE(res) < MRFSTR_REPL_TLIMIT)
         {
 #endif
-            mrfstr_bit_t rem = res->size & MRFSTR_REPL_SIMD_MASK;
-            mrfstr_size_t size = res->size >> MRFSTR_REPL_SIMD_SHIFT;
+            mrfstr_byte_t rem = size & MRFSTR_REPL_SIMD_MASK;
+            size >>= MRFSTR_REPL_SIMD_SHIFT;
 
-            mrfstr_repl_sub(rblock, oblock, nblock, size);
+            mrfstr_repl_simd_t block;
+#ifdef MRFSTR_NOAVX512
+            mrfstr_repl_simd_t cres;
+#else
+            mrfstr_size_t cres;
+#endif
+            for (; size; rblock++, size--)
+            {
+                block = mrfstr_repl_loadu(rblock);
+
+                cres = mrfstr_repl_cmpeq(block, oblock);
+#ifdef MRFSTR_NOAVX512
+                mrfstr_repl_store(rblock, nblock, block, cres);
+#else
+                if (cres)
+                    mrfstr_repl_store(rblock, cres, nblock);
+#endif
+            }
+
             mrfstr_repl_rem;
-
-            return MRFSTR_RES_NOERROR;
+            return;
 #if MRFSTR_THREADING
         }
 
-        mrfstr_size_t rem = res->size % MRFSTR_REPL_TCHK;
-        mrfstr_size_t size = res->size / MRFSTR_REPL_TCHK;
+        mrfstr_short_t rem = size % MRFSTR_REPL_TCHK;
+        size /= MRFSTR_REPL_TCHK;
 
         pthread_t threads[MRFSTR_THREAD_COUNT];
-        mrfstr_bit_t i;
+        mrfstr_byte_t i;
         mrfstr_repl_t data;
         for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
         {
@@ -148,24 +210,60 @@ ret:
 
         while (i--)
             pthread_join(threads[i], NULL);
-        return MRFSTR_RES_NOERROR;
+        return;
 
 rem:
         size *= MRFSTR_THREAD_COUNT - i;
-        mrfstr_repl_sub(rblock, oblock, nblock, size);
+
+        mrfstr_repl_simd_t block;
+#ifdef MRFSTR_NOAVX512
+        mrfstr_repl_simd_t cres;
+#else
+        mrfstr_size_t cres;
+#endif
+        for (; size; rblock++, size--)
+        {
+            block = mrfstr_repl_loadu(rblock);
+
+            cres = mrfstr_repl_cmpeq(block, oblock);
+#ifdef MRFSTR_NOAVX512
+            mrfstr_repl_store(rblock, nblock, block, cres);
+#else
+            if (cres)
+                mrfstr_repl_store(rblock, cres, nblock);
+#endif
+        }
+
         goto ret;
 #endif
     }
 
     // For later support
-    return MRFSTR_RES_NOERROR;
 }
 
 #if MRFSTR_THREADING
 void *mrfstr_repl_threaded(void *args)
 {
     mrfstr_repl_t data = (mrfstr_repl_t)args;
-    mrfstr_repl_sub(data->res, data->old, data->new, data->size);
+
+    mrfstr_repl_simd_t block;
+#ifdef MRFSTR_NOAVX512
+        mrfstr_repl_simd_t cres;
+#else
+        mrfstr_size_t cres;
+#endif
+        for (; data->size; data->res++, data->size--)
+        {
+            block = mrfstr_repl_loadu(data->res);
+
+            cres = mrfstr_repl_cmpeq(block, data->old);
+#ifdef MRFSTR_NOAVX512
+            mrfstr_repl_store(data->res, data->new, block, cres);
+#else
+            if (cres)
+                mrfstr_repl_store(data->res, cres, data->new);
+#endif
+        }
 
     mrstr_free(data);
     return NULL;

@@ -7,7 +7,8 @@
 #include <alloc.h>
 #include <string.h>
 
-mrtstr_res_enum_t mrtstr_set(mrtstr_t dst, mrtstr_ct src)
+mrtstr_res_enum_t mrtstr_set(
+    mrtstr_t dst, mrtstr_ct src)
 {
     for (; mrtstr_locked(dst););
 
@@ -20,24 +21,24 @@ mrtstr_res_enum_t mrtstr_set(mrtstr_t dst, mrtstr_ct src)
         return MRTSTR_RES_NOERROR;
     }
 
-    mrtstr_size_t size = src->size + 1;
-    if (dst->alloc < size)
+    if (dst->alloc < src->size)
     {
-        if (dst->alloc && dst->data != src->data)
+        if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
-        dst->alloc = size;
-        dst->data = mrstr_aligned_alloc(dst->alloc, MRTSTR_SIMD_SIZE);
+        dst->data = mrstr_aligned_alloc(src->size, MRTSTR_SIMD_SIZE);
+        dst->alloc = src->size;
         if (!dst->data)
             return MRTSTR_RES_MEM_ERROR;
     }
 
-    mrtstr_memcpy(dst, src, size);
+    mrtstr_memcpy(dst, src, src->size);
     dst->size = src->size;
     return MRTSTR_RES_NOERROR;
 }
 
-mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
+mrtstr_res_enum_t mrtstr_set_str(
+    mrtstr_t dst, mrtstr_data_ct src)
 {
     for (; mrtstr_locked(dst););
 
@@ -51,14 +52,14 @@ mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
         return MRTSTR_RES_NOERROR;
     }
 
-    dst->size = size++;
+    dst->size = size;
     if (dst->alloc < size)
     {
-        if (dst->alloc && dst->data != src)
+        if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
+        dst->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
         dst->alloc = size;
-        dst->data = mrstr_aligned_alloc(dst->alloc, MRTSTR_SIMD_SIZE);
         if (!dst->data)
             return MRTSTR_RES_MEM_ERROR;
     }
@@ -67,7 +68,8 @@ mrtstr_res_enum_t mrtstr_set_str(mrtstr_t dst, mrtstr_data_ct src)
     return MRTSTR_RES_NOERROR;
 }
 
-mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
+mrtstr_res_enum_t mrtstr_set_nstr(
+    mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_t size)
 {
     for (; mrtstr_locked(dst););
 
@@ -80,14 +82,14 @@ mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_
         return MRTSTR_RES_NOERROR;
     }
 
-    dst->size = size++;
+    dst->size = size;
     if (dst->alloc < size)
     {
         if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
+        dst->data = mrstr_aligned_alloc(size, MRTSTR_SIMD_SIZE);
         dst->alloc = size;
-        dst->data = mrstr_aligned_alloc(dst->alloc, MRTSTR_SIMD_SIZE);
         if (!dst->data)
             return MRTSTR_RES_MEM_ERROR;
     }
@@ -96,23 +98,23 @@ mrtstr_res_enum_t mrtstr_set_nstr(mrtstr_t dst, mrtstr_data_ct src, mrtstr_size_
     return MRTSTR_RES_NOERROR;
 }
 
-mrtstr_res_enum_t mrtstr_set_chr(mrtstr_t dst, mrtstr_chr_t src)
+mrtstr_res_enum_t mrtstr_set_chr(
+    mrtstr_t dst, mrtstr_chr_t src)
 {
     for (; mrtstr_locked(dst););
 
     dst->size = 1;
-    if (dst->alloc < 2)
+    if (!dst->alloc)
     {
         if (dst->alloc)
             mrstr_aligned_free(dst->data);
 
-        dst->alloc = 2;
-        dst->data = mrstr_aligned_alloc(2, MRTSTR_SIMD_SIZE);
+        dst->data = mrstr_aligned_alloc(1, MRTSTR_SIMD_SIZE);
+        dst->alloc = 1;
         if (!dst->data)
             return MRTSTR_RES_MEM_ERROR;
     }
 
     *dst->data = src;
-    dst->data[1] = '\0';
     return MRTSTR_RES_NOERROR;
 }

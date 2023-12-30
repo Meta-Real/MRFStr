@@ -27,18 +27,3 @@ add_custom_command(TARGET MRFStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy l
 
 install(TARGETS MRFStr DESTINATION lib)
 install(FILES mrfstr.h DESTINATION include)
-
-project(MRTStr VERSION 1.0.0)
-
-add_library(MRTStr STATIC tsrcs/thread.c
-    tsrcs/memcpy.c tsrcs/memcmp.c tsrcs/memchr.c tsrcs/memset.c
-    tsrcs/init.c tsrcs/set.c
-    tsrcs/repeat.c
-    tsrcs/cmp.c tsrcs/contain.c
-    tsrcs/util.c tsrcs/bres.c)
-target_include_directories(MRTStr PUBLIC "heads" PUBLIC ".")
-
-add_custom_command(TARGET MRTStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy libMRTStr.a ..)
-
-install(TARGETS MRTStr DESTINATION lib)
-install(FILES mrtstr.h DESTINATION include)

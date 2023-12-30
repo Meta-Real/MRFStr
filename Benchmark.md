@@ -20,7 +20,7 @@ c = a + b # 1GB
 ```
 
 * **Python:** 326.40 milliseconds (3.064 GB/s)
-* **C:** 141.04 milliseconds (7.0902 GB/s)
+* **C:** 141.04 milliseconds (7.09 GB/s)
 * **MRFStr:** 45.77 milliseconds (21.848 GB/s)
 
 ## mrfstr_repeat
@@ -31,7 +31,7 @@ a = 'Hello' * (1024 * 1024 * 200) # 1GB
 
 * **Python:** 331.43 milliseconds (3.017 GB/s)
 * **C:** 126.82 milliseconds (7.885 GB/s)
-* **MRFStr:** 48.90 milliseconds (20.450 GB/s)
+* **MRFStr:** 48.90 milliseconds (20.45 GB/s)
 
 ## mrfstr_repeat_chr
 
@@ -51,8 +51,8 @@ a[::-1]
 ```
 
 * **Python:** 593.23 milliseconds (1.686 GB/s)
-* **C:** 632.79 milliseconds (1.580 GB/s)
-* **MRFStr:** 47.46 milliseconds (21.070 GB/s)
+* **C:** 632.79 milliseconds (1.58 GB/s)
+* **MRFStr:** 47.46 milliseconds (21.07 GB/s)
 
 ## mrfstr_replace
 
@@ -73,7 +73,7 @@ b = '0' * (1024 * 1024 * 1024) # 1GB
 a == b
 ```
 
-* **Python:** 96.15 milliseconds (10.400 GB/s)
+* **Python:** 96.15 milliseconds (10.4 GB/s)
 * **C:** 96.23 milliseconds (10.392 GB/s)
 * **MRFStr:** 48.12 milliseconds (20.781 GB/s)
 
@@ -84,7 +84,7 @@ a = '0' * (1024 * 1024 * 1024) # 1GB
 '1' in a
 ```
 
-* **Python:** 248.42 milliseconds (4.0254 GB/s)
+* **Python:** 248.42 milliseconds (4.025 GB/s)
 * **C:** 252.75 milliseconds (3.956 GB/s)
 * **MRFStr:** 24.56 milliseconds (40.717 GB/s)
 
@@ -95,6 +95,6 @@ a = '0' * (1024 * 1024 * 1024) # 1GB
 a.find('1')
 ```
 
-* **Python:** 248.64 milliseconds (4.0219 GB/s)
+* **Python:** 248.64 milliseconds (4.022 GB/s)
 * **C:** 250.65 milliseconds (3.99 GB/s)
 * **MRFStr:** 24.66 milliseconds (40.552 GB/s)

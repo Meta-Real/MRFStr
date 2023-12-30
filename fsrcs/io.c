@@ -18,5 +18,11 @@ void mrfstr_print(
 void mrfstr_n_print(
     mrfstr_ct str, mrfstr_size_t size)
 {
+    if (size > MRFSTR_SIZE(str))
+        size = MRFSTR_SIZE(str);
+
+    if (!size)
+        return;
+
     fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stdout);
 }

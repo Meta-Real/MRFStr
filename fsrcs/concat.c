@@ -51,6 +51,9 @@ mrfstr_res_enum_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size)
 {
+    if (size > MRFSTR_SIZE(str2))
+        size = MRFSTR_SIZE(str2);
+
     if (res == str1)
     {
         if (!size)

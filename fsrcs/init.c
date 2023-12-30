@@ -45,6 +45,9 @@ mrfstr_t mrfstr_init3(
 mrfstr_res_enum_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size)
 {
+    if (!size)
+        return MRFSTR_RES_NOERROR;
+
     MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
@@ -68,6 +71,15 @@ void mrfstr_clear(
 mrfstr_res_enum_t mrfstr_realloc(
     mrfstr_t str, mrfstr_size_t size)
 {
+    if (!size)
+    {
+        mrstr_free(MRFSTR_DATA(str));
+
+        MRFSTR_DATA(str) = NULL;
+        MRFSTR_SIZE(str) = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
     if (!MRFSTR_SIZE(str))
     {
         mrstr_free(MRFSTR_DATA(str));
@@ -80,7 +92,7 @@ mrfstr_res_enum_t mrfstr_realloc(
         return MRFSTR_RES_MEM_ERROR;
 
     MRFSTR_DATA(str) = block;
-    if (MRFSTR_SIZE(str) < size)
+    if (MRFSTR_SIZE(str) > size)
         MRFSTR_SIZE(str) = size;
 
     return MRFSTR_RES_NOERROR;
@@ -91,6 +103,12 @@ mrfstr_res_enum_t mrfstr_clear_realloc(
 {
     mrstr_free(MRFSTR_DATA(str));
     MRFSTR_SIZE(str) = 0;
+
+    if (!size)
+    {
+        MRFSTR_DATA(str) = NULL;
+        return MRFSTR_RES_NOERROR;
+    }
 
     MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
@@ -127,6 +145,15 @@ mrfstr_res_enum_t mrfstr_clear_expand(
 mrfstr_res_enum_t mrfstr_shrink(
     mrfstr_t str, mrfstr_size_t size)
 {
+    if (!size)
+    {
+        mrstr_free(MRFSTR_DATA(str));
+
+        MRFSTR_DATA(str) = NULL;
+        MRFSTR_SIZE(str) = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
     mrfstr_data_t block = mrstr_realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
     if (!block)
         return MRFSTR_RES_MEM_ERROR;
@@ -143,6 +170,12 @@ mrfstr_res_enum_t mrfstr_clear_shrink(
 {
     mrstr_free(MRFSTR_DATA(str));
     MRFSTR_SIZE(str) = 0;
+
+    if (!size)
+    {
+        MRFSTR_DATA(str) = NULL;
+        return MRFSTR_RES_NOERROR;
+    }
 
     MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;

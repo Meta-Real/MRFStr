@@ -59,11 +59,11 @@ typedef uint64_t mrfstr_memchr_simd_t;
     } while (0)
 
 #define mrfstr_memchr_loadu(x) (*(x))
-#define mrfstr_memchr_cmpeq(r, x, y)                                      \
-    do                                                                    \
-    {                                                                     \
-        (x) ^= (y);                                                       \
-        (r) = ((x)-0x1010101010101010ULL) & ~(x) & 0x8080808080808080ULL; \
+#define mrfstr_memchr_cmpeq(r, x, y)                                        \
+    do                                                                      \
+    {                                                                       \
+        (x) ^= (y);                                                         \
+        (r) = ((x) - 0x1010101010101010ULL) & ~(x) & 0x8080808080808080ULL; \
     } while (0)
 
 #define mrfstr_memchr2_cmpeq mrfstr_memchr_cmpeq

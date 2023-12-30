@@ -11,28 +11,41 @@ int main()
 {
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
-    mrfstr_repeat_chr(a, '8', SIZE);
+
+    char *b = malloc(SIZE + 1);
+    for (mrfstr_size_t i = 0; i < SIZE; i++)
+        if (b[i] == '\0')
+            b[i] = 'Q';
+    b[SIZE] = '\0';
+
+    mrfstr_set_nstr(a, b, SIZE);
 
     double t = 0;
     double c;
     for (uint64_t i = 0; i < COUNT; i++)
     {
-        struct timeval s;
+        struct timeval s, e;
+
         mingw_gettimeofday(&s, NULL);
-
-        mrfstr_replace(a, a, '8', '1');
-
-        struct timeval e;
+        mrfstr_reverse(a, a);
         mingw_gettimeofday(&e, NULL);
 
         c = (e.tv_sec - s.tv_sec) * 1000 + (e.tv_usec - s.tv_usec) / 1000.0;
         t += c;
-        printf("Test%llu: %lf milliseconds\n", i, c);
+        printf("Test%llu: %lf milliseconds ", i, c);
 
-        mrfstr_replace(a, a, '1', '8');
+        mingw_gettimeofday(&s, NULL);
+        strrev(b);
+        mingw_gettimeofday(&e, NULL);
+
+        c = (e.tv_sec - s.tv_sec) * 1000 + (e.tv_usec - s.tv_usec) / 1000.0;
+        printf("vs %lf milliseconds, ", c);
+
+        printf("cmp result: %d\n", memcmp(a->data, b, SIZE));
     }
 
     printf("Average MRFStr: %lf milliseconds\n", t / COUNT);
     mrfstr_free(a);
+    free(b);
     return 0;
 }

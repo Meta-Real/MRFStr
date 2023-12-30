@@ -9,6 +9,9 @@
 mrfstr_bool_t mrfstr_equal(
     mrfstr_ct str1, mrfstr_ct str2)
 {
+    if (str1 == str2)
+        return MRFSTR_TRUE;
+
     if (MRFSTR_SIZE(str1) != MRFSTR_SIZE(str2))
         return MRFSTR_FALSE;
 
@@ -22,6 +25,9 @@ mrfstr_bool_t mrfstr_n_equal(
     mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size)
 {
+    if (str1 == str2)
+        return MRFSTR_TRUE;
+
     if (MRFSTR_SIZE(str1) < size)
     {
         if (MRFSTR_SIZE(str1) != MRFSTR_SIZE(str2))

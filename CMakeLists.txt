@@ -17,10 +17,10 @@ add_library(MRFStr STATIC
     fsrcs/memcpy.c fsrcs/memcmp.c fsrcs/memchr.c fsrcs/memset.c
     fsrcs/init.c fsrcs/set.c
     fsrcs/concat.c fsrcs/repeat.c
-#    fsrcs/reverse.c
+    fsrcs/reverse.c
     fsrcs/replace.c
     fsrcs/cmp.c fsrcs/contain.c fsrcs/find.c
-    fsrcs/util.c)
+    fsrcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 
 add_custom_command(TARGET MRFStr POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy libMRFStr.a ..)

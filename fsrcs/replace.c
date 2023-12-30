@@ -12,7 +12,7 @@ typedef __m512i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 64
 #define MRFSTR_REPL_SIMD_SHIFT 6
 
-#define mrfstr_repl_set _mm512_set1_epi8
+#define mrfstr_repl_set(x, y) ((x) = _mm512_set1_epi8(y))
 #define mrfstr_repl_loadu _mm512_loadu_si512
 #define mrfstr_repl_cmpeq _mm512_cmpeq_epi8_mask
 #define mrfstr_repl_store _mm512_mask_storeu_epi8
@@ -24,24 +24,39 @@ typedef __m256i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 32
 #define MRFSTR_REPL_SIMD_SHIFT 5
 
-#define mrfstr_repl_set _mm256_set1_epi8
+#define mrfstr_repl_set(x, y) ((x) = _mm256_set1_epi8(y))
 #define mrfstr_repl_loadu _mm256_loadu_si256
 #define mrfstr_repl_cmpeq _mm256_cmpeq_epi8
 #define mrfstr_repl_store(r, x, y, c) _mm256_store_si256((r), _mm256_blendv_epi8((x), (y), (c)))
 
-#elif defined(__SSE2__)
+#elif defined(__SSE2__) && defined(__SSE4_1__)
 #define MRFSTR_NOAVX512
 
 typedef __m128i mrfstr_repl_simd_t;
 #define MRFSTR_REPL_SIMD_SIZE 16
 #define MRFSTR_REPL_SIMD_SHIFT 4
 
-#define mrfstr_repl_set _mm_set1_epi8
+#define mrfstr_repl_set(x, y) ((x) = _mm_set1_epi8(y))
 #define mrfstr_repl_loadu _mm_loadu_si128
 #define mrfstr_repl_cmpeq _mm_cmpeq_epi8
 #define mrfstr_repl_store(r, x, y, c) _mm_store_si128((r), _mm_blendv_epi8((x), (y), (c)))
 
 #else
+
+typedef uint64_t mrfstr_repl_simd_t;
+#define MRFSTR_REPL_SIMD_SIZE 8
+#define MRFSTR_REPL_SIMD_SHIFT 3
+
+#define mrfstr_repl_set(x, y)   \
+    do                          \
+    {                           \
+        (x) = (y) | ((y) << 8); \
+        (x) |= ((x) << 16);     \
+        (x) |= ((x) << 32);     \
+    } while (0)
+
+#define mrfstr_repl_loadu(x) (*(x))
+
 #error 64-bit Replace Not Implemented Yet
 #endif
 
@@ -144,8 +159,12 @@ void mrfstr_replace(
         }
 
         mrfstr_repl_simd_t *rblock = (mrfstr_repl_simd_t*)rptr;
-        mrfstr_repl_simd_t oblock = mrfstr_repl_set(old);
-        mrfstr_repl_simd_t nblock = mrfstr_repl_set(new);
+
+        mrfstr_repl_simd_t oblock;
+        mrfstr_repl_set(oblock, old);
+
+        mrfstr_repl_simd_t nblock;
+        mrfstr_repl_set(nblock, old);
 
 #if MRFSTR_THREADING
         if (MRFSTR_SIZE(res) < MRFSTR_REPL_TLIMIT)

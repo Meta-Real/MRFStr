@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 1.0.0
+    MRFStr Library version 0.1.0
     MetaReal Fast String Library
 */
 
@@ -8,6 +8,10 @@
 
 #include <mrfstr.h>
 #include <immintrin.h>
+
+#ifdef _MSC_VER
+#include <simddef.h>
+#endif
 
 #ifdef __AVX512F__
 

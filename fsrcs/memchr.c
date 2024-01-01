@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 1.0.0
+    MRFStr Library version 0.1.0
     MetaReal Fast String Library
 */
 
@@ -124,9 +124,9 @@ DWORD WINAPI mrfstr_memchr2_threaded(LPVOID args);
 
 inline mrfstr_byte_t bsf(mrfstr_size_t bits)
 {
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined(__GNUC__) || defined(__clang__)
     return __builtin_ctzll(bits);
-#elif defined(_WIN32)
+#elif defined(_MSC_VER)
     mrfstr_byte_t idx;
     BitScanForward64((DWORD*)&idx, bits);
     return idx;

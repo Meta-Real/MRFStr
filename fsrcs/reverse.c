@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 1.0.0
+    MRFStr Library version 0.1.0
     MetaReal Fast String Library
 */
 

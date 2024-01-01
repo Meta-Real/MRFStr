@@ -1,5 +1,5 @@
 /*
-    MRStr Library version 1.0.0
+    MRStr Library version 0.1.0
     MetaReal String Library
 */
 

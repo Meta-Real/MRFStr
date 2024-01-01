@@ -2,7 +2,9 @@
 *.a
 *.exe
 *.out
+heads/simddef.h
 
 build
+winsetup
 
 !.gitignore

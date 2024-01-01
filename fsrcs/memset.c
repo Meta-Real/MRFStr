@@ -14,7 +14,6 @@
 #endif
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
 struct __MRFSTR_MEMSET_T
 {
@@ -24,7 +23,12 @@ struct __MRFSTR_MEMSET_T
 };
 typedef struct __MRFSTR_MEMSET_T *mrfstr_memset_t;
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memset_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memset_threaded(LPVOID args);
+#endif
+
 #endif
 
 void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
@@ -77,7 +81,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
     size /= MRFSTR_SIMD_TCHK;
 #endif
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_memset_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -92,7 +96,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 
         rblock += size;
 
-        if (pthread_create(threads + i, NULL, mrfstr_memset_threaded, data))
+        mrfstr_create_thread(mrfstr_memset_threaded)
         {
             rblock -= size;
 
@@ -104,8 +108,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
     memset(rblock, chr, rem);
 
 ret:
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
     return;
 
 rem:
@@ -124,7 +127,11 @@ rem:
 }
 
 #if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memset_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memset_threaded(LPVOID args)
+#endif
 {
     mrfstr_memset_t data = (mrfstr_memset_t)args;
 
@@ -136,6 +143,6 @@ void *mrfstr_memset_threaded(void *args)
 #endif
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 #endif

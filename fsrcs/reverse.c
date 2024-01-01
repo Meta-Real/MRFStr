@@ -84,7 +84,14 @@ typedef unsigned long long mrfstr_rev_simd_t;
 #define MRFSTR_REV_SIMD_SIZE 16
 
 #define mrfstr_init_revidx
+
+#if defined(unix) || defined(__unix) || defined(__unix__)
 #define mrfstr_rev_perm(x, y) ((x) = _bswap64(*(y)))
+#elif defined(_WIN32)
+#include <stdlib.h>
+#define mrfstr_rev_perm(x, y) ((x) = _byteswap_uint64(*(y)))
+#endif
+
 #define mrfstr_rev_storeu(x, y) (*(x) = (y))
 
 #endif
@@ -95,7 +102,6 @@ typedef unsigned long long mrfstr_rev_simd_t;
 #define MRFSTR_REV2_SLIMIT (0x100 * MRFSTR_REV2_SIMD_SIZE)
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
 #define MRFSTR_REV_TCHK (MRFSTR_REV_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_REV_TLIMIT (0x10000 * MRFSTR_REV_TCHK)
@@ -111,8 +117,14 @@ struct __MRFSTR_REV_T
 };
 typedef struct __MRFSTR_REV_T *mrfstr_rev_t;
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_rev_threaded(void *args);
 void *mrfstr_rev2_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_rev_threaded(LPVOID args);
+DWORD WINAPI mrfstr_rev2_threaded(LPVOID args);
+#endif
+
 #endif
 
 #define mrfstr_rev_chrrev(c, i) \
@@ -139,14 +151,14 @@ mrfstr_res_enum_t mrfstr_reverse(
         if (MRFSTR_SIZE(res) <= 1)
             return MRFSTR_RES_NOERROR;
 
-        if (MRFSTR_SIZE(res) < MRFSTR_REV_SLIMIT)
-        {
-            strrev(MRFSTR_DATA(res));
-            return MRFSTR_RES_NOERROR;
-        }
-
         mrfstr_data_t lptr = MRFSTR_DATA(res);
         mrfstr_data_t rptr = lptr + MRFSTR_SIZE(res);
+
+        if (MRFSTR_SIZE(res) < MRFSTR_REV_SLIMIT)
+        {
+            mrfstr_rev_chrrev(lptr < rptr, lptr++);
+            return MRFSTR_RES_NOERROR;
+        }
 
         mrfstr_byte_t align = (uintptr_t)lptr & MRFSTR_REV2_SIMD_SIZE;
         if (align)
@@ -158,9 +170,8 @@ mrfstr_res_enum_t mrfstr_reverse(
         mrfstr_rev_simd_t *lblock = (mrfstr_rev_simd_t*)lptr;
         mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
-        mrstr_size_t size = MRFSTR_SIZE(res) - (align << 1);
-
 #if MRFSTR_THREADING
+        mrstr_size_t size = MRFSTR_SIZE(res) - (align << 1);
         if (size < MRFSTR_REV_TLIMIT)
         {
 #endif
@@ -189,7 +200,7 @@ mrfstr_res_enum_t mrfstr_reverse(
 
         size /= MRFSTR_REV_TCHK;
 
-        pthread_t threads[MRFSTR_THREAD_COUNT];
+        mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
         mrfstr_byte_t i;
         mrfstr_rev_t data;
         for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -205,7 +216,7 @@ mrfstr_res_enum_t mrfstr_reverse(
             lblock += size;
             rblock -= size;
 
-            if (pthread_create(threads + i, NULL, mrfstr_rev_threaded, data))
+            mrfstr_create_thread(mrfstr_rev_threaded)
             {
                 lblock -= size;
                 rblock += size;
@@ -223,8 +234,7 @@ ret:
             mrfstr_rev_chrrev(lptr < rptr, lptr++);
         }
 
-        while (i)
-            pthread_join(threads[--i], NULL);
+        mrfstr_close_threads;
         return MRFSTR_RES_NOERROR;
 
 rem:
@@ -269,10 +279,9 @@ rem:
     mrfstr_rev_simd_t *lblock = (mrfstr_rev_simd_t*)lptr;
     mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
-    mrstr_size_t size = MRFSTR_SIZE(res) - align;
-
 #if MRFSTR_THREADING
-    if (MRFSTR_SIZE(res) < MRFSTR_REV2_TLIMIT)
+    mrstr_size_t size = MRFSTR_SIZE(res) - align;
+    if (size < MRFSTR_REV2_TLIMIT)
     {
 #endif
         mrfstr_init_revidx;
@@ -297,7 +306,7 @@ rem:
 
     size /= MRFSTR_REV2_TCHK;
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_rev_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -313,7 +322,7 @@ rem:
         lblock += size;
         rblock -= size;
 
-        if (pthread_create(threads + i, NULL, mrfstr_rev2_threaded, data))
+        mrfstr_create_thread(mrfstr_rev2_threaded)
         {
             lblock -= size;
             rblock += size;
@@ -331,8 +340,7 @@ ret2:
         mrfstr_rev2_chrrev(rptr > MRFSTR_DATA(str), lptr++);
     }
 
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
     return MRFSTR_RES_NOERROR;
 
 rem2:
@@ -352,7 +360,11 @@ rem2:
 }
 
 #if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_rev_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_rev_threaded(LPVOID args)
+#endif
 {
     mrfstr_rev_t data = (mrfstr_rev_t)args;
     mrfstr_init_revidx;
@@ -370,10 +382,14 @@ void *mrfstr_rev_threaded(void *args)
     }
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_rev2_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_rev2_threaded(LPVOID args)
+#endif
 {
     mrfstr_rev_t data = (mrfstr_rev_t)args;
     mrfstr_init_revidx;
@@ -386,6 +402,6 @@ void *mrfstr_rev2_threaded(void *args)
     }
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 #endif

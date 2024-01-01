@@ -7,6 +7,14 @@
 #include <alloc.h>
 #include <string.h>
 
+#ifdef _WIN32
+#if !MRFSTR_THREADING
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif
+#include <intrin.h>
+#endif
+
 #if MRFSTR_SIMD_SIZE == 64
 
 typedef __m512i mrfstr_memchr_simd_t;
@@ -41,7 +49,7 @@ typedef __m128i mrfstr_memchr_simd_t;
 #define mrfstr_memchr_loadu _mm_loadu_si128
 #define mrfstr_memchr_cmpeq(x, y) (_mm_movemask_epi8(_mm_cmpeq_epi8((x), (y))))
 
-#define mrfstr_memchr2_cmpeq(r, x, y) ((r) = mrfstr_memchr_cmpeq((x), (y))))
+#define mrfstr_memchr2_cmpeq(r, x, y) ((r) = mrfstr_memchr_cmpeq((x), (y)))
 
 #else
 #define MRFSTR_MEMCHR_NOSIMD
@@ -74,11 +82,11 @@ typedef uint64_t mrfstr_memchr_simd_t;
 #define MRFSTR_MEMCHR_SLIMIT (0x100 * MRFSTR_MEMCHR_SIMD_SIZE)
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
 #define MRFSTR_MEMCHR_TCHK (MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCHR_TLIMIT (0x10000 * MRFSTR_MEMCHR_TCHK)
 
+#pragma pack(push, 1)
 struct __MRFSTR_MEMCHR_T
 {
     mrfstr_memchr_simd_t *str;
@@ -88,7 +96,9 @@ struct __MRFSTR_MEMCHR_T
     volatile mrfstr_bool_t *res;
 };
 typedef struct __MRFSTR_MEMCHR_T *mrfstr_memchr_t;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 struct __MRFSTR_MEMCHR2_T
 {
     mrfstr_memchr_simd_t *str;
@@ -97,20 +107,61 @@ struct __MRFSTR_MEMCHR2_T
     mrfstr_idx_t start;
 
     volatile mrfstr_idx_t *res;
-    pthread_mutex_t *mutex;
+    mrfstr_mutex_p mutex;
 };
 typedef struct __MRFSTR_MEMCHR2_T *mrfstr_memchr2_t;
+#pragma pack(pop)
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memchr_threaded(void *args);
 void *mrfstr_memchr2_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memchr_threaded(LPVOID args);
+DWORD WINAPI mrfstr_memchr2_threaded(LPVOID args);
 #endif
 
-mrfstr_byte_t bsf(mrfstr_size_t bits);
+#endif
+
+inline mrfstr_byte_t bsf(mrfstr_size_t bits)
+{
+#if defined(unix) || defined(__unix) || defined(__unix__)
+    return __builtin_ctzll(bits);
+#elif defined(_WIN32)
+    mrfstr_byte_t idx;
+    BitScanForward64((DWORD*)&idx, bits);
+    return idx;
+#else
+    mrfstr_byte_t n = 1;
+
+    if (!(bits & 0x0000FFFF))
+    {
+        n += 16;
+        bits >>= 16;
+    }
+    if (!(bits & 0x000000FF))
+    {
+        n += 8;
+        bits >>= 8;
+    }
+    if (!(bits & 0x0000000F))
+    {
+        n += 4;
+        bits >>= 4;
+    }
+    if (!(bits & 0x00000003))
+    {
+        n += 2;
+        bits >>= 2;
+    }
+
+    return n - (bits & 1);
+#endif
+}
 
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_MEMCHR_SLIMIT)
-        return !memchr(str, chr, size);
+        return !memchr(str, chr, (size_t)size);
 
 #ifndef MRFSTR_MEMCHR_NOSIMD
     mrfstr_byte_t align = (uintptr_t)str & MRFSTR_MEMCHR_SIMD_MASK;
@@ -140,7 +191,7 @@ single:
 
         mrfstr_memchr_simd_t block;
 #ifdef MRFSTR_MEMCHR_NOSIMD
-        mrfstr_bool_t cres;
+        mrstr_size_t cres;
 #endif
         for (; size; sblock++, size--)
         {
@@ -164,7 +215,7 @@ single:
 
     volatile mrfstr_bool_t res = MRFSTR_FALSE;
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_memchr_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -183,7 +234,8 @@ single:
         data->res = &res;
 
         sblock += size;
-        if (pthread_create(threads + i, NULL, mrfstr_memchr_threaded, data))
+
+        mrfstr_create_thread(mrfstr_memchr_threaded)
         {
             sblock -= size;
             mrstr_free(data);
@@ -198,8 +250,7 @@ single:
         res = MRFSTR_TRUE;
 
 ret:
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
     return res;
 
 rem:
@@ -264,7 +315,7 @@ mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t 
 {
     if (size < MRFSTR_MEMCHR_SLIMIT)
     {
-        mrfstr_data_t ptr = memchr(str, chr, size);
+        mrfstr_data_t ptr = memchr(str, chr, (size_t)size);
         return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
     }
 
@@ -303,7 +354,7 @@ single:
 
             mrfstr_memchr2_cmpeq(cres, block, cblock);
             if (cres)
-                return (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(cres);
+                return (mrfstr_idx_t)(uintptr_t)sblock - (mrfstr_idx_t)(uintptr_t)str + bsf(cres);
         }
 
         mrfstr_data_t ptr = memchr(sblock, chr, rem);
@@ -315,11 +366,12 @@ single:
     size /= MRFSTR_MEMCHR_TCHK;
 
     volatile mrfstr_idx_t res = MRFSTR_INVIDX;
-    pthread_mutex_t mutex;
-    if (pthread_mutex_init(&mutex, NULL))
+
+    mrfstr_mutex_t mutex;
+    mrfstr_create_mutex(mutex)
         goto single;
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_memchr2_t data;
     mrfstr_data_t ptr;
@@ -336,12 +388,12 @@ single:
         data->str = sblock;
         data->chr = cblock;
         data->size = size;
-        data->start = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str;
+        data->start = (mrfstr_idx_t)(uintptr_t)sblock - (mrfstr_idx_t)(uintptr_t)str;
         data->res = &res;
-        data->mutex = &mutex;
+        data->mutex = MRFSTR_CAST_MUTEX(mutex);
 
         sblock += size;
-        if (pthread_create(threads + i, NULL, mrfstr_memchr2_threaded, data))
+        mrfstr_create_thread(mrfstr_memchr2_threaded)
         {
             sblock -= size;
             mrstr_free(data);
@@ -356,14 +408,14 @@ ret:
     ptr = memchr(sblock, chr, rem);
     if (ptr)
     {
-        pthread_mutex_lock(&mutex);
+        mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
         if (res == MRFSTR_INVIDX)
             res = (mrfstr_idx_t)(ptr - str);
-        pthread_mutex_unlock(&mutex);
+        mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
     }
 
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
+    mrfstr_close_mutex(mutex);
     return res;
 
 rem:
@@ -384,10 +436,10 @@ rem:
             mrfstr_memchr2_cmpeq(cres, block, cblock);
             if (cres)
             {
-                pthread_mutex_lock(&mutex);
+                mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
                 if (res != MRFSTR_INVIDX)
-                    res = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(cres);
-                pthread_mutex_unlock(&mutex);
+                    res = (mrfstr_idx_t)(uintptr_t)sblock - (mrfstr_idx_t)(uintptr_t)str + bsf(cres);
+                mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
                 goto ret;
             }
         }
@@ -405,10 +457,10 @@ rem:
         mrfstr_memchr2_cmpeq(cres, block, cblock);
         if (cres)
         {
-            pthread_mutex_lock(&mutex);
+            mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
             if (res != MRFSTR_INVIDX)
-                res = (mrfstr_idx_t)sblock - (mrfstr_idx_t)str + bsf(cres);
-            pthread_mutex_unlock(&mutex);
+                res = (mrfstr_idx_t)(uintptr_t)sblock - (mrfstr_idx_t)(uintptr_t)str + bsf(cres);
+            mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
             goto ret;
         }
     }
@@ -418,7 +470,12 @@ rem:
 }
 
 #if MRFSTR_THREADING
+
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memchr_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memchr_threaded(LPVOID args)
+#endif
 {
     mrfstr_memchr_t data = (mrfstr_memchr_t)args;
 
@@ -432,7 +489,7 @@ void *mrfstr_memchr_threaded(void *args)
         if (*data->res)
         {
             mrstr_free(data);
-            return NULL;
+            return MRFSTR_TFUNC_RET;
         }
 
         for (i = 0; i < 0x10000; data->str++, i++)
@@ -449,7 +506,7 @@ void *mrfstr_memchr_threaded(void *args)
                 *data->res = MRFSTR_TRUE;
 
                 mrstr_free(data);
-                return NULL;
+                return MRFSTR_TFUNC_RET;
             }
         }
 
@@ -459,7 +516,7 @@ void *mrfstr_memchr_threaded(void *args)
     if (*data->res)
     {
         mrstr_free(data);
-        return NULL;
+        return MRFSTR_TFUNC_RET;
     }
 
     for (; data->size; data->str++, data->size--)
@@ -476,15 +533,19 @@ void *mrfstr_memchr_threaded(void *args)
             *data->res = MRFSTR_TRUE;
 
             mrstr_free(data);
-            return NULL;
+            return MRFSTR_TFUNC_RET;
         }
     }
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memchr2_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memchr2_threaded(LPVOID args)
+#endif
 {
     mrfstr_memchr2_t data = (mrfstr_memchr2_t)args;
     mrfstr_data_t ptr = (mrfstr_data_t)data->str;
@@ -496,7 +557,7 @@ void *mrfstr_memchr2_threaded(void *args)
         if (*data->res < data->start)
         {
             mrstr_free(data);
-            return NULL;
+            return MRFSTR_TFUNC_RET;
         }
 
         for (i = 0; i < 0x10000; data->str++, i++)
@@ -506,14 +567,14 @@ void *mrfstr_memchr2_threaded(void *args)
             mrfstr_memchr2_cmpeq(cres, block, data->chr);
             if (cres)
             {
-                pthread_mutex_lock(data->mutex);
+                mrfstr_lock_mutex(data->mutex);
                 if (*data->res > data->start)
-                    *data->res = (mrfstr_idx_t)data->str - (mrfstr_idx_t)ptr +
+                    *data->res = (mrfstr_idx_t)(uintptr_t)data->str - (mrfstr_idx_t)(uintptr_t)ptr +
                         data->start + bsf(cres);
-                pthread_mutex_unlock(data->mutex);
+                mrfstr_unlock_mutex(data->mutex);
 
                 mrstr_free(data);
-                return NULL;
+                return MRFSTR_TFUNC_RET;
             }
         }
 
@@ -523,7 +584,7 @@ void *mrfstr_memchr2_threaded(void *args)
     if (*data->res < data->start)
     {
         mrstr_free(data);
-        return NULL;
+        return MRFSTR_TFUNC_RET;
     }
 
     for (; data->size; data->str++, data->size--)
@@ -533,54 +594,19 @@ void *mrfstr_memchr2_threaded(void *args)
         mrfstr_memchr2_cmpeq(cres, block, data->chr);
         if (cres)
         {
-            pthread_mutex_lock(data->mutex);
+            mrfstr_lock_mutex(data->mutex);
             if (*data->res > data->start)
-                *data->res = (mrfstr_idx_t)data->str - (mrfstr_idx_t)ptr +
+                *data->res = (mrfstr_idx_t)(uintptr_t)data->str - (mrfstr_idx_t)(uintptr_t)ptr +
                     data->start + bsf(cres);
-            pthread_mutex_unlock(data->mutex);
+            mrfstr_unlock_mutex(data->mutex);
 
             mrstr_free(data);
-            return NULL;
+            return MRFSTR_TFUNC_RET;
         }
     }
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
+
 #endif
-
-mrfstr_byte_t bsf(mrfstr_size_t bits)
-{
-#ifdef __GNUC__
-    return __builtin_ctzll(bits);
-#elif defined(_MSC_VER)
-    mrfstr_byte_t idx;
-    _BitScanForward64(&idx, bits);
-    return idx;
-#else
-    mrfstr_byte_t n = 1;
-
-    if (!(bits & 0x0000FFFF))
-    {
-        n += 16;
-        bits >>= 16;
-    }
-    if (!(bits & 0x000000FF))
-    {
-        n += 8;
-        bits >>= 8;
-    }
-    if (!(bits & 0x0000000F))
-    {
-        n += 4;
-        bits >>= 4;
-    }
-    if (!(bits & 0x00000003))
-    {
-        n += 2;
-        bits >>= 2;
-    }
-
-    return n - (bits & 1);
-#endif
-}

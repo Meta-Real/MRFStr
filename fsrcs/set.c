@@ -10,7 +10,7 @@
 void mrfstr_set(
     mrfstr_t dst, mrfstr_ct src)
 {
-    if (!MRFSTR_DATA(src))
+    if (!MRFSTR_SIZE(src))
     {
         mrstr_free(MRFSTR_DATA(dst));
 

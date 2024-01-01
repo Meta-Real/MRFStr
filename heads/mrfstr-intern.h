@@ -63,6 +63,64 @@ typedef uint64_t mrfstr_simd_t;
 #define MRFSTR_SIMD_TLIMIT (0x10000ULL * MRFSTR_SIMD_TCHK)
 #endif
 
+#if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
+#include <pthread.h>
+
+typedef pthread_t mrfstr_thread_t;
+typedef pthread_mutex_t mrfstr_mutex_t;
+typedef mrfstr_mutex_t *mrfstr_mutex_p;
+
+#define MRFSTR_TFUNC_RET NULL
+#define MRFSTR_CAST_MUTEX(m) (&(m))
+
+#define mrfstr_create_thread(f) \
+    if (pthread_create(threads + i, NULL, (f), data))
+
+#define mrfstr_close_threads \
+    while (i)                \
+        pthread_join(threads[--i], NULL)
+
+#define mrfstr_create_mutex(m) \
+    if (pthread_mutex_init(&(m), NULL))
+
+#define mrfstr_close_mutex(m) pthread_mutex_destroy(&(m))
+#define mrfstr_lock_mutex(m) pthread_mutex_lock(m)
+#define mrfstr_unlock_mutex(m) pthread_mutex_unlock(m)
+
+#elif defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+typedef HANDLE mrfstr_thread_t;
+typedef HANDLE mrfstr_mutex_t;
+typedef HANDLE mrfstr_mutex_p;
+
+#define MRFSTR_TFUNC_RET TRUE
+#define MRFSTR_CAST_MUTEX(m) (m)
+
+#define mrfstr_create_thread(f)                             \
+    threads[i] = CreateThread(NULL, 0, (f), data, 0, NULL); \
+    if (!threads[i])
+
+#define mrfstr_close_threads                                              \
+    WaitForMultipleObjects(MRFSTR_THREAD_COUNT, threads, TRUE, INFINITE); \
+    while (i)                                                             \
+        CloseHandle(threads[--i])
+
+#define mrfstr_create_mutex(m)            \
+    (m) = CreateMutex(NULL, FALSE, NULL); \
+    if (!(m))
+
+#define mrfstr_close_mutex CloseHandle
+#define mrfstr_lock_mutex(m) WaitForSingleObject((m), INFINITE)
+#define mrfstr_unlock_mutex ReleaseMutex
+
+#else
+#error The OS is not supported for multithreading
+#endif
+#endif
+
 void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
 mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);

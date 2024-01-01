@@ -4,48 +4,31 @@
 #include <string.h>
 #include <time.h>
 
-#define SIZE (1024 * 1024 * 1024)
+#define SIZE (1024 * 1024 * 1024ULL)
 #define COUNT 100
 
-int main()
+int main(void)
 {
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
 
-    char *b = malloc(SIZE + 1);
-    for (mrfstr_size_t i = 0; i < SIZE; i++)
-        if (b[i] == '\0')
-            b[i] = 'Q';
-    b[SIZE] = '\0';
-
-    mrfstr_set_nstr(a, b, SIZE);
+    mrfstr_t b = mrfstr_init();
+    mrfstr_alloc(b, SIZE);
+    mrfstr_repeat_chr(b, 'q', SIZE);
 
     double t = 0;
     double c;
     for (uint64_t i = 0; i < COUNT; i++)
     {
-        struct timeval s, e;
-
-        mingw_gettimeofday(&s, NULL);
-        mrfstr_reverse(a, a);
-        mingw_gettimeofday(&e, NULL);
-
-        c = (e.tv_sec - s.tv_sec) * 1000 + (e.tv_usec - s.tv_usec) / 1000.0;
+        clock_t s = clock();
+        mrfstr_set(a, b);
+        c = (clock() - s) * 1000.0 / CLOCKS_PER_SEC;
         t += c;
-        printf("Test%llu: %lf milliseconds ", i, c);
-
-        mingw_gettimeofday(&s, NULL);
-        strrev(b);
-        mingw_gettimeofday(&e, NULL);
-
-        c = (e.tv_sec - s.tv_sec) * 1000 + (e.tv_usec - s.tv_usec) / 1000.0;
-        printf("vs %lf milliseconds, ", c);
-
-        printf("cmp result: %d\n", memcmp(a->data, b, SIZE));
+        printf("Test%llu: %lf milliseconds\n", i, c);
     }
 
     printf("Average MRFStr: %lf milliseconds\n", t / COUNT);
     mrfstr_free(a);
-    free(b);
+    mrfstr_free(b);
     return 0;
 }

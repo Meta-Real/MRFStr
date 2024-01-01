@@ -9,126 +9,68 @@
 
 #if MRFSTR_SIMD_SIZE == 64
 
-#define mrfstr_memcpy_sub(x, y, s)            \
-    do                                        \
-    {                                         \
-        mrfstr_simd_t                         \
-            block1, block2, block3, block4;   \
-                                              \
-        for (; s >= 4; s -= 4)                \
-        {                                     \
-            block1 = _mm512_loadu_si512(y++); \
-            block2 = _mm512_loadu_si512(y++); \
-            block3 = _mm512_loadu_si512(y++); \
-            block4 = _mm512_loadu_si512(y++); \
-            _mm512_stream_si512(x++, block1); \
-            _mm512_stream_si512(x++, block2); \
-            _mm512_stream_si512(x++, block3); \
-            _mm512_stream_si512(x++, block4); \
-        }                                     \
-                                              \
-        while (s--)                           \
-        {                                     \
-            block1 = _mm512_loadu_si512(y++); \
-            _mm512_stream_si512(x++, block1); \
-        }                                     \
+#define mrfstr_memcpy_sub(x, y, s)             \
+    do                                         \
+    {                                          \
+        mrfstr_simd_t block;                   \
+        for (; (s); (s)--)                     \
+        {                                      \
+            block = _mm512_loadu_si512((y)++); \
+            _mm512_stream_si512((x)++, block); \
+        }                                      \
     } while (0)
 
 #elif MRFSTR_SIMD_SIZE == 32
 
-#define mrfstr_memcpy_sub(x, y, s)            \
-    do                                        \
-    {                                         \
-        mrfstr_simd_t                         \
-            block1, block2, block3, block4,   \
-            block5, block6, block7, block8;   \
-                                              \
-        for (; s >= 8; s -= 8)                \
-        {                                     \
-            block1 = _mm256_loadu_si256(y++); \
-            block2 = _mm256_loadu_si256(y++); \
-            block3 = _mm256_loadu_si256(y++); \
-            block4 = _mm256_loadu_si256(y++); \
-            block5 = _mm256_loadu_si256(y++); \
-            block6 = _mm256_loadu_si256(y++); \
-            block7 = _mm256_loadu_si256(y++); \
-            block8 = _mm256_loadu_si256(y++); \
-            _mm256_stream_si256(x++, block1); \
-            _mm256_stream_si256(x++, block2); \
-            _mm256_stream_si256(x++, block3); \
-            _mm256_stream_si256(x++, block4); \
-            _mm256_stream_si256(x++, block5); \
-            _mm256_stream_si256(x++, block6); \
-            _mm256_stream_si256(x++, block7); \
-            _mm256_stream_si256(x++, block8); \
-        }                                     \
-                                              \
-        while (s--)                           \
-        {                                     \
-            block1 = _mm256_loadu_si256(y++); \
-            _mm256_store_si256(x++, block1);  \
-        }                                     \
+#define mrfstr_memcpy_sub(x, y, s)              \
+    do                                          \
+    {                                           \
+        mrfstr_simd_t block1, block2;           \
+        for (; s >= 2; s -= 2)                  \
+        {                                       \
+            block1 = _mm256_loadu_si256((y)++); \
+            block2 = _mm256_loadu_si256((y)++); \
+            _mm256_stream_si256((x)++, block1); \
+            _mm256_stream_si256((x)++, block2); \
+        }                                       \
+                                                \
+        if (s)                                  \
+        {                                       \
+            block1 = _mm256_loadu_si256((y)++); \
+            _mm256_store_si256((x)++, block1);  \
+        }                                       \
     } while (0)
 
 #elif MRFSTR_SIMD_SIZE == 16
 
-#define mrfstr_memcpy_sub(x, y, s)              \
-    do                                          \
-    {                                           \
-        mrfstr_simd_t                           \
-            block01, block02, block03, block04, \
-            block05, block06, block07, block08, \
-            block09, block10, block11, block12, \
-            block13, block14, block15, block16; \
-                                                \
-        for (; s >= 16; s -= 16)                \
-        {                                       \
-            block01 = _mm_loadu_si128(y++);     \
-            block02 = _mm_loadu_si128(y++);     \
-            block03 = _mm_loadu_si128(y++);     \
-            block04 = _mm_loadu_si128(y++);     \
-            block05 = _mm_loadu_si128(y++);     \
-            block06 = _mm_loadu_si128(y++);     \
-            block07 = _mm_loadu_si128(y++);     \
-            block08 = _mm_loadu_si128(y++);     \
-            block09 = _mm_loadu_si128(y++);     \
-            block10 = _mm_loadu_si128(y++);     \
-            block11 = _mm_loadu_si128(y++);     \
-            block12 = _mm_loadu_si128(y++);     \
-            block13 = _mm_loadu_si128(y++);     \
-            block14 = _mm_loadu_si128(y++);     \
-            block15 = _mm_loadu_si128(y++);     \
-            block16 = _mm_loadu_si128(y++);     \
-            _mm_stream_si128(x++, block01);     \
-            _mm_stream_si128(x++, block02);     \
-            _mm_stream_si128(x++, block03);     \
-            _mm_stream_si128(x++, block04);     \
-            _mm_stream_si128(x++, block05);     \
-            _mm_stream_si128(x++, block06);     \
-            _mm_stream_si128(x++, block07);     \
-            _mm_stream_si128(x++, block08);     \
-            _mm_stream_si128(x++, block09);     \
-            _mm_stream_si128(x++, block10);     \
-            _mm_stream_si128(x++, block11);     \
-            _mm_stream_si128(x++, block12);     \
-            _mm_stream_si128(x++, block13);     \
-            _mm_stream_si128(x++, block14);     \
-            _mm_stream_si128(x++, block15);     \
-            _mm_stream_si128(x++, block16);     \
-        }                                       \
-                                                \
-        while (s--)                             \
-        {                                       \
-            block01 = _mm_loadu_si128(y++);     \
-            _mm_store_si128(x++, block01);      \
-        }                                       \
+#define mrfstr_memcpy_sub(x, y, s)                     \
+    do                                                 \
+    {                                                  \
+        mrfstr_simd_t  block1, block2, block3, block4; \
+        for (; s >= 4; s -= 4)                         \
+        {                                              \
+            block1 = _mm_loadu_si128((y)++);           \
+            block2 = _mm_loadu_si128((y)++);           \
+            block3 = _mm_loadu_si128((y)++);           \
+            block4 = _mm_loadu_si128((y)++);           \
+            _mm_stream_si128((x)++, block1);           \
+            _mm_stream_si128((x)++, block2);           \
+            _mm_stream_si128((x)++, block3);           \
+            _mm_stream_si128((x)++, block4);           \
+        }                                              \
+                                                       \
+        while (s--)                                    \
+        {                                              \
+            block1 = _mm_loadu_si128((y)++);           \
+            _mm_store_si128((x)++, block1);            \
+        }                                              \
     } while (0)
 
 #endif
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
+#pragma pack(push, 1)
 struct __MRFSTR_MEMCPY_T
 {
     mrfstr_simd_t *src;
@@ -136,15 +78,21 @@ struct __MRFSTR_MEMCPY_T
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_MEMCPY_T *mrfstr_memcpy_t;
+#pragma pack(pop)
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcpy_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memcpy_threaded(LPVOID args);
+#endif
+
 #endif
 
 void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
     if (size < MRFSTR_SIMD_SLIMIT)
     {
-        memcpy(dst, src, size);
+        memcpy(dst, src, (size_t)size);
         return;
     }
 
@@ -161,7 +109,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_NOSIMD) || defined(MRFSTR_THREADING)
+#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREADING
     mrfstr_simd_t *dblock = (mrfstr_simd_t*)dst;
     mrfstr_simd_t *sblock = (mrfstr_simd_t*)src;
 #endif
@@ -191,7 +139,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     size /= MRFSTR_SIMD_TCHK;
 #endif
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_memcpy_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -207,7 +155,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         sblock += size;
         dblock += size;
 
-        if (pthread_create(threads + i, NULL, mrfstr_memcpy_threaded, data))
+        mrfstr_create_thread(mrfstr_memcpy_threaded)
         {
             sblock -= size;
             dblock -= size;
@@ -220,8 +168,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     memcpy(dblock, sblock, rem);
 
 ret:
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
     return;
 
 rem:
@@ -238,7 +185,11 @@ rem:
 }
 
 #if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcpy_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memcpy_threaded(LPVOID args)
+#endif
 {
     mrfstr_memcpy_t data = args;
 
@@ -249,6 +200,6 @@ void *mrfstr_memcpy_threaded(void *args)
 #endif
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 #endif

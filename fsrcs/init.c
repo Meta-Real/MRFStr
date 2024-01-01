@@ -7,7 +7,7 @@
 #include <alloc.h>
 #include <string.h>
 
-mrfstr_t mrfstr_init()
+mrfstr_t mrfstr_init(void)
 {
     mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
     if (!str)

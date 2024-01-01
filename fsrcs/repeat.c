@@ -13,7 +13,17 @@ mrfstr_res_enum_t mrfstr_repeat(
 {
     if (MRFSTR_SIZE(str) == 1)
     {
-        mrfstr_repeat_chr(res, *MRFSTR_DATA(str), count);
+        if (!count)
+        {
+            mrstr_free(MRFSTR_DATA(res));
+
+            MRFSTR_DATA(res) = NULL;
+            MRFSTR_SIZE(res) = 0;
+            return MRFSTR_RES_NOERROR;
+        }
+
+        mrfstr_memset(MRFSTR_DATA(res), *MRFSTR_DATA(res), count);
+        MRFSTR_SIZE(res) = count;
         return MRFSTR_RES_NOERROR;
     }
 

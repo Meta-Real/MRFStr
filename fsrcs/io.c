@@ -12,7 +12,7 @@ void mrfstr_print(
     if (!MRFSTR_SIZE(str))
         return;
 
-    fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), MRFSTR_SIZE(str), stdout);
+    fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), (size_t)MRFSTR_SIZE(str), stdout);
 }
 
 void mrfstr_n_print(
@@ -24,5 +24,5 @@ void mrfstr_n_print(
     if (!size)
         return;
 
-    fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stdout);
+    fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), (size_t)size, stdout);
 }

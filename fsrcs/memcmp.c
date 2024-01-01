@@ -64,7 +64,6 @@ typedef uint64_t mrfstr_memcmp_simd_t;
     } while (0)
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
 #define MRFSTR_MEMCMP_TCHK (MRFSTR_MEMCMP_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCMP_TLIMIT (0x10000 * MRFSTR_MEMCMP_TCHK)
@@ -79,7 +78,7 @@ typedef uint64_t mrfstr_memcmp_simd_t;
             *data->res = MRFSTR_FALSE;            \
                                                   \
             mrstr_free(data);                     \
-            return NULL;                          \
+            return MRFSTR_TFUNC_RET;              \
         }                                         \
     } while (0)
 
@@ -93,13 +92,18 @@ struct __MRFSTR_MEMCMP_T
 };
 typedef struct __MRFSTR_MEMCMP_T *mrfstr_memcmp_t;
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcmp_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memcmp_threaded(LPVOID args);
+#endif
+
 #endif
 
 mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
     if (size < MRFSTR_MEMCMP_SLIMIT)
-        return !memcmp(str1, str2, size);
+        return !memcmp(str1, str2, (size_t)size);
 
 #ifndef MRFSTR_MEMCMP_NOSIMD
     mrfstr_byte_t align = (uintptr_t)str1 & MRFSTR_MEMCMP_SIMD_MASK;
@@ -118,9 +122,10 @@ mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_siz
 #if !defined(MRFSTR_MEMCMP_NOSIMD) || MRFSTR_THREADING
     mrfstr_memcmp_simd_t *s1block = (mrfstr_memcmp_simd_t*)str1;
     mrfstr_memcmp_simd_t *s2block = (mrfstr_memcmp_simd_t*)str2;
-#endif
 
     mrfstr_short_t rem;
+#endif
+
 #if MRFSTR_THREADING
     if (size < MRFSTR_MEMCMP_TLIMIT)
     {
@@ -151,7 +156,7 @@ single:
 
     volatile mrfstr_bool_t res = MRFSTR_TRUE;
 
-    pthread_t threads[MRFSTR_THREAD_COUNT];
+    mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
     mrfstr_byte_t i;
     mrfstr_memcmp_t data;
     for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -172,7 +177,7 @@ single:
         s1block += size;
         s2block += size;
 
-        if (pthread_create(threads + i, NULL, mrfstr_memcmp_threaded, data))
+        mrfstr_create_thread(mrfstr_memcmp_threaded)
         {
             s1block -= size;
             s2block -= size;
@@ -188,8 +193,7 @@ ret:
     if (res && memcmp(s2block, s1block, rem))
         res = MRFSTR_FALSE;
 
-    while (i)
-        pthread_join(threads[--i], NULL);
+    mrfstr_close_threads;
     return res;
 
 rem:
@@ -219,7 +223,11 @@ rem:
 }
 
 #if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcmp_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_memcmp_threaded(LPVOID args)
+#endif
 {
     mrfstr_memcmp_t data = (mrfstr_memcmp_t)args;
 
@@ -230,7 +238,7 @@ void *mrfstr_memcmp_threaded(void *args)
         if (!*data->res)
         {
             mrstr_free(data);
-            return NULL;
+            return MRFSTR_TFUNC_RET;
         }
 
         for (i = 0; i < 0x10000; data->str1++, data->str2++, i++)
@@ -242,13 +250,13 @@ void *mrfstr_memcmp_threaded(void *args)
     if (!*data->res)
     {
         mrstr_free(data);
-        return NULL;
+        return MRFSTR_TFUNC_RET;
     }
 
     for (; data->size; data->str1++, data->str2++, data->size--)
         mrfstr_memcmp_tsub(data->str1, data->str2);
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 #endif

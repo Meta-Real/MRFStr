@@ -87,7 +87,6 @@ typedef uint64_t mrfstr_repl_simd_t;
     } while (0)
 
 #if MRFSTR_THREADING
-#include <pthread.h>
 
 #define MRFSTR_REPL_TCHK (MRFSTR_REPL_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_REPL_TLIMIT (0x10000 * MRFSTR_REPL_TCHK)
@@ -101,7 +100,12 @@ struct __MRFSTR_REPL_T
 };
 typedef struct __MRFSTR_REPL_T *mrfstr_repl_t;
 
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_repl_threaded(void *args);
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_repl_threaded(LPVOID args);
+#endif
+
 #endif
 
 void mrfstr_replace(
@@ -200,7 +204,7 @@ void mrfstr_replace(
         mrfstr_short_t rem = size % MRFSTR_REPL_TCHK;
         size /= MRFSTR_REPL_TCHK;
 
-        pthread_t threads[MRFSTR_THREAD_COUNT];
+        mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];
         mrfstr_byte_t i;
         mrfstr_repl_t data;
         for (i = 0; i < MRFSTR_THREAD_COUNT; i++)
@@ -215,7 +219,7 @@ void mrfstr_replace(
             data->size = size;
 
             rblock += size;
-            if (pthread_create(threads + i, NULL, mrfstr_repl_threaded, data))
+            mrfstr_create_thread(mrfstr_repl_threaded)
             {
                 rblock -= size;
 
@@ -227,8 +231,7 @@ void mrfstr_replace(
 ret:
         mrfstr_repl_rem;
 
-        while (i--)
-            pthread_join(threads[i], NULL);
+        mrfstr_close_threads;
         return;
 
 rem:
@@ -261,7 +264,11 @@ rem:
 }
 
 #if MRFSTR_THREADING
+#if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_repl_threaded(void *args)
+#elif defined(_WIN32)
+DWORD WINAPI mrfstr_repl_threaded(LPVOID args)
+#endif
 {
     mrfstr_repl_t data = (mrfstr_repl_t)args;
 
@@ -285,6 +292,6 @@ void *mrfstr_repl_threaded(void *args)
         }
 
     mrstr_free(data);
-    return NULL;
+    return MRFSTR_TFUNC_RET;
 }
 #endif

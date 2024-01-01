@@ -13,17 +13,17 @@ typedef void *mrstr_ptr_t;
 
 inline mrstr_ptr_t mrstr_alloc(mrstr_size_t size)
 {
-    return malloc(size);
+    return malloc((size_t)size);
 }
 
 inline mrstr_ptr_t mrstr_calloc(mrstr_size_t count, mrstr_size_t unit)
 {
-    return calloc(count, unit);
+    return calloc((size_t)count, (size_t)unit);
 }
 
 inline mrstr_ptr_t mrstr_realloc(mrstr_ptr_t block, mrstr_size_t size)
 {
-    return realloc(block, size);
+    return realloc(block, (size_t)size);
 }
 
 inline void mrstr_free(mrstr_ptr_t block)

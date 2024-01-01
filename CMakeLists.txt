@@ -24,17 +24,13 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 add_library(MRFStr STATIC
-    fsrcs/memcpy.c fsrcs/memset.c fsrcs/memcmp.c fsrcs/memchr.c
-    fsrcs/init.c fsrcs/set.c
-    fsrcs/concat.c fsrcs/repeat.c
-    fsrcs/reverse.c fsrcs/replace.c
-    fsrcs/cmp.c fsrcs/contain.c fsrcs/find.c
-    fsrcs/io.c)
+    srcs/memcpy.c srcs/memset.c srcs/memcmp.c srcs/memchr.c
+    srcs/init.c srcs/set.c
+    srcs/concat.c srcs/repeat.c
+    srcs/reverse.c srcs/replace.c
+    srcs/cmp.c srcs/contain.c srcs/find.c
+    srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
-
-add_executable(Test test.c)
-target_link_libraries(Test MRFStr)
-add_test(NAME Test COMMAND Test)
 
 install(TARGETS MRFStr DESTINATION lib)
 install(FILES mrfstr.h DESTINATION include)

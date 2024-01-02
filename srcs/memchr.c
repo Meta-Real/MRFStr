@@ -112,7 +112,7 @@ struct __MRFSTR_MEMCHR2_T
 typedef struct __MRFSTR_MEMCHR2_T *mrfstr_memchr2_t;
 #pragma pack(pop)
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_memchr_threaded(void *args);
 void *mrfstr_memchr2_threaded(void *args);
 #elif defined(_WIN32)
@@ -475,7 +475,7 @@ rem:
 
 #if MRFSTR_THREAD_COUNT
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_memchr_threaded(void *args)
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_memchr_threaded(LPVOID args)
@@ -545,7 +545,7 @@ DWORD WINAPI mrfstr_memchr_threaded(LPVOID args)
     return MRFSTR_TFUNC_RET;
 }
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_memchr2_threaded(void *args)
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_memchr2_threaded(LPVOID args)

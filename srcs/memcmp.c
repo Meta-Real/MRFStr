@@ -92,7 +92,7 @@ struct __MRFSTR_MEMCMP_T
 };
 typedef struct __MRFSTR_MEMCMP_T *mrfstr_memcmp_t;
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_memcmp_threaded(void *args);
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_memcmp_threaded(LPVOID args);
@@ -223,7 +223,7 @@ rem:
 }
 
 #if MRFSTR_THREAD_COUNT
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_memcmp_threaded(void *args)
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_memcmp_threaded(LPVOID args)

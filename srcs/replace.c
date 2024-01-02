@@ -99,7 +99,7 @@ struct __MRFSTR_REPL_T
 };
 typedef struct __MRFSTR_REPL_T *mrfstr_repl_t;
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_repl_threaded(void *args);
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_repl_threaded(LPVOID args);
@@ -264,7 +264,7 @@ rem:
 }
 
 #if MRFSTR_THREAD_COUNT
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 void *mrfstr_repl_threaded(void *args)
 #elif defined(_WIN32)
 DWORD WINAPI mrfstr_repl_threaded(LPVOID args)

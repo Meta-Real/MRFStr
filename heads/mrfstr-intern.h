@@ -68,7 +68,7 @@ typedef uint64_t mrfstr_simd_t;
 #endif
 
 #if MRFSTR_THREAD_COUNT
-#if defined(unix) || defined(__unix) || defined(__unix__)
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include <pthread.h>
 
 typedef pthread_t mrfstr_thread_t;

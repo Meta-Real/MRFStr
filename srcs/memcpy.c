@@ -9,15 +9,23 @@
 
 #if MRFSTR_SIMD_SIZE == 64
 
-#define mrfstr_memcpy_sub(x, y, s)             \
-    do                                         \
-    {                                          \
-        mrfstr_simd_t block;                   \
-        for (; (s); (s)--)                     \
-        {                                      \
-            block = _mm512_loadu_si512((y)++); \
-            _mm512_stream_si512((x)++, block); \
-        }                                      \
+#define mrfstr_memcpy_sub(x, y, s)              \
+    do                                          \
+    {                                           \
+        mrfstr_simd_t block1, block2;           \
+        for (; (s) >= 2; (s) -= 2)              \
+        {                                       \
+            block1 = _mm512_loadu_si512((y)++); \
+            block2 = _mm512_loadu_si512((y)++); \
+            _mm512_stream_si512((x)++, block1); \
+            _mm512_stream_si512((x)++, block2); \
+        }                                       \
+                                                \
+        if (s)                                  \
+        {                                       \
+            block1 = _mm512_loadu_si512((y)++); \
+            _mm512_store_si512((x)++, block1);  \
+        }                                       \
     } while (0)
 
 #elif MRFSTR_SIMD_SIZE == 32
@@ -25,16 +33,21 @@
 #define mrfstr_memcpy_sub(x, y, s)              \
     do                                          \
     {                                           \
-        mrfstr_simd_t block1, block2;           \
-        for (; s >= 2; s -= 2)                  \
+        mrfstr_simd_t                           \
+            block1, block2, block3, block4;     \
+        for (; (s) >= 4; (s) -= 4)              \
         {                                       \
             block1 = _mm256_loadu_si256((y)++); \
             block2 = _mm256_loadu_si256((y)++); \
+            block3 = _mm256_loadu_si256((y)++); \
+            block4 = _mm256_loadu_si256((y)++); \
             _mm256_stream_si256((x)++, block1); \
             _mm256_stream_si256((x)++, block2); \
+            _mm256_stream_si256((x)++, block3); \
+            _mm256_stream_si256((x)++, block4); \
         }                                       \
                                                 \
-        if (s)                                  \
+        while (s--)                             \
         {                                       \
             block1 = _mm256_loadu_si256((y)++); \
             _mm256_store_si256((x)++, block1);  \
@@ -43,27 +56,55 @@
 
 #elif MRFSTR_SIMD_SIZE == 16
 
-#define mrfstr_memcpy_sub(x, y, s)                     \
-    do                                                 \
-    {                                                  \
-        mrfstr_simd_t  block1, block2, block3, block4; \
-        for (; s >= 4; s -= 4)                         \
-        {                                              \
-            block1 = _mm_loadu_si128((y)++);           \
-            block2 = _mm_loadu_si128((y)++);           \
-            block3 = _mm_loadu_si128((y)++);           \
-            block4 = _mm_loadu_si128((y)++);           \
-            _mm_stream_si128((x)++, block1);           \
-            _mm_stream_si128((x)++, block2);           \
-            _mm_stream_si128((x)++, block3);           \
-            _mm_stream_si128((x)++, block4);           \
-        }                                              \
-                                                       \
-        while (s--)                                    \
-        {                                              \
-            block1 = _mm_loadu_si128((y)++);           \
-            _mm_store_si128((x)++, block1);            \
-        }                                              \
+#define mrfstr_memcpy_sub(x, y, s)           \
+    do                                       \
+    {                                        \
+        mrfstr_simd_t                        \
+            block1, block2, block3, block4,  \
+            block5, block6, block7, block8,  \
+            blockA, blockB, blockC, blockD,  \
+            blockE, blockF, blockG, blockH;  \
+        for (; s >= 16; s -= 16)               \
+        {                                    \
+            block1 = _mm_loadu_si128((y)++); \
+            block2 = _mm_loadu_si128((y)++); \
+            block3 = _mm_loadu_si128((y)++); \
+            block4 = _mm_loadu_si128((y)++); \
+            block5 = _mm_loadu_si128((y)++); \
+            block6 = _mm_loadu_si128((y)++); \
+            block7 = _mm_loadu_si128((y)++); \
+            block8 = _mm_loadu_si128((y)++); \
+            blockA = _mm_loadu_si128((y)++); \
+            blockB = _mm_loadu_si128((y)++); \
+            blockC = _mm_loadu_si128((y)++); \
+            blockD = _mm_loadu_si128((y)++); \
+            blockE = _mm_loadu_si128((y)++); \
+            blockF = _mm_loadu_si128((y)++); \
+            blockG = _mm_loadu_si128((y)++); \
+            blockH = _mm_loadu_si128((y)++); \
+            _mm_stream_si128((x)++, block1); \
+            _mm_stream_si128((x)++, block2); \
+            _mm_stream_si128((x)++, block3); \
+            _mm_stream_si128((x)++, block4); \
+            _mm_stream_si128((x)++, block5); \
+            _mm_stream_si128((x)++, block6); \
+            _mm_stream_si128((x)++, block7); \
+            _mm_stream_si128((x)++, block8); \
+            _mm_stream_si128((x)++, blockA); \
+            _mm_stream_si128((x)++, blockB); \
+            _mm_stream_si128((x)++, blockC); \
+            _mm_stream_si128((x)++, blockD); \
+            _mm_stream_si128((x)++, blockE); \
+            _mm_stream_si128((x)++, blockF); \
+            _mm_stream_si128((x)++, blockG); \
+            _mm_stream_si128((x)++, blockH); \
+        }                                    \
+                                             \
+        while (s--)                          \
+        {                                    \
+            block1 = _mm_loadu_si128((y)++); \
+            _mm_store_si128((x)++, block1);  \
+        }                                    \
     } while (0)
 
 #endif
@@ -73,8 +114,14 @@
 #pragma pack(push, 1)
 struct __MRFSTR_MEMCPY_T
 {
+#ifndef MRFSTR_NOSIMD
     mrfstr_simd_t *src;
     mrfstr_simd_t *dst;
+#else
+    mrfstr_data_t src;
+    mrfstr_data_t dst;
+#endif
+
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_MEMCPY_T *mrfstr_memcpy_t;
@@ -109,9 +156,12 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREAD_COUNT
-    mrfstr_simd_t *dblock = (mrfstr_simd_t*)dst;
+#ifndef MRFSTR_NOSIMD
     mrfstr_simd_t *sblock = (mrfstr_simd_t*)src;
+    mrfstr_simd_t *dblock = (mrfstr_simd_t*)dst;
+#elif MRFSTR_THREAD_COUNT
+    mrfstr_data_t sblock = (mrfstr_data_t)src;
+    mrfstr_data_t dblock = dst;
 #endif
 
 #if MRFSTR_THREAD_COUNT
@@ -131,12 +181,12 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         return;
     }
 
-#ifdef MRFSTR_NOSIMD
-    mrfstr_byte_t rem = size % MRFSTR_THREAD_COUNT;
-    size /= MRFSTR_THREAD_COUNT;
-#else
+#ifndef MRFSTR_NOSIMD
     mrfstr_short_t rem = size % MRFSTR_SIMD_TCHK;
     size /= MRFSTR_SIMD_TCHK;
+#else
+    mrfstr_byte_t rem = size % MRFSTR_THREAD_COUNT;
+    size /= MRFSTR_THREAD_COUNT;
 #endif
 
     mrfstr_thread_t threads[MRFSTR_THREAD_COUNT];

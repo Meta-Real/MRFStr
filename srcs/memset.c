@@ -17,7 +17,12 @@
 
 struct __MRFSTR_MEMSET_T
 {
+#ifndef MRFSTR_NOSIMD
     mrfstr_simd_t *res;
+#else
+    mrfstr_data_t res;
+#endif
+
     mrfstr_chr_t chr;
     mrfstr_size_t size;
 };
@@ -51,8 +56,10 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREAD_COUNT
+#ifndef MRFSTR_NOSIMD
     mrfstr_simd_t *rblock = (mrfstr_simd_t*)res;
+#elif MRFSTR_THREAD_COUNT
+    mrfstr_data_t rblock = res;
 #endif
 
 #if MRFSTR_THREAD_COUNT

@@ -25,7 +25,7 @@ typedef uint64_t mrfstr_idx_t;
 
 #define MRFSTR_INVIDX ((mrfstr_idx_t)-1)
 
-#define MRFSTR_THREAD_COUNT 0
+#define MRFSTR_THREAD_COUNT 6
 
 struct __MRFSTR_T
 {

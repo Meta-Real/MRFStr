@@ -34,6 +34,10 @@ add_library(MRFStr STATIC
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 
+add_executable(Test test.c)
+target_link_libraries(Test PUBLIC MRFStr)
+add_test(Test COMMAND Test)
+
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
 install(TARGETS MRFStr
     LIBRARY DESTINATION lib

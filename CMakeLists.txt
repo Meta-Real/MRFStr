@@ -24,7 +24,6 @@ elseif (MSVC)
     file(REMOVE_RECURSE "${PROJECT_SOURCE_DIR}/winsetup")
 endif()
 
-
 add_library(MRFStr STATIC
     srcs/memcpy.c srcs/memset.c srcs/memcmp.c srcs/memchr.c
     srcs/init.c srcs/set.c
@@ -34,10 +33,6 @@ add_library(MRFStr STATIC
     srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
-
-add_executable(Test test.c)
-target_link_libraries(Test PUBLIC MRFStr)
-add_test(Test COMMAND Test)
 
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
 install(TARGETS MRFStr

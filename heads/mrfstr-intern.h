@@ -62,12 +62,12 @@ typedef uint64_t mrfstr_simd_t;
 #define MRFSTR_SIMD_MASK (MRFSTR_SIMD_SIZE - 1)
 #define MRFSTR_SIMD_SLIMIT (0x100 * MRFSTR_SIMD_SIZE)
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #define MRFSTR_SIMD_TCHK (MRFSTR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_SIMD_TLIMIT (0x10000ULL * MRFSTR_SIMD_TCHK)
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 #include <pthread.h>
 

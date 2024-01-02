@@ -13,7 +13,7 @@
         mrfstr_simd_stream(r, block)
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 struct __MRFSTR_MEMSET_T
 {
@@ -51,11 +51,11 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREADING
+#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREAD_COUNT
     mrfstr_simd_t *rblock = (mrfstr_simd_t*)res;
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     if (size <= MRFSTR_SIMD_TLIMIT)
     {
 #endif
@@ -69,7 +69,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
         mrfstr_memset_sub(rblock, block, size);
         memset(rblock, chr, rem);
 #endif
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         return;
     }
 
@@ -126,7 +126,7 @@ rem:
 #endif
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memset_threaded(void *args)
 #elif defined(_WIN32)

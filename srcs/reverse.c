@@ -116,7 +116,7 @@ typedef unsigned long long mrfstr_rev_simd_t;
 #define MRFSTR_REV2_SIMD_SIZE (MRFSTR_REV_SIMD_SIZE >> 1)
 #define MRFSTR_REV2_SLIMIT (0x100 * MRFSTR_REV2_SIMD_SIZE)
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #define MRFSTR_REV_TCHK (MRFSTR_REV_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_REV_TLIMIT (0x10000 * MRFSTR_REV_TCHK)
@@ -185,7 +185,7 @@ mrfstr_res_enum_t mrfstr_reverse(
         mrfstr_rev_simd_t *lblock = (mrfstr_rev_simd_t*)lptr;
         mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         mrstr_size_t size = MRFSTR_SIZE(res) - (align << 1);
         if (size < MRFSTR_REV_TLIMIT)
         {
@@ -210,7 +210,7 @@ mrfstr_res_enum_t mrfstr_reverse(
 
             mrfstr_rev_chrrev(lptr < rptr, lptr++);
             return MRFSTR_RES_NOERROR;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         }
 
         size /= MRFSTR_REV_TCHK;
@@ -294,7 +294,7 @@ rem:
     mrfstr_rev_simd_t *lblock = (mrfstr_rev_simd_t*)lptr;
     mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     mrstr_size_t size = MRFSTR_SIZE(res) - align;
     if (size < MRFSTR_REV2_TLIMIT)
     {
@@ -316,7 +316,7 @@ rem:
 
         mrfstr_rev2_chrrev(rptr > MRFSTR_DATA(str), lptr++);
         return MRFSTR_RES_NOERROR;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     }
 
     size /= MRFSTR_REV2_TCHK;
@@ -374,7 +374,7 @@ rem2:
 #endif
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_rev_threaded(void *args)
 #elif defined(_WIN32)

@@ -85,7 +85,7 @@ typedef uint64_t mrfstr_repl_simd_t;
                 *rptr = new;          \
     } while (0)
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #define MRFSTR_REPL_TCHK (MRFSTR_REPL_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_REPL_TLIMIT (0x10000 * MRFSTR_REPL_TCHK)
@@ -170,7 +170,7 @@ void mrfstr_replace(
         mrfstr_repl_simd_t nblock;
         mrfstr_repl_set(nblock, new);
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         if (MRFSTR_SIZE(res) < MRFSTR_REPL_TLIMIT)
         {
 #endif
@@ -198,7 +198,7 @@ void mrfstr_replace(
 
             mrfstr_repl_rem;
             return;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         }
 
         mrfstr_short_t rem = size % MRFSTR_REPL_TCHK;
@@ -263,7 +263,7 @@ rem:
     // For later support
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_repl_threaded(void *args)
 #elif defined(_WIN32)

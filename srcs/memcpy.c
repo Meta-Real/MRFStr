@@ -68,7 +68,7 @@
 
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #pragma pack(push, 1)
 struct __MRFSTR_MEMCPY_T
@@ -109,12 +109,12 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     }
 #endif
 
-#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREADING
+#if !defined(MRFSTR_NOSIMD) || MRFSTR_THREAD_COUNT
     mrfstr_simd_t *dblock = (mrfstr_simd_t*)dst;
     mrfstr_simd_t *sblock = (mrfstr_simd_t*)src;
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     if (size < MRFSTR_SIMD_TLIMIT)
     {
 #endif
@@ -127,7 +127,7 @@ void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
         mrfstr_memcpy_sub(dblock, sblock, size);
         memcpy(dblock, sblock, rem);
 #endif
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
         return;
     }
 
@@ -184,7 +184,7 @@ rem:
 #endif
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcpy_threaded(void *args)
 #elif defined(_WIN32)

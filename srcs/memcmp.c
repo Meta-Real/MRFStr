@@ -63,7 +63,7 @@ typedef uint64_t mrfstr_memcmp_simd_t;
         }                                         \
     } while (0)
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #define MRFSTR_MEMCMP_TCHK (MRFSTR_MEMCMP_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCMP_TLIMIT (0x10000 * MRFSTR_MEMCMP_TCHK)
@@ -119,14 +119,14 @@ mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_siz
     }
 #endif
 
-#if !defined(MRFSTR_MEMCMP_NOSIMD) || MRFSTR_THREADING
+#if !defined(MRFSTR_MEMCMP_NOSIMD) || MRFSTR_THREAD_COUNT
     mrfstr_memcmp_simd_t *s1block = (mrfstr_memcmp_simd_t*)str1;
     mrfstr_memcmp_simd_t *s2block = (mrfstr_memcmp_simd_t*)str2;
 
     mrfstr_short_t rem;
 #endif
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     if (size < MRFSTR_MEMCMP_TLIMIT)
     {
 single:
@@ -148,7 +148,7 @@ single:
 
         return !memcmp(s1block, s2block, rem);
 #endif
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     }
 
     rem = size % MRFSTR_MEMCMP_TCHK;
@@ -222,7 +222,7 @@ rem:
 #endif
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memcmp_threaded(void *args)
 #elif defined(_WIN32)

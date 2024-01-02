@@ -8,7 +8,7 @@
 #include <string.h>
 
 #ifdef _WIN32
-#if !MRFSTR_THREADING
+#if !MRFSTR_THREAD_COUNT
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #endif
@@ -81,7 +81,7 @@ typedef uint64_t mrfstr_memchr_simd_t;
 #define MRFSTR_MEMCHR_SIMD_MASK (MRFSTR_MEMCHR_SIMD_SIZE - 1)
 #define MRFSTR_MEMCHR_SLIMIT (0x100 * MRFSTR_MEMCHR_SIMD_SIZE)
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #define MRFSTR_MEMCHR_TCHK (MRFSTR_MEMCHR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
 #define MRFSTR_MEMCHR_TLIMIT (0x10000 * MRFSTR_MEMCHR_TCHK)
@@ -185,7 +185,7 @@ mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t 
     mrfstr_memchr_set(cblock, chr);
 
     mrfstr_short_t rem;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     if (size < MRFSTR_MEMCHR_TLIMIT)
     {
 single:
@@ -211,7 +211,7 @@ single:
         }
 
         return memchr(sblock, chr, rem) != NULL;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     }
 
     rem = size % MRFSTR_MEMCHR_TCHK;
@@ -342,7 +342,7 @@ mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t 
     mrfstr_memchr_set(cblock, chr);
 
     mrfstr_short_t rem;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     if (size < MRFSTR_MEMCHR_TLIMIT)
     {
 single:
@@ -363,7 +363,7 @@ single:
 
         mrfstr_data_t ptr = memchr(sblock, chr, rem);
         return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
     }
 
     rem = size % MRFSTR_MEMCHR_TCHK;
@@ -473,7 +473,7 @@ rem:
 #endif
 }
 
-#if MRFSTR_THREADING
+#if MRFSTR_THREAD_COUNT
 
 #if defined(unix) || defined(__unix) || defined(__unix__)
 void *mrfstr_memchr_threaded(void *args)

@@ -5,6 +5,6 @@
 heads/simddef.h
 
 build
-winsetup
+msvcsetup
 
 !.gitignore

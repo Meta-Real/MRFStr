@@ -121,17 +121,15 @@ typedef HANDLE mrfstr_mutex_p;
 #define mrfstr_unlock_mutex ReleaseMutex
 
 #else
-#error The OS is not supported for multithreading
+#error Your OS is not supported yet for multithreading
 #endif
 #endif
 
 void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
-
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-
-void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif /* __MRFSTR_INTERN__ */

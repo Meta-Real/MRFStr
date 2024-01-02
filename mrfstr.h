@@ -31,13 +31,11 @@ typedef uint64_t mrfstr_idx_t;
 #define MRFSTR_THREAD_COUNT 6
 #endif
 
-#pragma pack(push, 1)
 struct __MRFSTR_T
 {
     mrfstr_data_t data;
     mrfstr_size_t size;
 };
-#pragma pack(pop)
 
 typedef struct __MRFSTR_T *mrfstr_t;
 typedef const struct __MRFSTR_T *mrfstr_ct;

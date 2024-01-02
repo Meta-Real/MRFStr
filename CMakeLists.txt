@@ -13,7 +13,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
     set(CMAKE_C_FLAGS_DEBUG "-g")
     set(CMAKE_C_FLAGS_RELEASE "-O3")
-elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+elseif (MSVC)
     set(CMAKE_C_FLAGS "/Wall /wd5045 /wd5105 /wd4324 /wd4820 /wd4710 /Zi /WX")
     set(CMAKE_C_FLAGS_DEBUG "/Od")
     set(CMAKE_C_FLAGS_RELEASE "/O2")
@@ -21,7 +21,9 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     try_run(_ _ "${PROJECT_SOURCE_DIR}/winsetup"
         "${PROJECT_SOURCE_DIR}/winsetup.c"
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+    file(REMOVE_RECURSE "${PROJECT_SOURCE_DIR}/winsetup")
 endif()
+
 
 add_library(MRFStr STATIC
     srcs/memcpy.c srcs/memset.c srcs/memcmp.c srcs/memchr.c
@@ -31,6 +33,13 @@ add_library(MRFStr STATIC
     srcs/cmp.c srcs/contain.c srcs/find.c
     srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
+target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 
-install(TARGETS MRFStr DESTINATION lib)
-install(FILES mrfstr.h DESTINATION include)
+add_executable(Test test.c)
+target_link_libraries(Test PUBLIC MRFStr)
+add_test(Test COMMAND Test)
+
+set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
+install(TARGETS MRFStr
+    LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include)

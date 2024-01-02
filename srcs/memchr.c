@@ -122,7 +122,11 @@ DWORD WINAPI mrfstr_memchr2_threaded(LPVOID args);
 
 #endif
 
+#ifndef __MRFSTR_DEBUG__
 inline mrfstr_byte_t bsf(mrfstr_size_t bits)
+#else
+mrfstr_byte_t bsf(mrfstr_size_t bits)
+#endif
 {
 #if defined(__GNUC__) || defined(__clang__)
     return __builtin_ctzll(bits);

@@ -85,11 +85,26 @@ typedef unsigned long long mrfstr_rev_simd_t;
 
 #define mrfstr_init_revidx
 
-#if defined(unix) || defined(__unix) || defined(__unix__)
-#define mrfstr_rev_perm(x, y) ((x) = _bswap64(*(y)))
-#elif defined(_WIN32)
+#if defined(__GNUC__) || defined(__clang__)
+#define mrfstr_rev_perm(x, y) ((x) = __builtin_bswap64(*(y)))
+#elif defined(_MSC_VER)
 #include <stdlib.h>
 #define mrfstr_rev_perm(x, y) ((x) = _byteswap_uint64(*(y)))
+#else
+
+#define mrfstr_rev_perm(x, y)                       \
+    do                                              \
+    {                                               \
+        (x) = ((y) & 0xff00000000000000ULL) >> 56;  \
+        (x) |= ((y) & 0x00ff000000000000ULL) >> 40; \
+        (x) |= ((y) & 0x0000ff0000000000ULL) >> 24; \
+        (x) |= ((y) & 0x000000ff00000000ULL) >> 8;  \
+        (x) |= ((y) & 0x00000000ff000000ULL) << 8;  \
+        (x) |= ((y) & 0x0000000000ff0000ULL) << 24; \
+        (x) |= ((y) & 0x000000000000ff00ULL) << 40; \
+        (x) |= ((y) & 0x00000000000000ffULL) << 56; \
+    } while (0)
+
 #endif
 
 #define mrfstr_rev_storeu(x, y) (*(x) = (y))

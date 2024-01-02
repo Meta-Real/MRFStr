@@ -35,7 +35,7 @@ void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_SIMD_SLIMIT)
     {
-        memset(res, chr, size);
+        memset(res, chr, (size_t)size);
         return;
     }
 

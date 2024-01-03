@@ -9,27 +9,27 @@
 ## mrfstr_memcpy
 
 threading on:
-64 > 512 > 256 > 128 > C
+64 > 512 > 256 > 128 > C \
 threading off:
 128 > 512 > 256 > C = 64
 
 ## mrfstr_memset
 
 threading on:
-64 > 512 > C > 256 > 128
+64 > 512 > C > 256 > 128 \
 threading off:
 256 = 512 > 128 > C = 64
 
 ## mrfstr_memcmp
 
 threading on:
-512 > 256 > 128 = 64 > C
+512 > 256 > 128 = 64 > C \
 threading off:
 512 > 256 > 128 = 64 = C
 
 ## mrfstr_memchr
 
 threading on:
-256 > 512 > 128 = 64 > C
+256 > 512 > 128 = 64 > C \
 threading off:
 612 > 256 > 64 > 128 > C

@@ -14,9 +14,8 @@
 #include <immintrin.h>
 #include <mrfstr.h>
 
-typedef __m128i mrfstr_sse_t;
-
-mrfstr_ptr_t mrfstr_sse_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void mrfstr_sse_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void mrfstr_sse_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif
 

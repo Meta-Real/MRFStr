@@ -7,12 +7,12 @@
 
 #ifdef __AVX512F__
 
-mrfstr_ptr_t mrfstr_avx512_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+void mrfstr_avx512_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    mrfstr_avx512_t *dblock = (mrfstr_avx512_t*)dst;
-    mrfstr_avx512_t *sblock = (mrfstr_avx512_t*)src;
+    __m512i *dblock = (__m512i*)dst;
+    __m512i *sblock = (__m512i*)src;
 
-    mrfstr_avx512_t block1, block2;
+    __m512i block1, block2;
     for (; size >= 2; size -= 2)
     {
         block1 = _mm512_loadu_si512(sblock++);
@@ -26,8 +26,15 @@ mrfstr_ptr_t mrfstr_avx512_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfst
         block1 = _mm512_loadu_si512(sblock);
         _mm512_store_si512(dblock, block1);
     }
+}
 
-    return NULL;
+void mrfstr_avx512_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m512i *rblock = (__m512i*)res;
+    __m512i block = _mm512_set1_epi8(chr);
+
+    for (; size; size--)
+        _mm512_stream_si512(rblock++, block);
 }
 
 #endif

@@ -14,9 +14,8 @@
 #include <immintrin.h>
 #include <mrfstr.h>
 
-typedef __m512i mrfstr_avx512_t;
-
-mrfstr_ptr_t mrfstr_avx512_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void mrfstr_avx512_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void mrfstr_avx512_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif
 

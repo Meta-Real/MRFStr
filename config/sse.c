@@ -7,13 +7,12 @@
 
 #ifdef __SSE2__
 
-#include <stdio.h>
-mrfstr_ptr_t mrfstr_sse_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+void mrfstr_sse_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    mrfstr_sse_t *dblock = (mrfstr_sse_t*)dst;
-    mrfstr_sse_t *sblock = (mrfstr_sse_t*)src;
+    __m128i *dblock = (__m128i*)dst;
+    __m128i *sblock = (__m128i*)src;
 
-    mrfstr_sse_t
+    __m128i
         block1, block2, block3, block4,
         block5, block6, block7, block8,
         blockA, blockB, blockC, blockD,
@@ -59,8 +58,15 @@ mrfstr_ptr_t mrfstr_sse_memcpy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_s
         block1 = _mm_loadu_si128(sblock++);
         _mm_store_si128(dblock++, block1);
     }
+}
 
-    return NULL;
+void mrfstr_sse_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m128i *rblock = (__m128i*)res;
+    __m128i block = _mm_set1_epi8(chr);
+
+    for (; size; size--)
+        _mm_stream_si128(rblock++, block);
 }
 
 #endif

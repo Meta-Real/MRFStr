@@ -20,11 +20,15 @@ struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t thread_count;
 
-    mrfstr_ptr_t (*ncopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*ncopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     mrfstr_byte_t ncopy_size;
-
-    mrfstr_ptr_t (*tcopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*tcopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     mrfstr_byte_t tcopy_size;
+
+    void (*nfill_sub)(mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_byte_t nfill_size;
+    void (*tfill_sub)(mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_byte_t tfill_size;
 };
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t mrfstr_config;
@@ -143,7 +147,7 @@ typedef HANDLE mrfstr_mutex_p;
 #endif
 
 void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
-void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+void mrfstr_fill(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);

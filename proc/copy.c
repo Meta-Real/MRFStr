@@ -6,18 +6,18 @@
 #include <mrfstr-intern.h>
 #include <string.h>
 
-struct __MRFSTR_MEMCPY_T
+struct __MRFSTR_COPY_T
 {
     mrfstr_data_t dst;
     mrfstr_data_ct src;
     mrfstr_size_t size;
 };
-typedef struct __MRFSTR_MEMCPY_T *mrfstr_memcpy_t;
+typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_memcpy_threaded(mrfstr_ptr_t args);
+mrfstr_ptr_t mrfstr_copy_threaded(mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_memcpy_threaded(LPVOID args);
+DWORD WINAPI mrfstr_copy_threaded(LPVOID args);
 #endif
 
 void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
@@ -35,7 +35,7 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 #ifndef MRFSTR_NOSIMD
     if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
     {
-        if (mrfstr_config.ncopy_size == 1)
+        if (!mrfstr_config.ncopy_sub)
         {
             memcpy(dst, src, size);
             return;
@@ -70,36 +70,48 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
+    mrfstr_size_t inc;
 #ifndef MRFSTR_NOSIMD
-    mrfstr_byte_t align = (uintptr_t)dst % mrfstr_config.tcopy_size;
-    if (align)
+    mrfstr_short_t rem;
+    if (mrfstr_config.tcopy_sub)
     {
-        align = mrfstr_config.tcopy_size - align;
-        memcpy(dst, src, align);
+        mrfstr_byte_t align = (uintptr_t)dst % mrfstr_config.tcopy_size;
+        if (align)
+        {
+            align = mrfstr_config.tcopy_size - align;
+            memcpy(dst, src, align);
 
-        dst += align;
-        src += align;
-        size -= align;
+            dst += align;
+            src += align;
+            size -= align;
+        }
+
+        mrfstr_short_t factor = mrfstr_config.tcopy_size * tcount;
+        rem = size % factor;
+        size /= factor;
+        inc = size * mrfstr_config.tcopy_size;
     }
-
-    mrfstr_short_t factor = mrfstr_config.tcopy_size * tcount;
-    mrfstr_short_t rem = size % factor;
-    size /= factor;
-
-    mrfstr_size_t inc = size * mrfstr_config.tcopy_size;
+    else
+    {
+        rem = size % tcount;
+        size /= tcount;
+        inc = size;
+    }
 #else
     mrfstr_byte_t rem = size % tcount;
     size /= tcount;
+    inc = size;
 #endif
 
-    mrfstr_thread_t *threads = malloc((tcount - 1) * sizeof(mrfstr_thread_t));
+    mrfstr_byte_t nthreads = tcount - 1;
+    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
-        mrfstr_memcpy_t data;
-        for (; i < tcount - 1; i++)
+        mrfstr_copy_t data;
+        for (; i < nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_MEMCPY_T));
+            data = malloc(sizeof(struct __MRFSTR_COPY_T));
             if (!data)
                 break;
 
@@ -110,7 +122,7 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
             dst += inc;
             src += inc;
 
-            mrfstr_create_thread(mrfstr_memcpy_threaded)
+            mrfstr_create_thread(mrfstr_copy_threaded)
             {
                 dst -= inc;
                 src -= inc;
@@ -125,9 +137,7 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 
 #ifndef MRFSTR_NOSIMD
     inc *= tcount;
-    if (mrfstr_config.tcopy_size == 1)
-        memcpy(dst, src, inc + rem);
-    else
+    if (mrfstr_config.tcopy_sub)
     {
         mrfstr_config.tcopy_sub(dst, src, size * tcount);
         dst += inc;
@@ -135,9 +145,9 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 
         memcpy(dst, src, rem);
     }
-#else
-    memcpy(dst, src, size + rem);
+    else
 #endif
+        memcpy(dst, src, inc + rem);
 
     if (i)
         mrfstr_close_threads;
@@ -145,18 +155,19 @@ void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_memcpy_threaded(mrfstr_ptr_t args)
+mrfstr_ptr_t mrfstr_copy_threaded(mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_memcpy_threaded(LPVOID args)
+DWORD WINAPI mrfstr_copy_threaded(LPVOID args)
 #endif
 {
-    mrfstr_memcpy_t data = args;
+    mrfstr_copy_t data = args;
 
 #ifndef MRFSTR_NOSIMD
-    mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
-#else
-    memcpy(data->dst, data->src, data->size);
+    if (mrfstr_config.tcopy_sub)
+        mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
+    else
 #endif
+        memcpy(data->dst, data->src, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

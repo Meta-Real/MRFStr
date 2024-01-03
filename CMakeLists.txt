@@ -20,7 +20,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS_DEBUG "-g")
     set(CMAKE_C_FLAGS_RELEASE "-O3")
 elseif (MSVC)
-    set(CMAKE_C_FLAGS "/Wall /wd5045 /wd5105 /wd4324 /wd4820 /wd4710 /Zi /WX")
+    set(CMAKE_C_FLAGS "/Wall /wd5045 /wd5105 /wd4324 /wd4820 /wd4710 /wd4711 /Zi /WX")
     set(CMAKE_C_FLAGS_DEBUG "/Od")
     set(CMAKE_C_FLAGS_RELEASE "/O2")
 
@@ -32,9 +32,10 @@ endif()
 
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c
-    proc/copy.c
-    srcs/init.c
-    srcs/set.c)
+    proc/copy.c proc/fill.c
+    srcs/init.c srcs/set.c
+    srcs/concat.c srcs/repeat.c
+    srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 

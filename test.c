@@ -8,16 +8,15 @@
 
 int main(void)
 {
-    mrfstr_config_thread_count(5);
-    mrfstr_config_copy(MRFSTR_SIMD_CONFIG_AVX512, MRFSTR_SIMD_CONFIG_AVX512);
+    mrfstr_config_thread_count(0);
+    mrfstr_config_copy(MRFSTR_SIMD_CONFIG_AVX, MRFSTR_SIMD_CONFIG_AVX);
 
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
 
     mrfstr_t b = mrfstr_init();
     mrfstr_alloc(b, SIZE);
-    memset(b->data, '0', SIZE);
-    b->size = SIZE;
+    mrfstr_repeat_chr(b, '0', SIZE);
 
     double t = 0;
     clock_t c;

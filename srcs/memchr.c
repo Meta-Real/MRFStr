@@ -165,7 +165,7 @@ mrfstr_byte_t bsf(mrfstr_size_t bits)
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_MEMCHR_SLIMIT)
-        return !memchr(str, chr, (size_t)size);
+        return memchr(str, chr, (size_t)size) != NULL;
 
 #ifndef MRFSTR_MEMCHR_NOSIMD
     mrfstr_byte_t align = (uintptr_t)str & MRFSTR_MEMCHR_SIMD_MASK;

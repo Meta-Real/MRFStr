@@ -112,18 +112,15 @@ void mrfstr_replace(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new)
 {
-    if (MRFSTR_SIZE(str) <= MRFSTR_REPL_SLIMIT)
+    if (MRFSTR_SIZE(str) < MRFSTR_REPL_SLIMIT)
     {
         mrfstr_chr_t chr;
         mrfstr_short_t i;
         if (res == str)
         {
-            for (i = 0; i < MRFSTR_SIZE(str); i++)
-            {
-                chr = MRFSTR_DATA(res)[i];
-                if (chr == old)
-                    chr = new;
-            }
+            for (i = 0; i < MRFSTR_SIZE(res); i++)
+                if (MRFSTR_DATA(res)[i] == old)
+                    MRFSTR_DATA(res)[i] = new;
 
             return;
         }

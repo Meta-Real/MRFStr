@@ -186,7 +186,7 @@ mrfstr_res_enum_t mrfstr_reverse(
         mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
 #if MRFSTR_THREAD_COUNT
-        mrstr_size_t size = MRFSTR_SIZE(res) - (align << 1);
+        mrfstr_size_t size = MRFSTR_SIZE(res) - (align << 1);
         if (size < MRFSTR_REV_TLIMIT)
         {
 #endif
@@ -295,7 +295,7 @@ rem:
     mrfstr_rev_simd_t *rblock = (mrfstr_rev_simd_t*)rptr;
 
 #if MRFSTR_THREAD_COUNT
-    mrstr_size_t size = MRFSTR_SIZE(res) - align;
+    mrfstr_size_t size = MRFSTR_SIZE(res) - align;
     if (size < MRFSTR_REV2_TLIMIT)
     {
 #endif

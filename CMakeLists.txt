@@ -24,24 +24,29 @@ elseif (MSVC)
     set(CMAKE_C_FLAGS_DEBUG "/Od")
     set(CMAKE_C_FLAGS_RELEASE "/O2")
 
-    try_run(_ _ "${PROJECT_SOURCE_DIR}/msvcsetup"
-        "${PROJECT_SOURCE_DIR}/msvcsetup.c"
-        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
-    file(REMOVE_RECURSE "${PROJECT_SOURCE_DIR}/msvcsetup")
+    try_run(_ _ ${PROJECT_SOURCE_DIR}/msvcsetup
+        ${PROJECT_SOURCE_DIR}/msvcsetup.c
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/msvcsetup)
 endif()
 
 add_library(MRFStr STATIC
-    srcs/memcpy.c srcs/memset.c srcs/memcmp.c srcs/memchr.c
-    srcs/init.c srcs/set.c
-    srcs/concat.c srcs/repeat.c
-    srcs/reverse.c srcs/replace.c
-    srcs/cmp.c srcs/contain.c srcs/find.c
-    srcs/io.c)
+    config/config.c config/avx512.c config/avx.c config/sse.c
+    proc/copy.c
+    srcs/init.c
+    srcs/set.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 
 enable_testing()
 add_subdirectory(tests)
+
+add_custom_command(TARGET MRFStr POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:MRFStr> ..)
+
+add_executable(Test test.c)
+target_link_libraries(Test MRFStr)
+add_test(Test Test)
 
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
 install(TARGETS MRFStr

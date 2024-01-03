@@ -4,12 +4,11 @@
 */
 
 #include <mrfstr-intern.h>
-#include <alloc.h>
 #include <string.h>
 
 mrfstr_t mrfstr_init(void)
 {
-    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -21,7 +20,7 @@ mrfstr_t mrfstr_init(void)
 mrfstr_t mrfstr_init2(
     mrfstr_data_t data)
 {
-    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -33,7 +32,7 @@ mrfstr_t mrfstr_init2(
 mrfstr_t mrfstr_init3(
     mrfstr_data_t data, mrfstr_size_t size)
 {
-    mrfstr_t str = mrstr_alloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str = malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -48,21 +47,21 @@ mrfstr_res_enum_t mrfstr_alloc(
     if (!size)
         return MRFSTR_RES_NOERROR;
 
-    MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+    MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
 void mrfstr_free(
     mrfstr_t str)
 {
-    mrstr_free(MRFSTR_DATA(str));
-    mrstr_free(str);
+    free(MRFSTR_DATA(str));
+    free(str);
 }
 
 void mrfstr_clear(
     mrfstr_t str)
 {
-    mrstr_free(MRFSTR_DATA(str));
+    free(MRFSTR_DATA(str));
 
     MRFSTR_DATA(str) = NULL;
     MRFSTR_SIZE(str) = 0;
@@ -73,7 +72,7 @@ mrfstr_res_enum_t mrfstr_realloc(
 {
     if (!size)
     {
-        mrstr_free(MRFSTR_DATA(str));
+        free(MRFSTR_DATA(str));
 
         MRFSTR_DATA(str) = NULL;
         MRFSTR_SIZE(str) = 0;
@@ -82,12 +81,12 @@ mrfstr_res_enum_t mrfstr_realloc(
 
     if (!MRFSTR_SIZE(str))
     {
-        mrstr_free(MRFSTR_DATA(str));
-        MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+        free(MRFSTR_DATA(str));
+        MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
         return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
     }
 
-    mrfstr_data_t block = mrstr_realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
+    mrfstr_data_t block = realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
     if (!block)
         return MRFSTR_RES_MEM_ERROR;
 
@@ -101,7 +100,7 @@ mrfstr_res_enum_t mrfstr_realloc(
 mrfstr_res_enum_t mrfstr_clear_realloc(
     mrfstr_t str, mrfstr_size_t size)
 {
-    mrstr_free(MRFSTR_DATA(str));
+    free(MRFSTR_DATA(str));
     MRFSTR_SIZE(str) = 0;
 
     if (!size)
@@ -110,7 +109,7 @@ mrfstr_res_enum_t mrfstr_clear_realloc(
         return MRFSTR_RES_NOERROR;
     }
 
-    MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+    MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
@@ -119,12 +118,12 @@ mrfstr_res_enum_t mrfstr_expand(
 {
     if (!MRFSTR_SIZE(str))
     {
-        mrstr_free(MRFSTR_DATA(str));
-        MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+        free(MRFSTR_DATA(str));
+        MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
         return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
     }
 
-    mrfstr_data_t block = mrstr_realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
+    mrfstr_data_t block = realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
     if (!block)
         return MRFSTR_RES_MEM_ERROR;
 
@@ -135,10 +134,10 @@ mrfstr_res_enum_t mrfstr_expand(
 mrfstr_res_enum_t mrfstr_clear_expand(
     mrfstr_t str, mrfstr_size_t size)
 {
-    mrstr_free(MRFSTR_DATA(str));
+    free(MRFSTR_DATA(str));
     MRFSTR_SIZE(str) = 0;
 
-    MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+    MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 
@@ -147,14 +146,14 @@ mrfstr_res_enum_t mrfstr_shrink(
 {
     if (!size)
     {
-        mrstr_free(MRFSTR_DATA(str));
+        free(MRFSTR_DATA(str));
 
         MRFSTR_DATA(str) = NULL;
         MRFSTR_SIZE(str) = 0;
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_data_t block = mrstr_realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
+    mrfstr_data_t block = realloc(MRFSTR_DATA(str), size * sizeof(mrfstr_chr_t));
     if (!block)
         return MRFSTR_RES_MEM_ERROR;
 
@@ -168,7 +167,7 @@ mrfstr_res_enum_t mrfstr_shrink(
 mrfstr_res_enum_t mrfstr_clear_shrink(
     mrfstr_t str, mrfstr_size_t size)
 {
-    mrstr_free(MRFSTR_DATA(str));
+    free(MRFSTR_DATA(str));
     MRFSTR_SIZE(str) = 0;
 
     if (!size)
@@ -177,7 +176,7 @@ mrfstr_res_enum_t mrfstr_clear_shrink(
         return MRFSTR_RES_NOERROR;
     }
 
-    MRFSTR_DATA(str) = mrstr_alloc(size * sizeof(mrfstr_chr_t));
+    MRFSTR_DATA(str) = malloc(size * sizeof(mrfstr_chr_t));
     return MRFSTR_DATA(str) ? MRFSTR_RES_NOERROR : MRFSTR_RES_MEM_ERROR;
 }
 

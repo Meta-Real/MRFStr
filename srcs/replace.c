@@ -145,7 +145,7 @@ void mrfstr_replace(
 
     if (res == str)
     {
-        mrstr_size_t size = MRFSTR_SIZE(res);
+        mrfstr_size_t size = MRFSTR_SIZE(res);
         mrfstr_data_t rptr = MRFSTR_DATA(res);
 
         mrfstr_byte_t align = (uintptr_t)MRFSTR_DATA(res) & MRFSTR_REPL_SIMD_SIZE;

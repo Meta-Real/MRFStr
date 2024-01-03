@@ -7,11 +7,27 @@
 #define __MRFSTR_INTERN__
 
 #include <mrfstr.h>
-#include <immintrin.h>
 
 #ifdef _MSC_VER
 #include <simddef.h>
 #endif
+
+#include <avx512.h>
+#include <avx.h>
+#include <sse.h>
+
+struct __MRFSTR_CONFIG_T
+{
+    mrfstr_byte_t thread_count;
+
+    mrfstr_ptr_t (*ncopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t ncopy_size;
+
+    mrfstr_ptr_t (*tcopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t tcopy_size;
+};
+typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
+extern mrfstr_config_t mrfstr_config;
 
 #ifdef __AVX512F__
 
@@ -59,15 +75,14 @@ typedef uint64_t mrfstr_simd_t;
 
 #endif
 
+#define MRFSTR_SLIMIT 0x10000ULL
+
+#define MRFSTR_TSIZE 0x1000000ULL
+#define MRFSTR_TLIMIT (MRFSTR_TSIZE << 1)
+
 #define MRFSTR_SIMD_MASK (MRFSTR_SIMD_SIZE - 1)
-#define MRFSTR_SIMD_SLIMIT (0x100 * MRFSTR_SIMD_SIZE)
-
-#if MRFSTR_THREAD_COUNT
 #define MRFSTR_SIMD_TCHK (MRFSTR_SIMD_SIZE * MRFSTR_THREAD_COUNT)
-#define MRFSTR_SIMD_TLIMIT (0x10000ULL * MRFSTR_SIMD_TCHK)
-#endif
 
-#if MRFSTR_THREAD_COUNT
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include <pthread.h>
 
@@ -76,10 +91,10 @@ typedef pthread_mutex_t mrfstr_mutex_t;
 typedef mrfstr_mutex_t *mrfstr_mutex_p;
 
 #define MRFSTR_TFUNC_RET NULL
-#define MRFSTR_CAST_MUTEX(m) (&(m))
+#define MRFSTR_CAST_MUTEX(m) &(m)
 
 #define mrfstr_create_thread(f) \
-    if (pthread_create(threads + i, NULL, (f), data))
+    if (pthread_create(threads + i, NULL, f, data))
 
 #define mrfstr_close_threads \
     while (i)                \
@@ -101,35 +116,37 @@ typedef HANDLE mrfstr_mutex_t;
 typedef HANDLE mrfstr_mutex_p;
 
 #define MRFSTR_TFUNC_RET TRUE
-#define MRFSTR_CAST_MUTEX(m) (m)
+#define MRFSTR_CAST_MUTEX(m) m
 
-#define mrfstr_create_thread(f)                             \
-    threads[i] = CreateThread(NULL, 0, (f), data, 0, NULL); \
+#define mrfstr_create_thread(f)                           \
+    threads[i] = CreateThread(NULL, 0, f, data, 0, NULL); \
     if (!threads[i])
 
-#define mrfstr_close_threads                                              \
-    WaitForMultipleObjects(MRFSTR_THREAD_COUNT, threads, TRUE, INFINITE); \
-    while (i)                                                             \
-        CloseHandle(threads[--i])
+#define mrfstr_close_threads                                     \
+    do                                                           \
+    {                                                            \
+        WaitForMultipleObjects(tcount, threads, TRUE, INFINITE); \
+        while (i)                                                \
+            CloseHandle(threads[--i]);                           \
+    } while (0)
 
-#define mrfstr_create_mutex(m)            \
-    (m) = CreateMutex(NULL, FALSE, NULL); \
+#define mrfstr_create_mutex(m)          \
+    m = CreateMutex(NULL, FALSE, NULL); \
     if (!(m))
 
 #define mrfstr_close_mutex CloseHandle
-#define mrfstr_lock_mutex(m) WaitForSingleObject((m), INFINITE)
+#define mrfstr_lock_mutex(m) WaitForSingleObject(m, INFINITE)
 #define mrfstr_unlock_mutex ReleaseMutex
 
 #else
-#error Your OS is not supported yet for multithreading
-#endif
+#error Your os is not yet supported for multithreading
 #endif
 
-void mrfstr_memcpy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 void mrfstr_memset(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
-#endif /* __MRFSTR_INTERN__ */
+#endif

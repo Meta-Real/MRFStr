@@ -195,7 +195,7 @@ single:
 
         mrfstr_memchr_simd_t block;
 #ifdef MRFSTR_MEMCHR_NOSIMD
-        mrstr_size_t cres;
+        mrfstr_size_t cres;
 #endif
         for (; size; sblock++, size--)
         {

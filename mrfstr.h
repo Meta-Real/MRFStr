@@ -6,33 +6,32 @@
 #ifndef __MRFSTR__
 #define __MRFSTR__
 
-#include <stdint.h>
+#include <inttypes.h>
+
+typedef uint8_t mrfstr_bool_t;
+typedef uint8_t mrfstr_byte_t;
+typedef uint16_t mrfstr_short_t;
+typedef uint32_t mrfstr_long_t;
+typedef size_t mrfstr_idx_t;
+typedef size_t mrfstr_size_t;
 
 typedef char mrfstr_chr_t;
 typedef mrfstr_chr_t *mrfstr_data_t;
 typedef const mrfstr_chr_t *mrfstr_data_ct;
 
-typedef uint8_t mrfstr_byte_t;
-typedef uint16_t mrfstr_short_t;
-typedef uint32_t mrfstr_long_t;
-typedef uint64_t mrfstr_size_t;
-
-typedef uint8_t mrfstr_bool_t;
-typedef uint64_t mrfstr_idx_t;
+typedef void *mrfstr_ptr_t;
+typedef const void *mrfstr_ptr_ct;
 
 #define MRFSTR_TRUE ((mrfstr_bool_t)1)
 #define MRFSTR_FALSE ((mrfstr_bool_t)0)
 
 #define MRFSTR_INVIDX ((mrfstr_idx_t)-1)
 
-#define MRFSTR_THREAD_COUNT 6
-
 struct __MRFSTR_T
 {
     mrfstr_data_t data;
     mrfstr_size_t size;
 };
-
 typedef struct __MRFSTR_T *mrfstr_t;
 typedef const struct __MRFSTR_T *mrfstr_ct;
 
@@ -45,11 +44,12 @@ enum __MRFSTR_RES_ENUM
     MRFSTR_RES_MEM_ERROR,
     MRFSTR_RES_OVERFLOW_ERROR
 };
-typedef uint8_t mrfstr_res_enum_t;
+typedef mrfstr_byte_t mrfstr_res_enum_t;
 
 /* init functions */
 
-mrfstr_t mrfstr_init(void);
+mrfstr_t mrfstr_init(
+    void);
 mrfstr_t mrfstr_init2(
     mrfstr_data_t data);
 mrfstr_t mrfstr_init3(
@@ -166,7 +166,7 @@ mrfstr_idx_t mrfstr_n_find_chr(
     mrfstr_ct str, mrfstr_chr_t chr,
     mrfstr_size_t size);
 
-/* util functions */
+/* data functions */
 
 inline mrfstr_data_t mrfstr_get_data(
     mrfstr_ct str)
@@ -192,9 +192,28 @@ inline void mrfstr_modify_chr(
     MRFSTR_DATA(str)[idx] = chr;
 }
 
+/* io functions */
+
 void mrfstr_print(
     mrfstr_ct str);
 void mrfstr_n_print(
     mrfstr_ct str, mrfstr_size_t size);
+
+/* config functions */
+
+enum __MRFSTR_SIMD_CONFIG_ENUM
+{
+    MRFSTR_SIMD_CONFIG_AVX512,
+    MRFSTR_SIMD_CONFIG_AVX,
+    MRFSTR_SIMD_CONFIG_SSE,
+    MRFSTR_SIMD_CONFIG_NONE
+};
+typedef mrfstr_byte_t mrfstr_simd_config_enum_t;
+
+void mrfstr_config_thread_count(
+    mrfstr_byte_t thread_count);
+void mrfstr_config_copy(
+    mrfstr_simd_config_enum_t normal,
+    mrfstr_simd_config_enum_t threaded);
 
 #endif /* __MRFSTR__ */

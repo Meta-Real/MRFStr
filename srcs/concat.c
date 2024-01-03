@@ -4,7 +4,6 @@
 */
 
 #include <mrfstr-intern.h>
-#include <alloc.h>
 
 mrfstr_res_enum_t mrfstr_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2)

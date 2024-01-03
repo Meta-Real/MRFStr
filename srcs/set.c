@@ -4,7 +4,6 @@
 */
 
 #include <mrfstr-intern.h>
-#include <alloc.h>
 #include <string.h>
 
 void mrfstr_set(
@@ -12,14 +11,14 @@ void mrfstr_set(
 {
     if (!MRFSTR_SIZE(src))
     {
-        mrstr_free(MRFSTR_DATA(dst));
+        free(MRFSTR_DATA(dst));
 
         MRFSTR_DATA(dst) = NULL;
         MRFSTR_SIZE(dst) = 0;
         return;
     }
 
-    mrfstr_memcpy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(src));
+    mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(src));
     MRFSTR_SIZE(dst) = MRFSTR_SIZE(src);
 }
 
@@ -29,14 +28,14 @@ void mrfstr_set_str(
     mrfstr_size_t size = strlen(src);
     if (!size)
     {
-        mrstr_free(MRFSTR_DATA(dst));
+        free(MRFSTR_DATA(dst));
 
         MRFSTR_DATA(dst) = NULL;
         MRFSTR_SIZE(dst) = 0;
         return;
     }
 
-    mrfstr_memcpy(MRFSTR_DATA(dst), src, size);
+    mrfstr_copy(MRFSTR_DATA(dst), src, size);
     MRFSTR_SIZE(dst) = size;
 }
 
@@ -46,14 +45,14 @@ void mrfstr_set_nstr(
 {
     if (!size)
     {
-        mrstr_free(MRFSTR_DATA(dst));
+        free(MRFSTR_DATA(dst));
 
         MRFSTR_DATA(dst) = NULL;
         MRFSTR_SIZE(dst) = 0;
         return;
     }
 
-    mrfstr_memcpy(MRFSTR_DATA(dst), src, size);
+    mrfstr_copy(MRFSTR_DATA(dst), src, size);
     MRFSTR_SIZE(dst) = size;
 }
 

@@ -12,7 +12,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(MRFStr VERSION 0.1.0 LANGUAGES C)
-enable_testing()
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
@@ -39,6 +38,7 @@ add_library(MRFStr STATIC
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 
+enable_testing()
 add_subdirectory(tests)
 
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)

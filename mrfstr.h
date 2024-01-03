@@ -218,5 +218,8 @@ void mrfstr_config_copy(
 void mrfstr_config_fill(
     mrfstr_simd_config_enum_t normal,
     mrfstr_simd_config_enum_t threaded);
+void mrfstr_config_cmp(
+    mrfstr_simd_config_enum_t normal,
+    mrfstr_simd_config_enum_t threaded);
 
 #endif /* __MRFSTR__ */

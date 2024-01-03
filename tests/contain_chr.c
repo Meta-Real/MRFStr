@@ -92,7 +92,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"contain_chr\" error: TEST_MID random one section\n"
-                "\tFailed index: %" PRIu64 "\n", idx);
+                "\tFailed index: %" PRIu64 "\n", (uint64_t)idx);
             return EXIT_FAILURE;
         }
 
@@ -123,7 +123,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"contain_chr\" error: TEST_HIGH random one section\n"
-                "\tFailed index: %" PRIu64 "\n", idx);
+                "\tFailed index: %" PRIu64 "\n", (uint64_t)idx);
             return EXIT_FAILURE;
         }
 

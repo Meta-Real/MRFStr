@@ -14,8 +14,18 @@
 #include <immintrin.h>
 #include <mrfstr.h>
 
-void mrfstr_avx512_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-void mrfstr_avx512_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+#define MRFSTR_AVX512_TCMP_LOAD 0x10000
+
+void mrfstr_avx512_copy_sub(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void mrfstr_avx512_fill_sub(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_bool_t mrfstr_avx512_cmp_sub(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void mrfstr_avx512_tcmp_sub(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 #endif
 

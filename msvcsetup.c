@@ -46,13 +46,7 @@ int main(void)
     {
         __cpuidex(data, 1, 0);
 
-        int reg = data[3];
-        if (reg & 0x4000000)
-            fputs("#ifndef __SSE2__\n"
-                "#define __SSE2__\n"
-                "#endif\n\n", header);
-
-        reg = data[2];
+        int reg = data[2];
         if (reg & 0x200)
             fputs("#ifndef __SSSE3__\n"
                 "#define __SSSE3__\n"
@@ -64,6 +58,12 @@ int main(void)
         if (reg & 0x10000000)
             fputs("#ifndef __AVX__\n"
                 "#define __AVX__\n"
+                "#endif\n\n", header);
+
+        reg = data[3];
+        if (reg & 0x4000000)
+            fputs("#ifndef __SSE2__\n"
+                "#define __SSE2__\n"
                 "#endif\n\n", header);
 
         if (nid >= 7)
@@ -82,6 +82,10 @@ int main(void)
             if (reg & 0x40000000)
                 fputs("#ifndef __AVX512BW__\n"
                     "#define __AVX512BW__\n"
+                    "#endif\n\n", header);
+            if (reg & 0x80000000)
+                fputs("#ifndef __AVX512VL__\n"
+                    "#define __AVX512VL__\n"
                     "#endif\n\n", header);
 
             reg = data[2];

@@ -18,7 +18,7 @@ mrfstr_bool_t mrfstr_equal(
     if (!MRFSTR_SIZE(str1))
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), MRFSTR_DATA(str2), MRFSTR_SIZE(str1));
+    return mrfstr_cmp(MRFSTR_DATA(str1), MRFSTR_DATA(str2), MRFSTR_SIZE(str1));
 }
 
 mrfstr_bool_t mrfstr_n_equal(
@@ -41,7 +41,7 @@ mrfstr_bool_t mrfstr_n_equal(
     if (!size)
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), MRFSTR_DATA(str2), size);
+    return mrfstr_cmp(MRFSTR_DATA(str1), MRFSTR_DATA(str2), size);
 }
 
 mrfstr_bool_t mrfstr_equal_str(
@@ -53,7 +53,7 @@ mrfstr_bool_t mrfstr_equal_str(
     if (!MRFSTR_SIZE(str1))
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), str2, MRFSTR_SIZE(str1));
+    return mrfstr_cmp(MRFSTR_DATA(str1), str2, MRFSTR_SIZE(str1));
 }
 
 mrfstr_bool_t mrfstr_n_equal_str(
@@ -73,7 +73,7 @@ mrfstr_bool_t mrfstr_n_equal_str(
     if (!size)
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), str2, size);
+    return mrfstr_cmp(MRFSTR_DATA(str1), str2, size);
 }
 
 mrfstr_bool_t mrfstr_equal_nstr(
@@ -85,7 +85,7 @@ mrfstr_bool_t mrfstr_equal_nstr(
     if (!size)
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), str2, size);
+    return mrfstr_cmp(MRFSTR_DATA(str1), str2, size);
 }
 
 mrfstr_bool_t mrfstr_n_equal_nstr(
@@ -105,7 +105,7 @@ mrfstr_bool_t mrfstr_n_equal_nstr(
     if (!size)
         return MRFSTR_TRUE;
 
-    return mrfstr_memcmp(MRFSTR_DATA(str1), str2, size);
+    return mrfstr_cmp(MRFSTR_DATA(str1), str2, size);
 }
 
 mrfstr_bool_t mrfstr_equal_chr(

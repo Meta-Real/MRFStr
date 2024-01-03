@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    mrfstr_config_thread_count(0);
+    mrfstr_config_thread_count(5);
     mrfstr_config_copy(MRFSTR_SIMD_CONFIG_AVX, MRFSTR_SIMD_CONFIG_AVX);
 
     mrfstr_t a = mrfstr_init();
@@ -22,8 +22,9 @@ int main(void)
     clock_t c;
     for (int i = 0; i < COUNT; i++)
     {
-        c = clock();
         mrfstr_set(a, b);
+        c = clock();
+        printf("%hu   ", mrfstr_equal(a, b));
         c = clock() - c;
 
         t += c;

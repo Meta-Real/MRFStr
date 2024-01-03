@@ -32,9 +32,10 @@ endif()
 
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c
-    proc/copy.c proc/fill.c
+    proc/copy.c proc/fill.c proc/cmp.c
     srcs/init.c srcs/set.c
     srcs/concat.c srcs/repeat.c
+    srcs/cmp.c
     srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)

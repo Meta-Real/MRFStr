@@ -15,13 +15,16 @@ struct __MRFSTR_FILL_T
 typedef struct __MRFSTR_FILL_T *mrfstr_fill_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_fill_threaded(mrfstr_ptr_t args);
+mrfstr_ptr_t mrfstr_fill_threaded(
+    mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_fill_threaded(LPVOID args);
+DWORD WINAPI mrfstr_fill_threaded(
+    LPVOID args);
 #endif
 
 #include <stdio.h>
-void mrfstr_fill(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+void mrfstr_fill(
+    mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
 #ifndef MRFSTR_NOSIMD
     if (size < MRFSTR_SLIMIT)
@@ -150,9 +153,11 @@ void mrfstr_fill(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_fill_threaded(mrfstr_ptr_t args)
+mrfstr_ptr_t mrfstr_fill_threaded(
+    mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_fill_threaded(LPVOID args)
+DWORD WINAPI mrfstr_fill_threaded(
+    LPVOID args)
 #endif
 {
     mrfstr_fill_t data = (mrfstr_fill_t)args;

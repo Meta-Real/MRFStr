@@ -20,15 +20,27 @@ struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t thread_count;
 
-    void (*ncopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*ncopy_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     mrfstr_byte_t ncopy_size;
-    void (*tcopy_sub)(mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*tcopy_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     mrfstr_byte_t tcopy_size;
 
-    void (*nfill_sub)(mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+    void (*nfill_sub)(
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t nfill_size;
-    void (*tfill_sub)(mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+    void (*tfill_sub)(
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tfill_size;
+
+    mrfstr_bool_t (*ncmp_sub)(
+        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t ncmp_size;
+    void (*tcmp_sub)(
+        volatile mrfstr_bool_t*,
+        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t tcmp_size;
 };
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t mrfstr_config;
@@ -146,10 +158,14 @@ typedef HANDLE mrfstr_mutex_p;
 #error Your os is not yet supported for multithreading
 #endif
 
-void mrfstr_copy(mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
-void mrfstr_fill(mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+void mrfstr_copy(
+    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+void mrfstr_fill(
+    mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
-mrfstr_bool_t mrfstr_memcmp(mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
+mrfstr_bool_t mrfstr_cmp(
+    mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
+
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 

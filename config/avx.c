@@ -41,4 +41,83 @@ void mrfstr_avx_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
         _mm256_stream_si256(rblock++, block);
 }
 
+#ifdef __AVX2__
+
+mrfstr_bool_t mrfstr_avx_cmp_sub(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+{
+    __m256i *s1block = (__m256i*)str1;
+    __m256i *s2block = (__m256i*)str2;
+
+    __m256i block1, block2;
+    for (; size; size--)
+    {
+        block1 = _mm256_loadu_si256(s1block++);
+        block2 = _mm256_loadu_si256(s2block++);
+
+#if defined(__AVX512F__) && defined(__AVX512VL__)
+        if (_mm256_cmpneq_epi64_mask(block1, block2))
+#else
+        if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
+#endif
+            return MRFSTR_FALSE;
+    }
+
+    return MRFSTR_TRUE;
+}
+
+void mrfstr_avx_tcmp_sub(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+{
+    __m256i *s1block = (__m256i*)str1;
+    __m256i *s2block = (__m256i*)str2;
+
+    __m256i block1, block2;
+    mrfstr_size_t nsize;
+    while (size >= MRFSTR_AVX_TCMP_LOAD)
+    {
+        if (!*res)
+            return;
+
+        nsize = size - MRFSTR_AVX_TCMP_LOAD;
+        for (; size != nsize; size--)
+        {
+            block1 = _mm256_loadu_si256(s1block++);
+            block2 = _mm256_loadu_si256(s2block++);
+
+#if defined(__AVX512F__) && defined(__AVX512VL__)
+            if (_mm256_cmpneq_epi64_mask(block1, block2))
+#else
+            if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
+#endif
+            {
+                *res = MRFSTR_FALSE;
+                return;
+            }
+        }
+    }
+
+    if (!*res)
+        return;
+
+    for (; size; size--)
+    {
+        block1 = _mm256_loadu_si256(s1block++);
+        block2 = _mm256_loadu_si256(s2block++);
+
+#if defined(__AVX512F__) && defined(__AVX512VL__)
+        if (_mm256_cmpneq_epi64_mask(block1, block2))
+#else
+        if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
+#endif
+        {
+            *res = MRFSTR_FALSE;
+            return;
+        }
+    }
+}
+
+#endif
+
 #endif

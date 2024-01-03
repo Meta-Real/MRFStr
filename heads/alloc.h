@@ -8,7 +8,6 @@
 
 #include <stdint.h>
 
-
 typedef uint64_t mrstr_size_t;
 typedef void *mrstr_ptr_t;
 

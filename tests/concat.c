@@ -8,12 +8,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_LOW 0x400
+#define TEST_LOW 0x200
 #define TEST_MID 0x100000
 #define TEST_HIGH 0x40000000
 
 int main(void)
 {
+    mrfstr_config_thread_count(5);
+
     mrfstr_t res = mrfstr_init();
     if (!res)
     {

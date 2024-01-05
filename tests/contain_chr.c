@@ -10,7 +10,7 @@
 #include <time.h>
 #include <inttypes.h>
 
-#define TEST_LOW 0x400
+#define TEST_LOW 0x200
 #define TEST_MID 0x100000
 #define TEST_HIGH 0x40000000
 
@@ -19,6 +19,8 @@
 
 int main(void)
 {
+    mrfstr_config_thread_count(5);
+
     mrfstr_t str = mrfstr_init();
     if (!str)
     {
@@ -61,7 +63,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"contain_chr\" error: TEST_LOW random one section\n"
-                "\tFailed index: %" PRIu64 "\n", idx);
+                "\tFailed index: %zu\n", idx);
             return EXIT_FAILURE;
         }
 
@@ -92,7 +94,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"contain_chr\" error: TEST_MID random one section\n"
-                "\tFailed index: %" PRIu64 "\n", (uint64_t)idx);
+                "\tFailed index: %zu\n", (uint64_t)idx);
             return EXIT_FAILURE;
         }
 
@@ -123,7 +125,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"contain_chr\" error: TEST_HIGH random one section\n"
-                "\tFailed index: %" PRIu64 "\n", (uint64_t)idx);
+                "\tFailed index: %zu\n", (uint64_t)idx);
             return EXIT_FAILURE;
         }
 

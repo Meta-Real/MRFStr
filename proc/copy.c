@@ -4,7 +4,10 @@
 */
 
 #include <mrfstr-intern.h>
-#include <string.h>
+
+#define mrfstr_copy_rem \
+    for (; rem; rem--)  \
+        *dst++ = *src++
 
 struct __MRFSTR_COPY_T
 {
@@ -25,47 +28,33 @@ DWORD WINAPI __mrfstr_copy_threaded(
 void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-#ifndef MRFSTR_NOSIMD
     if (size < MRFSTR_SLIMIT)
-#else
-    if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
-#endif
     {
-        memcpy(dst, src, size);
+        for (; size; size--)
+            *dst++ = *src++;
         return;
     }
 
-#ifndef MRFSTR_NOSIMD
     if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
     {
-        if (!mrfstr_config.ncopy_sub)
+        mrfstr_byte_t rem = (uintptr_t)dst % mrfstr_config.ncopy_size;
+        if (rem)
         {
-            memcpy(dst, src, size);
-            return;
+            rem = mrfstr_config.ncopy_size - rem;
+            size -= rem;
+            mrfstr_copy_rem;
         }
 
-        mrfstr_byte_t align = (uintptr_t)dst % mrfstr_config.ncopy_size;
-        if (align)
-        {
-            align = mrfstr_config.ncopy_size - align;
-            memcpy(dst, src, align);
-
-            dst += align;
-            src += align;
-            size -= align;
-        }
-
-        mrfstr_byte_t rem = size % mrfstr_config.ncopy_size;
+        rem = size % mrfstr_config.ncopy_size;
         size -= rem;
 
         mrfstr_config.ncopy_sub(dst, src, size / mrfstr_config.ncopy_size);
         dst += size;
         src += size;
 
-        memcpy(dst, src, rem);
+        mrfstr_copy_rem;
         return;
     }
-#endif
 
     mrfstr_byte_t tcount;
     if (size > mrfstr_config.thread_count * MRFSTR_TSIZE)
@@ -73,38 +62,17 @@ void __mrfstr_copy(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_size_t inc;
-#ifndef MRFSTR_NOSIMD
-    mrfstr_short_t rem;
-    if (mrfstr_config.tcopy_sub)
+    mrfstr_short_t rem = (uintptr_t)dst % mrfstr_config.tcopy_size;
+    if (rem)
     {
-        mrfstr_byte_t align = (uintptr_t)dst % mrfstr_config.tcopy_size;
-        if (align)
-        {
-            align = mrfstr_config.tcopy_size - align;
-            memcpy(dst, src, align);
-
-            dst += align;
-            src += align;
-            size -= align;
-        }
-
-        mrfstr_short_t factor = mrfstr_config.tcopy_size * tcount;
-        rem = size % factor;
-        size /= factor;
-        inc = size * mrfstr_config.tcopy_size;
+        rem = mrfstr_config.tcopy_size - rem;
+        size -= rem;
+        mrfstr_copy_rem;
     }
-    else
-    {
-        rem = size % tcount;
-        size /= tcount;
-        inc = size;
-    }
-#else
-    mrfstr_byte_t rem = size % tcount;
-    size /= tcount;
-    inc = size;
-#endif
+
+    mrfstr_short_t factor = mrfstr_config.tcopy_size * tcount;
+    rem = size % factor;
+    mrfstr_size_t inc = (size /= factor) * mrfstr_config.tcopy_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
     mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -138,19 +106,12 @@ void __mrfstr_copy(
         tcount -= i;
     }
 
-#ifndef MRFSTR_NOSIMD
+    mrfstr_config.tcopy_sub(dst, src, size * tcount);
     inc *= tcount;
-    if (mrfstr_config.tcopy_sub)
-    {
-        mrfstr_config.tcopy_sub(dst, src, size * tcount);
-        dst += inc;
-        src += inc;
+    dst += inc;
+    src += inc;
 
-        memcpy(dst, src, rem);
-    }
-    else
-#endif
-        memcpy(dst, src, inc + rem);
+    mrfstr_copy_rem;
 
     if (i)
         mrfstr_close_threads;
@@ -166,13 +127,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 {
     mrfstr_copy_t data = args;
-
-#ifndef MRFSTR_NOSIMD
-    if (mrfstr_config.tcopy_sub)
-        mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
-    else
-#endif
-        memcpy(data->dst, data->src, data->size);
+    mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

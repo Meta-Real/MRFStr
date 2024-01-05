@@ -39,14 +39,9 @@ void __mrfstr_avx_fill(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 
     for (; size; size--)
         _mm256_stream_si256(rblock++, block);
-
-#ifdef __SSE__
-    _mm_sfence();
-#endif
 }
 
 #ifdef __AVX2__
-
 mrfstr_bool_t __mrfstr_avx_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -59,7 +54,7 @@ mrfstr_bool_t __mrfstr_avx_equal(
         block1 = _mm256_loadu_si256(s1block++);
         block2 = _mm256_loadu_si256(s2block++);
 
-#if defined(__AVX512F__) && defined(__AVX512VL__)
+#ifdef __AVX512VL__
         if (_mm256_cmpneq_epi64_mask(block1, block2))
 #else
         if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
@@ -90,7 +85,7 @@ void __mrfstr_avx_tequal(
             block1 = _mm256_loadu_si256(s1block++);
             block2 = _mm256_loadu_si256(s2block++);
 
-#if defined(__AVX512F__) && defined(__AVX512VL__)
+#ifdef __AVX512VL__
             if (_mm256_cmpneq_epi64_mask(block1, block2))
 #else
             if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
@@ -110,7 +105,7 @@ void __mrfstr_avx_tequal(
         block1 = _mm256_loadu_si256(s1block++);
         block2 = _mm256_loadu_si256(s2block++);
 
-#if defined(__AVX512F__) && defined(__AVX512VL__)
+#ifdef __AVX512VL__
         if (_mm256_cmpneq_epi64_mask(block1, block2))
 #else
         if (~_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
@@ -122,6 +117,77 @@ void __mrfstr_avx_tequal(
     }
 }
 
+mrfstr_bool_t __mrfstr_avx_contain(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m256i *sblock = (__m256i*)str;
+    __m256i cblock = _mm256_set1_epi8(chr);
+
+    __m256i block;
+    for (; size; size--)
+    {
+        block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+        if (_mm256_cmpeq_epi8_mask(block, cblock))
+#else
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
+#endif
+            return MRFSTR_TRUE;
+    }
+
+    return MRFSTR_FALSE;
+}
+
+void __mrfstr_avx_tcontain(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m256i *sblock = (__m256i*)str;
+    __m256i cblock = _mm256_set1_epi8(chr);
+
+    __m256i block;
+    mrfstr_size_t nsize;
+    while (size >= MRFSTR_AVX_TCONTAIN_LOAD)
+    {
+        if (*res)
+            return;
+
+        nsize = size - MRFSTR_AVX_TCONTAIN_LOAD;
+        for (; size != nsize; size--)
+        {
+            block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+            if (_mm256_cmpeq_epi8_mask(block, cblock))
+#else
+            if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
+#endif
+            {
+                *res = MRFSTR_TRUE;
+                return;
+            }
+        }
+    }
+
+    if (*res)
+        return;
+
+    for (; size; size--)
+    {
+        block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+        if (_mm256_cmpeq_epi8_mask(block, cblock))
+#else
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
+#endif
+        {
+            *res = MRFSTR_TRUE;
+            return;
+        }
+    }
+}
 #endif
 
 #endif

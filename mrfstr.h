@@ -12,6 +12,8 @@ typedef uint8_t mrfstr_bool_t;
 typedef uint8_t mrfstr_byte_t;
 typedef uint16_t mrfstr_short_t;
 typedef uint32_t mrfstr_long_t;
+typedef uint64_t mrfstr_longlong_t;
+
 typedef size_t mrfstr_idx_t;
 typedef size_t mrfstr_size_t;
 
@@ -218,7 +220,10 @@ void mrfstr_config_copy(
 void mrfstr_config_fill(
     mrfstr_simd_config_enum_t normal,
     mrfstr_simd_config_enum_t threaded);
-void mrfstr_config_cmp(
+void mrfstr_config_equal(
+    mrfstr_simd_config_enum_t normal,
+    mrfstr_simd_config_enum_t threaded);
+void mrfstr_config_contain(
     mrfstr_simd_config_enum_t normal,
     mrfstr_simd_config_enum_t threaded);
 

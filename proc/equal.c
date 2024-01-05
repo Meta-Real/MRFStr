@@ -4,53 +4,11 @@
 */
 
 #include <mrfstr-intern.h>
-#include <string.h>
 
-#define MRFSTR_NOSIMD_TCMP_LOAD 0x80000
-
-#define mrfstr_ncmp_sub(size, inc)                     \
-    do                                                 \
-    {                                                  \
-        if (!mrfstr_config.ncmp_sub(str1, str2, size)) \
-            return MRFSTR_FALSE;                       \
-                                                       \
-        str1 += inc;                                   \
-        str2 += inc;                                   \
-        return !memcmp(str1, str2, rem);               \
-    } while (0)
-
-#define mrfstr_tcmp_sub(res, size, ret)             \
-    do                                              \
-    {                                               \
-        mrfstr_size_t nsize;                        \
-        while (size >= MRFSTR_NOSIMD_TCMP_LOAD)     \
-        {                                           \
-            if (!res)                               \
-            {                                       \
-                ret;                                \
-            }                                       \
-                                                    \
-            nsize = size - MRFSTR_NOSIMD_TCMP_LOAD; \
-            for (; size != nsize; size--)           \
-                if (*s1block++ != *s2block++)       \
-                {                                   \
-                    res = MRFSTR_FALSE;             \
-                    ret;                            \
-                }                                   \
-        }                                           \
-                                                    \
-        if (!res)                                   \
-        {                                           \
-            ret;                                    \
-        }                                           \
-                                                    \
-        for (; size; size--)                        \
-            if (*s1block++ != *s2block++)           \
-            {                                       \
-                res = MRFSTR_FALSE;                 \
-                ret;                                \
-            }                                       \
-    } while (0)
+#define mrfstr_equal_rem        \
+    for (; rem; rem--)          \
+        if (*str1++ != *str2++) \
+            return MRFSTR_FALSE
 
 struct __MRFSTR_EQUAL_T
 {
@@ -73,36 +31,35 @@ DWORD WINAPI __mrfstr_equal_threaded(
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
-#ifndef MRFSTR_NOSIMD
     if (size < MRFSTR_SLIMIT)
-#else
-    if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
-#endif
-        return !memcmp(str1, str2, size);
+    {
+        for (; size; size--)
+            if (*str1++ != *str2++)
+                return MRFSTR_FALSE;
+        return MRFSTR_TRUE;
+    }
 
-#ifndef MRFSTR_NOSIMD
     if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
     {
-        if (!mrfstr_config.ncmp_sub)
-            return !memcmp(str1, str2, size);
-
-        mrfstr_byte_t align = (uintptr_t)str1 % mrfstr_config.ncmp_size;
-        if (align)
+        mrfstr_byte_t rem = (uintptr_t)str1 % mrfstr_config.nequal_size;
+        if (rem)
         {
-            align = mrfstr_config.ncmp_size - align;
-            if (memcmp(str1, str2, align))
-                return MRFSTR_FALSE;
-
-            str1 += align;
-            str2 += align;
-            size -= align;
+            rem = mrfstr_config.nequal_size - rem;
+            size -= rem;
+            mrfstr_equal_rem;
         }
 
-        mrfstr_byte_t rem = size % mrfstr_config.ncmp_size;
+        rem = size % mrfstr_config.nequal_size;
         size -= rem;
-        mrfstr_ncmp_sub(size / mrfstr_config.ncmp_size, size);
+
+        if (!mrfstr_config.nequal_sub(str1, str2, size / mrfstr_config.nequal_size))
+            return MRFSTR_FALSE;
+        str1 += size;
+        str2 += size;
+
+        mrfstr_equal_rem;
+        return MRFSTR_TRUE;
     }
-#endif
 
     mrfstr_byte_t tcount;
     if (size > mrfstr_config.thread_count * MRFSTR_TSIZE)
@@ -110,38 +67,17 @@ mrfstr_bool_t __mrfstr_equal(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_size_t inc;
-#ifndef MRFSTR_NOSIMD
-    mrfstr_short_t rem;
-    if (mrfstr_config.tcmp_sub)
+    mrfstr_short_t rem = (uintptr_t)str1 & mrfstr_config.tequal_size;
+    if (rem)
     {
-        mrfstr_byte_t align = (uintptr_t)str1 % mrfstr_config.tcmp_size;
-        if (align)
-        {
-            align = mrfstr_config.tcmp_size - align;
-            if (memcmp(str1, str2, align))
-                return MRFSTR_FALSE;
-
-            str1 += align;
-            str2 += align;
-            size -= align;
-        }
-
-        mrfstr_short_t factor = mrfstr_config.tcmp_size * tcount;
-        rem = size % factor;
-        inc = (size /= factor) * mrfstr_config.tcmp_size;
+        rem = mrfstr_config.tequal_size - rem;
+        size -= rem;
+        mrfstr_equal_rem;
     }
-    else
-    {
-        mrfstr_short_t factor = sizeof(mrfstr_size_t) * tcount;
-        rem = size % factor;
-        inc = (size /= factor) * sizeof(mrfstr_size_t);
-    }
-#else
-    mrfstr_short_t factor = sizeof(mrfstr_size_t) * tcount;
-    mrfstr_short_t rem = size % factor;
-    inc = (size /= factor) * sizeof(mrfstr_size_t);
-#endif
+
+    mrfstr_short_t factor = mrfstr_config.tequal_size * tcount;
+    rem = size % factor;
+    mrfstr_size_t inc = (size /= factor) * mrfstr_config.tequal_size;
 
     volatile mrfstr_bool_t res = MRFSTR_TRUE;
 
@@ -158,13 +94,14 @@ mrfstr_bool_t __mrfstr_equal(
             {
                 if (!i)
                 {
+                    if (!mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                        return MRFSTR_FALSE;
                     inc *= tcount;
-#ifndef MRFSTR_NOSIMD
-                    if (mrfstr_config.tcmp_sub)
-                        mrfstr_ncmp_sub(size * tcount, inc);
-                    else
-#endif
-                        return !memcmp(str1, str2, inc + rem);
+                    str1 += inc;
+                    str2 += inc;
+
+                    mrfstr_equal_rem;
+                    return MRFSTR_TRUE;
                 }
                 break;
             }
@@ -179,19 +116,20 @@ mrfstr_bool_t __mrfstr_equal(
 
             mrfstr_create_thread(__mrfstr_equal_threaded)
             {
-                str1 -= size;
-                str2 -= size;
+                str1 -= inc;
+                str2 -= inc;
                 free(data);
 
                 if (!i)
                 {
+                    if (!mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                        return MRFSTR_FALSE;
                     inc *= tcount;
-#ifndef MRFSTR_NOSIMD
-                    if (mrfstr_config.tcmp_sub)
-                        mrfstr_ncmp_sub(size * tcount, inc);
-                    else
-#endif
-                        return !memcmp(str1, str2, inc + rem);
+                    str1 += inc;
+                    str2 += inc;
+
+                    mrfstr_equal_rem;
+                    return MRFSTR_TRUE;
                 }
                 break;
             }
@@ -200,35 +138,18 @@ mrfstr_bool_t __mrfstr_equal(
         tcount -= i;
     }
 
-#ifndef MRFSTR_NOSIMD
+    mrfstr_config.tequal_sub(&res, str1, str2, size * tcount);
+    if (!res)
+    {
+        mrfstr_close_threads;
+        free(threads);
+        return MRFSTR_FALSE;
+    }
+
     inc *= tcount;
-    if (mrfstr_config.tcmp_sub)
-    {
-        mrfstr_config.tcmp_sub(&res, str1, str2, size * tcount);
-        if (!res)
-        {
-            mrfstr_close_threads;
-            free(threads);
-            return MRFSTR_FALSE;
-        }
-
-        str1 += inc;
-        str2 += inc;
-        if (memcmp(str1, str2, rem))
-            res = MRFSTR_FALSE;
-    }
-    else
-#endif
-    {
-        mrfstr_size_t *s1block = (mrfstr_size_t*)str1;
-        mrfstr_size_t *s2block = (mrfstr_size_t*)str2;
-
-        mrfstr_tcmp_sub(res, size,
-            mrfstr_close_threads; free(threads); return res);
-
-        if (memcmp(s1block, s2block, rem))
-            res = MRFSTR_FALSE;
-    }
+    str1 += inc;
+    str2 += inc;
+    mrfstr_equal_rem;
 
     mrfstr_close_threads;
     free(threads);
@@ -244,17 +165,7 @@ DWORD WINAPI __mrfstr_equal_threaded(
 #endif
 {
     mrfstr_equal_t data = (mrfstr_equal_t)args;
-
-    if (mrfstr_config.tcmp_sub)
-        mrfstr_config.tcmp_sub(data->res, data->str1, data->str2, data->size);
-    else
-    {
-        mrfstr_size_t *s1block = (mrfstr_size_t*)data->str1;
-        mrfstr_size_t *s2block = (mrfstr_size_t*)data->str2;
-
-        mrfstr_tcmp_sub(*data->res, data->size,
-            free(data); return MRFSTR_TFUNC_RET);
-    }
+    mrfstr_config.tequal_sub(data->res, data->str1, data->str2, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

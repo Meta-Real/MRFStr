@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_LOW 0x400
+#define TEST_LOW 0x200
 #define TEST_MID 0x100000
 #define TEST_HIGH 0x40000000
 

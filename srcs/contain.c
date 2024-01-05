@@ -11,7 +11,7 @@ mrfstr_bool_t mrfstr_contain_chr(
     if (!MRFSTR_SIZE(str))
         return MRFSTR_FALSE;
 
-    return mrfstr_memchr(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
+    return __mrfstr_contain(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
 }
 
 mrfstr_bool_t mrfstr_n_contain_chr(
@@ -24,5 +24,5 @@ mrfstr_bool_t mrfstr_n_contain_chr(
     if (!size)
         return MRFSTR_FALSE;
 
-    return mrfstr_memchr(MRFSTR_DATA(str), chr, size);
+    return __mrfstr_contain(MRFSTR_DATA(str), chr, size);
 }

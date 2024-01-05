@@ -52,7 +52,7 @@
             }                                       \
     } while (0)
 
-struct __MRFSTR_CMP_T
+struct __MRFSTR_EQUAL_T
 {
     mrfstr_data_ct str1;
     mrfstr_data_ct str2;
@@ -60,17 +60,17 @@ struct __MRFSTR_CMP_T
 
     volatile mrfstr_bool_t *res;
 };
-typedef struct __MRFSTR_CMP_T *mrfstr_cmp_t;
+typedef struct __MRFSTR_EQUAL_T *mrfstr_equal_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_cmp_threaded(
+mrfstr_ptr_t __mrfstr_equal_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_cmp_threaded(
+DWORD WINAPI __mrfstr_equal_threaded(
     LPVOID args);
 #endif
 
-mrfstr_bool_t mrfstr_cmp(
+mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
 #ifndef MRFSTR_NOSIMD
@@ -150,10 +150,10 @@ mrfstr_bool_t mrfstr_cmp(
     mrfstr_byte_t i = 0;
     if (threads)
     {
-        mrfstr_cmp_t data;
+        mrfstr_equal_t data;
         for (i = 0; i < nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_CMP_T));
+            data = malloc(sizeof(struct __MRFSTR_EQUAL_T));
             if (!data)
             {
                 if (!i)
@@ -177,7 +177,7 @@ mrfstr_bool_t mrfstr_cmp(
             str1 += inc;
             str2 += inc;
 
-            mrfstr_create_thread(mrfstr_cmp_threaded)
+            mrfstr_create_thread(__mrfstr_equal_threaded)
             {
                 str1 -= size;
                 str2 -= size;
@@ -236,14 +236,14 @@ mrfstr_bool_t mrfstr_cmp(
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_cmp_threaded(
+mrfstr_ptr_t __mrfstr_equal_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_cmp_threaded(
+DWORD WINAPI __mrfstr_equal_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_cmp_t data = (mrfstr_cmp_t)args;
+    mrfstr_equal_t data = (mrfstr_equal_t)args;
 
     if (mrfstr_config.tcmp_sub)
         mrfstr_config.tcmp_sub(data->res, data->str1, data->str2, data->size);

@@ -10,27 +10,27 @@
 mrfstr_config_t mrfstr_config =
 {
     1,
-    mrfstr_avx512_copy_sub, 64,
-    mrfstr_avx512_copy_sub, 64,
-    mrfstr_avx512_fill_sub, 64,
-    mrfstr_avx512_fill_sub, 64,
-    mrfstr_avx512_cmp_sub, 64,
-    mrfstr_avx512_tcmp_sub, 64
+    __mrfstr_avx512_copy, 64,
+    __mrfstr_avx512_copy, 64,
+    __mrfstr_avx512_fill, 64,
+    __mrfstr_avx512_fill, 64,
+    __mrfstr_avx512_equal, 64,
+    __mrfstr_avx512_tequal, 64
 };
 #elif defined(__AVX__)
 mrfstr_config_t mrfstr_config =
 {
     1,
-    mrfstr_avx_copy_sub, 32,
-    mrfstr_avx_copy_sub, 32,
-    mrfstr_avx_fill_sub, 32,
-    mrfstr_avx_fill_sub, 32,
+    __mrfstr_avx_copy, 32,
+    __mrfstr_avx_copy, 32,
+    __mrfstr_avx_fill, 32,
+    __mrfstr_avx_fill, 32,
 #ifdef __AVX2__
-    mrfstr_avx_cmp_sub, 32,
-    mrfstr_avx_tcmp_sub, 32
+    __mrfstr_avx_equal, 32,
+    __mrfstr_avx_tequal, 32
 #elif defined(__SSE2__)
-    mrfstr_sse_cmp_sub, 16,
-    mrfstr_sse_tcmp_sub, 16
+    __mrfstr_sse_equal, 16,
+    __mrfstr_sse_tequal, 16
 #else
     NULL, 0,
     NULL, 0
@@ -40,12 +40,12 @@ mrfstr_config_t mrfstr_config =
 mrfstr_config_t mrfstr_config =
 {
     1,
-    mrfstr_sse_copy_sub, 16,
-    mrfstr_sse_copy_sub, 16,
-    mrfstr_sse_fill_sub, 16,
-    mrfstr_sse_fill_sub, 16,
-    mrfstr_sse_cmp_sub, 16,
-    mrfstr_sse_tcmp_sub, 16
+    __mrfstr_sse_copy, 16,
+    __mrfstr_sse_copy, 16,
+    __mrfstr_sse_fill, 16,
+    __mrfstr_sse_fill, 16,
+    __mrfstr_sse_equal, 16,
+    __mrfstr_sse_tequal, 16
 };
 #else
 mrfstr_config_t mrfstr_config =
@@ -74,19 +74,19 @@ void mrfstr_config_copy(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.ncopy_sub = mrfstr_avx512_copy_sub;
+        mrfstr_config.ncopy_sub = __mrfstr_avx512_copy;
         mrfstr_config.ncopy_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #ifdef __AVX__
-        mrfstr_config.ncopy_sub = mrfstr_avx_copy_sub;
+        mrfstr_config.ncopy_sub = __mrfstr_avx_copy;
         mrfstr_config.ncopy_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.ncopy_sub = mrfstr_sse_copy_sub;
+        mrfstr_config.ncopy_sub = __mrfstr_sse_copy;
         mrfstr_config.ncopy_size = 16;
         break;
 #endif
@@ -99,19 +99,19 @@ void mrfstr_config_copy(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.tcopy_sub = mrfstr_avx512_copy_sub;
+        mrfstr_config.tcopy_sub = __mrfstr_avx512_copy;
         mrfstr_config.tcopy_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #ifdef __AVX__
-        mrfstr_config.tcopy_sub = mrfstr_avx_copy_sub;
+        mrfstr_config.tcopy_sub = __mrfstr_avx_copy;
         mrfstr_config.tcopy_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.tcopy_sub = mrfstr_sse_copy_sub;
+        mrfstr_config.tcopy_sub = __mrfstr_sse_copy;
         mrfstr_config.tcopy_size = 16;
         break;
 #endif
@@ -129,19 +129,19 @@ void mrfstr_config_fill(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.nfill_sub = mrfstr_avx512_fill_sub;
+        mrfstr_config.nfill_sub = __mrfstr_avx512_fill;
         mrfstr_config.nfill_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #ifdef __AVX__
-        mrfstr_config.nfill_sub = mrfstr_avx_fill_sub;
+        mrfstr_config.nfill_sub = __mrfstr_avx_fill;
         mrfstr_config.nfill_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.nfill_sub = mrfstr_sse_fill_sub;
+        mrfstr_config.nfill_sub = __mrfstr_sse_fill;
         mrfstr_config.nfill_size = 16;
         break;
 #endif
@@ -154,19 +154,19 @@ void mrfstr_config_fill(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.tfill_sub = mrfstr_avx512_fill_sub;
+        mrfstr_config.tfill_sub = __mrfstr_avx512_fill;
         mrfstr_config.tfill_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #ifdef __AVX__
-        mrfstr_config.tfill_sub = mrfstr_avx_fill_sub;
+        mrfstr_config.tfill_sub = __mrfstr_avx_fill;
         mrfstr_config.tfill_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.tfill_sub = mrfstr_sse_fill_sub;
+        mrfstr_config.tfill_sub = __mrfstr_sse_fill;
         mrfstr_config.tfill_size = 16;
         break;
 #endif
@@ -184,19 +184,19 @@ void mrfstr_config_cmp(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.ncmp_sub = mrfstr_avx512_cmp_sub;
+        mrfstr_config.ncmp_sub = __mrfstr_avx512_equal;
         mrfstr_config.ncmp_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #if  defined(__AVX__) && defined(__AVX2__)
-        mrfstr_config.ncmp_sub = mrfstr_avx_cmp_sub;
+        mrfstr_config.ncmp_sub = __mrfstr_avx_equal;
         mrfstr_config.ncmp_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.ncmp_sub = mrfstr_sse_cmp_sub;
+        mrfstr_config.ncmp_sub = __mrfstr_sse_equal;
         mrfstr_config.ncmp_size = 16;
         break;
 #endif
@@ -209,19 +209,19 @@ void mrfstr_config_cmp(
     {
     case MRFSTR_SIMD_CONFIG_AVX512:
 #ifdef __AVX512F__
-        mrfstr_config.tcmp_sub = mrfstr_avx512_tcmp_sub;
+        mrfstr_config.tcmp_sub = __mrfstr_avx512_tequal;
         mrfstr_config.tcmp_size = 64;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_AVX:
 #if defined(__AVX__) && defined(__AVX2__)
-        mrfstr_config.tcmp_sub = mrfstr_avx_tcmp_sub;
+        mrfstr_config.tcmp_sub = __mrfstr_avx_tequal;
         mrfstr_config.tcmp_size = 32;
         break;
 #endif
     case MRFSTR_SIMD_CONFIG_SSE:
 #ifdef __SSE2__
-        mrfstr_config.tcmp_sub = mrfstr_sse_tcmp_sub;
+        mrfstr_config.tcmp_sub = __mrfstr_sse_tequal;
         mrfstr_config.tcmp_size = 16;
         break;
 #endif

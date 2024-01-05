@@ -7,7 +7,7 @@
 
 #ifdef __AVX__
 
-void mrfstr_avx_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+void __mrfstr_avx_copy(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m256i *dblock = (__m256i*)dst;
     __m256i *sblock = (__m256i*)src;
@@ -32,18 +32,22 @@ void mrfstr_avx_copy_sub(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size
     }
 }
 
-void mrfstr_avx_fill_sub(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+void __mrfstr_avx_fill(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m256i *rblock = (__m256i*)res;
     __m256i block = _mm256_set1_epi8(chr);
 
     for (; size; size--)
         _mm256_stream_si256(rblock++, block);
+
+#ifdef __SSE__
+    _mm_sfence();
+#endif
 }
 
 #ifdef __AVX2__
 
-mrfstr_bool_t mrfstr_avx_cmp_sub(
+mrfstr_bool_t __mrfstr_avx_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
     __m256i *s1block = (__m256i*)str1;
@@ -66,7 +70,7 @@ mrfstr_bool_t mrfstr_avx_cmp_sub(
     return MRFSTR_TRUE;
 }
 
-void mrfstr_avx_tcmp_sub(
+void __mrfstr_avx_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -75,12 +79,12 @@ void mrfstr_avx_tcmp_sub(
 
     __m256i block1, block2;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_AVX_TCMP_LOAD)
+    while (size >= MRFSTR_AVX_TEQUAL_LOAD)
     {
         if (!*res)
             return;
 
-        nsize = size - MRFSTR_AVX_TCMP_LOAD;
+        nsize = size - MRFSTR_AVX_TEQUAL_LOAD;
         for (; size != nsize; size--)
         {
             block1 = _mm256_loadu_si256(s1block++);

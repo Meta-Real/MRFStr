@@ -30,7 +30,7 @@ mrfstr_res_enum_t mrfstr_repeat(
         if (res == str)
             return MRFSTR_RES_NOERROR;
 
-        mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
         MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
         return MRFSTR_RES_NOERROR;
     }
@@ -44,13 +44,13 @@ mrfstr_res_enum_t mrfstr_repeat(
         // We can do better
         while (MRFSTR_SIZE(res) <= size - MRFSTR_SIZE(res))
         {
-            mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
+            __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
             MRFSTR_SIZE(res) <<= 1;
         }
 
         MRFSTR_SIZE(res) = size - MRFSTR_SIZE(res);
         if (MRFSTR_SIZE(res))
-            mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
+            __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
 
         MRFSTR_SIZE(res) = size;
         return MRFSTR_RES_NOERROR;
@@ -60,19 +60,19 @@ mrfstr_res_enum_t mrfstr_repeat(
     if (size / count != MRFSTR_SIZE(str))
         return MRFSTR_RES_OVERFLOW_ERROR;
 
-    mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
+    __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
     MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
 
     // We can do better
     while (MRFSTR_SIZE(res) <= size - MRFSTR_SIZE(res))
     {
-        mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
+        __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
         MRFSTR_SIZE(res) <<= 1;
     }
 
     MRFSTR_SIZE(res) = size - MRFSTR_SIZE(res);
     if (MRFSTR_SIZE(res))
-        mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
+        __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
 
     MRFSTR_SIZE(res) = size;
     return MRFSTR_RES_NOERROR;
@@ -91,6 +91,6 @@ void mrfstr_repeat_chr(
         return;
     }
 
-    mrfstr_fill(MRFSTR_DATA(res), chr, count);
+    __mrfstr_fill(MRFSTR_DATA(res), chr, count);
     MRFSTR_SIZE(res) = count;
 }

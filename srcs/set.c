@@ -18,7 +18,7 @@ void mrfstr_set(
         return;
     }
 
-    mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(src));
+    __mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(src));
     MRFSTR_SIZE(dst) = MRFSTR_SIZE(src);
 }
 
@@ -35,7 +35,7 @@ void mrfstr_set_str(
         return;
     }
 
-    mrfstr_copy(MRFSTR_DATA(dst), src, size);
+    __mrfstr_copy(MRFSTR_DATA(dst), src, size);
     MRFSTR_SIZE(dst) = size;
 }
 
@@ -52,7 +52,7 @@ void mrfstr_set_nstr(
         return;
     }
 
-    mrfstr_copy(MRFSTR_DATA(dst), src, size);
+    __mrfstr_copy(MRFSTR_DATA(dst), src, size);
     MRFSTR_SIZE(dst) = size;
 }
 

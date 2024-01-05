@@ -7,7 +7,7 @@
 
 #ifdef __SSE2__
 
-void mrfstr_sse_copy_sub(
+void __mrfstr_sse_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m128i *dblock = (__m128i*)dst;
@@ -61,7 +61,7 @@ void mrfstr_sse_copy_sub(
     }
 }
 
-void mrfstr_sse_fill_sub(
+void __mrfstr_sse_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m128i *rblock = (__m128i*)res;
@@ -71,7 +71,7 @@ void mrfstr_sse_fill_sub(
         _mm_stream_si128(rblock++, block);
 }
 
-mrfstr_bool_t mrfstr_sse_cmp_sub(
+mrfstr_bool_t __mrfstr_sse_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
     __m128i *s1block = (__m128i*)str1;
@@ -94,7 +94,7 @@ mrfstr_bool_t mrfstr_sse_cmp_sub(
     return MRFSTR_TRUE;
 }
 
-void mrfstr_sse_tcmp_sub(
+void __mrfstr_sse_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -103,12 +103,12 @@ void mrfstr_sse_tcmp_sub(
 
     __m128i block1, block2;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_SSE_TCMP_LOAD)
+    while (size >= MRFSTR_SSE_TEQUAL_LOAD)
     {
         if (!*res)
             return;
 
-        nsize = size - MRFSTR_SSE_TCMP_LOAD;
+        nsize = size - MRFSTR_SSE_TEQUAL_LOAD;
         for (; size != nsize; size--)
         {
             block1 = _mm_loadu_si128(s1block++);

@@ -138,12 +138,12 @@ typedef HANDLE mrfstr_mutex_p;
     threads[i] = CreateThread(NULL, 0, f, data, 0, NULL); \
     if (!threads[i])
 
-#define mrfstr_close_threads                                     \
-    do                                                           \
-    {                                                            \
-        WaitForMultipleObjects(tcount, threads, TRUE, INFINITE); \
-        while (i)                                                \
-            CloseHandle(threads[--i]);                           \
+#define mrfstr_close_threads                                \
+    do                                                      \
+    {                                                       \
+        WaitForMultipleObjects(i, threads, TRUE, INFINITE); \
+        while (i)                                           \
+            CloseHandle(threads[--i]);                      \
     } while (0)
 
 #define mrfstr_create_mutex(m)          \
@@ -158,12 +158,12 @@ typedef HANDLE mrfstr_mutex_p;
 #error Your os is not yet supported for multithreading
 #endif
 
-void mrfstr_copy(
+void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
-void mrfstr_fill(
+void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
-mrfstr_bool_t mrfstr_cmp(
+mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t mrfstr_memchr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);

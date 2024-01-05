@@ -14,16 +14,16 @@
 #include <immintrin.h>
 #include <mrfstr.h>
 
-#define MRFSTR_AVX512_TCMP_LOAD 0x10000
+#define MRFSTR_AVX512_TEQUAL_LOAD 0x10000
 
-void mrfstr_avx512_copy_sub(
+void __mrfstr_avx512_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-void mrfstr_avx512_fill_sub(
+void __mrfstr_avx512_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
-mrfstr_bool_t mrfstr_avx512_cmp_sub(
+mrfstr_bool_t __mrfstr_avx512_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
-void mrfstr_avx512_tcmp_sub(
+void __mrfstr_avx512_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 

@@ -9,10 +9,11 @@
 int main(void)
 {
     mrfstr_config_thread_count(5);
-    mrfstr_config_copy(MRFSTR_SIMD_CONFIG_AVX, MRFSTR_SIMD_CONFIG_AVX);
+    mrfstr_config_cmp(MRFSTR_SIMD_CONFIG_NONE, MRFSTR_SIMD_CONFIG_SSE);
 
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
+    mrfstr_repeat_chr(a, '0', SIZE);
 
     mrfstr_t b = mrfstr_init();
     mrfstr_alloc(b, SIZE);
@@ -22,9 +23,8 @@ int main(void)
     clock_t c;
     for (int i = 0; i < COUNT; i++)
     {
-        mrfstr_set(a, b);
         c = clock();
-        printf("%hu   ", mrfstr_equal(a, b));
+        mrfstr_equal(a, b);
         c = clock() - c;
 
         t += c;

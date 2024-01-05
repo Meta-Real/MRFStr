@@ -7,7 +7,7 @@
 
 #ifdef __AVX512F__
 
-void mrfstr_avx512_copy_sub(
+void __mrfstr_avx512_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
@@ -29,7 +29,7 @@ void mrfstr_avx512_copy_sub(
     }
 }
 
-void mrfstr_avx512_fill_sub(
+void __mrfstr_avx512_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m512i *rblock = (__m512i*)res;
@@ -39,7 +39,7 @@ void mrfstr_avx512_fill_sub(
         _mm512_stream_si512(rblock++, block);
 }
 
-mrfstr_bool_t mrfstr_avx512_cmp_sub(
+mrfstr_bool_t __mrfstr_avx512_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
     __m512i *s1block = (__m512i*)str1;
@@ -57,7 +57,7 @@ mrfstr_bool_t mrfstr_avx512_cmp_sub(
     return MRFSTR_TRUE;
 }
 
-void mrfstr_avx512_tcmp_sub(
+void __mrfstr_avx512_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -66,12 +66,12 @@ void mrfstr_avx512_tcmp_sub(
 
     __m512i block1, block2;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_AVX512_TCMP_LOAD)
+    while (size >= MRFSTR_AVX512_TEQUAL_LOAD)
     {
         if (!*res)
             return;
 
-        nsize = size - MRFSTR_AVX512_TCMP_LOAD;
+        nsize = size - MRFSTR_AVX512_TEQUAL_LOAD;
         for (; size != nsize; size--)
         {
             block1 = _mm512_loadu_si512(s1block++);

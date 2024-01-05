@@ -15,14 +15,14 @@ struct __MRFSTR_COPY_T
 typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_copy_threaded(
+mrfstr_ptr_t __mrfstr_copy_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_copy_threaded(
+DWORD WINAPI __mrfstr_copy_threaded(
     LPVOID args);
 #endif
 
-void mrfstr_copy(
+void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
 #ifndef MRFSTR_NOSIMD
@@ -125,7 +125,7 @@ void mrfstr_copy(
             dst += inc;
             src += inc;
 
-            mrfstr_create_thread(mrfstr_copy_threaded)
+            mrfstr_create_thread(__mrfstr_copy_threaded)
             {
                 dst -= inc;
                 src -= inc;
@@ -158,10 +158,10 @@ void mrfstr_copy(
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t mrfstr_copy_threaded(
+mrfstr_ptr_t __mrfstr_copy_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI mrfstr_copy_threaded(
+DWORD WINAPI __mrfstr_copy_threaded(
     LPVOID args)
 #endif
 {

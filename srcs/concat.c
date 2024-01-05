@@ -15,7 +15,7 @@ mrfstr_res_enum_t mrfstr_concat(
 
         if (!MRFSTR_SIZE(res))
         {
-            mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+            __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
             MRFSTR_SIZE(res) = MRFSTR_SIZE(str2);
             return MRFSTR_RES_NOERROR;
         }
@@ -24,7 +24,7 @@ mrfstr_res_enum_t mrfstr_concat(
         if (size < MRFSTR_SIZE(res))
             return MRFSTR_RES_OVERFLOW_ERROR;
 
-        mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+        __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
         MRFSTR_SIZE(res) = size;
         return MRFSTR_RES_NOERROR;
     }
@@ -39,8 +39,8 @@ mrfstr_res_enum_t mrfstr_concat(
     if (size < MRFSTR_SIZE(str1))
         return MRFSTR_RES_OVERFLOW_ERROR;
 
-    mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
-    mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+    __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
+    __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
 
     MRFSTR_SIZE(res) = size;
     return MRFSTR_RES_NOERROR;
@@ -60,7 +60,7 @@ mrfstr_res_enum_t mrfstr_n_concat(
 
         if (!MRFSTR_SIZE(res))
         {
-            mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str2), size);
+            __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str2), size);
             MRFSTR_SIZE(res) = size;
             return MRFSTR_RES_NOERROR;
         }
@@ -69,7 +69,7 @@ mrfstr_res_enum_t mrfstr_n_concat(
         if (nsize < size)
             return MRFSTR_RES_OVERFLOW_ERROR;
 
-        mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), size);
+        __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), size);
         MRFSTR_SIZE(res) = nsize;
         return MRFSTR_RES_NOERROR;
     }
@@ -84,8 +84,8 @@ mrfstr_res_enum_t mrfstr_n_concat(
     if (nsize < size)
         return MRFSTR_RES_OVERFLOW_ERROR;
 
-    mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
-    mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(str2), size);
+    __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
+    __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(str2), size);
 
     MRFSTR_SIZE(res) = nsize;
     return MRFSTR_RES_NOERROR;

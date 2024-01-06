@@ -35,20 +35,20 @@ void __mrfstr_copy(
         return;
     }
 
-    if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)dst % mrfstr_config.ncopy_size;
+        mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.ncopy_size;
         if (rem)
         {
-            rem = mrfstr_config.ncopy_size - rem;
+            rem = _mrfstr_config.ncopy_size - rem;
             size -= rem;
             mrfstr_copy_rem;
         }
 
-        rem = size % mrfstr_config.ncopy_size;
+        rem = size % _mrfstr_config.ncopy_size;
         size -= rem;
 
-        mrfstr_config.ncopy_sub(dst, src, size / mrfstr_config.ncopy_size);
+        _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.ncopy_size);
         dst += size;
         src += size;
 
@@ -57,22 +57,22 @@ void __mrfstr_copy(
     }
 
     mrfstr_byte_t tcount;
-    if (size > mrfstr_config.thread_count * MRFSTR_TSIZE)
-        tcount = mrfstr_config.thread_count;
+    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+        tcount = _mrfstr_config.tcount;
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)dst % mrfstr_config.tcopy_size;
+    mrfstr_short_t rem = (uintptr_t)dst % _mrfstr_config.tcopy_size;
     if (rem)
     {
-        rem = mrfstr_config.tcopy_size - rem;
+        rem = _mrfstr_config.tcopy_size - rem;
         size -= rem;
         mrfstr_copy_rem;
     }
 
-    mrfstr_short_t factor = mrfstr_config.tcopy_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tcopy_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * mrfstr_config.tcopy_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tcopy_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
     mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -80,7 +80,7 @@ void __mrfstr_copy(
     if (threads)
     {
         mrfstr_copy_t data;
-        for (; i < nthreads; i++)
+        for (; i != nthreads; i++)
         {
             data = malloc(sizeof(struct __MRFSTR_COPY_T));
             if (!data)
@@ -106,7 +106,7 @@ void __mrfstr_copy(
         tcount -= i;
     }
 
-    mrfstr_config.tcopy_sub(dst, src, size * tcount);
+    _mrfstr_config.tcopy_sub(dst, src, size * tcount);
     inc *= tcount;
     dst += inc;
     src += inc;
@@ -127,7 +127,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 {
     mrfstr_copy_t data = args;
-    mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
+    _mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

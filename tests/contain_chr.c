@@ -19,7 +19,7 @@
 
 int main(void)
 {
-    mrfstr_config_thread_count(5);
+    mrfstr_config_tcount(5);
 
     mrfstr_t str = mrfstr_init();
     if (!str)
@@ -51,7 +51,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    for (i = 0; i < TEST_COUNT;)
+    for (i = 0; i != TEST_COUNT;)
     {
         idx = rand() % TEST_LOW;
         if (MRFSTR_DATA(str)[idx] == '2')
@@ -82,7 +82,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    for (i = 0; i < TEST_COUNT;)
+    for (i = 0; i != TEST_COUNT;)
     {
         idx = GENERATE32_RAND % TEST_MID;
         if (MRFSTR_DATA(str)[idx] == '2')
@@ -113,7 +113,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    for (i = 0; i < TEST_COUNT;)
+    for (i = 0; i != TEST_COUNT;)
     {
         idx = (((mrfstr_size_t)GENERATE32_RAND << 32) + GENERATE32_RAND) % TEST_HIGH;
         if (MRFSTR_DATA(str)[idx] == '2')

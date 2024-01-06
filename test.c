@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    mrfstr_config_thread_count(5);
+    mrfstr_config_tcount(5);
 
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
@@ -19,7 +19,7 @@ int main(void)
 
     double t = 0;
     clock_t c;
-    for (int i = 0; i < COUNT; i++)
+    for (int i = 0; i != COUNT; i++)
     {
         c = clock();
         mrfstr_set(a, b);

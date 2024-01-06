@@ -4,6 +4,7 @@
 */
 
 #include <avx.h>
+#include <binary.h>
 
 #ifdef __AVX__
 
@@ -117,7 +118,7 @@ void __mrfstr_avx_tequal(
     }
 }
 
-mrfstr_bool_t __mrfstr_avx_contain(
+mrfstr_bool_t __mrfstr_avx_contain_chr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m256i *sblock = (__m256i*)str;
@@ -139,7 +140,7 @@ mrfstr_bool_t __mrfstr_avx_contain(
     return MRFSTR_FALSE;
 }
 
-void __mrfstr_avx_tcontain(
+void __mrfstr_avx_tcontain_chr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -148,12 +149,12 @@ void __mrfstr_avx_tcontain(
 
     __m256i block;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_AVX_TCONTAIN_LOAD)
+    while (size >= MRFSTR_AVX_TCONTAIN_CHR_LOAD)
     {
         if (*res)
             return;
 
-        nsize = size - MRFSTR_AVX_TCONTAIN_LOAD;
+        nsize = size - MRFSTR_AVX_TCONTAIN_CHR_LOAD;
         for (; size != nsize; size--)
         {
             block = _mm256_loadu_si256(sblock++);
@@ -187,6 +188,80 @@ void __mrfstr_avx_tcontain(
             return;
         }
     }
+}
+
+mrfstr_idx_t __mrfstr_avx_find_chr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m256i *sblock = (__m256i*)str;
+    __m256i cblock = _mm256_set1_epi8(chr);
+
+    __m256i block;
+    mrfstr_long_t mask;
+    mrfstr_size_t i;
+    for (i = 0; i != size; i++)
+    {
+        block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+        mask = _mm256_cmpeq_epi8_mask(block, cblock);
+#else
+        mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
+#endif
+        if (mask)
+            return i * 32 + __mrfstr_ctz32(mask);
+    }
+
+    return MRFSTR_INVIDX;
+}
+
+mrfstr_idx_t __mrfstr_avx_tfind_chr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m256i *sblock = (__m256i*)str;
+    __m256i cblock = _mm256_set1_epi8(chr);
+
+    __m256i block;
+    mrfstr_long_t mask;
+    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_AVX_TFIND_CHR_LOAD;
+    while (i <= lsize)
+    {
+        if (*res < start)
+            return MRFSTR_INVIDX;
+
+        ni = i + MRFSTR_AVX_TFIND_CHR_LOAD;
+        for (; i != ni; i++)
+        {
+            block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+            mask = _mm256_cmpeq_epi8_mask(block, cblock);
+#else
+            mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
+#endif
+            if (mask)
+                return start + i * 32 + __mrfstr_ctz32(mask);
+        }
+    }
+
+    if (*res < start)
+        return MRFSTR_INVIDX;
+
+    for (; i != size; i++)
+    {
+        block = _mm256_loadu_si256(sblock++);
+
+#ifdef __AVX512BW__
+        mask = _mm256_cmpeq_epi8_mask(block, cblock);
+#else
+        mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
+#endif
+        if (mask)
+            return start + i * 32 + __mrfstr_ctz32(mask);
+    }
+
+    return MRFSTR_INVIDX;
 }
 #endif
 

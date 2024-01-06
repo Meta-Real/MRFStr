@@ -39,20 +39,20 @@ mrfstr_bool_t __mrfstr_equal(
         return MRFSTR_TRUE;
     }
 
-    if (mrfstr_config.thread_count == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)str1 % mrfstr_config.nequal_size;
+        mrfstr_byte_t rem = (uintptr_t)str1 % _mrfstr_config.nequal_size;
         if (rem)
         {
-            rem = mrfstr_config.nequal_size - rem;
+            rem = _mrfstr_config.nequal_size - rem;
             size -= rem;
             mrfstr_equal_rem;
         }
 
-        rem = size % mrfstr_config.nequal_size;
+        rem = size % _mrfstr_config.nequal_size;
         size -= rem;
 
-        if (!mrfstr_config.nequal_sub(str1, str2, size / mrfstr_config.nequal_size))
+        if (!_mrfstr_config.nequal_sub(str1, str2, size / _mrfstr_config.nequal_size))
             return MRFSTR_FALSE;
         str1 += size;
         str2 += size;
@@ -62,22 +62,22 @@ mrfstr_bool_t __mrfstr_equal(
     }
 
     mrfstr_byte_t tcount;
-    if (size > mrfstr_config.thread_count * MRFSTR_TSIZE)
-        tcount = mrfstr_config.thread_count;
+    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+        tcount = _mrfstr_config.tcount;
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)str1 & mrfstr_config.tequal_size;
+    mrfstr_short_t rem = (uintptr_t)str1 & _mrfstr_config.tequal_size;
     if (rem)
     {
-        rem = mrfstr_config.tequal_size - rem;
+        rem = _mrfstr_config.tequal_size - rem;
         size -= rem;
         mrfstr_equal_rem;
     }
 
-    mrfstr_short_t factor = mrfstr_config.tequal_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tequal_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * mrfstr_config.tequal_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tequal_size;
 
     volatile mrfstr_bool_t res = MRFSTR_TRUE;
 
@@ -87,14 +87,14 @@ mrfstr_bool_t __mrfstr_equal(
     if (threads)
     {
         mrfstr_equal_t data;
-        for (i = 0; i < nthreads; i++)
+        for (i = 0; i != nthreads; i++)
         {
             data = malloc(sizeof(struct __MRFSTR_EQUAL_T));
             if (!data)
             {
                 if (!i)
                 {
-                    if (!mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                    if (!_mrfstr_config.nequal_sub(str1, str2, size * tcount))
                         return MRFSTR_FALSE;
                     inc *= tcount;
                     str1 += inc;
@@ -122,7 +122,7 @@ mrfstr_bool_t __mrfstr_equal(
 
                 if (!i)
                 {
-                    if (!mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                    if (!_mrfstr_config.nequal_sub(str1, str2, size * tcount))
                         return MRFSTR_FALSE;
                     inc *= tcount;
                     str1 += inc;
@@ -138,7 +138,7 @@ mrfstr_bool_t __mrfstr_equal(
         tcount -= i;
     }
 
-    mrfstr_config.tequal_sub(&res, str1, str2, size * tcount);
+    _mrfstr_config.tequal_sub(&res, str1, str2, size * tcount);
     if (!res)
     {
         mrfstr_close_threads;
@@ -165,7 +165,7 @@ DWORD WINAPI __mrfstr_equal_threaded(
 #endif
 {
     mrfstr_equal_t data = (mrfstr_equal_t)args;
-    mrfstr_config.tequal_sub(data->res, data->str1, data->str2, data->size);
+    _mrfstr_config.tequal_sub(data->res, data->str1, data->str2, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

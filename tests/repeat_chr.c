@@ -14,7 +14,7 @@
 
 int main(void)
 {
-    mrfstr_config_thread_count(5);
+    mrfstr_config_tcount(5);
 
     mrfstr_t res = mrfstr_init();
     if (!res)

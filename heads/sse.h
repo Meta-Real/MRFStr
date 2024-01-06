@@ -15,7 +15,8 @@
 #include <mrfstr.h>
 
 #define MRFSTR_SSE_TEQUAL_LOAD 0x40000
-#define MRFSTR_SSE_TCONTAIN_LOAD 0x40000
+#define MRFSTR_SSE_TCONTAIN_CHR_LOAD 0x40000
+#define MRFSTR_SSE_TFIND_CHR_LOAD 0x40000
 
 void __mrfstr_sse_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
@@ -28,12 +29,17 @@ void __mrfstr_sse_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
-mrfstr_bool_t __mrfstr_sse_contain(
+mrfstr_bool_t __mrfstr_sse_contain_chr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-void __mrfstr_sse_tcontain(
+void __mrfstr_sse_tcontain_chr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
-#endif
+mrfstr_idx_t __mrfstr_sse_find_chr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_sse_tfind_chr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
+#endif
 #endif

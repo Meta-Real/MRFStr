@@ -203,28 +203,30 @@ void mrfstr_n_print(
 
 /* config functions */
 
-enum __MRFSTR_SIMD_CONFIG_ENUM
+enum __MRFSTR_CONFIG_TYPE_ENUM
 {
-    MRFSTR_SIMD_CONFIG_AVX512,
-    MRFSTR_SIMD_CONFIG_AVX,
-    MRFSTR_SIMD_CONFIG_SSE,
-    MRFSTR_SIMD_CONFIG_NONE
+    MRFSTR_CONFIG_TYPE_COPY,
+    MRFSTR_CONFIG_TYPE_FILL,
+    MRFSTR_CONFIG_TYPE_EQUAL,
+    MRFSTR_CONFIG_TYPE_CONTAIN_CHR,
+    MRFSTR_CONFIG_TYPE_FIND_CHR,
 };
-typedef mrfstr_byte_t mrfstr_simd_config_enum_t;
+typedef mrfstr_byte_t mrfstr_config_type_enum_t;
 
-void mrfstr_config_thread_count(
-    mrfstr_byte_t thread_count);
-void mrfstr_config_copy(
-    mrfstr_simd_config_enum_t normal,
-    mrfstr_simd_config_enum_t threaded);
-void mrfstr_config_fill(
-    mrfstr_simd_config_enum_t normal,
-    mrfstr_simd_config_enum_t threaded);
-void mrfstr_config_equal(
-    mrfstr_simd_config_enum_t normal,
-    mrfstr_simd_config_enum_t threaded);
-void mrfstr_config_contain(
-    mrfstr_simd_config_enum_t normal,
-    mrfstr_simd_config_enum_t threaded);
+enum __MRFSTR_CONFIG_SIMD_ENUM
+{
+    MRFSTR_CONFIG_SIMD_AVX512,
+    MRFSTR_CONFIG_SIMD_AVX,
+    MRFSTR_CONFIG_SIMD_SSE,
+    MRFSTR_CONFIG_SIMD_NONE
+};
+typedef mrfstr_byte_t mrfstr_config_simd_enum_t;
+
+void mrfstr_config_tcount(
+    mrfstr_byte_t tcount);
+void mrfstr_config(
+    mrfstr_config_type_enum_t type,
+    mrfstr_config_simd_enum_t normal,
+    mrfstr_config_simd_enum_t threaded);
 
 #endif /* __MRFSTR__ */

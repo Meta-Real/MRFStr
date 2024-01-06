@@ -19,7 +19,7 @@
 
 struct __MRFSTR_CONFIG_T
 {
-    mrfstr_byte_t thread_count;
+    mrfstr_byte_t tcount;
 
     void (*ncopy_sub)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
@@ -43,16 +43,24 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
     mrfstr_byte_t tequal_size;
 
-    mrfstr_bool_t (*ncontain_sub)(
+    mrfstr_bool_t (*ncontain_chr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t ncontain_size;
-    void (*tcontain_sub)(
+    mrfstr_byte_t ncontain_chr_size;
+    void (*tcontain_chr_sub)(
         volatile mrfstr_bool_t*,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tcontain_size;
+    mrfstr_byte_t tcontain_chr_size;
+
+    mrfstr_idx_t (*nfind_chr_sub)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_byte_t nfind_chr_size;
+    mrfstr_idx_t (*tfind_chr_sub)(
+        volatile mrfstr_idx_t*, mrfstr_idx_t,
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_byte_t tfind_chr_size;
 };
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
-extern mrfstr_config_t mrfstr_config;
+extern mrfstr_config_t _mrfstr_config;
 
 #define MRFSTR_SLIMIT 0x400
 
@@ -126,7 +134,7 @@ void __mrfstr_fill(
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
-mrfstr_bool_t __mrfstr_contain(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_bool_t __mrfstr_contain_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif

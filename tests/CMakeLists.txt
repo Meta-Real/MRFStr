@@ -3,19 +3,19 @@
 
 add_executable(MRFStrSet set.c)
 target_link_libraries(MRFStrSet PUBLIC MRFStr)
-add_test(TMRFStrSet MRFStrSet)
+add_test(MRFStrSet MRFStrSet)
 
 add_executable(MRFStrConcat concat.c)
 target_link_libraries(MRFStrConcat PUBLIC MRFStr)
-add_test(TMRFStrConcat MRFStrConcat)
+add_test(MRFStrConcat MRFStrConcat)
 
 add_executable(MRFStrRepeatChr repeat_chr.c)
 target_link_libraries(MRFStrRepeatChr PUBLIC MRFStr)
-add_test(TMRFStrRepeatChr MRFStrRepeatChr)
+add_test(MRFStrRepeatChr MRFStrRepeatChr)
 
 add_executable(MRFStrRepeat repeat.c)
 target_link_libraries(MRFStrRepeat PUBLIC MRFStr)
-add_test(TMRFStrRepeat MRFStrRepeat)
+add_test(MRFStrRepeat MRFStrRepeat)
 
 #add_executable(MRFStrReplace replace.c)
 #target_link_libraries(MRFStrReplace PUBLIC MRFStr)
@@ -23,11 +23,11 @@ add_test(TMRFStrRepeat MRFStrRepeat)
 
 add_executable(MRFStrEqual equal.c)
 target_link_libraries(MRFStrEqual PUBLIC MRFStr)
-add_test(TMRFStrEqual MRFStrEqual)
+add_test(MRFStrEqual MRFStrEqual)
 
 add_executable(MRFStrContainChr contain_chr.c)
 target_link_libraries(MRFStrContainChr PUBLIC MRFStr)
-add_test(TMRFStrContainChr MRFStrContainChr)
+add_test(MRFStrContainChr MRFStrContainChr)
 
 #add_executable(MRFStrFindChr find_chr.c)
 #target_link_libraries(MRFStrFindChr PUBLIC MRFStr)

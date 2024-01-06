@@ -4,6 +4,7 @@
 */
 
 #include <base.h>
+#include <binary.h>
 
 void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -72,7 +73,7 @@ void __mrfstr_base_tequal(
         }
 }
 
-mrfstr_bool_t __mrfstr_base_contain(
+mrfstr_bool_t __mrfstr_base_contain_chr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
@@ -91,7 +92,7 @@ mrfstr_bool_t __mrfstr_base_contain(
     return MRFSTR_FALSE;
 }
 
-void __mrfstr_base_tcontain(
+void __mrfstr_base_tcontain_chr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -101,17 +102,17 @@ void __mrfstr_base_tcontain(
     cblock |= cblock << 32;
 
     mrfstr_size_t nsize;
-    mrfstr_longlong_t block;
-    while (size >= MRFSTR_BASE_TCONTAIN_LOAD)
+    mrfstr_longlong_t mask;
+    while (size >= MRFSTR_BASE_TCONTAIN_CHR_LOAD)
     {
         if (*res)
             return;
 
-        nsize = size - MRFSTR_BASE_TCONTAIN_LOAD;
+        nsize = size - MRFSTR_BASE_TCONTAIN_CHR_LOAD;
         for (; size != nsize; size--)
         {
-            block = cblock ^ *sblock++;
-            if ((block - 0x1010101010101010ULL) & ~block & 0x8080808080808080ULL)
+            mask = cblock ^ *sblock++;
+            if ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
             {
                 *res = MRFSTR_TRUE;
                 return;
@@ -124,11 +125,72 @@ void __mrfstr_base_tcontain(
 
     for (; size; size--)
     {
-        block = cblock ^ *sblock++;
-        if ((block - 0x1010101010101010ULL) & ~block & 0x8080808080808080ULL)
+        mask = cblock ^ *sblock++;
+        if ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
         {
             *res = MRFSTR_TRUE;
             return;
         }
     }
+}
+
+mrfstr_idx_t __mrfstr_base_find_chr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
+    mrfstr_longlong_t cblock = (mrfstr_short_t)chr << 8 | chr;
+    cblock |= cblock << 16;
+    cblock |= cblock << 32;
+
+    mrfstr_longlong_t mask;
+    mrfstr_size_t i;
+    for (i = 0; i != size; i++)
+    {
+        mask = cblock ^ *sblock++;
+        mask = (mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL;
+        if (mask)
+            return i * 8 + __mrfstr_ctz64(mask) / 8;
+    }
+
+    return MRFSTR_FALSE;
+}
+
+mrfstr_idx_t __mrfstr_base_tfind_chr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
+    mrfstr_longlong_t cblock = (mrfstr_short_t)chr << 8 | chr;
+    cblock |= cblock << 16;
+    cblock |= cblock << 32;
+
+    mrfstr_longlong_t mask;
+    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_BASE_TFIND_CHR_LOAD;
+    while (i <= lsize)
+    {
+        if (*res < start)
+            return MRFSTR_INVIDX;
+
+        ni = i + MRFSTR_BASE_TFIND_CHR_LOAD;
+        for (; i != ni; i++)
+        {
+            mask = cblock ^ *sblock++;
+            mask = (mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL;
+            if (mask)
+                return i * 8 + __mrfstr_ctz64(mask) / 8;
+        }
+    }
+
+    if (*res < start)
+        return MRFSTR_INVIDX;
+
+    for (; i != size; i++)
+    {
+        mask = cblock ^ *sblock++;
+        mask = (mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL;
+        if (mask)
+            return i * 8 + __mrfstr_ctz64(mask) / 8;
+    }
+
+    return MRFSTR_INVIDX;
 }

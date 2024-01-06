@@ -252,7 +252,7 @@ mrfstr_idx_t __mrfstr_avx_find_chr(
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
 #endif
         if (mask)
-            return i * 32 + __mrfstr_ctz32(mask);
+            return (i << 5) + __mrfstr_ctz32(mask);
     }
 
     return MRFSTR_INVIDX;
@@ -284,7 +284,7 @@ mrfstr_idx_t __mrfstr_avx_tfind_chr(
             mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
 #endif
             if (mask)
-                return start + i * 32 + __mrfstr_ctz32(mask);
+                return start + (i << 5) + __mrfstr_ctz32(mask);
         }
     }
 
@@ -301,10 +301,32 @@ mrfstr_idx_t __mrfstr_avx_tfind_chr(
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
 #endif
         if (mask)
-            return start + i * 32 + __mrfstr_ctz32(mask);
+            return start + (i << 5) + __mrfstr_ctz32(mask);
     }
 
     return MRFSTR_INVIDX;
+}
+
+mrfstr_size_t __mrfstr_avx_strlen(
+    mrfstr_ptr_ct str)
+{
+    mrfstr_data_ct base = (mrfstr_data_ct)str;
+    __m256i *sblock = (__m256i*)str;
+
+    __m256i block, zero = _mm256_setzero_si256();
+    mrfstr_long_t mask;
+    for (;; sblock++)
+    {
+        block = _mm256_load_si256(sblock);
+
+#ifdef __AVX512VL__
+        mask = _mm256_cmpeq_epi8_mask(block, zero);
+#else
+        mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, zero));
+#endif
+        if (mask)
+            return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + __mrfstr_ctz32(mask);
+    }
 }
 #endif
 

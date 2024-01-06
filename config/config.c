@@ -156,7 +156,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_contain_chr, 64,
     __mrfstr_avx512_tcontain_chr, 64,
     __mrfstr_avx512_find_chr, 64,
-    __mrfstr_avx512_tfind_chr, 64
+    __mrfstr_avx512_tfind_chr, 64,
+    __mrfstr_avx512_strlen, 64
 };
 #elif defined(__AVX__)
 mrfstr_config_t _mrfstr_config =
@@ -174,7 +175,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_contain_chr, 32,
     __mrfstr_avx_tcontain_chr, 32,
     __mrfstr_avx_find_chr, 32,
-    __mrfstr_avx_tfind_chr, 32
+    __mrfstr_avx_tfind_chr, 32,
+    __mrfstr_avx_strlen, 32
 #else
     __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
     __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
@@ -183,7 +185,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_contain_chr, 16,
     __mrfstr_sse_tcontain_chr, 16,
     __mrfstr_sse_find_chr, 16,
-    __mrfstr_sse_tfind_chr, 16
+    __mrfstr_sse_tfind_chr, 16,
+    __mrfstr_sse_strlen, 16
 #endif
 };
 #elif defined(__SSE2__)
@@ -206,7 +209,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_contain_chr, 16,
     __mrfstr_sse_tcontain_chr, 16,
     __mrfstr_sse_find_chr, 16,
-    __mrfstr_sse_tfind_chr, 16
+    __mrfstr_sse_tfind_chr, 16,
+    __mrfstr_sse_strlen, 16
 };
 #else
 mrfstr_config_t _mrfstr_config =
@@ -223,7 +227,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_base_contain_chr, 8,
     __mrfstr_base_tcontain_chr, 8,
     __mrfstr_base_find_chr, 8,
-    __mrfstr_base_tfind_chr, 8
+    __mrfstr_base_tfind_chr, 8,
+    __mrfstr_base_strlen, 8
 };
 #endif
 
@@ -309,6 +314,36 @@ void mrfstr_config(
             _mrfstr_config.treplace_chr_size = 8;
             break;
         }
+        break;
+    }
+}
+
+void mrfstr_config_strlen(
+    mrfstr_config_simd_enum_t normal)
+{
+    switch (normal)
+    {
+    case MRFSTR_CONFIG_SIMD_AVX512:
+#ifdef __AVX512F__
+        _mrfstr_config.strlen_sub = __mrfstr_avx512_strlen;
+        _mrfstr_config.strlen_size = 64;
+        break;
+#endif
+    case MRFSTR_CONFIG_SIMD_AVX:
+#ifdef __AVX2__
+        _mrfstr_config.strlen_sub = __mrfstr_avx_strlen;
+        _mrfstr_config.strlen_size = 32;
+        break;
+#endif
+    case MRFSTR_CONFIG_SIMD_SSE:
+#ifdef __SSE2__
+        _mrfstr_config.strlen_sub = __mrfstr_sse_strlen;
+        _mrfstr_config.strlen_size = 16;
+        break;
+#endif
+    case MRFSTR_CONFIG_SIMD_NONE:
+        _mrfstr_config.strlen_sub = __mrfstr_base_strlen;
+        _mrfstr_config.strlen_size = 8;
         break;
     }
 }

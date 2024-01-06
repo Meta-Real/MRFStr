@@ -9,22 +9,20 @@
 int main(void)
 {
     mrfstr_config_tcount(5);
+    mrfstr_config_strlen(MRFSTR_CONFIG_SIMD_NONE);
 
     mrfstr_t a = mrfstr_init();
-    mrfstr_alloc(a, SIZE);
+    mrfstr_alloc(a, SIZE + 1);
     mrfstr_repeat_chr(a, '0', SIZE);
-
-    mrfstr_t b = mrfstr_init();
-    mrfstr_alloc(b, SIZE);
+    a->data[SIZE] = '\0';
 
     double t = 0;
     clock_t c;
     for (int i = 0; i != COUNT; i++)
     {
         c = clock();
-        mrfstr_replace_chr(a, a, '0', '1');
+        mrfstr_strlen(a->data);
         c = clock() - c;
-        mrfstr_replace_chr(a, a, '1', '0');
 
         t += c;
         printf("%ld msc\n", c);
@@ -33,6 +31,5 @@ int main(void)
     printf("AVG: %lf msc\n", t / COUNT);
 
     mrfstr_free(a);
-    mrfstr_free(b);
     return 0;
 }

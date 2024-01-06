@@ -31,4 +31,4 @@ add_test(MRFStrContainChr MRFStrContainChr)
 
 add_executable(MRFStrFindChr find_chr.c)
 target_link_libraries(MRFStrFindChr PUBLIC MRFStr)
-add_test(TMRFStrFindChr MRFStrFindChr)
+add_test(MRFStrFindChr MRFStrFindChr)

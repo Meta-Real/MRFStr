@@ -25,7 +25,7 @@ void mrfstr_set(
 void mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src)
 {
-    mrfstr_size_t size = strlen(src);
+    mrfstr_size_t size = mrfstr_strlen(src);
     if (!size)
     {
         free(MRFSTR_DATA(dst));

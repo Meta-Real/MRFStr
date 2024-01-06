@@ -44,7 +44,8 @@ enum __MRFSTR_RES_ENUM
 {
     MRFSTR_RES_NOERROR,
     MRFSTR_RES_MEM_ERROR,
-    MRFSTR_RES_OVERFLOW_ERROR
+    MRFSTR_RES_OVERFLOW_ERROR,
+    MRFSTR_RES_IDXOUT_ERROR
 };
 typedef mrfstr_byte_t mrfstr_res_enum_t;
 
@@ -170,29 +171,16 @@ mrfstr_idx_t mrfstr_n_find_chr(
 
 /* data functions */
 
-inline mrfstr_data_t mrfstr_get_data(
-    mrfstr_ct str)
-{
-    return MRFSTR_DATA(str);
-}
+mrfstr_data_t mrfstr_get_data(
+    mrfstr_ct str);
+mrfstr_size_t mrfstr_get_size(
+    mrfstr_ct str);
+mrfstr_chr_t mrfstr_get_chr(
+    mrfstr_res_enum_t *error,
+    mrfstr_ct str, mrfstr_size_t idx);
 
-inline mrfstr_size_t mrfstr_get_size(
-    mrfstr_ct str)
-{
-    return MRFSTR_SIZE(str);
-}
-
-inline mrfstr_chr_t mrfstr_get_chr(
-    mrfstr_ct str, mrfstr_size_t idx)
-{
-    return MRFSTR_DATA(str)[idx];
-}
-
-inline void mrfstr_modify_chr(
-    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx)
-{
-    MRFSTR_DATA(str)[idx] = chr;
-}
+mrfstr_res_enum_t mrfstr_modify_chr(
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx);
 
 /* io functions */
 
@@ -201,6 +189,11 @@ void mrfstr_print(
 void mrfstr_n_print(
     mrfstr_ct str, mrfstr_size_t size);
 
+/* str functions */
+
+mrfstr_size_t mrfstr_strlen(
+    mrfstr_data_ct str);
+
 /* config functions */
 
 enum __MRFSTR_CONFIG_TYPE_ENUM
@@ -208,9 +201,12 @@ enum __MRFSTR_CONFIG_TYPE_ENUM
     MRFSTR_CONFIG_TYPE_COPY,
     MRFSTR_CONFIG_TYPE_FILL,
     MRFSTR_CONFIG_TYPE_REPLACE_CHR,
+
     MRFSTR_CONFIG_TYPE_EQUAL,
     MRFSTR_CONFIG_TYPE_CONTAIN_CHR,
     MRFSTR_CONFIG_TYPE_FIND_CHR,
+
+    MRFSTR_CONFIG_TYPE_STRLEN
 };
 typedef mrfstr_byte_t mrfstr_config_type_enum_t;
 
@@ -229,5 +225,7 @@ void mrfstr_config(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t normal,
     mrfstr_config_simd_enum_t threaded);
+void mrfstr_config_strlen(
+    mrfstr_config_simd_enum_t normal);
 
 #endif /* __MRFSTR__ */

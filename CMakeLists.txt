@@ -36,7 +36,8 @@ add_library(MRFStr STATIC
     srcs/init.c srcs/set.c srcs/replace_chr.c
     srcs/concat.c srcs/repeat.c
     srcs/equal.c srcs/contain.c srcs/find.c
-    srcs/io.c)
+    srcs/data.c srcs/io.c
+    srcs/str.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
 
 enable_testing()

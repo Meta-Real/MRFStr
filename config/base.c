@@ -208,7 +208,7 @@ mrfstr_idx_t __mrfstr_base_find_chr(
         mask = cblock ^ *sblock++;
         mask = mrfstr_base_cmp(mask) >> 7;
         if (mask)
-            return i * 8 + __mrfstr_ctz64(mask) / 8;
+            return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
     }
 
     return MRFSTR_FALSE;
@@ -235,7 +235,7 @@ mrfstr_idx_t __mrfstr_base_tfind_chr(
             mask = cblock ^ *sblock++;
             mask = mrfstr_base_cmp(mask) >> 7;
             if (mask)
-                return i * 8 + __mrfstr_ctz64(mask) / 8;
+                return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
         }
     }
 
@@ -247,8 +247,23 @@ mrfstr_idx_t __mrfstr_base_tfind_chr(
         mask = cblock ^ *sblock++;
         mask = mrfstr_base_cmp(mask) >> 7;
         if (mask)
-            return i * 8 + __mrfstr_ctz64(mask) / 8;
+            return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
     }
 
     return MRFSTR_INVIDX;
+}
+
+mrfstr_size_t __mrfstr_base_strlen(
+    mrfstr_ptr_ct str)
+{
+    mrfstr_data_ct base = (mrfstr_data_ct)str;
+    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
+
+    mrfstr_longlong_t mask;
+    for (;; sblock++)
+    {
+        mask = mrfstr_base_cmp(*sblock) >> 7;
+        if (mask)
+            return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + (__mrfstr_ctz64(mask) >> 3);
+    }
 }

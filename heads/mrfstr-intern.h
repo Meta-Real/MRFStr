@@ -78,6 +78,10 @@ struct __MRFSTR_CONFIG_T
         volatile mrfstr_idx_t*, mrfstr_idx_t,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tfind_chr_size;
+
+    mrfstr_size_t (*strlen_sub)(
+        mrfstr_ptr_ct);
+    mrfstr_byte_t strlen_size;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;

@@ -24,7 +24,7 @@ mrfstr_t mrfstr_init2(
     if (!str)
         return NULL;
 
-    MRFSTR_SIZE(str) = strlen(data);
+    MRFSTR_SIZE(str) = mrfstr_strlen(data);
     MRFSTR_DATA(str) = MRFSTR_SIZE(str) ? data : NULL;
     return str;
 }

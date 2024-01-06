@@ -52,5 +52,8 @@ mrfstr_idx_t __mrfstr_sse_tfind_chr(
     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
+mrfstr_size_t __mrfstr_sse_strlen(
+    mrfstr_ptr_ct str);
+
 #endif
 #endif

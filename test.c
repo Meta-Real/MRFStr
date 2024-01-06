@@ -12,18 +12,19 @@ int main(void)
 
     mrfstr_t a = mrfstr_init();
     mrfstr_alloc(a, SIZE);
+    mrfstr_repeat_chr(a, '0', SIZE);
 
     mrfstr_t b = mrfstr_init();
     mrfstr_alloc(b, SIZE);
-    b->size = 64;
 
     double t = 0;
     clock_t c;
     for (int i = 0; i != COUNT; i++)
     {
         c = clock();
-        mrfstr_set(a, b);
+        mrfstr_replace_chr(a, a, '0', '1');
         c = clock() - c;
+        mrfstr_replace_chr(a, a, '1', '0');
 
         t += c;
         printf("%ld msc\n", c);

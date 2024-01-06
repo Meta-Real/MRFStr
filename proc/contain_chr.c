@@ -10,6 +10,7 @@
         if (chr == *str++)     \
             return MRFSTR_TRUE
 
+#pragma pack(push, 1)
 struct __MRFSTR_CONTAIN_CHR_T
 {
     mrfstr_data_ct str;
@@ -18,6 +19,7 @@ struct __MRFSTR_CONTAIN_CHR_T
 
     volatile mrfstr_bool_t *res;
 };
+#pragma pack(pop)
 typedef struct __MRFSTR_CONTAIN_CHR_T *mrfstr_contain_chr_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
@@ -28,7 +30,8 @@ DWORD WINAPI __mrfstr_contain_chr_threaded(
     LPVOID args);
 #endif
 
-mrfstr_bool_t __mrfstr_contain_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+mrfstr_bool_t __mrfstr_contain_chr(
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
     {

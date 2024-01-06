@@ -121,10 +121,10 @@ mrfstr_res_enum_t mrfstr_reverse(
 
 /* replace functions */
 
-void mrfstr_replace(
+void mrfstr_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new);
-void mrfstr_n_replace(
+void mrfstr_n_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
@@ -207,6 +207,7 @@ enum __MRFSTR_CONFIG_TYPE_ENUM
 {
     MRFSTR_CONFIG_TYPE_COPY,
     MRFSTR_CONFIG_TYPE_FILL,
+    MRFSTR_CONFIG_TYPE_REPLACE_CHR,
     MRFSTR_CONFIG_TYPE_EQUAL,
     MRFSTR_CONFIG_TYPE_CONTAIN_CHR,
     MRFSTR_CONFIG_TYPE_FIND_CHR,

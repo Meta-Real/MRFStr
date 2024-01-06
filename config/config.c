@@ -144,6 +144,13 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_copy, 64,
     __mrfstr_avx512_fill, 64,
     __mrfstr_avx512_fill, 64,
+#ifdef __AVX512BW__
+    __mrfstr_avx512_replace_chr, __mrfstr_avx512_replace_chr2, 64,
+    __mrfstr_avx512_replace_chr, __mrfstr_avx512_replace_chr2, 64,
+#else
+    __mrfstr_avx_replace_chr, __mrfstr_avx_replace_chr2, 32,
+    __mrfstr_avx_replace_chr, __mrfstr_avx_replace_chr2, 32,
+#endif
     __mrfstr_avx512_equal, 64,
     __mrfstr_avx512_tequal, 64,
     __mrfstr_avx512_contain_chr, 64,
@@ -160,6 +167,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_fill, 32,
     __mrfstr_avx_fill, 32,
 #ifdef __AVX2__
+    __mrfstr_avx_replace_chr, __mrfstr_avx_replace_chr2, 32,
+    __mrfstr_avx_replace_chr, __mrfstr_avx_replace_chr2, 32,
     __mrfstr_avx_equal, 32,
     __mrfstr_avx_tequal, 32,
     __mrfstr_avx_contain_chr, 32,
@@ -167,6 +176,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_find_chr, 32,
     __mrfstr_avx_tfind_chr, 32
 #else
+    __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
+    __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
     __mrfstr_sse_equal, 16,
     __mrfstr_sse_tequal, 16,
     __mrfstr_sse_contain_chr, 16,
@@ -183,6 +194,13 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_copy, 16,
     __mrfstr_sse_fill, 16,
     __mrfstr_sse_fill, 16,
+#ifdef __SSE4_1__
+    __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
+    __mrfstr_sse_replace_chr, __mrfstr_sse_replace_chr2, 16,
+#else
+    __mrfstr_base_replace_chr, __mrfstr_base_replace_chr2, 8,
+    __mrfstr_base_replace_chr, __mrfstr_base_replace_chr2, 8,
+#endif
     __mrfstr_sse_equal, 16,
     __mrfstr_sse_tequal, 16,
     __mrfstr_sse_contain_chr, 16,
@@ -198,6 +216,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_base_copy, 8,
     __mrfstr_base_fill, 8,
     __mrfstr_base_fill, 8,
+    __mrfstr_base_replace_chr, __mrfstr_base_replace_chr2, 8,
+    __mrfstr_base_replace_chr, __mrfstr_base_replace_chr2, 8,
     __mrfstr_base_equal, 8,
     __mrfstr_base_tequal, 8,
     __mrfstr_base_contain_chr, 8,
@@ -230,5 +250,65 @@ void mrfstr_config(
         mrfstr_tnswitch(contain_chr);
     case MRFSTR_CONFIG_TYPE_FIND_CHR:
         mrfstr_tnswitch(find_chr);
+    case MRFSTR_CONFIG_TYPE_REPLACE_CHR:
+        switch (normal)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+#ifdef __AVX512BW__
+            _mrfstr_config.nreplace_chr_sub = __mrfstr_avx512_replace_chr;
+            _mrfstr_config.nreplace_chr2_sub = __mrfstr_avx512_replace_chr2;
+            _mrfstr_config.nreplace_chr_size = 64;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_AVX:
+#ifdef __AVX2__
+            _mrfstr_config.nreplace_chr_sub = __mrfstr_avx_replace_chr;
+            _mrfstr_config.nreplace_chr2_sub = __mrfstr_avx_replace_chr2;
+            _mrfstr_config.nreplace_chr_size = 32;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_SSE:
+#ifdef __SSE4_1__
+            _mrfstr_config.nreplace_chr_sub = __mrfstr_sse_replace_chr;
+            _mrfstr_config.nreplace_chr2_sub = __mrfstr_sse_replace_chr2;
+            _mrfstr_config.nreplace_chr_size = 16;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_NONE:
+            _mrfstr_config.nreplace_chr_sub = __mrfstr_base_replace_chr;
+            _mrfstr_config.nreplace_chr2_sub = __mrfstr_base_replace_chr2;
+            _mrfstr_config.nreplace_chr_size = 8;
+            break;
+        }
+        switch (threaded)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+#ifdef __AVX512BW__
+            _mrfstr_config.treplace_chr_sub = __mrfstr_avx512_replace_chr;
+            _mrfstr_config.treplace_chr2_sub = __mrfstr_avx512_replace_chr2;
+            _mrfstr_config.treplace_chr_size = 64;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_AVX:
+#ifdef __AVX2__
+            _mrfstr_config.treplace_chr_sub = __mrfstr_avx_replace_chr;
+            _mrfstr_config.treplace_chr2_sub = __mrfstr_avx_replace_chr2;
+            _mrfstr_config.treplace_chr_size = 32;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_SSE:
+#ifdef __SSE4_1__
+            _mrfstr_config.treplace_chr_sub = __mrfstr_sse_replace_chr;
+            _mrfstr_config.treplace_chr2_sub = __mrfstr_sse_replace_chr2;
+            _mrfstr_config.treplace_chr_size = 16;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_NONE:
+            _mrfstr_config.treplace_chr_sub = __mrfstr_base_replace_chr;
+            _mrfstr_config.treplace_chr2_sub = __mrfstr_base_replace_chr2;
+            _mrfstr_config.treplace_chr_size = 8;
+            break;
+        }
+        break;
     }
 }

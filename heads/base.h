@@ -17,6 +17,15 @@ void __mrfstr_base_copy(
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
+void __mrfstr_base_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+void __mrfstr_base_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+
 mrfstr_bool_t __mrfstr_base_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_base_tequal(

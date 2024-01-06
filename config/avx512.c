@@ -40,6 +40,69 @@ void __mrfstr_avx512_fill(
         _mm512_stream_si512(rblock++, block);
 }
 
+#ifdef __AVX512BW__
+void __mrfstr_avx512_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m512i *sblock = (__m512i*)str;
+    __m512i oblock = _mm512_set1_epi8(old);
+    __m512i nblock = _mm512_set1_epi8(new);
+
+    __m512i block;
+    mrfstr_longlong_t mask;
+    for (; size; size--)
+    {
+        block = _mm512_load_si512(sblock);
+
+        mask = _mm512_cmpeq_epi8_mask(block, oblock);
+        if (mask)
+            _mm512_mask_storeu_epi8(sblock++, mask, nblock);
+    }
+}
+
+void __mrfstr_avx512_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m512i *rblock = (__m512i*)res;
+    __m512i *sblock = (__m512i*)str;
+    __m512i oblock = _mm512_set1_epi8(old);
+    __m512i nblock = _mm512_set1_epi8(new);
+
+    __m512i block1, block2;
+    mrfstr_longlong_t mask;
+    for (; size >= 2; size -= 2)
+    {
+        block1 = _mm512_loadu_si512(sblock++);
+        block2 = _mm512_loadu_si512(sblock++);
+
+        mask = _mm512_cmpeq_epi8_mask(block1, oblock);
+        if (mask)
+            block1 = _mm512_mask_blend_epi8(mask, block1, nblock);
+        mask = _mm512_cmpeq_epi8_mask(block2, oblock);
+        if (mask)
+            block2 = _mm512_mask_blend_epi8(mask, block2, nblock);
+
+        _mm512_stream_si512(rblock++, block1);
+        _mm512_stream_si512(rblock++, block2);
+    }
+
+    if (size)
+    {
+        block1 = _mm512_loadu_si512(sblock);
+
+        mask = _mm512_cmpeq_epi8_mask(block1, oblock);
+        if (mask)
+            block1 = _mm512_mask_blend_epi8(mask, block1, nblock);
+
+        _mm512_store_si512(rblock, block1);
+    }
+}
+#endif
+
 mrfstr_bool_t __mrfstr_avx512_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -49,7 +112,7 @@ mrfstr_bool_t __mrfstr_avx512_equal(
     __m512i block1, block2;
     for (; size; size--)
     {
-        block1 = _mm512_loadu_si512(s1block++);
+        block1 = _mm512_load_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
         if (_mm512_cmpneq_epi64_mask(block1, block2))
             return MRFSTR_FALSE;
@@ -75,7 +138,7 @@ void __mrfstr_avx512_tequal(
         nsize = size - MRFSTR_AVX512_TEQUAL_LOAD;
         for (; size != nsize; size--)
         {
-            block1 = _mm512_loadu_si512(s1block++);
+            block1 = _mm512_load_si512(s1block++);
             block2 = _mm512_loadu_si512(s2block++);
             if (_mm512_cmpneq_epi64_mask(block1, block2))
             {
@@ -90,7 +153,7 @@ void __mrfstr_avx512_tequal(
 
     for (; size; size--)
     {
-        block1 = _mm512_loadu_si512(s1block++);
+        block1 = _mm512_load_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
         if (_mm512_cmpneq_epi64_mask(block1, block2))
         {
@@ -109,7 +172,7 @@ mrfstr_bool_t __mrfstr_avx512_contain_chr(
     __m512i block;
     for (; size; size--)
     {
-        block = _mm512_loadu_si512(sblock++);
+        block = _mm512_load_si512(sblock++);
         if (_mm512_cmpeq_epi8_mask(block, cblock))
             return MRFSTR_TRUE;
     }
@@ -134,7 +197,7 @@ void __mrfstr_avx512_tcontain_chr(
         nsize = size - MRFSTR_AVX512_TCONTAIN_CHR_LOAD;
         for (; size != nsize; size--)
         {
-            block = _mm512_loadu_si512(sblock++);
+            block = _mm512_load_si512(sblock++);
             if (_mm512_cmpeq_epi8_mask(block, cblock))
             {
                 *res = MRFSTR_TRUE;
@@ -148,7 +211,7 @@ void __mrfstr_avx512_tcontain_chr(
 
     for (; size; size--)
     {
-        block = _mm512_loadu_si512(sblock++);
+        block = _mm512_load_si512(sblock++);
         if (_mm512_cmpeq_epi8_mask(block, cblock))
         {
             *res = MRFSTR_TRUE;
@@ -196,7 +259,7 @@ mrfstr_idx_t __mrfstr_avx512_tfind_chr(
         ni = i + MRFSTR_AVX512_TFIND_CHR_LOAD;
         for (; i != ni; i++)
         {
-            block = _mm512_loadu_si512(sblock++);
+            block = _mm512_load_si512(sblock++);
 
             mask = _mm512_cmpeq_epi8_mask(block, cblock);
             if (mask)
@@ -209,7 +272,7 @@ mrfstr_idx_t __mrfstr_avx512_tfind_chr(
 
     for (; i != size; i++)
     {
-        block = _mm512_loadu_si512(sblock++);
+        block = _mm512_load_si512(sblock++);
 
         mask = _mm512_cmpeq_epi8_mask(block, cblock);
         if (mask)

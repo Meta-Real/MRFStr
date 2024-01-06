@@ -8,7 +8,8 @@
 
 #ifdef __AVX__
 
-void __mrfstr_avx_copy(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+void __mrfstr_avx_copy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m256i *dblock = (__m256i*)dst;
     __m256i *sblock = (__m256i*)src;
@@ -33,7 +34,8 @@ void __mrfstr_avx_copy(mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
     }
 }
 
-void __mrfstr_avx_fill(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+void __mrfstr_avx_fill(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m256i *rblock = (__m256i*)res;
     __m256i block = _mm256_set1_epi8(chr);
@@ -43,6 +45,47 @@ void __mrfstr_avx_fill(mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 }
 
 #ifdef __AVX2__
+void __mrfstr_avx_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m256i *sblock = (__m256i*)str;
+    __m256i oblock = _mm256_set1_epi8(old);
+    __m256i nblock = _mm256_set1_epi8(new);
+
+    __m256i block, mask;
+    for (; size; size--)
+    {
+        block = _mm256_load_si256(sblock);
+
+        mask = _mm256_cmpeq_epi8(block, oblock);
+        block = _mm256_blendv_epi8(block, nblock, mask);
+        _mm256_store_si256(sblock++, block);
+    }
+}
+
+void __mrfstr_avx_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m256i *rblock = (__m256i*)res;
+    __m256i *sblock = (__m256i*)str;
+    __m256i oblock = _mm256_set1_epi8(old);
+    __m256i nblock = _mm256_set1_epi8(new);
+
+    __m256i block, mask;
+    for (; size; size--)
+    {
+        block = _mm256_loadu_si256(sblock++);
+
+        mask = _mm256_cmpeq_epi8(block, oblock);
+        block = _mm256_blendv_epi8(block, nblock, mask);
+        _mm256_store_si256(rblock++, block);
+    }
+}
+
 mrfstr_bool_t __mrfstr_avx_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
@@ -129,7 +172,7 @@ mrfstr_bool_t __mrfstr_avx_contain_chr(
     {
         block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
         if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
         if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
@@ -159,7 +202,7 @@ void __mrfstr_avx_tcontain_chr(
         {
             block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
             if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
             if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
@@ -178,7 +221,7 @@ void __mrfstr_avx_tcontain_chr(
     {
         block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
         if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
         if (_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
@@ -203,7 +246,7 @@ mrfstr_idx_t __mrfstr_avx_find_chr(
     {
         block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
         mask = _mm256_cmpeq_epi8_mask(block, cblock);
 #else
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
@@ -235,7 +278,7 @@ mrfstr_idx_t __mrfstr_avx_tfind_chr(
         {
             block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
             mask = _mm256_cmpeq_epi8_mask(block, cblock);
 #else
             mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
@@ -252,7 +295,7 @@ mrfstr_idx_t __mrfstr_avx_tfind_chr(
     {
         block = _mm256_loadu_si256(sblock++);
 
-#ifdef __AVX512BW__
+#ifdef __AVX512VL__
         mask = _mm256_cmpeq_epi8_mask(block, cblock);
 #else
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));

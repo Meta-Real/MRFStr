@@ -40,7 +40,7 @@ int main(void)
 
     memset(MRFSTR_DATA(res), '0', TEST_LOW);
     MRFSTR_SIZE(res) = TEST_LOW;
-    mrfstr_replace(res, res, '0', '1');
+    mrfstr_replace_chr(res, res, '0', '1');
     memset(str, '1', TEST_LOW);
 
     if (MRFSTR_SIZE(res) != TEST_LOW || memcmp(MRFSTR_DATA(res), str, TEST_LOW))
@@ -54,7 +54,7 @@ int main(void)
 
     memset(MRFSTR_DATA(res), '0', TEST_MID);
     MRFSTR_SIZE(res) = TEST_MID;
-    mrfstr_replace(res, res, '0', '1');
+    mrfstr_replace_chr(res, res, '0', '1');
     memset(str, '1', TEST_MID);
 
     if (MRFSTR_SIZE(res) != TEST_MID || memcmp(MRFSTR_DATA(res), str, TEST_MID))
@@ -68,7 +68,7 @@ int main(void)
 
     memset(MRFSTR_DATA(res), '0', TEST_HIGH);
     MRFSTR_SIZE(res) = TEST_HIGH;
-    mrfstr_replace(res, res, '0', '1');
+    mrfstr_replace_chr(res, res, '0', '1');
     memset(str, '1', TEST_HIGH);
 
     if (MRFSTR_SIZE(res) != TEST_HIGH || memcmp(MRFSTR_DATA(res), str, TEST_HIGH))

@@ -23,6 +23,17 @@ void __mrfstr_sse_copy(
 void __mrfstr_sse_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
+#ifdef __SSE4_1__
+void __mrfstr_sse_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+void __mrfstr_sse_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+#endif
+
 mrfstr_bool_t __mrfstr_sse_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_sse_tequal(

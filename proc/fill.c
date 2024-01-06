@@ -9,12 +9,14 @@
     for (; rem; rem--)  \
         *res++ = chr
 
+#pragma pack(push, 1)
 struct __MRFSTR_FILL_T
 {
     mrfstr_data_t res;
     mrfstr_chr_t chr;
     mrfstr_size_t size;
 };
+#pragma pack(pop)
 typedef struct __MRFSTR_FILL_T *mrfstr_fill_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))

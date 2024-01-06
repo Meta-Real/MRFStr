@@ -17,9 +17,9 @@ add_executable(MRFStrRepeat repeat.c)
 target_link_libraries(MRFStrRepeat PUBLIC MRFStr)
 add_test(MRFStrRepeat MRFStrRepeat)
 
-#add_executable(MRFStrReplace replace.c)
-#target_link_libraries(MRFStrReplace PUBLIC MRFStr)
-#add_test(TMRFStrReplace MRFStrReplace)
+add_executable(MRFStrReplaceChr replace_chr.c)
+target_link_libraries(MRFStrReplaceChr PUBLIC MRFStr)
+add_test(MRFStrReplaceChr MRFStrReplaceChr)
 
 add_executable(MRFStrEqual equal.c)
 target_link_libraries(MRFStrEqual PUBLIC MRFStr)

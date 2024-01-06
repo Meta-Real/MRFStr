@@ -17,6 +17,7 @@
 #include <sse.h>
 #include <base.h>
 
+#pragma pack(push, 1)
 struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t tcount;
@@ -34,6 +35,25 @@ struct __MRFSTR_CONFIG_T
     void (*tfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tfill_size;
+
+    void (*nreplace_chr_sub)(
+        mrfstr_ptr_t,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    void (*nreplace_chr2_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    mrfstr_byte_t nreplace_chr_size;
+    void (*treplace_chr_sub)(
+        mrfstr_ptr_t,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    void (*treplace_chr2_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    mrfstr_byte_t treplace_chr_size;
 
     mrfstr_bool_t (*nequal_sub)(
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
@@ -59,6 +79,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tfind_chr_size;
 };
+#pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
@@ -131,10 +152,21 @@ void __mrfstr_copy(
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
+void __mrfstr_replace_chr(
+    mrfstr_data_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+void __mrfstr_replace_chr2(
+    mrfstr_data_t res, mrfstr_data_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
-mrfstr_bool_t __mrfstr_contain_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-mrfstr_idx_t __mrfstr_find_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_bool_t __mrfstr_contain_chr(
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_find_chr(
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif

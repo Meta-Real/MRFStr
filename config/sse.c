@@ -72,6 +72,49 @@ void __mrfstr_sse_fill(
         _mm_stream_si128(rblock++, block);
 }
 
+#ifdef __SSE4_1__
+void __mrfstr_sse_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m128i *sblock = (__m128i*)str;
+    __m128i oblock = _mm_set1_epi8(old);
+    __m128i nblock = _mm_set1_epi8(new);
+
+    __m128i block, mask;
+    for (; size; size--)
+    {
+        block = _mm_load_si128(sblock);
+
+        mask = _mm_cmpeq_epi8(block, oblock);
+        block = _mm_blendv_epi8(block, nblock, mask);
+        _mm_store_si128(sblock++, block);
+    }
+}
+
+void __mrfstr_sse_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size)
+{
+    __m128i *rblock = (__m128i*)res;
+    __m128i *sblock = (__m128i*)str;
+    __m128i oblock = _mm_set1_epi8(old);
+    __m128i nblock = _mm_set1_epi8(new);
+
+    __m128i block, mask;
+    for (; size; size--)
+    {
+        block = _mm_loadu_si128(sblock++);
+
+        mask = _mm_cmpeq_epi8(block, oblock);
+        block = _mm_blendv_epi8(block, nblock, mask);
+        _mm_store_si128(rblock++, block);
+    }
+}
+#endif
+
 mrfstr_bool_t __mrfstr_sse_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {

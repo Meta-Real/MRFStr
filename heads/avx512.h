@@ -20,8 +20,20 @@
 
 void __mrfstr_avx512_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
 void __mrfstr_avx512_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+
+#ifdef __AVX512BW__
+void __mrfstr_avx512_replace_chr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+void __mrfstr_avx512_replace_chr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_size_t size);
+#endif
 
 mrfstr_bool_t __mrfstr_avx512_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);

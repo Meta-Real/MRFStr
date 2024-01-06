@@ -10,6 +10,7 @@
         if (chr == *str)      \
             return (mrfstr_short_t)(str - base)
 
+#pragma pack(push, 1)
 struct __MRFSTR_FIND_CHR_T
 {
     mrfstr_data_ct str;
@@ -20,6 +21,7 @@ struct __MRFSTR_FIND_CHR_T
     volatile mrfstr_idx_t *res;
     mrfstr_mutex_p mutex;
 };
+#pragma pack(pop)
 typedef struct __MRFSTR_FIND_CHR_T *mrfstr_find_chr_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
@@ -30,7 +32,8 @@ DWORD WINAPI __mrfstr_find_chr_threaded(
     LPVOID args);
 #endif
 
-mrfstr_idx_t __mrfstr_find_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+mrfstr_idx_t __mrfstr_find_chr(
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     mrfstr_data_ct base = str;
 

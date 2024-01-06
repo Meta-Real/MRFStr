@@ -12,7 +12,8 @@
 
 #include <intrin.h>
 
-mrfstr_byte_t __mrfstr_ctz64(mrfstr_longlong_t bits)
+mrfstr_byte_t __mrfstr_ctz64(
+    mrfstr_longlong_t bits)
 {
 #if defined(__GNUC__) || defined(__clang__)
     return __builtin_ctzll(bits);
@@ -55,7 +56,8 @@ mrfstr_byte_t __mrfstr_ctz64(mrfstr_longlong_t bits)
 #endif
 }
 
-mrfstr_byte_t __mrfstr_ctz32(mrfstr_long_t bits)
+mrfstr_byte_t __mrfstr_ctz32(
+    mrfstr_long_t bits)
 {
 #if defined(__GNUC__) || defined(__clang__)
     return __builtin_ctz(bits);
@@ -93,7 +95,8 @@ mrfstr_byte_t __mrfstr_ctz32(mrfstr_long_t bits)
 #endif
 }
 
-mrfstr_byte_t __mrfstr_ctz16(mrfstr_short_t bits)
+mrfstr_byte_t __mrfstr_ctz16(
+    mrfstr_short_t bits)
 {
 #if defined(__GNUC__) || defined(__clang__)
     return __builtin_ctz(bits);

@@ -19,6 +19,8 @@
 
 int main(void)
 {
+    mrfstr_config_tcount(5);
+
     mrfstr_t str = mrfstr_init();
     if (!str)
     {

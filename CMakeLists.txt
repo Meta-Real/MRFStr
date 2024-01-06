@@ -32,13 +32,12 @@ endif()
 
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
-    proc/copy.c proc/fill.c proc/equal.c proc/contain_chr.c
+    proc/copy.c proc/fill.c proc/equal.c proc/contain_chr.c proc/find_chr.c
     srcs/init.c srcs/set.c
     srcs/concat.c srcs/repeat.c
-    srcs/equal.c srcs/contain.c
+    srcs/equal.c srcs/contain.c srcs/find.c
     srcs/io.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
-target_compile_definitions(MRFStr PRIVATE $<$<CONFIG:Debug>:__MRFSTR_DEBUG__>)
 
 enable_testing()
 add_subdirectory(tests)

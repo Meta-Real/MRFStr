@@ -75,7 +75,7 @@ typedef pthread_mutex_t mrfstr_mutex_t;
 typedef mrfstr_mutex_t *mrfstr_mutex_p;
 
 #define MRFSTR_TFUNC_RET NULL
-#define MRFSTR_CAST_MUTEX(m) &(m)
+#define MRFSTR_CAST_MUTEX(m) &m
 
 #define mrfstr_create_thread(f) \
     if (pthread_create(threads + i, NULL, f, data))
@@ -85,9 +85,9 @@ typedef mrfstr_mutex_t *mrfstr_mutex_p;
         pthread_join(threads[--i], NULL)
 
 #define mrfstr_create_mutex(m) \
-    if (pthread_mutex_init(&(m), NULL))
+    if (pthread_mutex_init(&m, NULL))
 
-#define mrfstr_close_mutex(m) pthread_mutex_destroy(&(m))
+#define mrfstr_close_mutex(m) pthread_mutex_destroy(&m)
 #define mrfstr_lock_mutex(m) pthread_mutex_lock(m)
 #define mrfstr_unlock_mutex(m) pthread_mutex_unlock(m)
 
@@ -116,7 +116,7 @@ typedef HANDLE mrfstr_mutex_p;
 
 #define mrfstr_create_mutex(m)          \
     m = CreateMutex(NULL, FALSE, NULL); \
-    if (!(m))
+    if (!m)
 
 #define mrfstr_close_mutex CloseHandle
 #define mrfstr_lock_mutex(m) WaitForSingleObject(m, INFINITE)
@@ -135,6 +135,6 @@ mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_contain_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-mrfstr_idx_t mrfstr_memchr2(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_find_chr(mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif

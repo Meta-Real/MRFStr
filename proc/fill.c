@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_fill_rem \
     for (; rem; rem--)  \
@@ -32,8 +33,7 @@ void __mrfstr_fill(
 {
     if (size < MRFSTR_SLIMIT)
     {
-        for (; size; size--)
-            *res++ = chr;
+        memset(res, chr, size);
         return;
     }
 

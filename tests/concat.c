@@ -94,7 +94,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_LOW separate result section\n", stderr);
+        fputs("\"concat\" error: TEST_LOW three strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -111,7 +111,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_LOW same result section\n", stderr);
+        fputs("\"concat\" error: TEST_LOW two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -129,7 +129,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_MID separate result section\n", stderr);
+        fputs("\"concat\" error: TEST_MID three strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -146,7 +146,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_LOW same result section\n", stderr);
+        fputs("\"concat\" error: TEST_LOW two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -164,7 +164,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_HIGH separate result section\n", stderr);
+        fputs("\"concat\" error: TEST_HIGH three strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -181,7 +181,7 @@ int main(void)
         mrfstr_free(str2);
         free(str);
 
-        fputs("\"concat\" error: TEST_LOW same result section\n", stderr);
+        fputs("\"concat\" error: TEST_LOW two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 

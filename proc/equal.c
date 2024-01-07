@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_equal_rem        \
     for (; rem; rem--)          \
@@ -32,12 +33,7 @@ mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
-    {
-        for (; size; size--)
-            if (*str1++ != *str2++)
-                return MRFSTR_FALSE;
-        return MRFSTR_TRUE;
-    }
+        return !memcmp(str1, str2, size);
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {

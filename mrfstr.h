@@ -97,6 +97,13 @@ void mrfstr_set_nstr(
 void mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src);
 
+/* get functions */
+
+mrfstr_data_t mrfstr_get_str(
+    mrfstr_data_t dst, mrfstr_ct src);
+mrfstr_data_t mrfstr_n_get_str(
+    mrfstr_data_t dst, mrfstr_ct src, mrfstr_size_t size);
+
 /* concat functions */
 
 mrfstr_res_enum_t mrfstr_concat(

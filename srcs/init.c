@@ -4,7 +4,6 @@
 */
 
 #include <mrfstr-intern.h>
-#include <string.h>
 
 mrfstr_t mrfstr_init(void)
 {

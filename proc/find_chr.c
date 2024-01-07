@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_find_chr_rem   \
     for (; rem; rem--, str++) \
@@ -35,17 +36,15 @@ DWORD WINAPI __mrfstr_find_chr_threaded(
 mrfstr_idx_t __mrfstr_find_chr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_data_ct base = str;
-
     if (size < MRFSTR_SLIMIT)
     {
-        mrfstr_short_t i;
-        for (i = 0; i != size; i++)
-            if (chr == *str++)
-                return i;
+        mrfstr_data_t ptr = memchr(str, chr, size);
+        if (ptr)
+            return (mrfstr_idx_t)(ptr - str);
         return MRFSTR_INVIDX;
     }
 
+    mrfstr_data_ct base = str;
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
         mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nfind_chr_size;

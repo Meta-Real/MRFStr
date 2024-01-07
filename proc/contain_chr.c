@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_contain_chr_rem \
     for (; rem; rem--)         \
@@ -34,12 +35,7 @@ mrfstr_bool_t __mrfstr_contain_chr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
-    {
-        for (; size; size--)
-            if (chr == *str++)
-                return MRFSTR_TRUE;
-        return MRFSTR_FALSE;
-    }
+        return memchr(str, chr, size) != NULL;
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {

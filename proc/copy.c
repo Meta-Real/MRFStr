@@ -4,6 +4,7 @@
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_copy_rem \
     for (; rem; rem--)  \
@@ -30,8 +31,7 @@ void __mrfstr_copy(
 {
     if (size < MRFSTR_SLIMIT)
     {
-        for (; size; size--)
-            *dst++ = *src++;
+        memcpy(dst, src, size);
         return;
     }
 

@@ -87,9 +87,9 @@ struct __MRFSTR_CONFIG_T
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
-#define MRFSTR_SLIMIT 0x400
+#define MRFSTR_SLIMIT 0x800
 
-#define MRFSTR_TSIZE 0x1000000ULL
+#define MRFSTR_TSIZE 0x8000000ULL
 #define MRFSTR_TLIMIT (MRFSTR_TSIZE << 1)
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))

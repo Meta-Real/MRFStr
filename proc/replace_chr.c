@@ -264,6 +264,7 @@ mrfstr_ptr_t __mrfstr_replace_chr2_threaded(
 #elif defined(_WIN32)
 DWORD WINAPI __mrfstr_replace_chr2_threaded(
     LPVOID args)
+#endif
 {
     mrfstr_replace_chr2_t data = (mrfstr_replace_chr2_t)args;
     _mrfstr_config.treplace_chr2_sub(
@@ -272,4 +273,3 @@ DWORD WINAPI __mrfstr_replace_chr2_threaded(
     free(data);
     return MRFSTR_TFUNC_RET;
 }
-#endif

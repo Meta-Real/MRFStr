@@ -7,9 +7,11 @@
 #define __MRFSTR__
 
 #include <inttypes.h>
+#include <stddef.h>
 
 typedef uint8_t mrfstr_bool_t;
 typedef uint8_t mrfstr_byte_t;
+typedef int16_t mrfstr_sshort_t;
 typedef uint16_t mrfstr_short_t;
 typedef uint32_t mrfstr_long_t;
 typedef uint64_t mrfstr_longlong_t;

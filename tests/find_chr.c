@@ -63,7 +63,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"find_chr\" error: TEST_LOW random one section\n"
-                "\tFailed index: %zu\n", (uint64_t)idx);
+                "\tFailed index: %zu\n", idx);
             return EXIT_FAILURE;
         }
 
@@ -94,7 +94,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"find_chr\" error: TEST_MID random one section\n"
-                "\tFailed index: %zu\n", (uint64_t)idx);
+                "\tFailed index: %zu\n", idx);
             return EXIT_FAILURE;
         }
 
@@ -115,7 +115,7 @@ int main(void)
 
     for (i = 0; i != TEST_COUNT;)
     {
-        idx = (((mrfstr_size_t)GENERATE32_RAND << 32) + GENERATE32_RAND) % TEST_HIGH;
+        idx = GENERATE32_RAND % TEST_HIGH;
         if (MRFSTR_DATA(str)[idx] == '2')
             continue;
 
@@ -125,7 +125,7 @@ int main(void)
             mrfstr_free(str);
 
             fprintf(stderr, "\"find_chr\" error: TEST_HIGH random one section\n"
-                "\tFailed index: %zu\n", (uint64_t)idx);
+                "\tFailed index: %zu\n", idx);
             return EXIT_FAILURE;
         }
 

@@ -8,9 +8,8 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#endif
-
 #include <intrin.h>
+#endif
 
 mrfstr_byte_t __mrfstr_ctz64(
     mrfstr_longlong_t bits)

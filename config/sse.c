@@ -130,7 +130,7 @@ mrfstr_bool_t __mrfstr_sse_equal(
 #ifdef __AVX512VL__
         if (_mm_cmpneq_epi64_mask(block1, block2))
 #else
-        if (~(mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
+        if (~(mrfstr_sshort_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
 #endif
             return MRFSTR_FALSE;
     }
@@ -161,7 +161,7 @@ void __mrfstr_sse_tequal(
 #ifdef __AVX512VL__
             if (_mm_cmpneq_epi64_mask(block1, block2))
 #else
-            if (~(mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
+            if (~(mrfstr_sshort_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
 #endif
             {
                 *res = MRFSTR_FALSE;
@@ -181,7 +181,7 @@ void __mrfstr_sse_tequal(
 #ifdef __AVX512VL__
         if (_mm_cmpneq_epi64_mask(block1, block2))
 #else
-        if (~(mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
+        if (~(mrfstr_sshort_t)_mm_movemask_epi8(_mm_cmpeq_epi32(block1, block2)))
 #endif
         {
             *res = MRFSTR_FALSE;
@@ -204,7 +204,7 @@ mrfstr_bool_t __mrfstr_sse_contain_chr(
 #ifdef __AVX512BW__
         if (_mm_cmpeq_epi8_mask(block, cblock))
 #else
-        if (_mm_movemask_epi8(_mm_cmpeq_epi8(block1, block2)))
+        if (_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock)))
 #endif
             return MRFSTR_TRUE;
     }
@@ -234,7 +234,7 @@ void __mrfstr_sse_tcontain_chr(
 #ifdef __AVX512BW__
             if (_mm_cmpeq_epi8_mask(block, cblock))
 #else
-            if (_mm_movemask_epi8(_mm_cmpeq_epi8(block1, block2)))
+            if (_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock)))
 #endif
             {
                 *res = MRFSTR_TRUE;
@@ -253,7 +253,7 @@ void __mrfstr_sse_tcontain_chr(
 #ifdef __AVX512BW__
         if (_mm_cmpeq_epi8_mask(block, cblock))
 #else
-        if (_mm_movemask_epi8(_mm_cmpeq_epi64(block1, block2)))
+        if (_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock)))
 #endif
         {
             *res = MRFSTR_TRUE;
@@ -275,7 +275,7 @@ mrfstr_idx_t __mrfstr_sse_find_chr(
     {
         block = _mm_loadu_si128(sblock++);
 
-#ifndef __AVX512BW__
+#ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, cblock);
 #else
         mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));

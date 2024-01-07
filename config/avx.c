@@ -175,7 +175,7 @@ mrfstr_bool_t __mrfstr_avx_contain_chr(
 #ifdef __AVX512VL__
         if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
-        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock)))
 #endif
             return MRFSTR_TRUE;
     }
@@ -205,7 +205,7 @@ void __mrfstr_avx_tcontain_chr(
 #ifdef __AVX512VL__
             if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
-            if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, block2)))
+            if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock)))
 #endif
             {
                 *res = MRFSTR_TRUE;
@@ -224,7 +224,7 @@ void __mrfstr_avx_tcontain_chr(
 #ifdef __AVX512VL__
         if (_mm256_cmpeq_epi8_mask(block, cblock))
 #else
-        if (_mm256_movemask_epi8(_mm256_cmpeq_epi64(block1, block2)))
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock)))
 #endif
         {
             *res = MRFSTR_TRUE;

@@ -118,7 +118,6 @@ int main(void)
         idx = GENERATE32_RAND % TEST_HIGH;
         if (MRFSTR_DATA(str)[idx] == '2')
             continue;
-        printf("%hhu, %zu\n", i, idx);
 
         MRFSTR_DATA(str)[idx] = '1';
         if (!mrfstr_contain_chr(str, '1'))

@@ -327,7 +327,7 @@ mrfstr_idx_t __mrfstr_sse_tfind_chr(
 #ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, cblock);
 #else
-        mask = _mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));
+        mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));
 #endif
         if (mask)
             return start + (i << 4) + __mrfstr_ctz16(mask);
@@ -351,7 +351,7 @@ mrfstr_size_t __mrfstr_sse_strlen(
 #ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, zero);
 #else
-        mask = _mm_movemask_epi8(_mm_cmpeq_epi8(block, zero));
+        mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, zero));
 #endif
         if (mask)
             return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + __mrfstr_ctz16(mask);

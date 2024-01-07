@@ -9,19 +9,19 @@
 #include <mrfstr.h>
 
 #define MRFSTR_BASE_TEQUAL_LOAD 0x80000
-#define MRFSTR_BASE_TCONTAIN_CHR_LOAD 0x80000
-#define MRFSTR_BASE_TFIND_CHR_LOAD 0x80000
+#define MRFSTR_BASE_TCONTCHR_LOAD 0x80000
+#define MRFSTR_BASE_TFINDCHR_LOAD 0x80000
 
 void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
-void __mrfstr_base_replace_chr(
+void __mrfstr_base_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
-void __mrfstr_base_replace_chr2(
+void __mrfstr_base_replchr2(
     mrfstr_ptr_t res, mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
@@ -32,15 +32,15 @@ void __mrfstr_base_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
-mrfstr_bool_t __mrfstr_base_contain_chr(
+mrfstr_bool_t __mrfstr_base_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-void __mrfstr_base_tcontain_chr(
+void __mrfstr_base_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
-mrfstr_idx_t __mrfstr_base_find_chr(
+mrfstr_idx_t __mrfstr_base_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-mrfstr_idx_t __mrfstr_base_tfind_chr(
+mrfstr_idx_t __mrfstr_base_tfindchr(
     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 

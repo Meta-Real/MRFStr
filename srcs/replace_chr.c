@@ -30,11 +30,11 @@ void mrfstr_replace_chr(
 
     if (res == str)
     {
-        __mrfstr_replace_chr(MRFSTR_DATA(res), old, new, MRFSTR_SIZE(res));
+        __mrfstr_replchr(MRFSTR_DATA(res), old, new, MRFSTR_SIZE(res));
         return;
     }
 
-    __mrfstr_replace_chr2(MRFSTR_DATA(res), MRFSTR_DATA(str), old, new, MRFSTR_SIZE(str));
+    __mrfstr_replchr2(MRFSTR_DATA(res), MRFSTR_DATA(str), old, new, MRFSTR_SIZE(str));
     MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
 }
 
@@ -67,11 +67,11 @@ void mrfstr_n_replace_chr(
 
     if (res == str)
     {
-        __mrfstr_replace_chr(MRFSTR_DATA(res), old, new, size);
+        __mrfstr_replchr(MRFSTR_DATA(res), old, new, size);
         return;
     }
 
-    __mrfstr_replace_chr2(MRFSTR_DATA(res), MRFSTR_DATA(str), old, new, size);
+    __mrfstr_replchr2(MRFSTR_DATA(res), MRFSTR_DATA(str), old, new, size);
     if (size != MRFSTR_SIZE(str))
         __mrfstr_copy(MRFSTR_DATA(res) + size, MRFSTR_DATA(str) + size, MRFSTR_SIZE(str) - size);
 

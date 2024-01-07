@@ -207,13 +207,11 @@ mrfstr_size_t mrfstr_strlen(
 
 enum __MRFSTR_CONFIG_TYPE_ENUM
 {
-    MRFSTR_CONFIG_TYPE_COPY,
-    MRFSTR_CONFIG_TYPE_FILL,
-    MRFSTR_CONFIG_TYPE_REPLACE_CHR,
+    MRFSTR_CONFIG_TYPE_MEMORY,
+    MRFSTR_CONFIG_TYPE_REPLACE,
 
-    MRFSTR_CONFIG_TYPE_EQUAL,
-    MRFSTR_CONFIG_TYPE_CONTAIN_CHR,
-    MRFSTR_CONFIG_TYPE_FIND_CHR,
+    MRFSTR_CONFIG_TYPE_CMP,
+    MRFSTR_CONFIG_TYPE_SEARCH,
 
     MRFSTR_CONFIG_TYPE_STRLEN
 };
@@ -234,7 +232,8 @@ void mrfstr_config(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t normal,
     mrfstr_config_simd_enum_t threaded);
-void mrfstr_config_strlen(
-    mrfstr_config_simd_enum_t normal);
+void mrfstr_config_str(
+    mrfstr_config_type_enum_t type,
+    mrfstr_config_simd_enum_t simd);
 
 #endif /* __MRFSTR__ */

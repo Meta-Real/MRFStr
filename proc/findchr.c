@@ -6,13 +6,13 @@
 #include <mrfstr-intern.h>
 #include <string.h>
 
-#define mrfstr_find_chr_rem   \
+#define mrfstr_findchr_rem    \
     for (; rem; rem--, str++) \
         if (chr == *str)      \
             return (mrfstr_short_t)(str - base)
 
 #pragma pack(push, 1)
-struct __MRFSTR_FIND_CHR_T
+struct __MRFSTR_FINDCHR_T
 {
     mrfstr_data_ct str;
     mrfstr_chr_t chr;
@@ -23,17 +23,17 @@ struct __MRFSTR_FIND_CHR_T
     mrfstr_mutex_p mutex;
 };
 #pragma pack(pop)
-typedef struct __MRFSTR_FIND_CHR_T *mrfstr_find_chr_t;
+typedef struct __MRFSTR_FINDCHR_T *mrfstr_findchr_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t __mrfstr_find_chr_threaded(
+mrfstr_ptr_t __mrfstr_findchr_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI __mrfstr_find_chr_threaded(
+DWORD WINAPI __mrfstr_findchr_threaded(
     LPVOID args);
 #endif
 
-mrfstr_idx_t __mrfstr_find_chr(
+mrfstr_idx_t __mrfstr_findchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
@@ -47,24 +47,24 @@ mrfstr_idx_t __mrfstr_find_chr(
     mrfstr_data_ct base = str;
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nfind_chr_size;
+        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nsearch_size;
         if (rem)
         {
-            rem = _mrfstr_config.nfind_chr_size - rem;
+            rem = _mrfstr_config.nsearch_size - rem;
             size -= rem;
-            mrfstr_find_chr_rem;
+            mrfstr_findchr_rem;
         }
 
-        rem = size % _mrfstr_config.nfind_chr_size;
+        rem = size % _mrfstr_config.nsearch_size;
         size -= rem;
 
-        mrfstr_idx_t idx = _mrfstr_config.nfind_chr_sub(
-            str, chr, size / _mrfstr_config.nfind_chr_size);
+        mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
+            str, chr, size / _mrfstr_config.nsearch_size);
         if (idx != MRFSTR_INVIDX)
             return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
         str += size;
 
-        mrfstr_find_chr_rem;
+        mrfstr_findchr_rem;
         return MRFSTR_INVIDX;
     }
 
@@ -74,30 +74,30 @@ mrfstr_idx_t __mrfstr_find_chr(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tfind_chr_size;
+    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tsearch_size;
     if (rem)
     {
-        rem = _mrfstr_config.tfind_chr_size - rem;
+        rem = _mrfstr_config.tsearch_size - rem;
         size -= rem;
-        mrfstr_find_chr_rem;
+        mrfstr_findchr_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tfind_chr_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tsearch_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tfind_chr_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tsearch_size;
 
     volatile mrfstr_idx_t res = MRFSTR_INVIDX;
 
     mrfstr_mutex_t mutex;
     mrfstr_create_mutex(mutex)
     {
-        mrfstr_idx_t idx = _mrfstr_config.nfind_chr_sub(
+        mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
             str, chr, size * tcount);
         if (idx != MRFSTR_INVIDX)
             return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
         str += inc * tcount;
 
-        mrfstr_find_chr_rem;
+        mrfstr_findchr_rem;
         return MRFSTR_INVIDX;
     }
 
@@ -106,21 +106,21 @@ mrfstr_idx_t __mrfstr_find_chr(
     mrfstr_byte_t i = 0;
     if (threads)
     {
-        mrfstr_find_chr_t data;
+        mrfstr_findchr_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_FIND_CHR_T));
+            data = malloc(sizeof(struct __MRFSTR_FINDCHR_T));
             if (!data)
             {
                 if (!i)
                 {
-                    mrfstr_idx_t idx = _mrfstr_config.nfind_chr_sub(
+                    mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
                         str, chr, size * tcount);
                     if (idx != MRFSTR_INVIDX)
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
                     str += inc * tcount;
 
-                    mrfstr_find_chr_rem;
+                    mrfstr_findchr_rem;
                     return MRFSTR_INVIDX;
                 }
                 break;
@@ -135,20 +135,20 @@ mrfstr_idx_t __mrfstr_find_chr(
 
             str += inc;
 
-            mrfstr_create_thread(__mrfstr_find_chr_threaded)
+            mrfstr_create_thread(__mrfstr_findchr_threaded)
             {
                 str -= inc;
                 free(data);
 
                 if (!i)
                 {
-                    mrfstr_idx_t idx = _mrfstr_config.nfind_chr_sub(
+                    mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
                         str, chr, size * tcount);
                     if (idx != MRFSTR_INVIDX)
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
                     str += inc * tcount;
 
-                    mrfstr_find_chr_rem;
+                    mrfstr_findchr_rem;
                     return MRFSTR_INVIDX;
                 }
                 break;
@@ -158,7 +158,7 @@ mrfstr_idx_t __mrfstr_find_chr(
         tcount -= i;
     }
 
-    mrfstr_idx_t idx = _mrfstr_config.tfind_chr_sub(
+    mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
         &res, (mrfstr_idx_t)(str - base), str, chr, size * tcount);
     if (idx != MRFSTR_INVIDX)
     {
@@ -169,7 +169,7 @@ mrfstr_idx_t __mrfstr_find_chr(
     }
     str += inc * tcount;
 
-    mrfstr_find_chr_rem;
+    mrfstr_findchr_rem;
 
     if (i)
         mrfstr_close_threads;
@@ -179,15 +179,15 @@ mrfstr_idx_t __mrfstr_find_chr(
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t __mrfstr_find_chr_threaded(
+mrfstr_ptr_t __mrfstr_findchr_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI __mrfstr_find_chr_threaded(
+DWORD WINAPI __mrfstr_findchr_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_find_chr_t data = (mrfstr_find_chr_t)args;
-    mrfstr_idx_t idx = _mrfstr_config.tfind_chr_sub(
+    mrfstr_findchr_t data = (mrfstr_findchr_t)args;
+    mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
         data->res, data->start, data->str, data->chr, data->size);
     if (idx != MRFSTR_INVIDX)
     {

@@ -6,13 +6,13 @@
 #include <mrfstr-intern.h>
 #include <string.h>
 
-#define mrfstr_contain_chr_rem \
-    for (; rem; rem--)         \
-        if (chr == *str++)     \
+#define mrfstr_contchr_rem \
+    for (; rem; rem--)     \
+        if (chr == *str++) \
             return MRFSTR_TRUE
 
 #pragma pack(push, 1)
-struct __MRFSTR_CONTAIN_CHR_T
+struct __MRFSTR_CONTCHR_T
 {
     mrfstr_data_ct str;
     mrfstr_chr_t chr;
@@ -21,17 +21,17 @@ struct __MRFSTR_CONTAIN_CHR_T
     volatile mrfstr_bool_t *res;
 };
 #pragma pack(pop)
-typedef struct __MRFSTR_CONTAIN_CHR_T *mrfstr_contain_chr_t;
+typedef struct __MRFSTR_CONTCHR_T *mrfstr_contchr_t;
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t __mrfstr_contain_chr_threaded(
+mrfstr_ptr_t __mrfstr_contchr_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
-DWORD WINAPI __mrfstr_contain_chr_threaded(
+DWORD WINAPI __mrfstr_contchr_threaded(
     LPVOID args);
 #endif
 
-mrfstr_bool_t __mrfstr_contain_chr(
+mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
@@ -39,22 +39,22 @@ mrfstr_bool_t __mrfstr_contain_chr(
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.ncontain_chr_size;
+        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nsearch_size;
         if (rem)
         {
-            rem = _mrfstr_config.ncontain_chr_size - rem;
+            rem = _mrfstr_config.nsearch_size - rem;
             size -= rem;
-            mrfstr_contain_chr_rem;
+            mrfstr_contchr_rem;
         }
 
-        rem = size % _mrfstr_config.ncontain_chr_size;
+        rem = size % _mrfstr_config.nsearch_size;
         size -= rem;
 
-        if (_mrfstr_config.ncontain_chr_sub(str, chr, size / _mrfstr_config.ncontain_chr_size))
+        if (_mrfstr_config.ncontchr_sub(str, chr, size / _mrfstr_config.nsearch_size))
             return MRFSTR_TRUE;
         str += size;
 
-        mrfstr_contain_chr_rem;
+        mrfstr_contchr_rem;
         return MRFSTR_FALSE;
     }
 
@@ -64,17 +64,17 @@ mrfstr_bool_t __mrfstr_contain_chr(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tcontain_chr_size;
+    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tsearch_size;
     if (rem)
     {
-        rem = _mrfstr_config.tcontain_chr_size - rem;
+        rem = _mrfstr_config.tsearch_size - rem;
         size -= rem;
-        mrfstr_contain_chr_rem;
+        mrfstr_contchr_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tcontain_chr_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tsearch_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tcontain_chr_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tsearch_size;
 
     volatile mrfstr_bool_t res = MRFSTR_FALSE;
 
@@ -83,19 +83,19 @@ mrfstr_bool_t __mrfstr_contain_chr(
     mrfstr_byte_t i = 0;
     if (threads)
     {
-        mrfstr_contain_chr_t data;
+        mrfstr_contchr_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_CONTAIN_CHR_T));
+            data = malloc(sizeof(struct __MRFSTR_CONTCHR_T));
             if (!data)
             {
                 if (!i)
                 {
-                    if (_mrfstr_config.ncontain_chr_sub(str, chr, size * tcount))
+                    if (_mrfstr_config.ncontchr_sub(str, chr, size * tcount))
                         return MRFSTR_TRUE;
                     str += inc * tcount;
 
-                    mrfstr_contain_chr_rem;
+                    mrfstr_contchr_rem;
                     return MRFSTR_FALSE;
                 }
                 break;
@@ -108,18 +108,18 @@ mrfstr_bool_t __mrfstr_contain_chr(
 
             str += inc;
 
-            mrfstr_create_thread(__mrfstr_contain_chr_threaded)
+            mrfstr_create_thread(__mrfstr_contchr_threaded)
             {
                 str -= inc;
                 free(data);
 
                 if (!i)
                 {
-                    if (_mrfstr_config.ncontain_chr_sub(str, chr, size * tcount))
+                    if (_mrfstr_config.ncontchr_sub(str, chr, size * tcount))
                         return MRFSTR_TRUE;
                     str += inc * tcount;
 
-                    mrfstr_contain_chr_rem;
+                    mrfstr_contchr_rem;
                     return MRFSTR_FALSE;
                 }
                 break;
@@ -129,10 +129,10 @@ mrfstr_bool_t __mrfstr_contain_chr(
         tcount -= i;
     }
 
-    _mrfstr_config.tcontain_chr_sub(&res, str, chr, size * tcount);
+    _mrfstr_config.tcontchr_sub(&res, str, chr, size * tcount);
     str += inc * tcount;
 
-    mrfstr_contain_chr_rem;
+    mrfstr_contchr_rem;
 
     if (i)
         mrfstr_close_threads;
@@ -141,15 +141,15 @@ mrfstr_bool_t __mrfstr_contain_chr(
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-mrfstr_ptr_t __mrfstr_contain_chr_threaded(
+mrfstr_ptr_t __mrfstr_contchr_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)
-DWORD WINAPI __mrfstr_contain_chr_threaded(
+DWORD WINAPI __mrfstr_contchr_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_contain_chr_t data = (mrfstr_contain_chr_t)args;
-    _mrfstr_config.tcontain_chr_sub(data->res, data->str, data->chr, data->size);
+    mrfstr_contchr_t data = (mrfstr_contchr_t)args;
+    _mrfstr_config.tcontchr_sub(data->res, data->str, data->chr, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

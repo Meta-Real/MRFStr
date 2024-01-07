@@ -39,18 +39,18 @@ void __mrfstr_fill(
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)res % _mrfstr_config.nfill_size;
+        mrfstr_byte_t rem = (uintptr_t)res % _mrfstr_config.nmem_size;
         if (rem)
         {
-            rem = _mrfstr_config.nfill_size - rem;
+            rem = _mrfstr_config.nmem_size - rem;
             size -= rem;
             mrfstr_fill_rem;
         }
 
-        rem = size % _mrfstr_config.nfill_size;
+        rem = size % _mrfstr_config.nmem_size;
         size -= rem;
 
-        _mrfstr_config.nfill_sub(res, chr, size / _mrfstr_config.nfill_size);
+        _mrfstr_config.nfill_sub(res, chr, size / _mrfstr_config.nmem_size);
         res += size;
 
         mrfstr_fill_rem;
@@ -63,17 +63,17 @@ void __mrfstr_fill(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)res % _mrfstr_config.tfill_size;
+    mrfstr_short_t rem = (uintptr_t)res % _mrfstr_config.tmem_size;
     if (rem)
     {
-        rem = _mrfstr_config.tfill_size - rem;
+        rem = _mrfstr_config.tmem_size - rem;
         size -= rem;
         mrfstr_fill_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tfill_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tfill_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
     mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));

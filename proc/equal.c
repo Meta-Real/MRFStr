@@ -37,18 +37,18 @@ mrfstr_bool_t __mrfstr_equal(
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)str1 % _mrfstr_config.nequal_size;
+        mrfstr_byte_t rem = (uintptr_t)str1 % _mrfstr_config.ncmp_size;
         if (rem)
         {
-            rem = _mrfstr_config.nequal_size - rem;
+            rem = _mrfstr_config.ncmp_size - rem;
             size -= rem;
             mrfstr_equal_rem;
         }
 
-        rem = size % _mrfstr_config.nequal_size;
+        rem = size % _mrfstr_config.ncmp_size;
         size -= rem;
 
-        if (!_mrfstr_config.nequal_sub(str1, str2, size / _mrfstr_config.nequal_size))
+        if (!_mrfstr_config.nequal_sub(str1, str2, size / _mrfstr_config.ncmp_size))
             return MRFSTR_FALSE;
         str1 += size;
         str2 += size;
@@ -63,17 +63,17 @@ mrfstr_bool_t __mrfstr_equal(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)str1 & _mrfstr_config.tequal_size;
+    mrfstr_short_t rem = (uintptr_t)str1 & _mrfstr_config.tcmp_size;
     if (rem)
     {
-        rem = _mrfstr_config.tequal_size - rem;
+        rem = _mrfstr_config.tcmp_size - rem;
         size -= rem;
         mrfstr_equal_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tequal_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tcmp_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tequal_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tcmp_size;
 
     volatile mrfstr_bool_t res = MRFSTR_TRUE;
 

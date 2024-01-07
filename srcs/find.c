@@ -11,7 +11,7 @@ mrfstr_idx_t mrfstr_find_chr(
     if (!MRFSTR_SIZE(str))
         return MRFSTR_INVIDX;
 
-    return __mrfstr_find_chr(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
+    return __mrfstr_findchr(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
 }
 
 mrfstr_idx_t mrfstr_n_find_chr(
@@ -24,5 +24,5 @@ mrfstr_idx_t mrfstr_n_find_chr(
     if (!MRFSTR_SIZE(str))
         return MRFSTR_INVIDX;
 
-    return __mrfstr_find_chr(MRFSTR_DATA(str), chr, size);
+    return __mrfstr_findchr(MRFSTR_DATA(str), chr, size);
 }

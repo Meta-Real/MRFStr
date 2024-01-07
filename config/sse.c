@@ -73,7 +73,7 @@ void __mrfstr_sse_fill(
 }
 
 #ifdef __SSE4_1__
-void __mrfstr_sse_replace_chr(
+void __mrfstr_sse_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
@@ -93,7 +93,7 @@ void __mrfstr_sse_replace_chr(
     }
 }
 
-void __mrfstr_sse_replace_chr2(
+void __mrfstr_sse_replchr2(
     mrfstr_ptr_t res, mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
@@ -190,7 +190,7 @@ void __mrfstr_sse_tequal(
     }
 }
 
-mrfstr_bool_t __mrfstr_sse_contain_chr(
+mrfstr_bool_t __mrfstr_sse_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m128i *sblock = (__m128i*)str;
@@ -212,7 +212,7 @@ mrfstr_bool_t __mrfstr_sse_contain_chr(
     return MRFSTR_FALSE;
 }
 
-void __mrfstr_sse_tcontain_chr(
+void __mrfstr_sse_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -221,12 +221,12 @@ void __mrfstr_sse_tcontain_chr(
 
     __m128i block;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_SSE_TCONTAIN_CHR_LOAD)
+    while (size >= MRFSTR_SSE_TCONTCHR_LOAD)
     {
         if (*res)
             return;
 
-        nsize = size - MRFSTR_SSE_TCONTAIN_CHR_LOAD;
+        nsize = size - MRFSTR_SSE_TCONTCHR_LOAD;
         for (; size != nsize; size--)
         {
             block = _mm_loadu_si128(sblock++);
@@ -262,7 +262,7 @@ void __mrfstr_sse_tcontain_chr(
     }
 }
 
-mrfstr_idx_t __mrfstr_sse_find_chr(
+mrfstr_idx_t __mrfstr_sse_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m128i *sblock = (__m128i*)str;
@@ -287,7 +287,7 @@ mrfstr_idx_t __mrfstr_sse_find_chr(
     return MRFSTR_INVIDX;
 }
 
-mrfstr_idx_t __mrfstr_sse_tfind_chr(
+mrfstr_idx_t __mrfstr_sse_tfindchr(
     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -296,13 +296,13 @@ mrfstr_idx_t __mrfstr_sse_tfind_chr(
 
     __m128i block;
     mrfstr_short_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_SSE_TFIND_CHR_LOAD;
+    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_SSE_TFINDCHR_LOAD;
     while (i <= lsize)
     {
         if (*res < start)
             return MRFSTR_INVIDX;
 
-        ni = i + MRFSTR_SSE_TFIND_CHR_LOAD;
+        ni = i + MRFSTR_SSE_TFINDCHR_LOAD;
         for (; i != ni; i++)
         {
             block = _mm_loadu_si128(sblock++);

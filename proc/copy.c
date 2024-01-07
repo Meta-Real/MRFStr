@@ -37,18 +37,18 @@ void __mrfstr_copy(
 
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.ncopy_size;
+        mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.nmem_size;
         if (rem)
         {
-            rem = _mrfstr_config.ncopy_size - rem;
+            rem = _mrfstr_config.nmem_size - rem;
             size -= rem;
             mrfstr_copy_rem;
         }
 
-        rem = size % _mrfstr_config.ncopy_size;
+        rem = size % _mrfstr_config.nmem_size;
         size -= rem;
 
-        _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.ncopy_size);
+        _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.nmem_size);
         dst += size;
         src += size;
 
@@ -62,17 +62,17 @@ void __mrfstr_copy(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    mrfstr_short_t rem = (uintptr_t)dst % _mrfstr_config.tcopy_size;
+    mrfstr_short_t rem = (uintptr_t)dst % _mrfstr_config.tmem_size;
     if (rem)
     {
-        rem = _mrfstr_config.tcopy_size - rem;
+        rem = _mrfstr_config.tmem_size - rem;
         size -= rem;
         mrfstr_copy_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tcopy_size * tcount;
+    mrfstr_short_t factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tcopy_size;
+    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
     mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));

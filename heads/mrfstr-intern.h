@@ -22,62 +22,70 @@ struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t tcount;
 
+    /* memory functions */
+
     void (*ncopy_sub)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t ncopy_size;
-    void (*tcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t tcopy_size;
-
     void (*nfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t nfill_size;
+    mrfstr_byte_t nmem_size;
+
+    void (*tcopy_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     void (*tfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tfill_size;
+    mrfstr_byte_t tmem_size;
 
-    void (*nreplace_chr_sub)(
+    /* replace function */
+
+    void (*nreplchr_sub)(
         mrfstr_ptr_t,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
-    void (*nreplace_chr2_sub)(
+    void (*nreplchr2_sub)(
         mrfstr_ptr_t, mrfstr_ptr_ct,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
-    mrfstr_byte_t nreplace_chr_size;
-    void (*treplace_chr_sub)(
+    mrfstr_byte_t nrepl_size;
+
+    void (*treplchr_sub)(
         mrfstr_ptr_t,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
-    void (*treplace_chr2_sub)(
+    void (*treplchr2_sub)(
         mrfstr_ptr_t, mrfstr_ptr_ct,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
-    mrfstr_byte_t treplace_chr_size;
+    mrfstr_byte_t trepl_size;
+
+    /* compare functions */
 
     mrfstr_bool_t (*nequal_sub)(
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t nequal_size;
+    mrfstr_byte_t ncmp_size;
+
     void (*tequal_sub)(
         volatile mrfstr_bool_t*,
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t tequal_size;
+    mrfstr_byte_t tcmp_size;
 
-    mrfstr_bool_t (*ncontain_chr_sub)(
+    /* search functions */
+
+    mrfstr_bool_t (*ncontchr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t ncontain_chr_size;
-    void (*tcontain_chr_sub)(
+    mrfstr_idx_t (*nfindchr_sub)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_byte_t nsearch_size;
+
+    void (*tcontchr_sub)(
         volatile mrfstr_bool_t*,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tcontain_chr_size;
-
-    mrfstr_idx_t (*nfind_chr_sub)(
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t nfind_chr_size;
-    mrfstr_idx_t (*tfind_chr_sub)(
+    mrfstr_idx_t (*tfindchr_sub)(
         volatile mrfstr_idx_t*, mrfstr_idx_t,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tfind_chr_size;
+    mrfstr_byte_t tsearch_size;
+
+    /* str functions */
 
     mrfstr_size_t (*strlen_sub)(
         mrfstr_ptr_ct);
@@ -156,11 +164,11 @@ void __mrfstr_copy(
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
-void __mrfstr_replace_chr(
+void __mrfstr_replchr(
     mrfstr_data_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
-void __mrfstr_replace_chr2(
+void __mrfstr_replchr2(
     mrfstr_data_t res, mrfstr_data_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
@@ -168,9 +176,9 @@ void __mrfstr_replace_chr2(
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
-mrfstr_bool_t __mrfstr_contain_chr(
+mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
-mrfstr_idx_t __mrfstr_find_chr(
+mrfstr_idx_t __mrfstr_findchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif

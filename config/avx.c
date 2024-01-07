@@ -45,7 +45,7 @@ void __mrfstr_avx_fill(
 }
 
 #ifdef __AVX2__
-void __mrfstr_avx_replace_chr(
+void __mrfstr_avx_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
@@ -65,7 +65,7 @@ void __mrfstr_avx_replace_chr(
     }
 }
 
-void __mrfstr_avx_replace_chr2(
+void __mrfstr_avx_replchr2(
     mrfstr_ptr_t res, mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
@@ -161,7 +161,7 @@ void __mrfstr_avx_tequal(
     }
 }
 
-mrfstr_bool_t __mrfstr_avx_contain_chr(
+mrfstr_bool_t __mrfstr_avx_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m256i *sblock = (__m256i*)str;
@@ -183,7 +183,7 @@ mrfstr_bool_t __mrfstr_avx_contain_chr(
     return MRFSTR_FALSE;
 }
 
-void __mrfstr_avx_tcontain_chr(
+void __mrfstr_avx_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -192,12 +192,12 @@ void __mrfstr_avx_tcontain_chr(
 
     __m256i block;
     mrfstr_size_t nsize;
-    while (size >= MRFSTR_AVX_TCONTAIN_CHR_LOAD)
+    while (size >= MRFSTR_AVX_TCONTCHR_LOAD)
     {
         if (*res)
             return;
 
-        nsize = size - MRFSTR_AVX_TCONTAIN_CHR_LOAD;
+        nsize = size - MRFSTR_AVX_TCONTCHR_LOAD;
         for (; size != nsize; size--)
         {
             block = _mm256_loadu_si256(sblock++);
@@ -233,7 +233,7 @@ void __mrfstr_avx_tcontain_chr(
     }
 }
 
-mrfstr_idx_t __mrfstr_avx_find_chr(
+mrfstr_idx_t __mrfstr_avx_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     __m256i *sblock = (__m256i*)str;
@@ -258,7 +258,7 @@ mrfstr_idx_t __mrfstr_avx_find_chr(
     return MRFSTR_INVIDX;
 }
 
-mrfstr_idx_t __mrfstr_avx_tfind_chr(
+mrfstr_idx_t __mrfstr_avx_tfindchr(
     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -267,13 +267,13 @@ mrfstr_idx_t __mrfstr_avx_tfind_chr(
 
     __m256i block;
     mrfstr_long_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_AVX_TFIND_CHR_LOAD;
+    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_AVX_TFINDCHR_LOAD;
     while (i <= lsize)
     {
         if (*res < start)
             return MRFSTR_INVIDX;
 
-        ni = i + MRFSTR_AVX_TFIND_CHR_LOAD;
+        ni = i + MRFSTR_AVX_TFINDCHR_LOAD;
         for (; i != ni; i++)
         {
             block = _mm256_loadu_si256(sblock++);

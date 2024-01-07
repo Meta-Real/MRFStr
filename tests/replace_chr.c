@@ -19,7 +19,7 @@ int main(void)
     mrfstr_t res1 = mrfstr_init();
     if (!res1)
     {
-        fputs("\"replace\" error: Initializing \"res1\" section\n", stderr);
+        fputs("\"replace_chr\" error: Initializing \"res1\" section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -27,7 +27,7 @@ int main(void)
     {
         mrfstr_free(res1);
 
-        fputs("\"replace\" error: Allocating \"res1\" section\n", stderr);
+        fputs("\"replace_chr\" error: Allocating \"res1\" section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -36,7 +36,7 @@ int main(void)
     {
         mrfstr_free(res1);
 
-        fputs("\"replace\" error: Initializing \"res2\" section\n", stderr);
+        fputs("\"replace_chr\" error: Initializing \"res2\" section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -45,7 +45,7 @@ int main(void)
         mrfstr_free(res1);
         mrfstr_free(res2);
 
-        fputs("\"replace\" error: Allocating \"res2\" section\n", stderr);
+        fputs("\"replace_chr\" error: Allocating \"res2\" section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -55,7 +55,7 @@ int main(void)
         mrfstr_free(res1);
         mrfstr_free(res2);
 
-        fputs("\"replace\" error: Allocating \"str\" section\n", stderr);
+        fputs("\"replace_chr\" error: Allocating \"str\" section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -71,7 +71,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_LOW on string section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_LOW on string section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -85,7 +85,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_LOW two strings section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_LOW two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -99,7 +99,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_MID one string section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_MID one string section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -113,7 +113,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_MID two strings section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_MID two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -127,7 +127,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_HIGH one string section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_HIGH one string section\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -141,7 +141,7 @@ int main(void)
         mrfstr_free(res2);
         free(str);
 
-        fputs("\"replace\" error: TEST_HIGH two strings section\n", stderr);
+        fputs("\"replace_chr\" error: TEST_HIGH two strings section\n", stderr);
         return EXIT_FAILURE;
     }
 

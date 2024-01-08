@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -27,7 +27,7 @@ int main(void)
         return EXIT_FAILURE;
 
     fputs("/*\n"
-        "\tMRFStr Library version 0.1.0\n"
+        "\tMRFStr Library version 1.0.0\n"
         "\tMetaReal Fast String Library\n"
         "*/\n\n"
         "#ifndef __MR_SIMDDEF__\n"

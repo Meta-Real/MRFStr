@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -117,10 +117,17 @@ mrfstr_idx_t __mrfstr_findchr(
                     mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
                         str, chr, size * tcount);
                     if (idx != MRFSTR_INVIDX)
+                    {
+                        mrfstr_close_mutex(mutex);
+                        free(threads);
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
-                    str += inc * tcount;
+                    }
 
+                    str += inc * tcount;
                     mrfstr_findchr_rem;
+
+                    mrfstr_close_mutex(mutex);
+                    free(threads);
                     return MRFSTR_INVIDX;
                 }
                 break;
@@ -145,10 +152,17 @@ mrfstr_idx_t __mrfstr_findchr(
                     mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
                         str, chr, size * tcount);
                     if (idx != MRFSTR_INVIDX)
+                    {
+                        mrfstr_close_mutex(mutex);
+                        free(threads);
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
-                    str += inc * tcount;
+                    }
 
+                    str += inc * tcount;
                     mrfstr_findchr_rem;
+
+                    mrfstr_close_mutex(mutex);
+                    free(threads);
                     return MRFSTR_INVIDX;
                 }
                 break;
@@ -171,8 +185,7 @@ mrfstr_idx_t __mrfstr_findchr(
 
     mrfstr_findchr_rem;
 
-    if (i)
-        mrfstr_close_threads;
+    mrfstr_close_threads;
     mrfstr_close_mutex(mutex);
     free(threads);
     return res;

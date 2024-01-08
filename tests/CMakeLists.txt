@@ -1,4 +1,4 @@
-# MRFStr Library version 0.1.0
+# MRFStr Library version 1.0.0
 # MetaReal Fast String Library
 
 add_executable(MRFStrSet set.c)
@@ -16,6 +16,10 @@ add_test(MRFStrRepeatChr MRFStrRepeatChr)
 add_executable(MRFStrRepeat repeat.c)
 target_link_libraries(MRFStrRepeat PUBLIC MRFStr)
 add_test(MRFStrRepeat MRFStrRepeat)
+
+add_executable(MRFStrReverse reverse.c)
+target_link_libraries(MRFStrReverse PUBLIC MRFStr)
+add_test(MRFStrReverse MRFStrReverse)
 
 add_executable(MRFStrReplaceChr replace_chr.c)
 target_link_libraries(MRFStrReplaceChr PUBLIC MRFStr)

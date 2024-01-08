@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -8,6 +8,13 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+
+#define MRFSTR_VERSION "1.0.0"
+#define MRFSTR_VERSION_MAJOR 1
+#define MRFSTR_VERSION_MINOR 0
+#define MRFSTR_VERSION_PATH 0
+
+/* data types */
 
 typedef uint8_t mrfstr_bool_t;
 typedef uint8_t mrfstr_byte_t;

@@ -1,4 +1,4 @@
-# MRFStr Library version 0.1.0
+# MRFStr Library version 1.0.0
 # MetaReal Fast String Library
 
 cmake_minimum_required(VERSION 3.20)
@@ -11,8 +11,8 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-project(MRFStr VERSION 0.1.0
-    DESCRIPTION "MetaReal Fast String library version 0.1.0"
+project(MRFStr VERSION 1.0.0
+    DESCRIPTION "MetaReal Fast String library version 1.0.0"
     LANGUAGES C)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")

@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -59,22 +59,23 @@ void __mrfstr_rev(
         return;
     }
 
-    mrfstr_byte_t revsize = _mrfstr_config.nrev_size << 1;
     if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
     {
-        mrfstr_byte_t rem = (uintptr_t)str % revsize;
+        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nrev_size;
         mrfstr_chr_t chr;
         if (rem)
         {
-            rem = revsize - rem;
+            rem = _mrfstr_config.nrev_size - rem;
             size -= rem;
             mrfstr_rev_rem;
         }
 
+        mrfstr_byte_t revsize = _mrfstr_config.nrev_size << 1;
         rem = size % revsize;
         size -= rem;
 
         _mrfstr_config.nrev_sub(str, right, size / revsize);
+        size >>= 1;
         str += size;
         right -= size;
 
@@ -93,19 +94,17 @@ void __mrfstr_rev(
     else
         tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
 
-    revsize = _mrfstr_config.trev_size << 1;
-    mrfstr_short_t rem = (uintptr_t)str & revsize;
+    mrfstr_short_t rem = (uintptr_t)str & _mrfstr_config.trev_size;
     mrfstr_chr_t chr;
     if (rem)
     {
-        rem = revsize - rem;
+        rem = _mrfstr_config.trev_size - rem;
         size -= rem;
         mrfstr_rev_rem;
     }
 
-    mrfstr_short_t factor = revsize * tcount;
-    rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * revsize;
+    size /= (_mrfstr_config.trev_size << 1) * tcount;
+    mrfstr_size_t inc = size * _mrfstr_config.trev_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
     mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -150,7 +149,8 @@ void __mrfstr_rev(
         *str++ = chr;
     }
 
-    mrfstr_close_threads;
+    if (i)
+        mrfstr_close_threads;
     free(threads);
 }
 
@@ -159,7 +159,7 @@ void __mrfstr_rev2(
 {
     if (size < MRFSTR_SLIMIT)
     {
-        while (left < right)
+        for (; size; size--)
             *left++ = *--right;
         return;
     }
@@ -181,8 +181,7 @@ void __mrfstr_rev2(
         left += size;
         right -= size;
 
-        while (left < right)
-            *left++ = *--right;
+        mrfstr_rev2_rem;
         return;
     }
 
@@ -240,10 +239,10 @@ void __mrfstr_rev2(
     inc *= tcount;
     left += inc;
     right -= inc;
-    while (left < right)
-        *left++ = *--right;
+    mrfstr_rev2_rem;
 
-    mrfstr_close_threads;
+    if (i)
+        mrfstr_close_threads;
     free(threads);
 }
 

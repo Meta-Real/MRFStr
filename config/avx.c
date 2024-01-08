@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -7,16 +7,6 @@
 #include <binary.h>
 
 #ifdef __AVX__
-
-#ifdef __AVX2__
-const __m256i mrfstr_avx_revidx =
-{
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-};
-#endif
 
 void __mrfstr_avx_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -61,6 +51,16 @@ void __mrfstr_avx_rev(
     __m256i *lblock = (__m256i*)left;
     __m256i *rblock = (__m256i*)right;
 
+#ifdef __AVX512VBMI__
+    const __m256i revidx = _mm256_set_epi64x(
+        0x0001020304050607, 0x08090a0b0c0d0e0f,
+        0x1011121314151617, 0x18191a1b1c1d1e1f);
+#else
+    const __m256i revidx = _mm256_set_epi64x(
+        0x0001020304050607, 0x08090a0b0c0d0e0f,
+        0x0001020304050607, 0x08090a0b0c0d0e0f);
+#endif
+
     __m256i block1, block2;
     for (; size; size--)
     {
@@ -68,13 +68,13 @@ void __mrfstr_avx_rev(
         block2 = _mm256_loadu_si256(--rblock);
 
 #ifdef __AVX512VBMI__
-        block1 = _mm256_permutexvar_epi8(mrfstr_avx_revidx, block1);
-        block2 = _mm256_permutexvar_epi8(mrfstr_avx_revidx, block2);
+        block1 = _mm256_permutexvar_epi8(revidx, block1);
+        block2 = _mm256_permutexvar_epi8(revidx, block2);
 #else
-        block1 = _mm256_shuffle_epi8(block1, mrfstr_avx_revidx);
+        block1 = _mm256_shuffle_epi8(block1, revidx);
         block1 = _mm256_permute2x128_si256(block1, block1, 1);
 
-        block2 = _mm256_shuffle_epi8(block2, mrfstr_avx_revidx);
+        block2 = _mm256_shuffle_epi8(block2, revidx);
         block2 = _mm256_permute2x128_si256(block2, block2, 1);
 #endif
 
@@ -89,15 +89,25 @@ void __mrfstr_avx_rev2(
     __m256i *lblock = (__m256i*)left;
     __m256i *rblock = (__m256i*)right;
 
+#ifdef __AVX512VBMI__
+    const __m256i revidx = _mm256_set_epi64x(
+        0x0001020304050607, 0x08090a0b0c0d0e0f,
+        0x1011121314151617, 0x18191a1b1c1d1e1f);
+#else
+    const __m256i revidx = _mm256_set_epi64x(
+        0x0001020304050607, 0x08090a0b0c0d0e0f,
+        0x0001020304050607, 0x08090a0b0c0d0e0f);
+#endif
+
     __m256i block;
     for (; size; size--)
     {
         block = _mm256_loadu_si256(--rblock);
 
 #ifdef __AVX512VBMI__
-        block = _mm256_permutexvar_epi8(mrfstr_avx_revidx, block);
+        block = _mm256_permutexvar_epi8(revidx, block);
 #else
-        block = _mm256_shuffle_epi8(block, mrfstr_avx_revidx);
+        block = _mm256_shuffle_epi8(block, revidx);
         block = _mm256_permute2x128_si256(block, block, 1);
 #endif
 

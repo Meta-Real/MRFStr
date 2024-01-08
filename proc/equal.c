@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -91,12 +91,18 @@ mrfstr_bool_t __mrfstr_equal(
                 if (!i)
                 {
                     if (!_mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                    {
+                        free(threads);
                         return MRFSTR_FALSE;
+                    }
+
                     inc *= tcount;
                     str1 += inc;
                     str2 += inc;
 
                     mrfstr_equal_rem;
+
+                    free(threads);
                     return MRFSTR_TRUE;
                 }
                 break;
@@ -119,12 +125,18 @@ mrfstr_bool_t __mrfstr_equal(
                 if (!i)
                 {
                     if (!_mrfstr_config.nequal_sub(str1, str2, size * tcount))
+                    {
+                        free(threads);
                         return MRFSTR_FALSE;
+                    }
+
                     inc *= tcount;
                     str1 += inc;
                     str2 += inc;
 
                     mrfstr_equal_rem;
+
+                    free(threads);
                     return MRFSTR_TRUE;
                 }
                 break;

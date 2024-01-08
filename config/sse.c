@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -7,14 +7,6 @@
 #include <binary.h>
 
 #ifdef __SSE2__
-
-#ifdef __SSSE3__
-const __m128i mrfstr_sse_revidx =
-{
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-};
-#endif
 
 void __mrfstr_sse_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -87,6 +79,10 @@ void __mrfstr_sse_rev(
     __m128i *lblock = (__m128i*)left;
     __m128i *rblock = (__m128i*)right;
 
+    const __m128i revidx = _mm_set_epi32(
+        0x00010203, 0x04050607,
+        0x08090a0b, 0x0c0d0e0f);
+
     __m128i block1, block2;
     for (; size; size--)
     {
@@ -94,11 +90,11 @@ void __mrfstr_sse_rev(
         block2 = _mm_loadu_si128(--rblock);
 
 #ifdef __AVX512VBMI__
-        block1 = _mm_permutexvar_epi8(mrfstr_sse_revidx, block1);
-        block2 = _mm_permutexvar_epi8(mrfstr_sse_revidx, block2);
+        block1 = _mm_permutexvar_epi8(revidx, block1);
+        block2 = _mm_permutexvar_epi8(revidx, block2);
 #else
-        block1 = _mm_shuffle_epi8(block1, mrfstr_sse_revidx);
-        block2 = _mm_shuffle_epi8(block2, mrfstr_sse_revidx);
+        block1 = _mm_shuffle_epi8(block1, revidx);
+        block2 = _mm_shuffle_epi8(block2, revidx);
 #endif
 
         _mm_store_si128(lblock++, block2);
@@ -112,15 +108,19 @@ void __mrfstr_sse_rev2(
     __m128i *lblock = (__m128i*)left;
     __m128i *rblock = (__m128i*)right;
 
+    const __m128i revidx = _mm_set_epi32(
+        0x00010203, 0x04050607,
+        0x08090a0b, 0x0c0d0e0f);
+
     __m128i block;
     for (; size; size--)
     {
         block = _mm_loadu_si128(--rblock);
 
 #ifdef __AVX512VBMI__
-        block = _mm_permutexvar_epi8(mrfstr_sse_revidx, block);
+        block = _mm_permutexvar_epi8(revidx, block);
 #else
-        block = _mm_shuffle_epi8(block, mrfstr_sse_revidx);
+        block = _mm_shuffle_epi8(block, revidx);
 #endif
 
         _mm_store_si128(lblock++, block);

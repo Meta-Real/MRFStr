@@ -1,5 +1,5 @@
 /*
-    MRFStr Library version 0.1.0
+    MRFStr Library version 1.0.0
     MetaReal Fast String Library
 */
 
@@ -143,7 +143,8 @@ void __mrfstr_replchr(
     str += inc;
     mrfstr_replchr_rem;
 
-    mrfstr_close_threads;
+    if (i)
+        mrfstr_close_threads;
     free(threads);
 }
 
@@ -239,7 +240,8 @@ void __mrfstr_replchr2(
     str += inc;
     mrfstr_replchr2_rem;
 
-    mrfstr_close_threads;
+    if (i)
+        mrfstr_close_threads;
     free(threads);
 }
 

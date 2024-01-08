@@ -1,6 +1,3 @@
-# MRFStr Library version 1.0.0
-# MetaReal Fast String Library
-
 cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_C_STANDARD 17)

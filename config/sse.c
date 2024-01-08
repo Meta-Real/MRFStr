@@ -8,6 +8,14 @@
 
 #ifdef __SSE2__
 
+#ifdef __SSSE3__
+const __m128i mrfstr_sse_revidx =
+{
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+};
+#endif
+
 void __mrfstr_sse_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
@@ -72,6 +80,54 @@ void __mrfstr_sse_fill(
         _mm_stream_si128(rblock++, block);
 }
 
+#ifdef __SSSE3__
+void __mrfstr_sse_rev(
+    mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
+{
+    __m128i *lblock = (__m128i*)left;
+    __m128i *rblock = (__m128i*)right;
+
+    __m128i block1, block2;
+    for (; size; size--)
+    {
+        block1 = _mm_load_si128(lblock);
+        block2 = _mm_loadu_si128(--rblock);
+
+#ifdef __AVX512VBMI__
+        block1 = _mm_permutexvar_epi8(mrfstr_sse_revidx, block1);
+        block2 = _mm_permutexvar_epi8(mrfstr_sse_revidx, block2);
+#else
+        block1 = _mm_shuffle_epi8(block1, mrfstr_sse_revidx);
+        block2 = _mm_shuffle_epi8(block2, mrfstr_sse_revidx);
+#endif
+
+        _mm_store_si128(lblock++, block2);
+        _mm_storeu_si128(rblock, block1);
+    }
+}
+
+void __mrfstr_sse_rev2(
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+{
+    __m128i *lblock = (__m128i*)left;
+    __m128i *rblock = (__m128i*)right;
+
+    __m128i block;
+    for (; size; size--)
+    {
+        block = _mm_loadu_si128(--rblock);
+
+#ifdef __AVX512VBMI__
+        block = _mm_permutexvar_epi8(mrfstr_sse_revidx, block);
+#else
+        block = _mm_shuffle_epi8(block, mrfstr_sse_revidx);
+#endif
+
+        _mm_store_si128(lblock++, block);
+    }
+}
+#endif
+
 #ifdef __SSE4_1__
 void __mrfstr_sse_replchr(
     mrfstr_ptr_t str,
@@ -82,14 +138,25 @@ void __mrfstr_sse_replchr(
     __m128i oblock = _mm_set1_epi8(old);
     __m128i nblock = _mm_set1_epi8(new);
 
-    __m128i block, mask;
-    for (; size; size--)
+    __m128i block;
+#ifdef __AVX512VL__
+    mrfstr_short_t mask;
+#else
+    __m128i mask;
+#endif
+    for (; size; size--, sblock++)
     {
         block = _mm_load_si128(sblock);
 
+#ifdef __AVX512VL__
+        mask = _mm_cmpeq_epi8_mask(block, oblock);
+        if (mask)
+            _mm_mask_storeu_epi8(sblock, mask, nblock);
+#else
         mask = _mm_cmpeq_epi8(block, oblock);
         block = _mm_blendv_epi8(block, nblock, mask);
-        _mm_store_si128(sblock++, block);
+        _mm_store_si128(sblock, block);
+#endif
     }
 }
 
@@ -103,13 +170,25 @@ void __mrfstr_sse_replchr2(
     __m128i oblock = _mm_set1_epi8(old);
     __m128i nblock = _mm_set1_epi8(new);
 
-    __m128i block, mask;
+    __m128i block;
+#ifdef __AVX512VL__
+    mrfstr_short_t mask;
+#else
+    __m128i mask;
+#endif
     for (; size; size--)
     {
         block = _mm_loadu_si128(sblock++);
 
+#ifdef __AVX512VL__
+        mask = _mm_cmpeq_epi8_mask(block, oblock);
+        if (mask)
+            block = _mm_mask_blend_epi8(mask, block, nblock);
+#else
         mask = _mm_cmpeq_epi8(block, oblock);
         block = _mm_blendv_epi8(block, nblock, mask);
+#endif
+
         _mm_store_si128(rblock++, block);
     }
 }

@@ -32,10 +32,13 @@ endif()
 
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
-    proc/copy.c proc/fill.c proc/replchr.c proc/equal.c proc/contchr.c proc/findchr.c
-    srcs/init.c srcs/set.c srcs/get.c srcs/replace_chr.c
-    srcs/concat.c srcs/repeat.c
-    srcs/equal.c srcs/contain.c srcs/find.c
+    proc/copy.c proc/fill.c proc/rev.c proc/replchr.c
+    proc/equal.c
+    proc/contchr.c proc/findchr.c
+    srcs/init.c srcs/set.c srcs/get.c
+    srcs/concat.c srcs/repeat.c srcs/reverse.c srcs/replace_chr.c
+    srcs/equal.c
+    srcs/contain.c srcs/find.c
     srcs/data.c srcs/io.c
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")

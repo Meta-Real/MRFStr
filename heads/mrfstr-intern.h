@@ -36,7 +36,21 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tmem_size;
 
-    /* replace function */
+    /* reverse function */
+
+    void (*nrev_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
+    void (*nrev2_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t nrev_size;
+
+    void (*trev_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
+    void (*trev2_sub)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    mrfstr_byte_t trev_size;
+
+    /* replace functions */
 
     void (*nreplchr_sub)(
         mrfstr_ptr_t,
@@ -163,6 +177,11 @@ void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
+
+void __mrfstr_rev(
+    mrfstr_data_t str, mrfstr_size_t size);
+void __mrfstr_rev2(
+    mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size);
 
 void __mrfstr_replchr(
     mrfstr_data_t str,

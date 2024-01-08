@@ -17,6 +17,11 @@ void __mrfstr_base_copy(
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
+void __mrfstr_base_rev(
+    mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
+void __mrfstr_base_rev2(
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
+
 void __mrfstr_base_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,

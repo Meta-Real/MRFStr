@@ -13,9 +13,13 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
 #ifdef __AVX512BW__
+    __mrfstr_avx512_rev, __mrfstr_avx512_rev2, 64,
+    __mrfstr_avx512_rev, __mrfstr_avx512_rev2, 64,
     __mrfstr_avx512_replchr, __mrfstr_avx512_replchr2, 64,
     __mrfstr_avx512_replchr, __mrfstr_avx512_replchr2, 64,
 #else
+    __mrfstr_avx_rev, __mrfstr_avx_rev2, 32,
+    __mrfstr_avx_rev, __mrfstr_avx_rev2, 32,
     __mrfstr_avx_replchr, __mrfstr_avx_replchr2, 32,
     __mrfstr_avx_replchr, __mrfstr_avx_replchr2, 32,
 #endif
@@ -32,6 +36,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_copy, __mrfstr_avx_fill, 32,
     __mrfstr_avx_copy, __mrfstr_avx_fill, 32,
 #ifdef __AVX2__
+    __mrfstr_avx_rev, __mrfstr_avx_rev2, 32,
+    __mrfstr_avx_rev, __mrfstr_avx_rev2, 32,
     __mrfstr_avx_replchr, __mrfstr_avx_replchr2, 32,
     __mrfstr_avx_replchr, __mrfstr_avx_replchr2, 32,
     __mrfstr_avx_equal, 32,
@@ -40,6 +46,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_tcontchr, __mrfstr_avx_tfindchr, 32,
     __mrfstr_avx_strlen, 32
 #else
+    __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
+    __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
     __mrfstr_sse_replchr, __mrfstr_sse_replchr2, 16,
     __mrfstr_sse_replchr, __mrfstr_sse_replchr2, 16,
     __mrfstr_sse_equal, 16,
@@ -55,6 +63,13 @@ mrfstr_config_t _mrfstr_config =
     1,
     __mrfstr_sse_copy, __mrfstr_sse_fill, 16,
     __mrfstr_sse_copy, __mrfstr_sse_fill, 16,
+#ifdef __SSSE3__
+    __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
+    __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
+#else
+    __mrfstr_base_rev, __mrfstr_base_rev2, 8,
+    __mrfstr_base_rev, __mrfstr_base_rev2, 8,
+#endif
 #ifdef __SSE4_1__
     __mrfstr_sse_replchr, __mrfstr_sse_replchr2, 16,
     __mrfstr_sse_replchr, __mrfstr_sse_replchr2, 16,
@@ -74,6 +89,8 @@ mrfstr_config_t _mrfstr_config =
     1,
     __mrfstr_base_copy, __mrfstr_base_fill, 8,
     __mrfstr_base_copy, __mrfstr_base_fill, 8,
+    __mrfstr_base_rev, __mrfstr_base_rev2, 8,
+    __mrfstr_base_rev, __mrfstr_base_rev2, 8,
     __mrfstr_base_replchr, __mrfstr_base_replchr2, 8,
     __mrfstr_base_replchr, __mrfstr_base_replchr2, 8,
     __mrfstr_base_equal, 8,
@@ -154,6 +171,66 @@ void mrfstr_config(
             _mrfstr_config.tcopy_sub = __mrfstr_base_copy;
             _mrfstr_config.tfill_sub = __mrfstr_base_fill;
             _mrfstr_config.tmem_size = 8;
+            break;
+        }
+        break;
+    case MRFSTR_CONFIG_TYPE_REV:
+        switch (normal)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+#ifdef __AVX512BW__
+            _mrfstr_config.nrev_sub = __mrfstr_avx512_rev;
+            _mrfstr_config.nrev2_sub = __mrfstr_avx512_rev2;
+            _mrfstr_config.nrev_size = 64;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_AVX:
+#ifdef __AVX2__
+            _mrfstr_config.nrev_sub = __mrfstr_avx_rev;
+            _mrfstr_config.nrev2_sub = __mrfstr_avx_rev2;
+            _mrfstr_config.nrev_size = 32;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_SSE:
+#ifdef __SSE4_1__
+            _mrfstr_config.nrev_sub = __mrfstr_sse_rev;
+            _mrfstr_config.nrev2_sub = __mrfstr_sse_rev2;
+            _mrfstr_config.nrev_size = 16;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_NONE:
+            _mrfstr_config.nrev_sub = __mrfstr_base_rev;
+            _mrfstr_config.nrev2_sub = __mrfstr_base_rev2;
+            _mrfstr_config.nrev_size = 8;
+            break;
+        }
+        switch (threaded)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+#ifdef __AVX512BW__
+            _mrfstr_config.trev_sub = __mrfstr_avx512_rev;
+            _mrfstr_config.trev2_sub = __mrfstr_avx512_rev2;
+            _mrfstr_config.trev_size = 64;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_AVX:
+#ifdef __AVX2__
+            _mrfstr_config.trev_sub = __mrfstr_avx_rev;
+            _mrfstr_config.trev2_sub = __mrfstr_avx_rev2;
+            _mrfstr_config.trev_size = 32;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_SSE:
+#ifdef __SSE4_1__
+            _mrfstr_config.trev_sub = __mrfstr_sse_rev;
+            _mrfstr_config.trev2_sub = __mrfstr_sse_rev2;
+            _mrfstr_config.trev_size = 16;
+            break;
+#endif
+        case MRFSTR_CONFIG_SIMD_NONE:
+            _mrfstr_config.trev_sub = __mrfstr_base_rev;
+            _mrfstr_config.trev2_sub = __mrfstr_base_rev2;
+            _mrfstr_config.trev_size = 8;
             break;
         }
         break;

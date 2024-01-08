@@ -126,7 +126,7 @@ void mrfstr_repeat_chr(
 
 /* reverse functions */
 
-mrfstr_res_enum_t mrfstr_reverse(
+void mrfstr_reverse(
     mrfstr_t res, mrfstr_ct str);
 
 /* replace functions */
@@ -209,6 +209,7 @@ enum __MRFSTR_CONFIG_TYPE_ENUM
 {
     MRFSTR_CONFIG_TYPE_MEMORY,
     MRFSTR_CONFIG_TYPE_REPLACE,
+    MRFSTR_CONFIG_TYPE_REV,
 
     MRFSTR_CONFIG_TYPE_CMP,
     MRFSTR_CONFIG_TYPE_SEARCH,

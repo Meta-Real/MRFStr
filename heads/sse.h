@@ -23,6 +23,13 @@ void __mrfstr_sse_copy(
 void __mrfstr_sse_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
+#ifdef __SSSE3__
+void __mrfstr_sse_rev(
+    mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
+void __mrfstr_sse_rev2(
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
+#endif
+
 #ifdef __SSE4_1__
 void __mrfstr_sse_replchr(
     mrfstr_ptr_t str,

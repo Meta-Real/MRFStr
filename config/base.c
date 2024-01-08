@@ -38,6 +38,48 @@ void __mrfstr_base_fill(
         *rblock++ = cblock;
 }
 
+void __mrfstr_base_rev(
+    mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
+    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
+
+    mrfstr_longlong_t block1, block2;
+    for (; size; size--)
+    {
+        block1 = *lblock;
+        block1 = (block1 & 0x00000000ffffffffULL) << 32 | (block1 & 0xffffffff00000000ULL) >> 32;
+        block1 = (block1 & 0x0000ffff0000ffffULL) << 16 | (block1 & 0xffff0000ffff0000ULL) >> 16;
+        block1 = (block1 & 0x00ff00ff00ff00ffULL) << 8 | (block1 & 0xff00ff00ff00ff00ULL) >> 8;
+
+        block2 = *--rblock;
+        block2 = (block2 & 0x00000000ffffffffULL) << 32 | (block2 & 0xffffffff00000000ULL) >> 32;
+        block2 = (block2 & 0x0000ffff0000ffffULL) << 16 | (block2 & 0xffff0000ffff0000ULL) >> 16;
+        block2 = (block2 & 0x00ff00ff00ff00ffULL) << 8 | (block2 & 0xff00ff00ff00ff00ULL) >> 8;
+
+        *lblock++ = block2;
+        *rblock = block1;
+    }
+}
+
+void __mrfstr_base_rev2(
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
+    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
+
+    mrfstr_longlong_t block;
+    for (; size; size--)
+    {
+        block = *--rblock;
+        block = (block & 0x00000000ffffffffULL) << 32 | (block & 0xffffffff00000000ULL) >> 32;
+        block = (block & 0x0000ffff0000ffffULL) << 16 | (block & 0xffff0000ffff0000ULL) >> 16;
+        block = (block & 0x00ff00ff00ff00ffULL) << 8 | (block & 0xff00ff00ff00ff00ULL) >> 8;
+
+        *lblock++ = block;
+    }
+}
+
 void __mrfstr_base_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,

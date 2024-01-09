@@ -14,8 +14,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#ifndef __MR_BASE__
-#define __MR_BASE__
+#ifndef __MRFSTR_BASE__
+#define __MRFSTR_BASE__
 
 #include <mrfstr.h>
 

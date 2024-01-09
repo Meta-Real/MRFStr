@@ -14,8 +14,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#ifndef __MR_BINARY__
-#define __MR_BINARY__
+#ifndef __MRFSTR_BINARY__
+#define __MRFSTR_BINARY__
 
 #include <mrfstr.h>
 

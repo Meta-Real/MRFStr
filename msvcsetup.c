@@ -37,8 +37,8 @@ int main(void)
     if (!header)
         return EXIT_FAILURE;
 
-    fputs("#ifndef __MR_SIMDDEF__\n"
-        "#define __MR_SIMDDEF__\n\n", header);
+    fputs("#ifndef __MRFSTR_SIMDDEF__\n"
+        "#define __MRFSTR_SIMDDEF__\n\n", header);
 
     int data[4];
 

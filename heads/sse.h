@@ -14,8 +14,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#ifndef __MR_SSE__
-#define __MR_SSE__
+#ifndef __MRFSTR_SSE__
+#define __MRFSTR_SSE__
 
 #ifdef _MSC_VER
 #include <simddef.h>

@@ -14,8 +14,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#ifndef __MR_AVX512__
-#define __MR_AVX512__
+#ifndef __MRFSTR_AVX512__
+#define __MRFSTR_AVX512__
 
 #ifdef _MSC_VER
 #include <simddef.h>

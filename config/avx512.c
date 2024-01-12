@@ -20,24 +20,16 @@ copies or substantial portions of the Software.
 #ifdef __AVX512F__
 
 void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
 
-    __m512i block1, block2;
-    for (; size >= 2; size -= 2)
+    __m512i block;
+    for (; size; size--)
     {
-        block1 = _mm512_loadu_si512(sblock++);
-        block2 = _mm512_loadu_si512(sblock++);
-        _mm512_stream_si512(dblock++, block1);
-        _mm512_stream_si512(dblock++, block2);
-    }
-
-    if (size)
-    {
-        block1 = _mm512_loadu_si512(sblock);
-        _mm512_store_si512(dblock, block1);
+        block = _mm512_loadu_si512(sblock++);
+        _mm512_stream_si512(dblock++, block);
     }
 }
 

@@ -79,7 +79,7 @@ void __mrfstr_replchr(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
         mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nrepl_size;
         if (rem)
@@ -100,11 +100,12 @@ void __mrfstr_replchr(
         return;
     }
 
+    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
     mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+    if (size > _mrfstr_config.tcount * tsize)
         tcount = _mrfstr_config.tcount;
     else
-        tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
+        tcount = (mrfstr_byte_t)(size / tsize);
 
     mrfstr_short_t rem = (uintptr_t)str & _mrfstr_config.trepl_size;
     if (rem)
@@ -171,7 +172,7 @@ void __mrfstr_replchr2(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
         mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nrepl_size;
         if (rem)
@@ -193,11 +194,12 @@ void __mrfstr_replchr2(
         return;
     }
 
+    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
     mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+    if (size > _mrfstr_config.tcount * tsize)
         tcount = _mrfstr_config.tcount;
     else
-        tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
+        tcount = (mrfstr_byte_t)(size / tsize);
 
     mrfstr_short_t rem = (uintptr_t)res & _mrfstr_config.trepl_size;
     if (rem)

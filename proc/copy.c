@@ -23,8 +23,8 @@ copies or substantial portions of the Software.
 
 struct __MRFSTR_COPY_T
 {
-    mrfstr_data_t dst;
-    mrfstr_data_ct src;
+    restrict mrfstr_data_t dst;
+    restrict mrfstr_data_ct src;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
@@ -38,7 +38,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 
 void __mrfstr_copy(
-    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
+    restrict mrfstr_data_t dst, restrict mrfstr_data_ct src, mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
     {
@@ -46,7 +46,7 @@ void __mrfstr_copy(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
         mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.nmem_size;
         if (rem)
@@ -67,11 +67,12 @@ void __mrfstr_copy(
         return;
     }
 
+    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
     mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+    if (size > _mrfstr_config.tcount * tsize)
         tcount = _mrfstr_config.tcount;
     else
-        tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
+        tcount = (mrfstr_byte_t)(size / tsize);
 
     mrfstr_short_t rem = (uintptr_t)dst % _mrfstr_config.tmem_size;
     if (rem)

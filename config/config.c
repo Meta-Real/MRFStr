@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 #ifdef __AVX512F__
 mrfstr_config_t _mrfstr_config =
 {
-    1,
+    1, 0x8000000ULL,
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
 #ifdef __AVX512BW__
@@ -116,6 +116,12 @@ void mrfstr_config_tcount(
     mrfstr_byte_t tcount)
 {
     _mrfstr_config.tcount = tcount + 1;
+}
+
+void mrfstr_config_tlimit(
+    mrfstr_size_t tlimit)
+{
+    _mrfstr_config.tlimit = tlimit;
 }
 
 void mrfstr_config(

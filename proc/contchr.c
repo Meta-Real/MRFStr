@@ -48,7 +48,7 @@ mrfstr_bool_t __mrfstr_contchr(
     if (size < MRFSTR_SLIMIT)
         return memchr(str, chr, size) != NULL;
 
-    if (_mrfstr_config.tcount == 1 || size < MRFSTR_TLIMIT)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
         mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nsearch_size;
         if (rem)
@@ -69,11 +69,12 @@ mrfstr_bool_t __mrfstr_contchr(
         return MRFSTR_FALSE;
     }
 
+    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
     mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * MRFSTR_TSIZE)
+    if (size > _mrfstr_config.tcount * tsize)
         tcount = _mrfstr_config.tcount;
     else
-        tcount = (mrfstr_byte_t)(size / MRFSTR_TSIZE);
+        tcount = (mrfstr_byte_t)(size / tsize);
 
     mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tsearch_size;
     if (rem)

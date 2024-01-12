@@ -32,17 +32,18 @@ copies or substantial portions of the Software.
 struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t tcount;
+    mrfstr_size_t tlimit;
 
     /* memory functions */
 
     void (*ncopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct, mrfstr_size_t);
     void (*nfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t nmem_size;
 
     void (*tcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct, mrfstr_size_t);
     void (*tfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tmem_size;
@@ -122,9 +123,6 @@ extern mrfstr_config_t _mrfstr_config;
 
 #define MRFSTR_SLIMIT 0x800
 
-#define MRFSTR_TSIZE 0x8000000ULL
-#define MRFSTR_TLIMIT (MRFSTR_TSIZE << 1)
-
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include <pthread.h>
 
@@ -185,7 +183,7 @@ typedef HANDLE mrfstr_mutex_p;
 #endif
 
 void __mrfstr_copy(
-    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+    restrict mrfstr_data_t dst, restrict mrfstr_data_ct src, mrfstr_size_t size);
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 

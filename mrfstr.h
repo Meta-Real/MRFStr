@@ -247,6 +247,8 @@ typedef mrfstr_byte_t mrfstr_config_simd_enum_t;
 
 void mrfstr_config_tcount(
     mrfstr_byte_t tcount);
+void mrfstr_config_tlimit(
+    mrfstr_size_t tlimit);
 void mrfstr_config(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t normal,

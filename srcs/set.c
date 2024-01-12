@@ -20,6 +20,9 @@ copies or substantial portions of the Software.
 void mrfstr_set(
     mrfstr_t dst, mrfstr_ct src)
 {
+    if (dst == src)
+        return;
+
     if (!MRFSTR_SIZE(src))
     {
         free(MRFSTR_DATA(dst));

@@ -20,8 +20,9 @@ copies or substantial portions of the Software.
 #ifdef __AVX512F__
 mrfstr_config_t _mrfstr_config =
 {
-    1, 0x8000000ULL,
-    __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
+    1, 0x200000, 0x8000000ULL,
+    __mrfstr_avx512_bcopy, __mrfstr_avx512_copy,
+    __mrfstr_avx512_bfill, __mrfstr_avx512_fill, 64,
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
 #ifdef __AVX512BW__
     __mrfstr_avx512_rev, __mrfstr_avx512_rev2, 64,
@@ -118,10 +119,20 @@ void mrfstr_config_tcount(
     _mrfstr_config.tcount = tcount + 1;
 }
 
+void mrfstr_config_nlimit(
+    mrfstr_size_t nlimit)
+{
+    _mrfstr_config.nlimit = nlimit;
+    if (_mrfstr_config.tlimit < nlimit)
+        _mrfstr_config.tlimit = nlimit;
+}
+
 void mrfstr_config_tlimit(
     mrfstr_size_t tlimit)
 {
     _mrfstr_config.tlimit = tlimit;
+    if (_mrfstr_config.nlimit > tlimit)
+        _mrfstr_config.nlimit = tlimit;
 }
 
 void mrfstr_config(
@@ -136,7 +147,9 @@ void mrfstr_config(
         {
         case MRFSTR_CONFIG_SIMD_AVX512:
 #ifdef __AVX512F__
+            _mrfstr_config.bcopy_sub = __mrfstr_avx512_bcopy;
             _mrfstr_config.ncopy_sub = __mrfstr_avx512_copy;
+            _mrfstr_config.bfill_sub = __mrfstr_avx512_bfill;
             _mrfstr_config.nfill_sub = __mrfstr_avx512_fill;
             _mrfstr_config.nmem_size = 64;
             break;

@@ -32,12 +32,18 @@ copies or substantial portions of the Software.
 struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t tcount;
+    mrfstr_size_t nlimit;
     mrfstr_size_t tlimit;
 
     /* memory functions */
 
+    void (*bcopy_sub)(
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct, mrfstr_size_t);
     void (*ncopy_sub)(
         restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct, mrfstr_size_t);
+
+    void (*bfill_sub)(
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     void (*nfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t nmem_size;

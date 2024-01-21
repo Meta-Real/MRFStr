@@ -59,7 +59,10 @@ void __mrfstr_copy(
         rem = size % _mrfstr_config.nmem_size;
         size -= rem;
 
-        _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.nmem_size);
+        if (size < _mrfstr_config.nlimit)
+            _mrfstr_config.bcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
+        else
+            _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.nmem_size);
         dst += size;
         src += size;
 

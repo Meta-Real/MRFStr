@@ -34,7 +34,7 @@ void __mrfstr_base_copy(
     mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
 
-    for (; size; size--)
+    while (size--)
         *dblock++ = *sblock++;
 }
 

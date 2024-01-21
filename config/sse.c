@@ -25,8 +25,7 @@ void __mrfstr_sse_copy(
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;
 
-    __m128i
-        block1, block2, block3, block4,
+    __m128i block1, block2, block3, block4,
         block5, block6, block7, block8;
     for (; size >= 8; size -= 8)
     {

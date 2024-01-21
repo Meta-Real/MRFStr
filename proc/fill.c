@@ -61,7 +61,10 @@ void __mrfstr_fill(
         rem = size % _mrfstr_config.nmem_size;
         size -= rem;
 
-        _mrfstr_config.nfill_sub(res, chr, size / _mrfstr_config.nmem_size);
+        if (size < _mrfstr_config.nlimit)
+            _mrfstr_config.bfill_sub(res, chr, size / _mrfstr_config.nmem_size);
+        else
+            _mrfstr_config.nfill_sub(res, chr, size / _mrfstr_config.nmem_size);
         res += size;
 
         mrfstr_fill_rem;

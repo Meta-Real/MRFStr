@@ -25,11 +25,19 @@ copies or substantial portions of the Software.
         block |= block << 32;                   \
     } while (0)
 
+#define mrfstr_base_rev(block)                                                                 \
+    do                                                                                         \
+    {                                                                                          \
+        block = (block & 0x00000000ffffffffULL) << 32 | (block & 0xffffffff00000000ULL) >> 32; \
+        block = (block & 0x0000ffff0000ffffULL) << 16 | (block & 0xffff0000ffff0000ULL) >> 16; \
+        block = (block & 0x00ff00ff00ff00ffULL) << 8 | (block & 0xff00ff00ff00ff00ULL) >> 8;   \
+    } while (0)
+
 #define mrfstr_base_cmp(mask) \
     ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
 
 void __mrfstr_base_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
@@ -59,14 +67,10 @@ void __mrfstr_base_rev(
     while (size--)
     {
         block1 = *lblock;
-        block1 = (block1 & 0x00000000ffffffffULL) << 32 | (block1 & 0xffffffff00000000ULL) >> 32;
-        block1 = (block1 & 0x0000ffff0000ffffULL) << 16 | (block1 & 0xffff0000ffff0000ULL) >> 16;
-        block1 = (block1 & 0x00ff00ff00ff00ffULL) << 8 | (block1 & 0xff00ff00ff00ff00ULL) >> 8;
+        mrfstr_base_rev(block1);
 
         block2 = *--rblock;
-        block2 = (block2 & 0x00000000ffffffffULL) << 32 | (block2 & 0xffffffff00000000ULL) >> 32;
-        block2 = (block2 & 0x0000ffff0000ffffULL) << 16 | (block2 & 0xffff0000ffff0000ULL) >> 16;
-        block2 = (block2 & 0x00ff00ff00ff00ffULL) << 8 | (block2 & 0xff00ff00ff00ff00ULL) >> 8;
+        mrfstr_base_rev(block2);
 
         *lblock++ = block2;
         *rblock = block1;
@@ -83,9 +87,7 @@ void __mrfstr_base_rev2(
     while (size--)
     {
         block = *--rblock;
-        block = (block & 0x00000000ffffffffULL) << 32 | (block & 0xffffffff00000000ULL) >> 32;
-        block = (block & 0x0000ffff0000ffffULL) << 16 | (block & 0xffff0000ffff0000ULL) >> 16;
-        block = (block & 0x00ff00ff00ff00ffULL) << 8 | (block & 0xff00ff00ff00ff00ULL) >> 8;
+        mrfstr_base_rev(block);
 
         *lblock++ = block;
     }

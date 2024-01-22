@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 #include <binary.h>
 
 void __mrfstr_avx512_bcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
@@ -34,7 +34,7 @@ void __mrfstr_avx512_bcopy(
 }
 
 void __mrfstr_avx512_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;

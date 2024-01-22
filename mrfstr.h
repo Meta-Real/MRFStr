@@ -20,18 +20,21 @@ copies or substantial portions of the Software.
 #include <inttypes.h>
 #include <stddef.h>
 
-#define MRFSTR_VERSION "1.0.0"
+#define MRFSTR_VERSION "1.1.0"
 #define MRFSTR_VERSION_MAJOR 1
-#define MRFSTR_VERSION_MINOR 0
-#define MRFSTR_VERSION_PATH 0
+#define MRFSTR_VERSION_MINOR 1
+#define MRFSTR_VERSION_PATCH 0
 
 /* data types */
 
 typedef uint8_t mrfstr_bool_t;
+typedef int8_t mrfstr_sbyte_t;
 typedef uint8_t mrfstr_byte_t;
 typedef int16_t mrfstr_sshort_t;
 typedef uint16_t mrfstr_short_t;
+typedef int32_t mrfstr_slong_t;
 typedef uint32_t mrfstr_long_t;
+typedef int64_t mrfstr_slonglong_t;
 typedef uint64_t mrfstr_longlong_t;
 
 typedef size_t mrfstr_idx_t;

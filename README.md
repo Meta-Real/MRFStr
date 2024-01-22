@@ -1,1 +1,1 @@
-# MRFStr (MetaReal Fast String Library) version 1.0.0
+# MRFStr (MetaReal Fast String Library) version 1.1.0

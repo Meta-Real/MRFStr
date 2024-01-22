@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 #include <binary.h>
 
 void __mrfstr_sse_bcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;
@@ -34,7 +34,7 @@ void __mrfstr_sse_bcopy(
 }
 
 void __mrfstr_sse_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;

@@ -64,8 +64,8 @@ void __mrfstr_sse_copy(
 void __mrfstr_sse_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m128i *dblock = (__m128i*)dst + size;
-    __m128i *sblock = (__m128i*)src + size;
+    __m128i *dblock = (__m128i*)dst;
+    __m128i *sblock = (__m128i*)src;
 
     __m128i block;
     while (size--)

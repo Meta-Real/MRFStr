@@ -60,8 +60,8 @@ void __mrfstr_avx_copy(
 void __mrfstr_avx_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m256i *dblock = (__m256i*)dst + size;
-    __m256i *sblock = (__m256i*)src + size;
+    __m256i *dblock = (__m256i*)dst;
+    __m256i *sblock = (__m256i*)src;
 
     __m256i block;
     while (size--)

@@ -52,8 +52,8 @@ void __mrfstr_avx512_copy(
 void __mrfstr_avx512_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m512i *dblock = (__m512i*)dst + size;
-    __m512i *sblock = (__m512i*)src + size;
+    __m512i *dblock = (__m512i*)dst;
+    __m512i *sblock = (__m512i*)src;
 
     __m512i block;
     while (size--)

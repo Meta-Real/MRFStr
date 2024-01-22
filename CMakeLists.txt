@@ -44,9 +44,6 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 enable_testing()
 add_subdirectory(tests)
 
-add_executable(Test test.c)
-target_link_libraries(Test PRIVATE MRFStr)
-
 add_custom_command(TARGET MRFStr POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:MRFStr> ..)
 

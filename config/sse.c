@@ -15,9 +15,9 @@ copies or substantial portions of the Software.
 */
 
 #include <sse.h>
+#include <binary.h>
 
 #ifdef __SSE2__
-#include <binary.h>
 
 void __mrfstr_sse_bcopy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,

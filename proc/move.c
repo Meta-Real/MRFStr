@@ -15,6 +15,7 @@ copies or substantial portions of the Software.
 */
 
 #include <mrfstr-intern.h>
+#include <string.h>
 
 #define mrfstr_move_rem \
     while (rem--)       \

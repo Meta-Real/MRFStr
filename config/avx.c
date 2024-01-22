@@ -15,9 +15,9 @@ copies or substantial portions of the Software.
 */
 
 #include <avx.h>
+#include <binary.h>
 
 #ifdef __AVX__
-#include <binary.h>
 
 void __mrfstr_avx_bcopy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,

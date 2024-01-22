@@ -18,13 +18,13 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 #define mrfstr_copy_rem \
-    for (; rem; rem--)  \
+    while (rem--)       \
         *dst++ = *src++
 
 struct __MRFSTR_COPY_T
 {
-    mrfstr_data_t dst;
-    mrfstr_data_ct src;
+    restrict mrfstr_data_t dst;
+    restrict mrfstr_data_ct src;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
@@ -38,7 +38,8 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 
 void __mrfstr_copy(
-    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
+    restrict mrfstr_data_t dst, restrict mrfstr_data_ct src,
+    mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
     {

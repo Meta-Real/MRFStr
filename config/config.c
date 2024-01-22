@@ -22,8 +22,10 @@ mrfstr_config_t _mrfstr_config =
 {
     1, 0x200000, 0x8000000ULL,
     __mrfstr_avx512_bcopy, __mrfstr_avx512_copy,
+    __mrfstr_avx512_brcopy, __mrfstr_avx512_rcopy,
     __mrfstr_avx512_bfill, __mrfstr_avx512_fill, 64,
-    __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
+    __mrfstr_avx512_copy, __mrfstr_avx512_rcopy,
+    __mrfstr_avx512_fill, 64,
 #ifdef __AVX512BW__
     __mrfstr_avx512_rev, __mrfstr_avx512_rev2, 64,
     __mrfstr_avx512_rev, __mrfstr_avx512_rev2, 64,
@@ -152,6 +154,8 @@ void mrfstr_config(
 #ifdef __AVX512F__
             _mrfstr_config.bcopy_sub = __mrfstr_avx512_bcopy;
             _mrfstr_config.ncopy_sub = __mrfstr_avx512_copy;
+            _mrfstr_config.brcopy_sub = __mrfstr_avx512_brcopy;
+            _mrfstr_config.nrcopy_sub = __mrfstr_avx512_rcopy;
             _mrfstr_config.bfill_sub = __mrfstr_avx512_bfill;
             _mrfstr_config.nfill_sub = __mrfstr_avx512_fill;
             _mrfstr_config.nmem_size = 64;
@@ -188,6 +192,7 @@ void mrfstr_config(
         case MRFSTR_CONFIG_SIMD_AVX512:
 #ifdef __AVX512F__
             _mrfstr_config.tcopy_sub = __mrfstr_avx512_copy;
+            _mrfstr_config.trcopy_sub = __mrfstr_avx512_rcopy;
             _mrfstr_config.tfill_sub = __mrfstr_avx512_fill;
             _mrfstr_config.tmem_size = 64;
             break;

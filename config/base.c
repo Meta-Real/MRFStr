@@ -37,7 +37,8 @@ copies or substantial portions of the Software.
     ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
 
 void __mrfstr_base_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
 {
     mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
@@ -78,7 +79,8 @@ void __mrfstr_base_rev(
 }
 
 void __mrfstr_base_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_size_t size)
 {
     mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
     mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
@@ -119,7 +121,7 @@ void __mrfstr_base_replchr(
 }
 
 void __mrfstr_base_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
 {

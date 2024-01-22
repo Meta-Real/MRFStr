@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 
 #define mrfstr_rev_rem  \
-    for (; rem; rem--)  \
+    while (rem--)       \
     {                   \
         chr = *--right; \
         *right = *str;  \
@@ -25,7 +25,7 @@ copies or substantial portions of the Software.
     }
 
 #define mrfstr_rev2_rem \
-    for (; rem; rem--)  \
+    while (rem--)       \
         *left++ = *--right
 
 #pragma pack(push, 1)
@@ -167,11 +167,12 @@ void __mrfstr_rev(
 }
 
 void __mrfstr_rev2(
-    mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size)
+    restrict mrfstr_data_t left, restrict mrfstr_data_ct right,
+    mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
     {
-        for (; size; size--)
+        while (size--)
             *left++ = *--right;
         return;
     }

@@ -20,7 +20,8 @@ copies or substantial portions of the Software.
 #include <binary.h>
 
 void __mrfstr_sse_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
 {
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;
@@ -34,7 +35,8 @@ void __mrfstr_sse_bcopy(
 }
 
 void __mrfstr_sse_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
 {
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;
@@ -119,7 +121,8 @@ void __mrfstr_sse_rev(
 }
 
 void __mrfstr_sse_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_size_t size)
 {
     __m128i *lblock = (__m128i*)left;
     __m128i *rblock = (__m128i*)right;
@@ -177,7 +180,7 @@ void __mrfstr_sse_replchr(
 }
 
 void __mrfstr_sse_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
 {

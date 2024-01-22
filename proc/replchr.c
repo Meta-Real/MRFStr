@@ -161,7 +161,7 @@ void __mrfstr_replchr(
 }
 
 void __mrfstr_replchr2(
-    mrfstr_data_t res, mrfstr_data_ct str,
+    restrict mrfstr_data_t res, restrict mrfstr_data_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
 {

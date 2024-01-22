@@ -20,7 +20,8 @@ copies or substantial portions of the Software.
 #include <binary.h>
 
 void __mrfstr_avx512_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
@@ -28,13 +29,14 @@ void __mrfstr_avx512_bcopy(
     __m512i block;
     while (size--)
     {
-        block = _mm512_loadu_si512(sblock);
+        block = _mm512_loadu_si512(sblock++);
         _mm512_store_si512(dblock++, block);
     }
 }
 
 void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
@@ -42,8 +44,46 @@ void __mrfstr_avx512_copy(
     __m512i block;
     while (size--)
     {
-        block = _mm512_loadu_si512(sblock);
+        block = _mm512_loadu_si512(sblock++);
         _mm512_stream_si512(dblock++, block);
+    }
+}
+
+void __mrfstr_avx512_brcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
+{
+    __m512i *dblock = (__m512i*)dst + size;
+    __m512i *sblock = (__m512i*)src + size;
+
+    __m512i block;
+    while (size--)
+    {
+        block = _mm512_loadu_si512(--sblock);
+        _mm512_store_si512(--dblock, block);
+    }
+}
+
+void __mrfstr_avx512_rcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size)
+{
+    __m512i *dblock = (__m512i*)dst + size;
+    __m512i *sblock = (__m512i*)src + size;
+
+    __m512i block1, block2;
+    for (; size >= 2; size -= 2)
+    {
+        block1 = _mm512_loadu_si512(--sblock);
+        block2 = _mm512_loadu_si512(--sblock);
+        _mm512_stream_si512(--dblock, block1);
+        _mm512_stream_si512(--dblock, block2);
+    }
+
+    if (size)
+    {
+        block1 = _mm512_loadu_si512(--sblock);
+        _mm512_stream_si512(--dblock, block1);
     }
 }
 
@@ -113,7 +153,8 @@ void __mrfstr_avx512_rev(
 }
 
 void __mrfstr_avx512_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_size_t size)
 {
     __m512i *lblock = (__m512i*)left;
     __m512i *rblock = (__m512i*)right;
@@ -172,7 +213,7 @@ void __mrfstr_avx512_replchr(
 }
 
 void __mrfstr_avx512_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size)
 {

@@ -18,7 +18,7 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 #define mrfstr_contchr_rem \
-    for (; rem; rem--)     \
+    while (rem--)          \
         if (chr == *str++) \
             return MRFSTR_TRUE
 

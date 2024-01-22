@@ -30,9 +30,18 @@ copies or substantial portions of the Software.
 #define MRFSTR_AVX512_TFINDCHR_LOAD 0x10000
 
 void __mrfstr_avx512_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size);
 void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size);
+
+void __mrfstr_avx512_brcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size);
+void __mrfstr_avx512_rcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_size_t size);
 
 void __mrfstr_avx512_bfill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
@@ -43,14 +52,15 @@ void __mrfstr_avx512_fill(
 void __mrfstr_avx512_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_avx512_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
+    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_size_t size);
 
 void __mrfstr_avx512_replchr(
     mrfstr_ptr_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
 void __mrfstr_avx512_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
 #endif

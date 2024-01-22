@@ -29,7 +29,8 @@ endif()
 
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
-    proc/copy.c proc/fill.c proc/rev.c proc/replchr.c
+    proc/copy.c proc/move.c proc/fill.c
+    proc/rev.c proc/replchr.c
     proc/equal.c
     proc/contchr.c proc/findchr.c
     srcs/init.c srcs/set.c srcs/get.c
@@ -38,7 +39,7 @@ add_library(MRFStr STATIC
     srcs/contain.c srcs/find.c
     srcs/data.c srcs/io.c
     srcs/str.c)
-target_include_directories(MRFStr PUBLIC "heads" PUBLIC ".")
+target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 enable_testing()
 add_subdirectory(tests)

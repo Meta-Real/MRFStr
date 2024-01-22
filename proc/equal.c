@@ -18,7 +18,7 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 #define mrfstr_equal_rem        \
-    for (; rem; rem--)          \
+    while (rem--)               \
         if (*str1++ != *str2++) \
             return MRFSTR_FALSE
 

@@ -18,7 +18,7 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 #define mrfstr_fill_rem \
-    for (; rem; rem--)  \
+    while (rem--)       \
         *res++ = chr
 
 #pragma pack(push, 1)

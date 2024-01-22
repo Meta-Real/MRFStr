@@ -38,9 +38,18 @@ struct __MRFSTR_CONFIG_T
     /* memory functions */
 
     void (*bcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
     void (*ncopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
+
+    void (*brcopy_sub)(
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
+    void (*nrcopy_sub)(
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
 
     void (*bfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
@@ -49,7 +58,11 @@ struct __MRFSTR_CONFIG_T
     mrfstr_byte_t nmem_size;
 
     void (*tcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
+    void (*trcopy_sub)(
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
     void (*tfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tmem_size;
@@ -59,13 +72,15 @@ struct __MRFSTR_CONFIG_T
     void (*nrev_sub)(
         mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
     void (*nrev2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
     mrfstr_byte_t nrev_size;
 
     void (*trev_sub)(
         mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
     void (*trev2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
+        mrfstr_size_t);
     mrfstr_byte_t trev_size;
 
     /* replace functions */
@@ -75,7 +90,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
     void (*nreplchr2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
     mrfstr_byte_t nrepl_size;
@@ -85,7 +100,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
     void (*treplchr2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
+        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
     mrfstr_byte_t trepl_size;
@@ -189,21 +204,28 @@ typedef HANDLE mrfstr_mutex_p;
 #endif
 
 void __mrfstr_copy(
+    restrict mrfstr_data_t dst, restrict mrfstr_data_ct src,
+    mrfstr_size_t size);
+void __mrfstr_move(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+void __mrfstr_rmove(
+    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
+
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 void __mrfstr_rev(
     mrfstr_data_t str, mrfstr_size_t size);
 void __mrfstr_rev2(
-    mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size);
+    restrict mrfstr_data_t left, restrict mrfstr_data_ct right,
+    mrfstr_size_t size);
 
 void __mrfstr_replchr(
     mrfstr_data_t str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
 void __mrfstr_replchr2(
-    mrfstr_data_t res, mrfstr_data_ct str,
+    restrict mrfstr_data_t res, restrict mrfstr_data_ct str,
     mrfstr_chr_t old, mrfstr_chr_t new,
     mrfstr_size_t size);
 

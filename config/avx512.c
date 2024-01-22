@@ -15,9 +15,9 @@ copies or substantial portions of the Software.
 */
 
 #include <avx512.h>
-#include <binary.h>
 
 #ifdef __AVX512F__
+#include <binary.h>
 
 void __mrfstr_avx512_bcopy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -63,7 +63,7 @@ void __mrfstr_avx512_fill(
     __m512i *rblock = (__m512i*)res;
     __m512i block = _mm512_set1_epi8(chr);
 
-    for (; size; size--)
+    while (size--)
         _mm512_stream_si512(rblock++, block);
 }
 
@@ -91,7 +91,7 @@ void __mrfstr_avx512_rev(
 #endif
 
     __m512i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm512_load_si512(lblock);
         block2 = _mm512_loadu_si512(--rblock);
@@ -109,44 +109,6 @@ void __mrfstr_avx512_rev(
 
         _mm512_store_si512(lblock++, block2);
         _mm512_storeu_si512(rblock, block1);
-    }
-}
-
-void __mrfstr_avx512_brev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
-{
-    __m512i *lblock = (__m512i*)left;
-    __m512i *rblock = (__m512i*)right;
-
-#ifdef __AVX512VBMI__
-    const __m512i revidx = _mm512_set_epi64(
-        0x0001020304050607, 0x08090a0b0c0d0e0f,
-        0x1011121314151617, 0x18191a1b1c1d1e1f,
-        0x2021222324252627, 0x28292a2b2c2d2e2f,
-        0x3031323334353637, 0x38393a3b3c3d3e3f);
-#else
-    const __m512i revidx1 = _mm512_set_epi64(
-        0x0001020304050607, 0x08090a0b0c0d0e0f,
-        0x0001020304050607, 0x08090a0b0c0d0e0f,
-        0x0001020304050607, 0x08090a0b0c0d0e0f,
-        0x0001020304050607, 0x08090a0b0c0d0e0f);
-
-    const __m512i revidx2 = _mm512_set_epi64(1, 0, 3, 2, 5, 4, 7, 6);
-#endif
-
-    __m512i block;
-    for (; size; size--)
-    {
-        block = _mm512_loadu_si512(--rblock);
-
-#ifdef __AVX512VBMI__
-        block = _mm512_permutexvar_epi8(revidx, block);
-#else
-        block = _mm512_shuffle_epi8(block, revidx1);
-        block = _mm512_permutexvar_epi64(revidx2, block);
-#endif
-
-        _mm512_stream_si512(lblock++, block);
     }
 }
 
@@ -173,7 +135,7 @@ void __mrfstr_avx512_rev2(
 #endif
 
     __m512i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm512_loadu_si512(--rblock);
 
@@ -199,7 +161,7 @@ void __mrfstr_avx512_replchr(
 
     __m512i block;
     mrfstr_longlong_t mask;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm512_load_si512(sblock);
 
@@ -221,7 +183,7 @@ void __mrfstr_avx512_replchr2(
 
     __m512i block;
     mrfstr_longlong_t mask;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm512_loadu_si512(sblock++);
 
@@ -241,7 +203,7 @@ mrfstr_bool_t __mrfstr_avx512_equal(
     __m512i *s2block = (__m512i*)str2;
 
     __m512i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm512_load_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
@@ -282,7 +244,7 @@ void __mrfstr_avx512_tequal(
     if (!*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm512_load_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
@@ -301,7 +263,7 @@ mrfstr_bool_t __mrfstr_avx512_contchr(
     __m512i cblock = _mm512_set1_epi8(chr);
 
     __m512i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm512_load_si512(sblock++);
         if (_mm512_cmpeq_epi8_mask(block, cblock))
@@ -340,7 +302,7 @@ void __mrfstr_avx512_tcontchr(
     if (*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block = _mm512_load_si512(sblock++);
         if (_mm512_cmpeq_epi8_mask(block, cblock))

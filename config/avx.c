@@ -15,9 +15,23 @@ copies or substantial portions of the Software.
 */
 
 #include <avx.h>
-#include <binary.h>
 
 #ifdef __AVX__
+#include <binary.h>
+
+void __mrfstr_avx_bcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+{
+    __m256i *dblock = (__m256i*)dst;
+    __m256i *sblock = (__m256i*)src;
+
+    __m256i block;
+    while (size--)
+    {
+        block = _mm256_loadu_si256(sblock++);
+        _mm256_store_si256(dblock++, block);
+    }
+}
 
 void __mrfstr_avx_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -37,8 +51,18 @@ void __mrfstr_avx_copy(
     if (size)
     {
         block1 = _mm256_loadu_si256(sblock++);
-        _mm256_store_si256(dblock++, block1);
+        _mm256_stream_si256(dblock++, block1);
     }
+}
+
+void __mrfstr_avx_bfill(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m256i *rblock = (__m256i*)res;
+    __m256i block = _mm256_set1_epi8(chr);
+
+    while (size--)
+        _mm256_store_si256(rblock++, block);
 }
 
 void __mrfstr_avx_fill(
@@ -47,7 +71,7 @@ void __mrfstr_avx_fill(
     __m256i *rblock = (__m256i*)res;
     __m256i block = _mm256_set1_epi8(chr);
 
-    for (; size; size--)
+    while (size--)
         _mm256_stream_si256(rblock++, block);
 }
 
@@ -69,7 +93,7 @@ void __mrfstr_avx_rev(
 #endif
 
     __m256i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm256_load_si256(lblock);
         block2 = _mm256_loadu_si256(--rblock);
@@ -107,7 +131,7 @@ void __mrfstr_avx_rev2(
 #endif
 
     __m256i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm256_loadu_si256(--rblock);
 
@@ -118,7 +142,7 @@ void __mrfstr_avx_rev2(
         block = _mm256_permute2x128_si256(block, block, 1);
 #endif
 
-        _mm256_store_si256(lblock++, block);
+        _mm256_stream_si256(lblock++, block);
     }
 }
 
@@ -169,7 +193,7 @@ void __mrfstr_avx_replchr2(
 #else
     __m256i mask;
 #endif
-    for (; size; size--)
+    while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
 
@@ -193,7 +217,7 @@ mrfstr_bool_t __mrfstr_avx_equal(
     __m256i *s2block = (__m256i*)str2;
 
     __m256i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm256_loadu_si256(s1block++);
         block2 = _mm256_loadu_si256(s2block++);
@@ -244,7 +268,7 @@ void __mrfstr_avx_tequal(
     if (!*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm256_loadu_si256(s1block++);
         block2 = _mm256_loadu_si256(s2block++);
@@ -268,7 +292,7 @@ mrfstr_bool_t __mrfstr_avx_contchr(
     __m256i cblock = _mm256_set1_epi8(chr);
 
     __m256i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
 
@@ -317,7 +341,7 @@ void __mrfstr_avx_tcontchr(
     if (*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
 

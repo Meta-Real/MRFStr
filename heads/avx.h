@@ -29,9 +29,13 @@ copies or substantial portions of the Software.
 #define MRFSTR_AVX_TCONTCHR_LOAD 0x20000
 #define MRFSTR_AVX_TFINDCHR_LOAD 0x20000
 
+void __mrfstr_avx_bcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_avx_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size);
 
+void __mrfstr_avx_bfill(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_avx_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 

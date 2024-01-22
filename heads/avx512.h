@@ -40,13 +40,8 @@ void __mrfstr_avx512_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #ifdef __AVX512BW__
-void __mrfstr_avx512_brev(
-    mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_avx512_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
-
-void __mrfstr_avx512_brev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 void __mrfstr_avx512_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 

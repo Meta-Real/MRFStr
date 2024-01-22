@@ -44,8 +44,9 @@ mrfstr_config_t _mrfstr_config =
 #elif defined(__AVX__)
 mrfstr_config_t _mrfstr_config =
 {
-    1,
-    __mrfstr_avx_copy, __mrfstr_avx_fill, 32,
+    1, 0x100000, 0x8000000ULL,
+    __mrfstr_avx_bcopy, __mrfstr_avx_copy,
+    __mrfstr_avx_bfill, __mrfstr_avx_fill, 32,
     __mrfstr_avx_copy, __mrfstr_avx_fill, 32,
 #ifdef __AVX2__
     __mrfstr_avx_rev, __mrfstr_avx_rev2, 32,
@@ -72,8 +73,9 @@ mrfstr_config_t _mrfstr_config =
 #elif defined(__SSE2__)
 mrfstr_config_t _mrfstr_config =
 {
-    1,
-    __mrfstr_sse_copy, __mrfstr_sse_fill, 16,
+    1, 0x200000, 0x8000000ULL,
+    __mrfstr_sse_bcopy, __mrfstr_sse_copy,
+    __mrfstr_sse_bfill, __mrfstr_sse_fill, 16,
     __mrfstr_sse_copy, __mrfstr_sse_fill, 16,
 #ifdef __SSSE3__
     __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
@@ -98,8 +100,9 @@ mrfstr_config_t _mrfstr_config =
 #else
 mrfstr_config_t _mrfstr_config =
 {
-    1,
-    __mrfstr_base_copy, __mrfstr_base_fill, 8,
+    1, 0x200000, 0x8000000ULL,
+    __mrfstr_base_copy, __mrfstr_base_copy,
+    __mrfstr_base_fill, __mrfstr_base_fill, 8,
     __mrfstr_base_copy, __mrfstr_base_fill, 8,
     __mrfstr_base_rev, __mrfstr_base_rev2, 8,
     __mrfstr_base_rev, __mrfstr_base_rev2, 8,
@@ -156,20 +159,26 @@ void mrfstr_config(
 #endif
         case MRFSTR_CONFIG_SIMD_AVX:
 #ifdef __AVX__
+            _mrfstr_config.bcopy_sub = __mrfstr_avx_bcopy;
             _mrfstr_config.ncopy_sub = __mrfstr_avx_copy;
+            _mrfstr_config.bfill_sub = __mrfstr_avx_bfill;
             _mrfstr_config.nfill_sub = __mrfstr_avx_fill;
             _mrfstr_config.nmem_size = 32;
             break;
 #endif
         case MRFSTR_CONFIG_SIMD_SSE:
 #ifdef __SSE2__
+            _mrfstr_config.bcopy_sub = __mrfstr_sse_bcopy;
             _mrfstr_config.ncopy_sub = __mrfstr_sse_copy;
+            _mrfstr_config.bfill_sub = __mrfstr_sse_bfill;
             _mrfstr_config.nfill_sub = __mrfstr_sse_fill;
             _mrfstr_config.nmem_size = 16;
             break;
 #endif
         case MRFSTR_CONFIG_SIMD_NONE:
+            _mrfstr_config.bcopy_sub = __mrfstr_base_copy;
             _mrfstr_config.ncopy_sub = __mrfstr_base_copy;
+            _mrfstr_config.bfill_sub = __mrfstr_base_fill;
             _mrfstr_config.nfill_sub = __mrfstr_base_fill;
             _mrfstr_config.nmem_size = 8;
             break;

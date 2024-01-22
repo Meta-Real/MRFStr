@@ -15,9 +15,23 @@ copies or substantial portions of the Software.
 */
 
 #include <sse.h>
-#include <binary.h>
 
 #ifdef __SSE2__
+#include <binary.h>
+
+void __mrfstr_sse_bcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
+{
+    __m128i *dblock = (__m128i*)dst;
+    __m128i *sblock = (__m128i*)src;
+
+    __m128i block;
+    while (size--)
+    {
+        block = _mm_loadu_si128(sblock++);
+        _mm_store_si128(dblock++, block);
+    }
+}
 
 void __mrfstr_sse_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size)
@@ -50,8 +64,18 @@ void __mrfstr_sse_copy(
     while (size--)
     {
         block1 = _mm_loadu_si128(sblock++);
-        _mm_store_si128(dblock++, block1);
+        _mm_stream_si128(dblock++, block1);
     }
+}
+
+void __mrfstr_sse_bfill(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m128i *rblock = (__m128i*)res;
+    __m128i block = _mm_set1_epi8(chr);
+
+    while (size--)
+        _mm_store_si128(rblock++, block);
 }
 
 void __mrfstr_sse_fill(
@@ -60,7 +84,7 @@ void __mrfstr_sse_fill(
     __m128i *rblock = (__m128i*)res;
     __m128i block = _mm_set1_epi8(chr);
 
-    for (; size; size--)
+    while (size--)
         _mm_stream_si128(rblock++, block);
 }
 
@@ -76,7 +100,7 @@ void __mrfstr_sse_rev(
         0x08090a0b, 0x0c0d0e0f);
 
     __m128i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm_load_si128(lblock);
         block2 = _mm_loadu_si128(--rblock);
@@ -105,7 +129,7 @@ void __mrfstr_sse_rev2(
         0x08090a0b, 0x0c0d0e0f);
 
     __m128i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm_loadu_si128(--rblock);
 
@@ -115,7 +139,7 @@ void __mrfstr_sse_rev2(
         block = _mm_shuffle_epi8(block, revidx);
 #endif
 
-        _mm_store_si128(lblock++, block);
+        _mm_stream_si128(lblock++, block);
     }
 }
 #endif
@@ -168,7 +192,7 @@ void __mrfstr_sse_replchr2(
 #else
     __m128i mask;
 #endif
-    for (; size; size--)
+    while (size--)
     {
         block = _mm_loadu_si128(sblock++);
 
@@ -193,7 +217,7 @@ mrfstr_bool_t __mrfstr_sse_equal(
     __m128i *s2block = (__m128i*)str2;
 
     __m128i block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm_loadu_si128(s1block++);
         block2 = _mm_loadu_si128(s2block++);
@@ -244,7 +268,7 @@ void __mrfstr_sse_tequal(
     if (!*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block1 = _mm_loadu_si128(s1block++);
         block2 = _mm_loadu_si128(s2block++);
@@ -268,7 +292,7 @@ mrfstr_bool_t __mrfstr_sse_contchr(
     __m128i cblock = _mm_set1_epi8(chr);
 
     __m128i block;
-    for (; size; size--)
+    while (size--)
     {
         block = _mm_loadu_si128(sblock++);
 
@@ -317,7 +341,7 @@ void __mrfstr_sse_tcontchr(
     if (*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         block = _mm_loadu_si128(sblock++);
 

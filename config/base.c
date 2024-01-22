@@ -45,7 +45,7 @@ void __mrfstr_base_fill(
     mrfstr_longlong_t cblock;
     mrfstr_base_set1(cblock, chr);
 
-    for (; size; size--)
+    while (size--)
         *rblock++ = cblock;
 }
 
@@ -56,7 +56,7 @@ void __mrfstr_base_rev(
     mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
 
     mrfstr_longlong_t block1, block2;
-    for (; size; size--)
+    while (size--)
     {
         block1 = *lblock;
         block1 = (block1 & 0x00000000ffffffffULL) << 32 | (block1 & 0xffffffff00000000ULL) >> 32;
@@ -80,7 +80,7 @@ void __mrfstr_base_rev2(
     mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
 
     mrfstr_longlong_t block;
-    for (; size; size--)
+    while (size--)
     {
         block = *--rblock;
         block = (block & 0x00000000ffffffffULL) << 32 | (block & 0xffffffff00000000ULL) >> 32;
@@ -127,7 +127,7 @@ void __mrfstr_base_replchr2(
     mrfstr_base_set1(oblock, old);
 
     mrfstr_longlong_t mask, block;
-    for (; size; size--)
+    while (size--)
     {
         block = *sblock++;
 
@@ -149,7 +149,7 @@ mrfstr_bool_t __mrfstr_base_equal(
     mrfstr_longlong_t *s1block = (mrfstr_longlong_t*)str1;
     mrfstr_longlong_t *s2block = (mrfstr_longlong_t*)str2;
 
-    for (; size; size--)
+    while (size--)
         if (*s1block++ != *s2block++)
             return MRFSTR_FALSE;
     return MRFSTR_TRUE;
@@ -180,7 +180,7 @@ void __mrfstr_base_tequal(
     if (!*res)
         return;
 
-    for (; size; size--)
+    while (size--)
         if (*s1block++ != *s2block++)
         {
             *res = MRFSTR_FALSE;
@@ -196,7 +196,7 @@ mrfstr_bool_t __mrfstr_base_contchr(
     mrfstr_base_set1(cblock, chr);
 
     mrfstr_longlong_t mask;
-    for (; size; size--)
+    while (size--)
     {
         mask = cblock ^ *sblock++;
         if (mrfstr_base_cmp(mask))
@@ -236,7 +236,7 @@ void __mrfstr_base_tcontchr(
     if (*res)
         return;
 
-    for (; size; size--)
+    while (size--)
     {
         mask = cblock ^ *sblock++;
         if (mrfstr_base_cmp(mask))

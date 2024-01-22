@@ -29,9 +29,13 @@ copies or substantial portions of the Software.
 #define MRFSTR_SSE_TCONTCHR_LOAD 0x40000
 #define MRFSTR_SSE_TFINDCHR_LOAD 0x40000
 
+void __mrfstr_sse_bcopy(
+    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_sse_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src, mrfstr_size_t size);
 
+void __mrfstr_sse_bfill(
+    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_sse_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 

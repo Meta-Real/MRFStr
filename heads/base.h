@@ -26,6 +26,8 @@ copies or substantial portions of the Software.
 void __mrfstr_base_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
     mrfstr_size_t size);
+void __mrfstr_base_rcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);

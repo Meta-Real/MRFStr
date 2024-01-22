@@ -47,6 +47,16 @@ void __mrfstr_base_copy(
         *dblock++ = *sblock++;
 }
 
+void __mrfstr_base_rcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
+    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
+
+    while (size--)
+        *--dblock = *--sblock;
+}
+
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {

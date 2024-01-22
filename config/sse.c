@@ -41,32 +41,72 @@ void __mrfstr_sse_copy(
     __m128i *dblock = (__m128i*)dst;
     __m128i *sblock = (__m128i*)src;
 
-    __m128i block1, block2, block3, block4,
-        block5, block6, block7, block8;
-    for (; size >= 8; size -= 8)
+    __m128i block1, block2, block3, block4;
+    for (; size >= 4; size -= 4)
     {
         block1 = _mm_loadu_si128(sblock++);
         block2 = _mm_loadu_si128(sblock++);
         block3 = _mm_loadu_si128(sblock++);
         block4 = _mm_loadu_si128(sblock++);
-        block5 = _mm_loadu_si128(sblock++);
-        block6 = _mm_loadu_si128(sblock++);
-        block7 = _mm_loadu_si128(sblock++);
-        block8 = _mm_loadu_si128(sblock++);
         _mm_stream_si128(dblock++, block1);
         _mm_stream_si128(dblock++, block2);
         _mm_stream_si128(dblock++, block3);
         _mm_stream_si128(dblock++, block4);
-        _mm_stream_si128(dblock++, block5);
-        _mm_stream_si128(dblock++, block6);
-        _mm_stream_si128(dblock++, block7);
-        _mm_stream_si128(dblock++, block8);
     }
 
     while (size--)
     {
         block1 = _mm_loadu_si128(sblock++);
         _mm_stream_si128(dblock++, block1);
+    }
+}
+
+void __mrfstr_sse_brcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+{
+    __m128i *dblock = (__m128i*)dst + size;
+    __m128i *sblock = (__m128i*)src + size;
+
+    __m128i block;
+    while (size--)
+    {
+        block = _mm_loadu_si128(--sblock);
+        _mm_store_si128(--dblock, block);
+    }
+}
+
+void __mrfstr_sse_rcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+{
+    __m128i *dblock = (__m128i*)dst;
+    __m128i *sblock = (__m128i*)src;
+
+    __m128i block1, block2, block3, block4,
+        block5, block6, block7, block8;
+    for (; size >= 8; size -= 8)
+    {
+        block1 = _mm_loadu_si128(--sblock);
+        block2 = _mm_loadu_si128(--sblock);
+        block3 = _mm_loadu_si128(--sblock);
+        block4 = _mm_loadu_si128(--sblock);
+        block5 = _mm_loadu_si128(--sblock);
+        block6 = _mm_loadu_si128(--sblock);
+        block7 = _mm_loadu_si128(--sblock);
+        block8 = _mm_loadu_si128(--sblock);
+        _mm_stream_si128(--dblock, block1);
+        _mm_stream_si128(--dblock, block2);
+        _mm_stream_si128(--dblock, block3);
+        _mm_stream_si128(--dblock, block4);
+        _mm_stream_si128(--dblock, block5);
+        _mm_stream_si128(--dblock, block6);
+        _mm_stream_si128(--dblock, block7);
+        _mm_stream_si128(--dblock, block8);
+    }
+
+    while (size--)
+    {
+        block1 = _mm_loadu_si128(--sblock);
+        _mm_stream_si128(--dblock, block1);
     }
 }
 

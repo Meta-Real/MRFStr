@@ -45,11 +45,9 @@ struct __MRFSTR_CONFIG_T
         mrfstr_size_t);
 
     void (*brcopy_sub)(
-        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
     void (*nrcopy_sub)(
-        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
 
     void (*bfill_sub)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
@@ -58,9 +56,6 @@ struct __MRFSTR_CONFIG_T
     mrfstr_byte_t nmem_size;
 
     void (*tcopy_sub)(
-        restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
-        mrfstr_size_t);
-    void (*trcopy_sub)(
         restrict mrfstr_ptr_t, restrict mrfstr_ptr_ct,
         mrfstr_size_t);
     void (*tfill_sub)(

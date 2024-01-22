@@ -36,6 +36,11 @@ void __mrfstr_sse_copy(
     restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
     mrfstr_size_t size);
 
+void __mrfstr_sse_brcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void __mrfstr_sse_rcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
 void __mrfstr_sse_bfill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_sse_fill(

@@ -37,11 +37,9 @@ void __mrfstr_avx512_copy(
     mrfstr_size_t size);
 
 void __mrfstr_avx512_brcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
-    mrfstr_size_t size);
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_avx512_rcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
-    mrfstr_size_t size);
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 
 void __mrfstr_avx512_bfill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);

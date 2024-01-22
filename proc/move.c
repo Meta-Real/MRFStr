@@ -75,13 +75,13 @@ void __mrfstr_rmove(
 
     rem = size % _mrfstr_config.nmem_size;
     size -= rem;
-    dst -= size;
-    src -= size;
 
     if (size < _mrfstr_config.nlimit)
         _mrfstr_config.brcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
     else
         _mrfstr_config.nrcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
 
+    dst -= size;
+    src -= size;
     mrfstr_rmove_rem;
 }

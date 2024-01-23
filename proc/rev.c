@@ -106,7 +106,7 @@ void __mrfstr_rev(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)str & _mrfstr_config.trev_size;
+    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.trev_size;
     mrfstr_chr_t chr;
     if (rem)
     {
@@ -205,7 +205,7 @@ void __mrfstr_rev2(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)left & _mrfstr_config.trev_size;
+    mrfstr_short_t rem = (uintptr_t)left % _mrfstr_config.trev_size;
     if (rem)
     {
         rem = _mrfstr_config.trev_size - rem;
@@ -238,8 +238,8 @@ void __mrfstr_rev2(
 
             mrfstr_create_thread(__mrfstr_rev2_threaded)
             {
-                left += inc;
-                right -= inc;
+                left -= inc;
+                right += inc;
                 free(data);
                 break;
             }

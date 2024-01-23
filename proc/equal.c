@@ -75,7 +75,7 @@ mrfstr_bool_t __mrfstr_equal(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)str1 & _mrfstr_config.tcmp_size;
+    mrfstr_short_t rem = (uintptr_t)str1 % _mrfstr_config.tcmp_size;
     if (rem)
     {
         rem = _mrfstr_config.tcmp_size - rem;

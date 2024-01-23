@@ -107,7 +107,7 @@ void __mrfstr_replchr(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)str & _mrfstr_config.trepl_size;
+    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.trepl_size;
     if (rem)
     {
         rem = _mrfstr_config.trepl_size - rem;
@@ -201,7 +201,7 @@ void __mrfstr_replchr2(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)res & _mrfstr_config.trepl_size;
+    mrfstr_short_t rem = (uintptr_t)res % _mrfstr_config.trepl_size;
     if (rem)
     {
         rem = _mrfstr_config.trepl_size - rem;

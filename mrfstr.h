@@ -74,8 +74,7 @@ typedef mrfstr_byte_t mrfstr_res_enum_t;
 
 /* init functions */
 
-mrfstr_t mrfstr_init(
-    void);
+mrfstr_t mrfstr_init(void);
 mrfstr_t mrfstr_init2(
     mrfstr_data_t data);
 mrfstr_t mrfstr_init3(

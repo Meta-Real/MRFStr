@@ -32,17 +32,20 @@ add_library(MRFStr STATIC
     proc/copy.c proc/move.c proc/fill.c
     proc/rev.c proc/replchr.c
     proc/equal.c
-    proc/contchr.c proc/findchr.c
+    proc/contchr.c proc/findchr.c proc/countchr.c
     srcs/init.c srcs/set.c srcs/get.c
     srcs/concat.c srcs/repeat.c srcs/reverse.c srcs/replace_chr.c
     srcs/equal.c
-    srcs/contain.c srcs/find.c
+    srcs/contain.c srcs/find.c srcs/count_chr.c
     srcs/data.c srcs/io.c
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 enable_testing()
 add_subdirectory(tests)
+
+add_executable(Test test.c)
+target_link_libraries(Test PRIVATE MRFStr)
 
 add_custom_command(TARGET MRFStr POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:MRFStr> ..)

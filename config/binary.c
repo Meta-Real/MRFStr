@@ -138,3 +138,43 @@ mrfstr_byte_t __mrfstr_ctz16(
     return count;
 #endif
 }
+
+mrfstr_byte_t __mrfstr_popcnt64(
+    mrfstr_longlong_t bits)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_popcountll(bits);
+#elif defined(_MSC_VER)
+    return (mrfstr_byte_t)PopulationCount64(bits);
+#else
+    mrfstr_byte_t count = 0;
+    while (bits)
+    {
+        if (bits & 1)
+            count++;
+        bits >>= 1;
+    }
+
+    return count;
+#endif
+}
+
+mrfstr_byte_t __mrfstr_popcnt32(
+    mrfstr_long_t bits)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_popcount(bits);
+#elif defined(_MSC_VER)
+    return (mrfstr_byte_t)PopulationCount64(bits);
+#else
+    mrfstr_byte_t count = 0;
+    while (bits)
+    {
+        if (bits & 1)
+            count++;
+        bits >>= 1;
+    }
+
+    return count;
+#endif
+}

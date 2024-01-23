@@ -117,6 +117,8 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*nfindchr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_size_t (*ncountchr_sub)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t nsearch_size;
 
     void (*tcontchr_sub)(
@@ -124,6 +126,8 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*tfindchr_sub)(
         volatile mrfstr_idx_t*, mrfstr_idx_t,
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_size_t (*tcountchr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tsearch_size;
 
@@ -230,6 +234,8 @@ mrfstr_bool_t __mrfstr_equal(
 mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_findchr(
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_size_t __mrfstr_countchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 #endif

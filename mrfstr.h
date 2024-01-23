@@ -203,6 +203,14 @@ mrfstr_idx_t mrfstr_n_find_chr(
     mrfstr_ct str, mrfstr_chr_t chr,
     mrfstr_size_t size);
 
+/* count functions */
+
+mrfstr_size_t mrfstr_count_chr(
+    mrfstr_ct str, mrfstr_chr_t chr);
+mrfstr_size_t mrfstr_n_count_chr(
+    mrfstr_ct str, mrfstr_chr_t chr,
+    mrfstr_size_t size);
+
 /* data functions */
 
 mrfstr_data_t mrfstr_get_data(

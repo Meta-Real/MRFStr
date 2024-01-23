@@ -38,8 +38,10 @@ mrfstr_config_t _mrfstr_config =
 #endif
     __mrfstr_avx512_equal, 64,
     __mrfstr_avx512_tequal, 64,
-    __mrfstr_avx512_contchr, __mrfstr_avx512_findchr, 64,
-    __mrfstr_avx512_tcontchr, __mrfstr_avx512_tfindchr, 64,
+    __mrfstr_avx512_contchr, __mrfstr_avx512_findchr,
+    __mrfstr_avx512_countchr, 64,
+    __mrfstr_avx512_tcontchr, __mrfstr_avx512_tfindchr,
+    __mrfstr_avx512_countchr, 64,
     __mrfstr_avx512_strlen, 64
 };
 #elif defined(__AVX__)

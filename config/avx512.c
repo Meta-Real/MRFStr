@@ -20,8 +20,7 @@ copies or substantial portions of the Software.
 #ifdef __AVX512F__
 
 void __mrfstr_avx512_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
@@ -35,8 +34,7 @@ void __mrfstr_avx512_bcopy(
 }
 
 void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
     __m512i *sblock = (__m512i*)src;
@@ -151,8 +149,7 @@ void __mrfstr_avx512_rev(
 }
 
 void __mrfstr_avx512_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right,
-    mrfstr_size_t size)
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
 {
     __m512i *lblock = (__m512i*)left;
     __m512i *rblock = (__m512i*)right;
@@ -412,6 +409,25 @@ mrfstr_idx_t __mrfstr_avx512_tfindchr(
     }
 
     return MRFSTR_INVIDX;
+}
+
+mrfstr_size_t __mrfstr_avx512_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m512i *sblock = (__m512i*)str;
+    __m512i cblock = _mm512_set1_epi8(chr);
+
+    __m512i block;
+    mrfstr_longlong_t mask;
+    mrfstr_size_t count = 0;
+    while (size--)
+    {
+        block = _mm512_load_si512(sblock++);
+        mask = _mm512_cmpeq_epi8_mask(block, cblock);
+        count += __mrfstr_popcnt64(mask);
+    }
+
+    return count;
 }
 
 mrfstr_size_t __mrfstr_avx512_strlen(

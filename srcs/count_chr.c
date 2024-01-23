@@ -14,21 +14,24 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#ifndef __MRFSTR_BINARY__
-#define __MRFSTR_BINARY__
+#include <mrfstr-intern.h>
 
-#include <mrfstr.h>
+mrfstr_size_t mrfstr_count_chr(
+    mrfstr_ct str, mrfstr_chr_t chr)
+{
+    if (!MRFSTR_SIZE(str))
+        return 0;
+    return __mrfstr_countchr(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
+}
 
-mrfstr_byte_t __mrfstr_ctz64(
-    mrfstr_longlong_t bits);
-mrfstr_byte_t __mrfstr_ctz32(
-    mrfstr_long_t bits);
-mrfstr_byte_t __mrfstr_ctz16(
-    mrfstr_short_t bits);
+mrfstr_size_t mrfstr_n_count_chr(
+    mrfstr_ct str, mrfstr_chr_t chr,
+    mrfstr_size_t size)
+{
+    if (size > MRFSTR_SIZE(str))
+        size = MRFSTR_SIZE(str);
 
-mrfstr_byte_t __mrfstr_popcnt64(
-    mrfstr_longlong_t bits);
-mrfstr_byte_t __mrfstr_popcnt32(
-    mrfstr_long_t bits);
-
-#endif
+    if (!size)
+        return 0;
+    return __mrfstr_countchr(MRFSTR_DATA(str), chr, size);
+}

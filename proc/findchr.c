@@ -50,9 +50,7 @@ mrfstr_idx_t __mrfstr_findchr(
     if (size < MRFSTR_SLIMIT)
     {
         mrfstr_data_t ptr = (mrfstr_data_t)memchr(str, chr, size);
-        if (ptr)
-            return (mrfstr_idx_t)(ptr - str);
-        return MRFSTR_INVIDX;
+        return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
     }
 
     mrfstr_data_ct base = str;

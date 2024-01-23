@@ -37,7 +37,7 @@ copies or substantial portions of the Software.
     ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
 
 void __mrfstr_base_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
     mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
@@ -89,7 +89,7 @@ void __mrfstr_base_rev(
 }
 
 void __mrfstr_base_rev2(
-    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_ptr_t left, mrfstr_ptr_ct right,
     mrfstr_size_t size)
 {
     mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
@@ -107,12 +107,12 @@ void __mrfstr_base_rev2(
 
 void __mrfstr_base_replchr(
     mrfstr_ptr_t str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
     mrfstr_longlong_t oblock;
-    mrfstr_base_set1(oblock, old);
+    mrfstr_base_set1(oblock, ochr);
 
     mrfstr_longlong_t mask, block;
     for (; size; size--, sblock++)
@@ -124,21 +124,21 @@ void __mrfstr_base_replchr(
         if (mask)
         {
             block &= ~(0xff * mask);
-            block |= new * mask;
+            block |= nchr * mask;
             *sblock = block;
         }
     }
 }
 
 void __mrfstr_base_replchr2(
-    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)res;
     mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
     mrfstr_longlong_t oblock;
-    mrfstr_base_set1(oblock, old);
+    mrfstr_base_set1(oblock, ochr);
 
     mrfstr_longlong_t mask, block;
     while (size--)
@@ -150,7 +150,7 @@ void __mrfstr_base_replchr2(
         if (mask)
         {
             block &= ~(0xff * mask);
-            block |= new * mask;
+            block |= nchr * mask;
         }
 
         *rblock++ = block;

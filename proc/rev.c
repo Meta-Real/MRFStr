@@ -119,14 +119,14 @@ void __mrfstr_rev(
     mrfstr_size_t inc = size * _mrfstr_config.trev_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_rev_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_REV_T));
+            data = (mrfstr_rev_t)malloc(sizeof(struct __MRFSTR_REV_T));
             if (!data)
                 break;
 
@@ -167,7 +167,7 @@ void __mrfstr_rev(
 }
 
 void __mrfstr_rev2(
-    restrict mrfstr_data_t left, restrict mrfstr_data_ct right,
+    mrfstr_data_t left, mrfstr_data_ct right,
     mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
@@ -218,14 +218,14 @@ void __mrfstr_rev2(
     mrfstr_size_t inc = (size /= factor) * _mrfstr_config.trev_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_rev_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_REV_T));
+            data = (mrfstr_rev_t)malloc(sizeof(struct __MRFSTR_REV_T));
             if (!data)
                 break;
 

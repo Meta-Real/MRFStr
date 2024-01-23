@@ -23,8 +23,8 @@ copies or substantial portions of the Software.
 
 struct __MRFSTR_COPY_T
 {
-    restrict mrfstr_data_t dst;
-    restrict mrfstr_data_ct src;
+    mrfstr_data_t dst;
+    mrfstr_data_ct src;
     mrfstr_size_t size;
 };
 typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
@@ -38,7 +38,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 
 void __mrfstr_copy(
-    restrict mrfstr_data_t dst, restrict mrfstr_data_ct src,
+    mrfstr_data_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
     if (size < MRFSTR_SLIMIT)
@@ -91,14 +91,14 @@ void __mrfstr_copy(
     mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_copy_t data;
         for (; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_COPY_T));
+            data = (mrfstr_copy_t)malloc(sizeof(struct __MRFSTR_COPY_T));
             if (!data)
                 break;
 
@@ -142,7 +142,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_copy_t data = args;
+    mrfstr_copy_t data = (mrfstr_copy_t)args;
     _mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
 
     free(data);

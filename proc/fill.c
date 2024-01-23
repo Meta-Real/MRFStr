@@ -91,14 +91,14 @@ void __mrfstr_fill(
     mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_fill_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_FILL_T));
+            data = (mrfstr_fill_t)malloc(sizeof(struct __MRFSTR_FILL_T));
             if (!data)
                 break;
 

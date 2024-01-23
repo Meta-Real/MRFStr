@@ -21,7 +21,7 @@ mrfstr_data_t mrfstr_get_str(
 {
     if (!dst)
     {
-        dst = malloc((MRFSTR_SIZE(src) + 1) * sizeof(mrfstr_chr_t));
+        dst = (mrfstr_data_t)malloc((MRFSTR_SIZE(src) + 1) * sizeof(mrfstr_chr_t));
         if (!dst)
             return NULL;
     }
@@ -42,7 +42,7 @@ mrfstr_data_t mrfstr_n_get_str(
 
     if (!dst)
     {
-        dst = malloc((size + 1) * sizeof(mrfstr_chr_t));
+        dst = (mrfstr_data_t)malloc((size + 1) * sizeof(mrfstr_chr_t));
         if (!dst)
             return NULL;
     }

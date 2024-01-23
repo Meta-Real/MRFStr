@@ -91,14 +91,14 @@ mrfstr_bool_t __mrfstr_contchr(
     volatile mrfstr_bool_t res = MRFSTR_FALSE;
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_contchr_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_CONTCHR_T));
+            data = (mrfstr_contchr_t)malloc(sizeof(struct __MRFSTR_CONTCHR_T));
             if (!data)
             {
                 if (!i)

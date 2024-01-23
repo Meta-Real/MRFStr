@@ -225,7 +225,7 @@ void mrfstr_config(
             break;
         }
         break;
-    case MRFSTR_CONFIG_TYPE_REV:
+    case MRFSTR_CONFIG_TYPE_REVERSE:
         switch (normal)
         {
         case MRFSTR_CONFIG_SIMD_AVX512:
@@ -345,7 +345,7 @@ void mrfstr_config(
             break;
         }
         break;
-    case MRFSTR_CONFIG_TYPE_CMP:
+    case MRFSTR_CONFIG_TYPE_COMPARE:
         switch (normal)
         {
         case MRFSTR_CONFIG_SIMD_AVX512:

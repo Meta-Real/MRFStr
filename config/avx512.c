@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 #ifdef __AVX512F__
 
 void __mrfstr_avx512_bcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
@@ -35,7 +35,7 @@ void __mrfstr_avx512_bcopy(
 }
 
 void __mrfstr_avx512_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
     __m512i *dblock = (__m512i*)dst;
@@ -151,7 +151,7 @@ void __mrfstr_avx512_rev(
 }
 
 void __mrfstr_avx512_rev2(
-    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_ptr_t left, mrfstr_ptr_ct right,
     mrfstr_size_t size)
 {
     __m512i *lblock = (__m512i*)left;
@@ -191,12 +191,12 @@ void __mrfstr_avx512_rev2(
 
 void __mrfstr_avx512_replchr(
     mrfstr_ptr_t str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     __m512i *sblock = (__m512i*)str;
-    __m512i oblock = _mm512_set1_epi8(old);
-    __m512i nblock = _mm512_set1_epi8(new);
+    __m512i oblock = _mm512_set1_epi8(ochr);
+    __m512i nblock = _mm512_set1_epi8(nchr);
 
     __m512i block;
     mrfstr_longlong_t mask;
@@ -211,14 +211,14 @@ void __mrfstr_avx512_replchr(
 }
 
 void __mrfstr_avx512_replchr2(
-    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     __m512i *rblock = (__m512i*)res;
     __m512i *sblock = (__m512i*)str;
-    __m512i oblock = _mm512_set1_epi8(old);
-    __m512i nblock = _mm512_set1_epi8(new);
+    __m512i oblock = _mm512_set1_epi8(ochr);
+    __m512i nblock = _mm512_set1_epi8(nchr);
 
     __m512i block;
     mrfstr_longlong_t mask;

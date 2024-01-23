@@ -17,6 +17,11 @@ copies or substantial portions of the Software.
 #ifndef __MRFSTR__
 #define __MRFSTR__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -153,10 +158,10 @@ void mrfstr_reverse(
 
 void mrfstr_replace_chr(
     mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new);
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr);
 void mrfstr_n_replace_chr(
     mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
 
 /* cmp functions */
@@ -229,9 +234,9 @@ enum __MRFSTR_CONFIG_TYPE_ENUM
 {
     MRFSTR_CONFIG_TYPE_MEMORY,
     MRFSTR_CONFIG_TYPE_REPLACE,
-    MRFSTR_CONFIG_TYPE_REV,
+    MRFSTR_CONFIG_TYPE_REVERSE,
 
-    MRFSTR_CONFIG_TYPE_CMP,
+    MRFSTR_CONFIG_TYPE_COMPARE,
     MRFSTR_CONFIG_TYPE_SEARCH,
 
     MRFSTR_CONFIG_TYPE_STRLEN
@@ -260,5 +265,9 @@ void mrfstr_config(
 void mrfstr_config_str(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t simd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MRFSTR__ */

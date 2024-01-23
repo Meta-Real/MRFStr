@@ -20,8 +20,7 @@ copies or substantial portions of the Software.
 #ifdef __AVX__
 
 void __mrfstr_avx_bcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
-    mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m256i *dblock = (__m256i*)dst;
     __m256i *sblock = (__m256i*)src;
@@ -35,8 +34,7 @@ void __mrfstr_avx_bcopy(
 }
 
 void __mrfstr_avx_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
-    mrfstr_size_t size)
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
     __m256i *dblock = (__m256i*)dst;
     __m256i *sblock = (__m256i*)src;
@@ -157,8 +155,7 @@ void __mrfstr_avx_rev(
 }
 
 void __mrfstr_avx_rev2(
-    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
-    mrfstr_size_t size)
+    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
 {
     __m256i *lblock = (__m256i*)left;
     __m256i *rblock = (__m256i*)right;
@@ -191,12 +188,12 @@ void __mrfstr_avx_rev2(
 
 void __mrfstr_avx_replchr(
     mrfstr_ptr_t str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     __m256i *sblock = (__m256i*)str;
-    __m256i oblock = _mm256_set1_epi8(old);
-    __m256i nblock = _mm256_set1_epi8(new);
+    __m256i oblock = _mm256_set1_epi8(ochr);
+    __m256i nblock = _mm256_set1_epi8(nchr);
 
     __m256i block;
 #ifdef __AVX512VL__
@@ -221,14 +218,14 @@ void __mrfstr_avx_replchr(
 }
 
 void __mrfstr_avx_replchr2(
-    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
     __m256i *rblock = (__m256i*)res;
     __m256i *sblock = (__m256i*)str;
-    __m256i oblock = _mm256_set1_epi8(old);
-    __m256i nblock = _mm256_set1_epi8(new);
+    __m256i oblock = _mm256_set1_epi8(ochr);
+    __m256i nblock = _mm256_set1_epi8(nchr);
 
     __m256i block;
 #ifdef __AVX512VL__

@@ -49,7 +49,7 @@ mrfstr_idx_t __mrfstr_findchr(
 {
     if (size < MRFSTR_SLIMIT)
     {
-        mrfstr_data_t ptr = memchr(str, chr, size);
+        mrfstr_data_t ptr = (mrfstr_data_t)memchr(str, chr, size);
         if (ptr)
             return (mrfstr_idx_t)(ptr - str);
         return MRFSTR_INVIDX;
@@ -114,14 +114,14 @@ mrfstr_idx_t __mrfstr_findchr(
     }
 
     mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = malloc(nthreads * sizeof(mrfstr_thread_t));
+    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     mrfstr_byte_t i = 0;
     if (threads)
     {
         mrfstr_findchr_t data;
         for (i = 0; i != nthreads; i++)
         {
-            data = malloc(sizeof(struct __MRFSTR_FINDCHR_T));
+            data = (mrfstr_findchr_t)malloc(sizeof(struct __MRFSTR_FINDCHR_T));
             if (!data)
             {
                 if (!i)

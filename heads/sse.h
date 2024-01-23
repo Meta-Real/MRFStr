@@ -30,10 +30,10 @@ copies or substantial portions of the Software.
 #define MRFSTR_SSE_TFINDCHR_LOAD 0x40000
 
 void __mrfstr_sse_bcopy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size);
 void __mrfstr_sse_copy(
-    restrict mrfstr_ptr_t dst, restrict mrfstr_ptr_ct src,
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size);
 
 void __mrfstr_sse_brcopy(
@@ -50,18 +50,18 @@ void __mrfstr_sse_fill(
 void __mrfstr_sse_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_sse_rev2(
-    restrict mrfstr_ptr_t left, restrict mrfstr_ptr_ct right,
+    mrfstr_ptr_t left, mrfstr_ptr_ct right,
     mrfstr_size_t size);
 #endif
 
 #ifdef __SSE4_1__
 void __mrfstr_sse_replchr(
     mrfstr_ptr_t str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
 void __mrfstr_sse_replchr2(
-    restrict mrfstr_ptr_t res, restrict mrfstr_ptr_ct str,
-    mrfstr_chr_t old, mrfstr_chr_t new,
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
 #endif
 

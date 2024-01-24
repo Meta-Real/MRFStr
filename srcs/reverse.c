@@ -28,15 +28,7 @@ void mrfstr_reverse(
         return;
     }
 
-    if (!MRFSTR_SIZE(str))
-    {
-        free(MRFSTR_DATA(res));
-
-        MRFSTR_DATA(res) = NULL;
-        MRFSTR_SIZE(res) = 0;
-        return;
-    }
-
-    __mrfstr_rev2(MRFSTR_DATA(res), MRFSTR_DATA(str) + MRFSTR_SIZE(str), MRFSTR_SIZE(str));
     MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
+    if (MRFSTR_SIZE(res))
+        __mrfstr_rev2(MRFSTR_DATA(res), MRFSTR_DATA(str) + MRFSTR_SIZE(str), MRFSTR_SIZE(res));
 }

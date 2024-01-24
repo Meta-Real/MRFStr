@@ -22,9 +22,6 @@ void mrfstr_replace_chr(
 {
     if (!MRFSTR_SIZE(str))
     {
-        free(MRFSTR_DATA(res));
-
-        MRFSTR_DATA(res) = NULL;
         MRFSTR_SIZE(res) = 0;
         return;
     }
@@ -56,9 +53,6 @@ void mrfstr_n_replace_chr(
 {
     if (!MRFSTR_SIZE(str))
     {
-        free(MRFSTR_DATA(res));
-
-        MRFSTR_DATA(res) = NULL;
         MRFSTR_SIZE(res) = 0;
         return;
     }

@@ -23,51 +23,26 @@ void mrfstr_set(
     if (dst == src)
         return;
 
-    if (!MRFSTR_SIZE(src))
-    {
-        free(MRFSTR_DATA(dst));
-
-        MRFSTR_DATA(dst) = NULL;
-        MRFSTR_SIZE(dst) = 0;
-        return;
-    }
-
-    __mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(src));
     MRFSTR_SIZE(dst) = MRFSTR_SIZE(src);
+    if (MRFSTR_SIZE(dst))
+        __mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(dst));
 }
 
 void mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src)
 {
-    mrfstr_size_t size = mrfstr_strlen(src);
-    if (!size)
-    {
-        free(MRFSTR_DATA(dst));
-
-        MRFSTR_DATA(dst) = NULL;
-        MRFSTR_SIZE(dst) = 0;
-        return;
-    }
-
-    __mrfstr_copy(MRFSTR_DATA(dst), src, size);
-    MRFSTR_SIZE(dst) = size;
+    MRFSTR_SIZE(dst) = mrfstr_strlen(src);
+    if (MRFSTR_SIZE(dst))
+        __mrfstr_copy(MRFSTR_DATA(dst), src, MRFSTR_SIZE(dst));
 }
 
 void mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
-    if (!size)
-    {
-        free(MRFSTR_DATA(dst));
-
-        MRFSTR_DATA(dst) = NULL;
-        MRFSTR_SIZE(dst) = 0;
-        return;
-    }
-
-    __mrfstr_copy(MRFSTR_DATA(dst), src, size);
     MRFSTR_SIZE(dst) = size;
+    if (size)
+        __mrfstr_copy(MRFSTR_DATA(dst), src, size);
 }
 
 void mrfstr_set_chr(

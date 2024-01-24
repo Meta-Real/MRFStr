@@ -34,7 +34,8 @@ add_library(MRFStr STATIC
     proc/equal.c
     proc/contchr.c proc/findchr.c proc/countchr.c
     srcs/init.c srcs/set.c srcs/get.c
-    srcs/concat.c srcs/repeat.c srcs/reverse.c srcs/replace_chr.c
+    srcs/concat.c srcs/remove.c srcs/repeat.c
+    srcs/reverse.c srcs/replace_chr.c
     srcs/equal.c
     srcs/contain.c srcs/find.c srcs/count_chr.c
     srcs/data.c srcs/io.c

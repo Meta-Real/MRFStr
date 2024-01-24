@@ -20,6 +20,9 @@ copies or substantial portions of the Software.
 mrfstr_size_t mrfstr_strlen(
     mrfstr_data_ct str)
 {
+    if (!str)
+        return 0;
+
     mrfstr_byte_t align = (uintptr_t)str % _mrfstr_config.strlen_size;
     if (align)
     {

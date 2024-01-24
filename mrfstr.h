@@ -139,6 +139,15 @@ mrfstr_res_enum_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size);
 
+/* remove functions */
+
+mrfstr_res_enum_t mrfstr_remove(
+    mrfstr_t res, mrfstr_ct str,
+    mrfstr_idx_t idx);
+mrfstr_res_enum_t mrfstr_n_remove(
+    mrfstr_t res, mrfstr_ct str,
+    mrfstr_idx_t idx, mrfstr_size_t count);
+
 /* repeat functions */
 
 mrfstr_res_enum_t mrfstr_repeat(

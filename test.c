@@ -21,7 +21,7 @@ int main(void)
     for (int i = 0; i < COUNT; i++)
     {
         QueryPerformanceCounter(&s);
-        mrfstr_count_chr(a, '1');
+        mrfstr_n_remove(a, a, 100, 1000 - 100);
         QueryPerformanceCounter(&e);
 
         t.QuadPart += e.QuadPart - s.QuadPart;

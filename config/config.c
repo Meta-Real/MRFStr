@@ -59,8 +59,10 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx_replchr, __mrfstr_avx_replchr2, 32,
     __mrfstr_avx_equal, 32,
     __mrfstr_avx_tequal, 32,
-    __mrfstr_avx_contchr, __mrfstr_avx_findchr, 32,
-    __mrfstr_avx_tcontchr, __mrfstr_avx_tfindchr, 32,
+    __mrfstr_avx_contchr, __mrfstr_avx_findchr,
+    __mrfstr_avx_countchr, 32,
+    __mrfstr_avx_tcontchr, __mrfstr_avx_tfindchr,
+    __mrfstr_avx_countchr, 32,
     __mrfstr_avx_strlen, 32
 #else
     __mrfstr_sse_rev, __mrfstr_sse_rev2, 16,
@@ -69,8 +71,10 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_replchr, __mrfstr_sse_replchr2, 16,
     __mrfstr_sse_equal, 16,
     __mrfstr_sse_tequal, 16,
-    __mrfstr_sse_contchr, __mrfstr_sse_findchr, 16,
-    __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr, 16,
+    __mrfstr_sse_contchr, __mrfstr_sse_findchr,
+    __mrfstr_sse_countchr, 16,
+    __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr,
+    __mrfstr_sse_countchr, 16,
     __mrfstr_sse_strlen, 16
 #endif
 };
@@ -98,8 +102,10 @@ mrfstr_config_t _mrfstr_config =
 #endif
     __mrfstr_sse_equal, 16,
     __mrfstr_sse_tequal, 16,
-    __mrfstr_sse_contchr, __mrfstr_sse_findchr, 16,
-    __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr, 16,
+    __mrfstr_sse_contchr, __mrfstr_sse_findchr,
+    __mrfstr_sse_countchr, 16,
+    __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr,
+    __mrfstr_sse_countchr, 16,
     __mrfstr_sse_strlen, 16
 };
 #else
@@ -116,8 +122,10 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_base_replchr, __mrfstr_base_replchr2, 8,
     __mrfstr_base_equal, 8,
     __mrfstr_base_tequal, 8,
-    __mrfstr_base_contchr, __mrfstr_base_findchr, 8,
-    __mrfstr_base_tcontchr, __mrfstr_base_tfindchr, 8,
+    __mrfstr_base_contchr, __mrfstr_base_findchr,
+    __mrfstr_base_countchr, 8,
+    __mrfstr_base_tcontchr, __mrfstr_base_tfindchr,
+    __mrfstr_base_countchr, 8,
     __mrfstr_base_strlen, 8
 };
 #endif
@@ -406,6 +414,7 @@ void mrfstr_config(
 #ifdef __AVX512F__
             _mrfstr_config.ncontchr_sub = __mrfstr_avx512_contchr;
             _mrfstr_config.nfindchr_sub = __mrfstr_avx512_findchr;
+            _mrfstr_config.ncountchr_sub = __mrfstr_avx512_countchr;
             _mrfstr_config.nsearch_size = 64;
             break;
 #endif
@@ -413,6 +422,7 @@ void mrfstr_config(
 #ifdef __AVX2__
             _mrfstr_config.ncontchr_sub = __mrfstr_avx_contchr;
             _mrfstr_config.nfindchr_sub = __mrfstr_avx_findchr;
+            _mrfstr_config.ncountchr_sub = __mrfstr_avx_countchr;
             _mrfstr_config.nsearch_size = 32;
             break;
 #endif
@@ -420,12 +430,14 @@ void mrfstr_config(
 #ifdef __SSE2__
             _mrfstr_config.ncontchr_sub = __mrfstr_sse_contchr;
             _mrfstr_config.nfindchr_sub = __mrfstr_sse_findchr;
+            _mrfstr_config.ncountchr_sub = __mrfstr_sse_countchr;
             _mrfstr_config.nsearch_size = 16;
             break;
 #endif
         case MRFSTR_CONFIG_SIMD_NONE:
             _mrfstr_config.ncontchr_sub = __mrfstr_base_contchr;
             _mrfstr_config.nfindchr_sub = __mrfstr_base_findchr;
+            _mrfstr_config.ncountchr_sub = __mrfstr_base_countchr;
             _mrfstr_config.nsearch_size = 8;
             break;
         }
@@ -435,6 +447,7 @@ void mrfstr_config(
 #ifdef __AVX512F__
             _mrfstr_config.tcontchr_sub = __mrfstr_avx512_tcontchr;
             _mrfstr_config.tfindchr_sub = __mrfstr_avx512_tfindchr;
+            _mrfstr_config.tcountchr_sub = __mrfstr_avx512_countchr;
             _mrfstr_config.tsearch_size = 64;
             break;
 #endif
@@ -442,6 +455,7 @@ void mrfstr_config(
 #ifdef __AVX2__
             _mrfstr_config.tcontchr_sub = __mrfstr_avx_tcontchr;
             _mrfstr_config.tfindchr_sub = __mrfstr_avx_tfindchr;
+            _mrfstr_config.tcountchr_sub = __mrfstr_avx_countchr;
             _mrfstr_config.tsearch_size = 32;
             break;
 #endif
@@ -449,12 +463,14 @@ void mrfstr_config(
 #ifdef __SSE2__
             _mrfstr_config.tcontchr_sub = __mrfstr_sse_tcontchr;
             _mrfstr_config.tfindchr_sub = __mrfstr_sse_tfindchr;
+            _mrfstr_config.tcountchr_sub = __mrfstr_sse_countchr;
             _mrfstr_config.tsearch_size = 16;
             break;
 #endif
         case MRFSTR_CONFIG_SIMD_NONE:
             _mrfstr_config.tcontchr_sub = __mrfstr_base_tcontchr;
             _mrfstr_config.tfindchr_sub = __mrfstr_base_tfindchr;
+            _mrfstr_config.tcountchr_sub = __mrfstr_base_countchr;
             _mrfstr_config.tsearch_size = 8;
             break;
         }

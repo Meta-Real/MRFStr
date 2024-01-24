@@ -320,6 +320,25 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
     return MRFSTR_INVIDX;
 }
 
+mrfstr_size_t __mrfstr_base_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
+    mrfstr_longlong_t cblock;
+    mrfstr_base_set1(cblock, chr);
+
+    mrfstr_longlong_t mask;
+    mrfstr_size_t count = 0;
+    while (size--)
+    {
+        mask = cblock ^ *sblock++;
+        mask = mrfstr_base_cmp(mask);
+        count += __mrfstr_popcnt64(mask);
+    }
+
+    return count;
+}
+
 mrfstr_size_t __mrfstr_base_strlen(
     mrfstr_ptr_ct str)
 {

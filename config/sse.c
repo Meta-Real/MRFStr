@@ -198,7 +198,7 @@ void __mrfstr_sse_replchr(
     __m128i nblock = _mm_set1_epi8(nchr);
 
     __m128i block;
-#ifdef __AVX512VL__
+#ifdef __AVX512BW__
     mrfstr_short_t mask;
 #else
     __m128i mask;
@@ -207,7 +207,7 @@ void __mrfstr_sse_replchr(
     {
         block = _mm_load_si128(sblock);
 
-#ifdef __AVX512VL__
+#ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, oblock);
         if (mask)
             _mm_mask_storeu_epi8(sblock, mask, nblock);
@@ -230,7 +230,7 @@ void __mrfstr_sse_replchr2(
     __m128i nblock = _mm_set1_epi8(nchr);
 
     __m128i block;
-#ifdef __AVX512VL__
+#ifdef __AVX512BW__
     mrfstr_short_t mask;
 #else
     __m128i mask;
@@ -239,7 +239,7 @@ void __mrfstr_sse_replchr2(
     {
         block = _mm_loadu_si128(sblock++);
 
-#ifdef __AVX512VL__
+#ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, oblock);
         if (mask)
             block = _mm_mask_blend_epi8(mask, block, nblock);
@@ -472,6 +472,29 @@ mrfstr_idx_t __mrfstr_sse_tfindchr(
     }
 
     return MRFSTR_INVIDX;
+}
+
+mrfstr_size_t __mrfstr_sse_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+{
+    __m128i *sblock = (__m128i*)str;
+    __m128i cblock = _mm_set1_epi8(chr);
+
+    __m128i block;
+    mrfstr_short_t mask;
+    mrfstr_size_t count = 0;
+    while (size--)
+    {
+        block = _mm_load_si128(sblock++);
+#ifdef __AVX512BW__
+        mask = _mm_cmpeq_epi8_mask(block, cblock);
+#else
+        mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));
+#endif
+        count += __mrfstr_popcnt32(mask);
+    }
+
+    return count;
 }
 
 mrfstr_size_t __mrfstr_sse_strlen(

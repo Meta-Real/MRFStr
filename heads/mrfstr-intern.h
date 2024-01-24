@@ -28,12 +28,64 @@ copies or substantial portions of the Software.
 #include <sse.h>
 #include <base.h>
 
+#define MRFSTR_ALLOC(x, size)                                                \
+    do                                                                       \
+    {                                                                        \
+        MRFSTR_DATA(x) = (mrfstr_data_t)malloc(size * sizeof(mrfstr_chr_t)); \
+        if (!MRFSTR_DATA(x))                                                 \
+            return MRFSTR_RES_MEM_ERROR;                                     \
+                                                                             \
+        MRFSTR_CAPA(x) = size;                                               \
+    } while (0)
+
+#define MRFSTR_REALLOC(x, size)                                      \
+    do                                                               \
+    {                                                                \
+        mrfstr_data_t block = (mrfstr_data_t)realloc(MRFSTR_DATA(x), \
+            size * sizeof(mrfstr_chr_t));                            \
+        if (!block)                                                  \
+            return MRFSTR_RES_MEM_ERROR;                             \
+                                                                     \
+        MRFSTR_DATA(x) = block;                                      \
+        MRFSTR_CAPA(x) = size;                                       \
+    } while (0)
+
+#define MRFSTR_CLEAR_REALLOC(x, size)                                        \
+    do                                                                       \
+    {                                                                        \
+        if (MRFSTR_CAPA(x))                                                  \
+            free(MRFSTR_DATA(x));                                            \
+                                                                             \
+        MRFSTR_DATA(x) = (mrfstr_data_t)malloc(size * sizeof(mrfstr_chr_t)); \
+        if (!MRFSTR_DATA(x))                                                 \
+        {                                                                    \
+            MRFSTR_SIZE(x) = 0;                                              \
+            MRFSTR_CAPA(x) = 0;                                              \
+            return MRFSTR_RES_MEM_ERROR;                                     \
+        }                                                                    \
+                                                                             \
+        MRFSTR_CAPA(x) = size;                                               \
+    } while (0)
+
+#define MRFSTR_FREE(x)            \
+    do                            \
+    {                             \
+        if (MRFSTR_CAPA(x))       \
+        {                         \
+            free(MRFSTR_DATA(x)); \
+                                  \
+            MRFSTR_SIZE(x) = 0;   \
+            MRFSTR_CAPA(x) = 0;   \
+        }                         \
+    } while (0)
+
 #pragma pack(push, 1)
 struct __MRFSTR_CONFIG_T
 {
     mrfstr_byte_t tcount;
     mrfstr_size_t nlimit;
     mrfstr_size_t tlimit;
+    mrfstr_byte_t stdin_alloc;
 
     /* memory functions */
 

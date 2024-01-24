@@ -21,6 +21,7 @@ mrfstr_size_t mrfstr_count_chr(
 {
     if (!MRFSTR_SIZE(str))
         return 0;
+
     return __mrfstr_countchr(MRFSTR_DATA(str), chr, MRFSTR_SIZE(str));
 }
 
@@ -33,5 +34,6 @@ mrfstr_size_t mrfstr_n_count_chr(
 
     if (!size)
         return 0;
+
     return __mrfstr_countchr(MRFSTR_DATA(str), chr, size);
 }

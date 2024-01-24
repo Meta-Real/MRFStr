@@ -17,37 +17,59 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
-void mrfstr_set(
+mrfstr_res_enum_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src)
 {
     if (dst == src)
-        return;
+        return MRFSTR_RES_NOERROR;
 
     MRFSTR_SIZE(dst) = MRFSTR_SIZE(src);
-    if (MRFSTR_SIZE(dst))
-        __mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(dst));
+    if (!MRFSTR_SIZE(dst))
+        return MRFSTR_RES_NOERROR;
+
+    if (MRFSTR_CAPA(dst) < MRFSTR_SIZE(dst))
+        MRFSTR_CLEAR_REALLOC(dst, MRFSTR_SIZE(dst));
+
+    __mrfstr_copy(MRFSTR_DATA(dst), MRFSTR_DATA(src), MRFSTR_SIZE(dst));
+    return MRFSTR_RES_NOERROR;
 }
 
-void mrfstr_set_str(
+mrfstr_res_enum_t mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src)
 {
     MRFSTR_SIZE(dst) = mrfstr_strlen(src);
-    if (MRFSTR_SIZE(dst))
-        __mrfstr_copy(MRFSTR_DATA(dst), src, MRFSTR_SIZE(dst));
+    if (!MRFSTR_SIZE(dst))
+        return MRFSTR_RES_NOERROR;
+
+    if (MRFSTR_CAPA(dst) < MRFSTR_SIZE(dst))
+        MRFSTR_CLEAR_REALLOC(dst, MRFSTR_SIZE(dst));
+
+    __mrfstr_copy(MRFSTR_DATA(dst), src, MRFSTR_SIZE(dst));
+    return MRFSTR_RES_NOERROR;
 }
 
-void mrfstr_set_nstr(
+mrfstr_res_enum_t mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
     MRFSTR_SIZE(dst) = size;
-    if (size)
-        __mrfstr_copy(MRFSTR_DATA(dst), src, size);
+    if (!size)
+        return MRFSTR_RES_NOERROR;
+
+    if (MRFSTR_CAPA(dst) < size)
+        MRFSTR_CLEAR_REALLOC(dst, size);
+
+    __mrfstr_copy(MRFSTR_DATA(dst), src, size);
+    return MRFSTR_RES_NOERROR;
 }
 
-void mrfstr_set_chr(
+mrfstr_res_enum_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src)
 {
+    if (!MRFSTR_CAPA(dst))
+        MRFSTR_ALLOC(dst, 1);
+
     *MRFSTR_DATA(dst) = src;
     MRFSTR_SIZE(dst) = 1;
+    return MRFSTR_RES_NOERROR;
 }

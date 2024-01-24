@@ -16,7 +16,6 @@ copies or substantial portions of the Software.
 
 #include <mrfstr.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <inttypes.h>

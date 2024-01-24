@@ -17,10 +17,10 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
-#ifdef __AVX512F__
 mrfstr_config_t _mrfstr_config =
 {
-    1, 0x200000, 0x8000000ULL,
+    1, 0x200000, 0x8000000ULL, 64,
+#ifdef __AVX512F__
     __mrfstr_avx512_bcopy, __mrfstr_avx512_copy,
     __mrfstr_avx512_brcopy, __mrfstr_avx512_rcopy,
     __mrfstr_avx512_bfill, __mrfstr_avx512_fill, 64,
@@ -43,11 +43,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_tcontchr, __mrfstr_avx512_tfindchr,
     __mrfstr_avx512_countchr, 64,
     __mrfstr_avx512_strlen, 64
-};
 #elif defined(__AVX__)
-mrfstr_config_t _mrfstr_config =
-{
-    1, 0x100000, 0x8000000ULL,
     __mrfstr_avx_bcopy, __mrfstr_avx_copy,
     __mrfstr_avx_brcopy, __mrfstr_avx_rcopy,
     __mrfstr_avx_bfill, __mrfstr_avx_fill, 32,
@@ -77,11 +73,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_countchr, 16,
     __mrfstr_sse_strlen, 16
 #endif
-};
 #elif defined(__SSE2__)
-mrfstr_config_t _mrfstr_config =
-{
-    1, 0x200000, 0x8000000ULL,
     __mrfstr_sse_bcopy, __mrfstr_sse_copy,
     __mrfstr_sse_brcopy, __mrfstr_sse_rcopy,
     __mrfstr_sse_bfill, __mrfstr_sse_fill, 16,
@@ -107,11 +99,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr,
     __mrfstr_sse_countchr, 16,
     __mrfstr_sse_strlen, 16
-};
 #else
-mrfstr_config_t _mrfstr_config =
-{
-    1, 0x200000, 0x8000000ULL,
     __mrfstr_base_copy, __mrfstr_base_copy,
     __mrfstr_base_rcopy, __mrfstr_base_rcopy,
     __mrfstr_base_fill, __mrfstr_base_fill, 8,
@@ -127,8 +115,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_base_tcontchr, __mrfstr_base_tfindchr,
     __mrfstr_base_countchr, 8,
     __mrfstr_base_strlen, 8
-};
 #endif
+};
 
 void mrfstr_config_tcount(
     mrfstr_byte_t tcount)

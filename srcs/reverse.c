@@ -16,19 +16,31 @@ copies or substantial portions of the Software.
 
 #include <mrfstr-intern.h>
 
-void mrfstr_reverse(
+mrfstr_res_enum_t mrfstr_reverse(
     mrfstr_t res, mrfstr_ct str)
 {
     if (res == str)
     {
         if (MRFSTR_SIZE(res) <= 1)
-            return;
+            return MRFSTR_RES_NOERROR;
 
         __mrfstr_rev(MRFSTR_DATA(res), MRFSTR_SIZE(res));
-        return;
+        return MRFSTR_RES_NOERROR;
     }
 
     MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
-    if (MRFSTR_SIZE(res))
-        __mrfstr_rev2(MRFSTR_DATA(res), MRFSTR_DATA(str) + MRFSTR_SIZE(str), MRFSTR_SIZE(res));
+    if (!MRFSTR_SIZE(res))
+        return MRFSTR_RES_NOERROR;
+
+    if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
+        MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(res));
+
+    if (MRFSTR_SIZE(res) == 1)
+    {
+        *MRFSTR_DATA(res) = *MRFSTR_DATA(str);
+        return MRFSTR_RES_NOERROR;
+    }
+
+    __mrfstr_rev2(MRFSTR_DATA(res), MRFSTR_DATA(str) + MRFSTR_SIZE(res), MRFSTR_SIZE(res));
+    return MRFSTR_RES_NOERROR;
 }

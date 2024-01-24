@@ -22,10 +22,7 @@ mrfstr_res_enum_t mrfstr_repeat(
     mrfstr_size_t count)
 {
     if (MRFSTR_SIZE(str) == 1)
-    {
-        mrfstr_repeat_chr(res, *MRFSTR_DATA(str), count);
-        return MRFSTR_RES_NOERROR;
-    }
+        return mrfstr_repeat_chr(res, *MRFSTR_DATA(str), count);
 
     if (!(count && MRFSTR_SIZE(str)))
     {
@@ -38,6 +35,9 @@ mrfstr_res_enum_t mrfstr_repeat(
         if (res == str)
             return MRFSTR_RES_NOERROR;
 
+        if (MRFSTR_CAPA(res) < MRFSTR_SIZE(str))
+            MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(str));
+
         __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
         MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
         return MRFSTR_RES_NOERROR;
@@ -48,6 +48,9 @@ mrfstr_res_enum_t mrfstr_repeat(
         mrfstr_size_t size = MRFSTR_SIZE(res) * count;
         if (size / count != MRFSTR_SIZE(res))
             return MRFSTR_RES_OVERFLOW_ERROR;
+
+        if (MRFSTR_CAPA(res) < size)
+            MRFSTR_REALLOC(res, size);
 
         while (MRFSTR_SIZE(res) <= size - MRFSTR_SIZE(res))
         {
@@ -67,6 +70,9 @@ mrfstr_res_enum_t mrfstr_repeat(
     if (size / count != MRFSTR_SIZE(str))
         return MRFSTR_RES_OVERFLOW_ERROR;
 
+    if (MRFSTR_CAPA(res) < size)
+        MRFSTR_CLEAR_REALLOC(res, size);
+
     __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
     MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
 
@@ -84,11 +90,20 @@ mrfstr_res_enum_t mrfstr_repeat(
     return MRFSTR_RES_NOERROR;
 }
 
-void mrfstr_repeat_chr(
+mrfstr_res_enum_t mrfstr_repeat_chr(
     mrfstr_t res, mrfstr_chr_t chr,
     mrfstr_size_t count)
 {
+    if (!count)
+    {
+        MRFSTR_SIZE(res) = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (MRFSTR_CAPA(res) < count)
+        MRFSTR_CLEAR_REALLOC(res, count);
+
+    __mrfstr_fill(MRFSTR_DATA(res), chr, count);
     MRFSTR_SIZE(res) = count;
-    if (count)
-        __mrfstr_fill(MRFSTR_DATA(res), chr, count);
+    return MRFSTR_RES_NOERROR;
 }

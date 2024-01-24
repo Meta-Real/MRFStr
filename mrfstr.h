@@ -25,6 +25,10 @@ extern "C"
 #include <inttypes.h>
 #include <stddef.h>
 
+#ifndef MRFSTR_DONT_INCLUDE_STDIO
+#include <stdio.h>
+#endif
+
 #define MRFSTR_VERSION "1.1.0"
 #define MRFSTR_VERSION_MAJOR 1
 #define MRFSTR_VERSION_MINOR 1
@@ -59,14 +63,16 @@ typedef const void *mrfstr_ptr_ct;
 
 struct __MRFSTR_T
 {
-    mrfstr_data_t data;
-    mrfstr_size_t size;
+    mrfstr_data_t _data;
+    mrfstr_size_t _size;
+    mrfstr_size_t _capa;
 };
 typedef struct __MRFSTR_T *mrfstr_t;
 typedef const struct __MRFSTR_T *mrfstr_ct;
 
-#define MRFSTR_DATA(x) ((x)->data)
-#define MRFSTR_SIZE(x) ((x)->size)
+#define MRFSTR_DATA(x) ((x)->_data)
+#define MRFSTR_SIZE(x) ((x)->_size)
+#define MRFSTR_CAPA(x) ((x)->_capa)
 
 enum __MRFSTR_RES_ENUM
 {
@@ -112,16 +118,16 @@ void mrfstr_swap(
 
 /* set functions */
 
-void mrfstr_set(
+mrfstr_res_enum_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src);
 
-void mrfstr_set_str(
+mrfstr_res_enum_t mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src);
-void mrfstr_set_nstr(
+mrfstr_res_enum_t mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src,
     mrfstr_size_t size);
 
-void mrfstr_set_chr(
+mrfstr_res_enum_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src);
 
 /* get functions */
@@ -154,21 +160,21 @@ mrfstr_res_enum_t mrfstr_repeat(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_size_t count);
 
-void mrfstr_repeat_chr(
+mrfstr_res_enum_t mrfstr_repeat_chr(
     mrfstr_t res, mrfstr_chr_t chr,
     mrfstr_size_t count);
 
 /* reverse functions */
 
-void mrfstr_reverse(
+mrfstr_res_enum_t mrfstr_reverse(
     mrfstr_t res, mrfstr_ct str);
 
 /* replace functions */
 
-void mrfstr_replace_chr(
+mrfstr_res_enum_t mrfstr_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr);
-void mrfstr_n_replace_chr(
+mrfstr_res_enum_t mrfstr_n_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
@@ -226,8 +232,8 @@ mrfstr_data_t mrfstr_get_data(
     mrfstr_ct str);
 mrfstr_size_t mrfstr_get_size(
     mrfstr_ct str);
-mrfstr_chr_t mrfstr_get_chr(
-    mrfstr_res_enum_t *error,
+mrfstr_res_enum_t mrfstr_get_chr(
+    mrfstr_chr_t *chr,
     mrfstr_ct str, mrfstr_size_t idx);
 
 mrfstr_res_enum_t mrfstr_modify_chr(
@@ -235,10 +241,24 @@ mrfstr_res_enum_t mrfstr_modify_chr(
 
 /* io functions */
 
-void mrfstr_print(
+void mrfstr_export(
     mrfstr_ct str);
-void mrfstr_n_print(
+void mrfstr_n_export(
     mrfstr_ct str, mrfstr_size_t size);
+
+mrfstr_res_enum_t mrfstr_import(
+    mrfstr_t str);
+mrfstr_res_enum_t mrfstr_n_import(
+    mrfstr_t str, mrfstr_size_t size);
+
+#ifndef MRFSTR_DONT_INCLUDE_STDIO
+void mrfstr_fexport(
+    FILE *stream,
+    mrfstr_ct str);
+void mrfstr_n_fexport(
+    FILE *stream,
+    mrfstr_ct str, mrfstr_size_t size);
+#endif
 
 /* str functions */
 

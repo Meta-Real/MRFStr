@@ -28,20 +28,15 @@ mrfstr_size_t mrfstr_get_size(
     return MRFSTR_SIZE(str);
 }
 
-mrfstr_chr_t mrfstr_get_chr(
-    mrfstr_res_enum_t *error,
+mrfstr_res_enum_t mrfstr_get_chr(
+    mrfstr_chr_t *chr,
     mrfstr_ct str, mrfstr_size_t idx)
 {
     if (idx >= MRFSTR_SIZE(str))
-    {
-        if (error)
-            *error = MRFSTR_RES_IDXOUT_ERROR;
-        return MRFSTR_DATA(str)[MRFSTR_SIZE(str) - 1];
-    }
-    else if (error)
-        *error = MRFSTR_RES_NOERROR;
+        return MRFSTR_RES_IDXOUT_ERROR;
 
-    return MRFSTR_DATA(str)[idx];
+    *chr = MRFSTR_DATA(str)[idx];
+    return MRFSTR_RES_NOERROR;
 }
 
 mrfstr_res_enum_t mrfstr_modify_chr(

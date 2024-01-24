@@ -23,6 +23,12 @@ mrfstr_res_enum_t mrfstr_remove(
     if (idx >= MRFSTR_SIZE(str))
         return MRFSTR_RES_IDXOUT_ERROR;
 
+    if (MRFSTR_SIZE(str) == 1)
+    {
+        MRFSTR_SIZE(res) = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
     if (res == str)
     {
         mrfstr_size_t size = --MRFSTR_SIZE(res) - idx;
@@ -33,10 +39,13 @@ mrfstr_res_enum_t mrfstr_remove(
         return MRFSTR_RES_NOERROR;
     }
 
+    MRFSTR_SIZE(res) = MRFSTR_SIZE(str) - 1;
+    if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
+        MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(res));
+
     if (idx)
         __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), idx);
 
-    MRFSTR_SIZE(res) = MRFSTR_SIZE(str) - 1;
     mrfstr_size_t size = MRFSTR_SIZE(res) - idx;
     if (size)
         __mrfstr_copy(MRFSTR_DATA(res) + idx, MRFSTR_DATA(str) + idx + 1, size);
@@ -55,9 +64,17 @@ mrfstr_res_enum_t mrfstr_n_remove(
         if (res == str)
             return MRFSTR_RES_NOERROR;
 
+        if (!MRFSTR_SIZE(str))
+        {
+            MRFSTR_SIZE(res) = 0;
+            return MRFSTR_RES_NOERROR;
+        }
+
+        if (MRFSTR_CAPA(res) < MRFSTR_SIZE(str))
+            MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(str));
+
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(res));
         MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
-        if (MRFSTR_SIZE(res))
-            __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(res));
         return MRFSTR_RES_NOERROR;
     }
 
@@ -76,18 +93,24 @@ mrfstr_res_enum_t mrfstr_n_remove(
         return MRFSTR_RES_NOERROR;
     }
 
+    if (count >= MRFSTR_SIZE(str) - idx)
+        MRFSTR_SIZE(res) = idx;
+    else
+        MRFSTR_SIZE(res) = MRFSTR_SIZE(str) - count;
+
+    if (!MRFSTR_SIZE(res))
+        return MRFSTR_RES_NOERROR;
+
+    if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
+        MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(res));
+
     if (idx)
         __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), idx);
 
-    if (count >= MRFSTR_SIZE(str) - idx)
-    {
-        MRFSTR_SIZE(res) = idx;
+    if (MRFSTR_SIZE(res) == idx)
         return MRFSTR_RES_NOERROR;
-    }
 
-    MRFSTR_SIZE(res) = MRFSTR_SIZE(str) - count;
-    mrfstr_size_t size = MRFSTR_SIZE(res) - idx;
-
-    __mrfstr_copy(MRFSTR_DATA(res) + idx, MRFSTR_DATA(str) + idx + count, size);
+    __mrfstr_copy(MRFSTR_DATA(res) + idx, MRFSTR_DATA(str) + idx + count,
+        MRFSTR_SIZE(res) - idx);
     return MRFSTR_RES_NOERROR;
 }

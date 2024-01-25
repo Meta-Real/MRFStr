@@ -34,7 +34,7 @@ copies or substantial portions of the Software.
     } while (0)
 
 #define mrfstr_base_cmp(mask) \
-    ((mask - 0x1010101010101010ULL) & ~mask & 0x8080808080808080ULL)
+    ((mask - 0x0101010101010101ULL) & ~mask & 0x8080808080808080ULL)
 
 void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
@@ -278,7 +278,7 @@ mrfstr_idx_t __mrfstr_base_findchr(
             return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
     }
 
-    return MRFSTR_FALSE;
+    return MRFSTR_INVIDX;
 }
 
 mrfstr_idx_t __mrfstr_base_tfindchr(
@@ -302,7 +302,7 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
             mask = cblock ^ *sblock++;
             mask = mrfstr_base_cmp(mask) >> 7;
             if (mask)
-                return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
+                return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
         }
     }
 
@@ -314,7 +314,7 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
         mask = cblock ^ *sblock++;
         mask = mrfstr_base_cmp(mask) >> 7;
         if (mask)
-            return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
+            return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
     }
 
     return MRFSTR_INVIDX;

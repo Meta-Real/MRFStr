@@ -14,174 +14,126 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_REVERSE
+
+#define MRFSTR_TLIB_EXPR(size)               \
+    do                                       \
+    {                                        \
+        MRFSTR_TLIB_MEMCPY(str1, str, size); \
+        MRFSTR_SIZE(str1) = size;            \
+                                             \
+        if (first)                           \
+            mrfstr_reverse(str1, str1);      \
+        else                                 \
+            mrfstr_reverse(str2, str1);      \
+    } while (0)
+
+#define MRFSTR_TLIB_OBJ(size)                           \
+    do                                                  \
+    {                                                   \
+        if (first)                                      \
+            obj = MRFSTR_TLIB_MEMCMP(str1, strr, size); \
+        else                                            \
+            obj = MRFSTR_TLIB_MEMCMP(str2, strr, size); \
+    } while (0)
+
+#define MRFSTR_TLIB_FREE   \
+    do                     \
+    {                      \
+        mrfstr_free(str1); \
+        mrfstr_free(str2); \
+        free(str);         \
+        free(strr);        \
+    } while (0)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t str1 = mrfstr_init();
-    if (!str1)
-    {
-        fputs("\"reverse\" error: Initializing \"str1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t str1;
+    MRFSTR_TLIB_INIT(str1,);
 
-    if (mrfstr_alloc(str1, TEST_HIGH))
-    {
-        mrfstr_free(str1);
+    mrfstr_t str2;
+    MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
 
-        fputs("\"reverse\" error: Allocating \"str1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_data_t str;
+    MRFSTR_TLIB_INIT_STR(str,
+        mrfstr_free(str1); mrfstr_free(str2));
 
-    mrfstr_t str2 = mrfstr_init();
-    if (!str2)
-    {
-        mrfstr_free(str1);
-
-        fputs("\"reverse\" error: Initializing \"str2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    if (mrfstr_alloc(str2, TEST_HIGH))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-
-        fputs("\"reverse\" error: Allocating \"str2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_data_t str = malloc(TEST_HIGH * sizeof(mrfstr_chr_t));
-    if (!str)
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-
-        fputs("\"reverse\" error: Allocating \"str\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_data_t strr;
+    MRFSTR_TLIB_INIT_STR(strr,
+        mrfstr_free(str1); mrfstr_free(str2); free(str));
 
     mrfstr_data_t ptr = str;
     mrfstr_size_t i;
-    mrfstr_sshort_t j;
-    for (i = 0; i < TEST_HIGH; i += 0x100)
+    mrfstr_short_t j;
+    for (i = 0; i < TEST4_SIZE; i += 0x100)
         for (j = 0; j != 0x100; j++)
             *ptr++ = (mrfstr_chr_t)j;
 
-    mrfstr_data_t strr = malloc(TEST_HIGH * sizeof(mrfstr_chr_t));
-    if (!strr)
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-
-        fputs("\"reverse\" error: Allocating \"strr\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
     ptr = strr;
-    for (i = 0; i < TEST_HIGH; i += 0x100)
-        for (j = 0xff; j != -1; j--)
+    for (i = 0; i < TEST4_SIZE; i += 0x100)
+        for (j = 0xff; j != 0xffff; j--)
             *ptr++ = (mrfstr_chr_t)j;
 
-    memcpy(MRFSTR_DATA(str1), str, TEST_LOW);
-    MRFSTR_SIZE(str1) = TEST_LOW;
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_reverse(str1, str1);
+    mrfstr_bool_t first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (MRFSTR_SIZE(str1) != TEST_LOW || memcmp(MRFSTR_DATA(str1), strr, TEST_LOW))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-        fputs("\"reverse\" error: TEST_LOW one string section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    mrfstr_reverse(str2, str1);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-    if (MRFSTR_SIZE(str2) != TEST_LOW || memcmp(MRFSTR_DATA(str2), str, TEST_LOW))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"reverse\" error: TEST_LOW two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-    memcpy(MRFSTR_DATA(str1), str, TEST_MID);
-    MRFSTR_SIZE(str1) = TEST_MID;
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    mrfstr_reverse(str1, str1);
-
-    if (MRFSTR_SIZE(str1) != TEST_MID || memcmp(MRFSTR_DATA(str1), strr, TEST_MID))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
-
-        fputs("\"reverse\" error: TEST_MID one string section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_reverse(str2, str1);
-
-    if (MRFSTR_SIZE(str2) != TEST_MID || memcmp(MRFSTR_DATA(str2), str, TEST_MID))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
-
-        fputs("\"reverse\" error: TEST_MID two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memcpy(MRFSTR_DATA(str1), str, TEST_HIGH);
-    MRFSTR_SIZE(str1) = TEST_HIGH;
-
-    mrfstr_reverse(str1, str1);
-
-    if (MRFSTR_SIZE(str1) != TEST_HIGH || memcmp(MRFSTR_DATA(str1), strr, TEST_HIGH))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
-
-        fputs("\"reverse\" error: TEST_HIGH one string section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_reverse(str2, str1);
-
-    if (MRFSTR_SIZE(str2) != TEST_HIGH || memcmp(MRFSTR_DATA(str2), str, TEST_HIGH))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-        free(str);
-        free(strr);
-
-        fputs("\"reverse\" error: TEST_HIGH two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_free(str1);
-    mrfstr_free(str2);
-    free(str);
-    free(strr);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

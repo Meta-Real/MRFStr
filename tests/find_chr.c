@@ -14,135 +14,101 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <inttypes.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_SEARCH
 
-#define TEST_COUNT 100
-#define GENERATE32_RAND (((mrfstr_long_t)rand() << 16) + rand())
+#define MRFSTR_GENERATE_RAND \
+    (((mrfstr_size_t)rand() << 16) + rand())
+
+#define MRFSTR_TLIB_EXPR(size) \
+    MRFSTR_SIZE(str) = size
+
+#define MRFSTR_TLIB_OBJ(size)                                    \
+    do                                                           \
+    {                                                            \
+        if (first)                                               \
+            obj = mrfstr_find_chr(str, '1') == MRFSTR_INVIDX;    \
+        else                                                     \
+            for (mrfstr_byte_t i = 0; i < 100; i++)              \
+            {                                                    \
+                mrfstr_size_t idx = MRFSTR_GENERATE_RAND % size; \
+                                                                 \
+                MRFSTR_DATA(str)[idx] = '1';                     \
+                obj = mrfstr_find_chr(str, '1') == idx;          \
+                MRFSTR_DATA(str)[idx] = '0';                     \
+                                                                 \
+                if (!obj)                                        \
+                    break;                                       \
+            }                                                    \
+    } while (0)
+
+#define MRFSTR_TLIB_FREE mrfstr_free(str)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t str = mrfstr_init();
-    if (!str)
-    {
-        fputs("\"find_chr\" error: Initializing \"str\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t str;
+    MRFSTR_TLIB_INIT(str,);
+    MRFSTR_TLIB_MEMSET(str, '0', TEST4_SIZE);
 
-    if (mrfstr_alloc(str, TEST_HIGH))
-    {
-        mrfstr_free(str);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-        fputs("\"find_chr\" error: Allocating \"str\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_bool_t first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    srand((unsigned int)time(NULL));
-    mrfstr_byte_t i;
-    mrfstr_idx_t idx;
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-    memset(MRFSTR_DATA(str), '0', TEST_LOW);
-    MRFSTR_SIZE(str) = TEST_LOW;
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (mrfstr_find_chr(str, '1') != MRFSTR_INVIDX)
-    {
-        mrfstr_free(str);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-        fputs("\"find_chr\" error: TEST_LOW all zero section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    for (i = 0; i != TEST_COUNT;)
-    {
-        idx = rand() % TEST_LOW;
-        if (MRFSTR_DATA(str)[idx] == '2')
-            continue;
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-        MRFSTR_DATA(str)[idx] = '1';
-        if (mrfstr_find_chr(str, '1') != idx)
-        {
-            mrfstr_free(str);
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-            fprintf(stderr, "\"find_chr\" error: TEST_LOW random one section\n"
-                "\tFailed index: %zu\n", idx);
-            return EXIT_FAILURE;
-        }
-
-        MRFSTR_DATA(str)[idx] = '2';
-        i++;
-    }
-
-    memset(MRFSTR_DATA(str), '0', TEST_MID);
-    MRFSTR_SIZE(str) = TEST_MID;
-
-    if (mrfstr_find_chr(str, '1') != MRFSTR_INVIDX)
-    {
-        mrfstr_free(str);
-
-        fputs("\"find_chr\" error: TEST_MID all zero section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    for (i = 0; i != TEST_COUNT;)
-    {
-        idx = GENERATE32_RAND % TEST_MID;
-        if (MRFSTR_DATA(str)[idx] == '2')
-            continue;
-
-        MRFSTR_DATA(str)[idx] = '1';
-        if (mrfstr_find_chr(str, '1') != idx)
-        {
-            mrfstr_free(str);
-
-            fprintf(stderr, "\"find_chr\" error: TEST_MID random one section\n"
-                "\tFailed index: %zu\n", idx);
-            return EXIT_FAILURE;
-        }
-
-        MRFSTR_DATA(str)[idx] = '2';
-        i++;
-    }
-
-    memset(MRFSTR_DATA(str), '0', TEST_HIGH);
-    MRFSTR_SIZE(str) = TEST_HIGH;
-
-    if (mrfstr_find_chr(str, '1') != MRFSTR_INVIDX)
-    {
-        mrfstr_free(str);
-
-        fputs("\"find_chr\" error: TEST_HIGH all zero section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    for (i = 0; i != TEST_COUNT;)
-    {
-        idx = GENERATE32_RAND % TEST_HIGH;
-        if (MRFSTR_DATA(str)[idx] == '2')
-            continue;
-
-        MRFSTR_DATA(str)[idx] = '1';
-        if (mrfstr_find_chr(str, '1') != idx)
-        {
-            mrfstr_free(str);
-
-            fprintf(stderr, "\"find_chr\" error: TEST_HIGH random one section\n"
-                "\tFailed index: %zu\n", idx);
-            return EXIT_FAILURE;
-        }
-
-        MRFSTR_DATA(str)[idx] = '2';
-        i++;
-    }
-
-    mrfstr_free(str);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

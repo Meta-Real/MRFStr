@@ -19,7 +19,7 @@ copies or substantial portions of the Software.
 
 mrfstr_config_t _mrfstr_config =
 {
-    1, 0x200000, 0x8000000ULL, 64,
+    1, 0x200000, 0x8000000, 64,
 #ifdef __AVX512F__
     __mrfstr_avx512_bcopy, __mrfstr_avx512_copy,
     __mrfstr_avx512_brcopy, __mrfstr_avx512_rcopy,

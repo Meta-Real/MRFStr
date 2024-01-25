@@ -14,149 +14,110 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_REPLACE
+
+#define MRFSTR_TLIB_EXPR(size)                        \
+    do                                                \
+    {                                                 \
+        MRFSTR_TLIB_MEMSET(res1, '0', size);          \
+        MRFSTR_SIZE(res1) = size;                     \
+                                                      \
+        if (first)                                    \
+            mrfstr_replace_chr(res1, res1, '0', '1'); \
+        else                                          \
+            mrfstr_replace_chr(res2, res1, '0', '1'); \
+    } while (0)
+
+#define MRFSTR_TLIB_OBJ(size)                          \
+    do                                                 \
+    {                                                  \
+        if (first)                                     \
+            obj = MRFSTR_TLIB_MEMCMP(res1, str, size); \
+        else                                           \
+            obj = MRFSTR_TLIB_MEMCMP(res2, str, size); \
+    } while (0)
+
+#define MRFSTR_TLIB_FREE   \
+    do                     \
+    {                      \
+        mrfstr_free(res1); \
+        mrfstr_free(res2); \
+        free(str);         \
+    } while (0)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t res1 = mrfstr_init();
-    if (!res1)
-    {
-        fputs("\"replace_chr\" error: Initializing \"res1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t res1;
+    MRFSTR_TLIB_INIT(res1,);
 
-    if (mrfstr_alloc(res1, TEST_HIGH))
-    {
-        mrfstr_free(res1);
+    mrfstr_t res2;
+    MRFSTR_TLIB_INIT(res2, mrfstr_free(res1));
 
-        fputs("\"replace_chr\" error: Allocating \"res1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_data_t str;
+    MRFSTR_TLIB_INIT_STR(str,
+        mrfstr_free(res1); mrfstr_free(res2));
+    memset(str, '1', TEST4_SIZE);
 
-    mrfstr_t res2 = mrfstr_init();
-    if (!res2)
-    {
-        mrfstr_free(res1);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-        fputs("\"replace_chr\" error: Initializing \"res2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_bool_t first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (mrfstr_alloc(res2, TEST_HIGH))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-        fputs("\"replace_chr\" error: Allocating \"res2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    mrfstr_data_t str = malloc(TEST_HIGH * sizeof(mrfstr_chr_t));
-    if (!str)
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-        fputs("\"replace_chr\" error: Allocating \"str\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    memset(str, '1', TEST_HIGH);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-    memset(MRFSTR_DATA(res1), '0', TEST_LOW);
-    MRFSTR_SIZE(res1) = TEST_LOW;
-    mrfstr_replace_chr(res1, res1, '0', '1');
+    first = MRFSTR_TRUE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
+    first = MRFSTR_FALSE;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (MRFSTR_SIZE(res1) != TEST_LOW || memcmp(MRFSTR_DATA(res1), str, TEST_LOW))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_LOW on string section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(res1), '0', TEST_LOW);
-    MRFSTR_SIZE(res1) = TEST_LOW;
-    mrfstr_replace_chr(res2, res1, '0', '1');
-
-    if (MRFSTR_SIZE(res2) != TEST_LOW || memcmp(MRFSTR_DATA(res2), str, TEST_LOW))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_LOW two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(res1), '0', TEST_MID);
-    MRFSTR_SIZE(res1) = TEST_MID;
-    mrfstr_replace_chr(res1, res1, '0', '1');
-
-    if (MRFSTR_SIZE(res1) != TEST_MID || memcmp(MRFSTR_DATA(res1), str, TEST_MID))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_MID one string section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(res1), '0', TEST_MID);
-    MRFSTR_SIZE(res1) = TEST_MID;
-    mrfstr_replace_chr(res2, res1, '0', '1');
-
-    if (MRFSTR_SIZE(res2) != TEST_MID || memcmp(MRFSTR_DATA(res2), str, TEST_MID))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_MID two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(res1), '0', TEST_HIGH);
-    MRFSTR_SIZE(res1) = TEST_HIGH;
-    mrfstr_replace_chr(res1, res1, '0', '1');
-
-    if (MRFSTR_SIZE(res1) != TEST_HIGH || memcmp(MRFSTR_DATA(res1), str, TEST_HIGH))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_HIGH one string section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(res1), '0', TEST_HIGH);
-    MRFSTR_SIZE(res1) = TEST_HIGH;
-    mrfstr_replace_chr(res2, res1, '0', '1');
-
-    if (MRFSTR_SIZE(res2) != TEST_HIGH || memcmp(MRFSTR_DATA(res2), str, TEST_HIGH))
-    {
-        mrfstr_free(res1);
-        mrfstr_free(res2);
-        free(str);
-
-        fputs("\"replace_chr\" error: TEST_HIGH two strings section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_free(res1);
-    mrfstr_free(res2);
-    free(str);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

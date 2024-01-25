@@ -14,91 +14,70 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
+
+#define MRFSTR_TLIB_EXPR(size)   \
+    do                           \
+    {                            \
+        MRFSTR_SIZE(src) = size; \
+        mrfstr_set(dst, src);    \
+    } while (0)
+
+#define MRFSTR_TLIB_OBJ(size) \
+    obj = MRFSTR_TLIB_MEMCMP(dst, MRFSTR_DATA(src), size)
+
+#define MRFSTR_TLIB_FREE  \
+    do                    \
+    {                     \
+        mrfstr_free(dst); \
+        mrfstr_free(src); \
+    } while (0)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t dst = mrfstr_init();
-    if (!dst)
-    {
-        fputs("\"set\" error: Initializing \"dst\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t dst;
+    MRFSTR_TLIB_INIT(dst,);
 
-    if (mrfstr_alloc(dst, TEST_HIGH))
-    {
-        mrfstr_free(dst);
+    mrfstr_t src;
+    MRFSTR_TLIB_INIT(src, mrfstr_free(dst));
+    MRFSTR_TLIB_MEMSET(src, '0', TEST4_SIZE);
 
-        fputs("\"set\" error: Allocating \"dst\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_t src = mrfstr_init();
-    if (!src)
-    {
-        mrfstr_free(dst);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"set\" error: Initializing \"src\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-    if (mrfstr_alloc(src, TEST_HIGH))
-    {
-        mrfstr_free(dst);
-        mrfstr_free(src);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"set\" error: Allocating \"src\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-    MRFSTR_SIZE(src) = TEST_LOW;
-    memset(MRFSTR_DATA(src), '0', TEST_LOW);
-    mrfstr_set(dst, src);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (MRFSTR_SIZE(dst) != TEST_LOW || memcmp(MRFSTR_DATA(dst), MRFSTR_DATA(src), TEST_LOW))
-    {
-        mrfstr_free(dst);
-        mrfstr_free(src);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-        fputs("\"set\" error: TEST_LOW section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    MRFSTR_SIZE(src) = TEST_MID;
-    memset(MRFSTR_DATA(src), '1', TEST_MID);
-    mrfstr_set(dst, src);
-
-    if (MRFSTR_SIZE(dst) != TEST_MID || memcmp(MRFSTR_DATA(dst), MRFSTR_DATA(src), TEST_MID))
-    {
-        mrfstr_free(dst);
-        mrfstr_free(src);
-
-        fputs("\"set\" error: TEST_MID section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    MRFSTR_SIZE(src) = TEST_HIGH;
-    memset(MRFSTR_DATA(src), '2', TEST_HIGH);
-    mrfstr_set(dst, src);
-
-    if (MRFSTR_SIZE(dst) != TEST_HIGH || memcmp(MRFSTR_DATA(dst), MRFSTR_DATA(src), TEST_HIGH))
-    {
-        mrfstr_free(dst);
-        mrfstr_free(src);
-
-        fputs("\"set\" error: TEST_HIGH section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_free(dst);
-    mrfstr_free(src);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

@@ -14,79 +14,66 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
+
+#define MRFSTR_TLIB_EXPR(size) \
+    mrfstr_repeat_chr(res, '0', size)
+
+#define MRFSTR_TLIB_OBJ(size) \
+    obj = MRFSTR_TLIB_MEMCMP(res, str, size)
+
+#define MRFSTR_TLIB_FREE  \
+    do                    \
+    {                     \
+        mrfstr_free(res); \
+        free(str);        \
+    } while (0)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t res = mrfstr_init();
-    if (!res)
-    {
-        fputs("\"repeat_chr\" error: Initializing \"res\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t res;
+    MRFSTR_TLIB_INIT(res,);
 
-    if (mrfstr_alloc(res, TEST_HIGH))
-    {
-        mrfstr_free(res);
+    mrfstr_data_t str;
+    MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));
+    memset(str, '0', TEST4_SIZE);
 
-        fputs("\"repeat_chr\" error: Allocating \"res\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_data_t str = malloc(TEST_HIGH * sizeof(mrfstr_chr_t));
-    if (!str)
-    {
-        mrfstr_free(res);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"repeat_chr\" error: Allocating \"str\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-    mrfstr_repeat_chr(res, '0', TEST_LOW);
-    memset(str, '0', TEST_LOW);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (MRFSTR_SIZE(res) != TEST_LOW || memcmp(MRFSTR_DATA(res), str, TEST_LOW))
-    {
-        mrfstr_free(res);
-        free(str);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-        fputs("\"repeat_chr\" error: TEST_LOW section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    mrfstr_repeat_chr(res, '1', TEST_MID);
-    memset(str, '1', TEST_MID);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-    if (MRFSTR_SIZE(res) != TEST_MID || memcmp(MRFSTR_DATA(res), str, TEST_MID))
-    {
-        mrfstr_free(res);
-        free(str);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"repeat_chr\" error: TEST_MID section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_repeat_chr(res, '2', TEST_HIGH);
-    memset(str, '2', TEST_HIGH);
-
-    if (MRFSTR_SIZE(res) != TEST_HIGH || memcmp(MRFSTR_DATA(res), str, TEST_HIGH))
-    {
-        mrfstr_free(res);
-        free(str);
-
-        fputs("\"repeat_chr\" error: TEST_HIGH section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_free(res);
-    free(str);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

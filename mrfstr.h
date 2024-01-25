@@ -331,4 +331,4 @@ void mrfstr_config_str(
 }
 #endif
 
-#endif /* __MRFSTR__ */
+#endif

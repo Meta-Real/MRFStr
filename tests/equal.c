@@ -14,94 +14,69 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 */
 
-#include <mrfstr.h>
-#include <string.h>
-#include <stdlib.h>
+#include "tlib.h"
 
-#define TEST_LOW 0x200
-#define TEST_MID 0x100000
-#define TEST_HIGH 0x40000000
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_COMPARE
+
+#define MRFSTR_TLIB_EXPR(size)    \
+    do                            \
+    {                             \
+        MRFSTR_SIZE(str1) = size; \
+        MRFSTR_SIZE(str2) = size; \
+    } while (0)
+
+#define MRFSTR_TLIB_OBJ(size) \
+    obj = mrfstr_equal(str1, str2)
+
+#define MRFSTR_TLIB_FREE   \
+    do                     \
+    {                      \
+        mrfstr_free(str1); \
+        mrfstr_free(str2); \
+    } while (0)
 
 int main(void)
 {
     mrfstr_config_tcount(5);
 
-    mrfstr_t str1 = mrfstr_init();
-    if (!str1)
-    {
-        fputs("\"equal\" error: Initializing \"str1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_t str1;
+    MRFSTR_TLIB_INIT(str1,);
 
-    if (mrfstr_alloc(str1, TEST_HIGH))
-    {
-        mrfstr_free(str1);
+    mrfstr_t str2;
+    MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
 
-        fputs("\"equal\" error: Allocating \"str1\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_t str2 = mrfstr_init();
-    if (!str2)
-    {
-        mrfstr_free(str1);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"equal\" error: Initializing \"str2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
-    if (mrfstr_alloc(str2, TEST_HIGH))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-        fputs("\"equal\" error: Allocating \"str2\" section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
-    memset(MRFSTR_DATA(str1), '0', TEST_LOW);
-    MRFSTR_SIZE(str1) = TEST_LOW;
-    memset(MRFSTR_DATA(str2), '0', TEST_LOW);
-    MRFSTR_SIZE(str2) = TEST_LOW;
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    if (!mrfstr_equal(str1, str2))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
+    mrfstr_config(MRFSTR_TLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
 
-        fputs("\"equal\" error: TEST_LOW section\n", stderr);
-        return EXIT_FAILURE;
-    }
+    MRFSTR_TLIB_ROUND(TEST1_SIZE);
+    MRFSTR_TLIB_ROUND(TEST2_SIZE);
+    MRFSTR_TLIB_ROUND(TEST3_SIZE);
+    MRFSTR_TLIB_ROUND(TEST4_SIZE);
 
-    memset(MRFSTR_DATA(str1), '1', TEST_MID);
-    MRFSTR_SIZE(str1) = TEST_MID;
-    memset(MRFSTR_DATA(str2), '1', TEST_MID);
-    MRFSTR_SIZE(str2) = TEST_MID;
-
-    if (!mrfstr_equal(str1, str2))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-
-        fputs("\"equal\" error: TEST_MID section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    memset(MRFSTR_DATA(str1), '2', TEST_HIGH);
-    MRFSTR_SIZE(str1) = TEST_MID;
-    memset(MRFSTR_DATA(str2), '2', TEST_HIGH);
-    MRFSTR_SIZE(str2) = TEST_MID;
-
-    if (!mrfstr_equal(str1, str2))
-    {
-        mrfstr_free(str1);
-        mrfstr_free(str2);
-
-        fputs("\"equal\" error: TEST_HIGH section\n", stderr);
-        return EXIT_FAILURE;
-    }
-
-    mrfstr_free(str1);
-    mrfstr_free(str2);
+    MRFSTR_TLIB_FREE;
     return EXIT_SUCCESS;
 }

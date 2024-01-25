@@ -85,7 +85,7 @@ struct __MRFSTR_CONFIG_T
     mrfstr_byte_t tcount;
     mrfstr_size_t nlimit;
     mrfstr_size_t tlimit;
-    mrfstr_byte_t stdin_alloc;
+    mrfstr_short_t stdalloc;
 
     /* memory functions */
 

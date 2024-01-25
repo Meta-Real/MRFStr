@@ -258,6 +258,13 @@ void mrfstr_fexport(
 void mrfstr_n_fexport(
     FILE *stream,
     mrfstr_ct str, mrfstr_size_t size);
+
+mrfstr_res_enum_t mrfstr_fimport(
+    mrfstr_t str,
+    FILE *stream);
+mrfstr_res_enum_t mrfstr_n_fimport(
+    mrfstr_t str,
+    FILE *stream, mrfstr_size_t size);
 #endif
 
 /* str functions */
@@ -295,6 +302,9 @@ void mrfstr_config_nlimit(
     mrfstr_size_t nlimit);
 void mrfstr_config_tlimit(
     mrfstr_size_t tlimit);
+void mrfstr_config_stdalloc(
+    mrfstr_short_t stdalloc);
+
 void mrfstr_config(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t normal,

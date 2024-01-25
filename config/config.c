@@ -140,6 +140,14 @@ void mrfstr_config_tlimit(
         _mrfstr_config.nlimit = tlimit;
 }
 
+void mrfstr_config_stdalloc(
+    mrfstr_short_t stdalloc)
+{
+    if (!stdalloc)
+        stdalloc = 1;
+    _mrfstr_config.stdalloc = stdalloc;
+}
+
 void mrfstr_config(
     mrfstr_config_type_enum_t type,
     mrfstr_config_simd_enum_t normal,

@@ -37,3 +37,78 @@ mrfstr_bool_t mrfstr_n_contain_chr(
 
     return __mrfstr_contchr(MRFSTR_DATA(str), chr, size);
 }
+
+mrfstr_bool_t mrfstr_startswith(
+    mrfstr_ct str, mrfstr_ct substr)
+{
+    if (MRFSTR_SIZE(substr) > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!MRFSTR_SIZE(substr) || str == substr)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str), MRFSTR_DATA(substr), MRFSTR_SIZE(substr));
+}
+
+mrfstr_bool_t mrfstr_startswith_str(
+    mrfstr_ct str, mrfstr_data_ct substr)
+{
+    mrfstr_size_t size = mrfstr_strlen(substr);
+    if (size > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!size)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str), substr, size);
+}
+
+mrfstr_bool_t mrfstr_startswith_nstr(
+    mrfstr_ct str, mrfstr_data_ct substr, mrfstr_size_t size)
+{
+    if (size > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!size)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str), substr, size);
+}
+
+mrfstr_bool_t mrfstr_endswith(
+    mrfstr_ct str, mrfstr_ct substr)
+{
+    if (MRFSTR_SIZE(substr) > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!MRFSTR_SIZE(substr) || str == substr)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str) + MRFSTR_SIZE(str) - MRFSTR_SIZE(substr),
+        MRFSTR_DATA(substr), MRFSTR_SIZE(substr));
+}
+
+mrfstr_bool_t mrfstr_endswith_str(
+    mrfstr_ct str, mrfstr_data_ct substr)
+{
+    mrfstr_size_t size = mrfstr_strlen(substr);
+    if (size > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!size)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str) + MRFSTR_SIZE(str) - size, substr, size);
+}
+
+mrfstr_bool_t mrfstr_endswith_nstr(
+    mrfstr_ct str, mrfstr_data_ct substr, mrfstr_size_t size)
+{
+    if (size > MRFSTR_SIZE(str))
+        return MRFSTR_FALSE;
+
+    if (!size)
+        return MRFSTR_TRUE;
+
+    return __mrfstr_equal(MRFSTR_DATA(str) + MRFSTR_SIZE(str) - size, substr, size);
+}

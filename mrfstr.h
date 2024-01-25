@@ -210,6 +210,20 @@ mrfstr_bool_t mrfstr_n_contain_chr(
     mrfstr_ct str, mrfstr_chr_t chr,
     mrfstr_size_t size);
 
+mrfstr_bool_t mrfstr_startswith(
+    mrfstr_ct str, mrfstr_ct substr);
+mrfstr_bool_t mrfstr_startswith_str(
+    mrfstr_ct str, mrfstr_data_ct substr);
+mrfstr_bool_t mrfstr_startswith_nstr(
+    mrfstr_ct str, mrfstr_data_ct substr, mrfstr_size_t size);
+
+mrfstr_bool_t mrfstr_endswith(
+    mrfstr_ct str, mrfstr_ct substr);
+mrfstr_bool_t mrfstr_endswith_str(
+    mrfstr_ct str, mrfstr_data_ct substr);
+mrfstr_bool_t mrfstr_endswith_nstr(
+    mrfstr_ct str, mrfstr_data_ct substr, mrfstr_size_t size);
+
 /* find functions */
 
 mrfstr_idx_t mrfstr_find_chr(

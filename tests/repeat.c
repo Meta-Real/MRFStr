@@ -18,15 +18,14 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
 
-#define MRFSTR_TLIB_EXPR(size)             \
-    do                                     \
-    {                                      \
-        MRFSTR_SIZE(res) = 8;              \
-        mrfstr_repeat(res, res, size / 8); \
+#define MRFSTR_TLIB_OBJ(size)                     \
+    do                                            \
+    {                                             \
+        MRFSTR_SIZE(res) = 8;                     \
+        mrfstr_repeat(res, res, size / 8);        \
+                                                  \
+        obj = MRFSTR_TLIB_MEMCMP(res, str, size); \
     } while (0)
-
-#define MRFSTR_TLIB_OBJ(size) \
-    obj = MRFSTR_TLIB_MEMCMP(res, str, size)
 
 #define MRFSTR_TLIB_FREE  \
     do                    \

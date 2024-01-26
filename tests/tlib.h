@@ -66,8 +66,6 @@ copies or substantial portions of the Software.
 #define MRFSTR_TLIB_ROUND(size)           \
     do                                    \
     {                                     \
-        MRFSTR_TLIB_EXPR(size);           \
-                                          \
         mrfstr_bool_t obj = MRFSTR_FALSE; \
         MRFSTR_TLIB_OBJ(size);            \
         if (!obj)                         \
@@ -85,5 +83,8 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_MEMCMP(x, str, size) \
     (MRFSTR_SIZE(x) == size && !memcmp(MRFSTR_DATA(x), str, size))
+
+#define MRFSTR_GENERATE_RAND \
+    (((mrfstr_size_t)rand() << 16) + rand())
 
 #endif

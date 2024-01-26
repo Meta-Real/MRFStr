@@ -13,16 +13,14 @@ int main(void)
 
     mrfstr_t a = mrfstr_init();
     mrfstr_repeat_chr(a, '1', SIZE);
-
-    mrfstr_t b = mrfstr_init();
-    mrfstr_repeat_chr(b, '1', SIZE);
+    a->_data[a->_size - 1] = '\0';
 
     LARGE_INTEGER s, e, t;
     t.QuadPart = 0;
     for (int i = 0; i < COUNT; i++)
     {
         QueryPerformanceCounter(&s);
-        mrfstr_startswith(a, b);
+        mrfstr_strlen(a->_data);
         QueryPerformanceCounter(&e);
 
         t.QuadPart += e.QuadPart - s.QuadPart;
@@ -31,6 +29,5 @@ int main(void)
     printf("%lf milliseconds\n", t.QuadPart / (10000.0 * COUNT));
 
     mrfstr_free(a);
-    mrfstr_free(b);
     return 0;
 }

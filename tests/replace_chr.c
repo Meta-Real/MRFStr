@@ -18,21 +18,17 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_REPLACE
 
-#define MRFSTR_TLIB_EXPR(size)                        \
-    do                                                \
-    {                                                 \
-        MRFSTR_TLIB_MEMSET(res1, '0', size);          \
-        MRFSTR_SIZE(res1) = size;                     \
-                                                      \
-        if (first)                                    \
-            mrfstr_replace_chr(res1, res1, '0', '1'); \
-        else                                          \
-            mrfstr_replace_chr(res2, res1, '0', '1'); \
-    } while (0)
-
 #define MRFSTR_TLIB_OBJ(size)                          \
     do                                                 \
     {                                                  \
+        MRFSTR_TLIB_MEMSET(res1, '0', size);           \
+        MRFSTR_SIZE(res1) = size;                      \
+                                                       \
+        if (first)                                     \
+            mrfstr_replace_chr(res1, res1, '0', '1');  \
+        else                                           \
+            mrfstr_replace_chr(res2, res1, '0', '1');  \
+                                                       \
         if (first)                                     \
             obj = MRFSTR_TLIB_MEMCMP(res1, str, size); \
         else                                           \

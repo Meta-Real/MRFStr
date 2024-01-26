@@ -18,15 +18,14 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_COMPARE
 
-#define MRFSTR_TLIB_EXPR(size)    \
-    do                            \
-    {                             \
-        MRFSTR_SIZE(str1) = size; \
-        MRFSTR_SIZE(str2) = size; \
+#define MRFSTR_TLIB_OBJ(size)           \
+    do                                  \
+    {                                   \
+        MRFSTR_SIZE(str1) = size;       \
+        MRFSTR_SIZE(str2) = size;       \
+                                        \
+        obj = mrfstr_equal(str1, str2); \
     } while (0)
-
-#define MRFSTR_TLIB_OBJ(size) \
-    obj = mrfstr_equal(str1, str2)
 
 #define MRFSTR_TLIB_FREE   \
     do                     \

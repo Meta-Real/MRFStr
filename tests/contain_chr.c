@@ -18,15 +18,11 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_SEARCH
 
-#define MRFSTR_GENERATE_RAND \
-    (((mrfstr_size_t)rand() << 16) + rand())
-
-#define MRFSTR_TLIB_EXPR(size) \
-    MRFSTR_SIZE(str) = size
-
 #define MRFSTR_TLIB_OBJ(size)                                    \
     do                                                           \
     {                                                            \
+        MRFSTR_SIZE(str) = size;                                 \
+                                                                 \
         if (first)                                               \
             obj = !mrfstr_contain_chr(str, '1');                 \
         else                                                     \

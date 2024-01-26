@@ -36,6 +36,11 @@ copies or substantial portions of the Software.
 #define mrfstr_base_cmp(mask) \
     ((mask - 0x0101010101010101ULL) & ~mask & 0x8080808080808080ULL)
 
+#define mrfstr_base_cmp2(mask) \
+    (~((((mask & 0x7f7f7f7f7f7f7f7f) + 0x7f7f7f7f7f7f7f7f) | mask) | 0x7f7f7f7f7f7f7f7f))
+
+#define mrfstr_base_idx(mask) (mrfstr_base_cmp2(mask) >> 7)
+
 void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
@@ -120,7 +125,7 @@ void __mrfstr_base_replchr(
         block = *sblock;
 
         mask = oblock ^ block;
-        mask = mrfstr_base_cmp(mask) >> 7;
+        mask = mrfstr_base_idx(mask);
         if (mask)
         {
             block &= ~(0xff * mask);
@@ -146,7 +151,7 @@ void __mrfstr_base_replchr2(
         block = *sblock++;
 
         mask = oblock ^ block;
-        mask = mrfstr_base_cmp(mask) >> 7;
+        mask = mrfstr_base_idx(mask);
         if (mask)
         {
             block &= ~(0xff * mask);
@@ -273,7 +278,7 @@ mrfstr_idx_t __mrfstr_base_findchr(
     for (i = 0; i != size; i++)
     {
         mask = cblock ^ *sblock++;
-        mask = mrfstr_base_cmp(mask) >> 7;
+        mask = mrfstr_base_idx(mask);
         if (mask)
             return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
     }
@@ -300,7 +305,7 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
         for (; i != ni; i++)
         {
             mask = cblock ^ *sblock++;
-            mask = mrfstr_base_cmp(mask) >> 7;
+            mask = mrfstr_base_idx(mask);
             if (mask)
                 return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
         }
@@ -312,7 +317,7 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
     for (; i != size; i++)
     {
         mask = cblock ^ *sblock++;
-        mask = mrfstr_base_cmp(mask) >> 7;
+        mask = mrfstr_base_idx(mask);
         if (mask)
             return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
     }
@@ -332,7 +337,7 @@ mrfstr_size_t __mrfstr_base_countchr(
     while (size--)
     {
         mask = cblock ^ *sblock++;
-        mask = mrfstr_base_cmp(mask);
+        mask = mrfstr_base_cmp2(mask);
         count += __mrfstr_popcnt64(mask);
     }
 
@@ -348,8 +353,11 @@ mrfstr_size_t __mrfstr_base_strlen(
     mrfstr_longlong_t mask;
     for (;; sblock++)
     {
-        mask = mrfstr_base_cmp(*sblock) >> 7;
+        mask = mrfstr_base_cmp(*sblock);
         if (mask)
+        {
+            mask = mrfstr_base_cmp2(*sblock);
             return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + (__mrfstr_ctz64(mask) >> 3);
+        }
     }
 }

@@ -30,7 +30,7 @@ copies or substantial portions of the Software.
     {                                                                                          \
         block = (block & 0x00000000ffffffffULL) << 32 | (block & 0xffffffff00000000ULL) >> 32; \
         block = (block & 0x0000ffff0000ffffULL) << 16 | (block & 0xffff0000ffff0000ULL) >> 16; \
-        block = (block & 0x00ff00ff00ff00ffULL) << 8 | (block & 0xff00ff00ff00ff00ULL) >> 8;   \
+        block = (block & 0x00ff00ff00ff00ffULL) << 8  | (block & 0xff00ff00ff00ff00ULL) >> 8;  \
     } while (0)
 
 #define mrfstr_base_cmp(mask) \
@@ -278,9 +278,8 @@ mrfstr_idx_t __mrfstr_base_findchr(
     for (i = 0; i != size; i++)
     {
         mask = cblock ^ *sblock++;
-        mask = mrfstr_base_idx(mask);
-        if (mask)
-            return (i << 3) + (__mrfstr_ctz64(mask) >> 3);
+        if (mrfstr_base_cmp(mask))
+            return (i << 3) + (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
     }
 
     return MRFSTR_INVIDX;
@@ -305,9 +304,9 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
         for (; i != ni; i++)
         {
             mask = cblock ^ *sblock++;
-            mask = mrfstr_base_idx(mask);
-            if (mask)
-                return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
+            if (mrfstr_base_cmp(mask))
+                return start + (i << 3) +
+                    (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
         }
     }
 
@@ -317,9 +316,9 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
     for (; i != size; i++)
     {
         mask = cblock ^ *sblock++;
-        mask = mrfstr_base_idx(mask);
-        if (mask)
-            return (i << 3) + (__mrfstr_ctz64(mask) >> 3) + start;
+        if (mrfstr_base_cmp(mask))
+            return start + (i << 3) +
+                (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
     }
 
     return MRFSTR_INVIDX;

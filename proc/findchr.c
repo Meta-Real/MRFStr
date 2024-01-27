@@ -27,8 +27,9 @@ struct __MRFSTR_FINDCHR_T
 {
     mrfstr_data_ct str;
     mrfstr_chr_t chr;
-    mrfstr_size_t size;
-    mrfstr_idx_t start;
+
+    mrfstr_byte_t step;
+    mrfstr_byte_t start;
 
     volatile mrfstr_idx_t *res;
     mrfstr_mutex_p mutex;
@@ -84,29 +85,32 @@ mrfstr_idx_t __mrfstr_findchr(
     else
         tcount = (mrfstr_byte_t)(size / tsize);
 
-    mrfstr_short_t rem = (uintptr_t)str % _mrfstr_config.tsearch_size;
-    if (rem)
+    mrfstr_byte_t align = (uintptr_t)str % _mrfstr_config.tsearch_size;
+    if (align)
     {
-        rem = _mrfstr_config.tsearch_size - rem;
-        size -= rem;
-        mrfstr_findchr_rem;
+        align = _mrfstr_config.tsearch_size - align;
+        size -= align;
+
+        for (mrfstr_byte_t i = 0; i < align; i++)
+            if (*str++ == chr)
+                return i;
     }
 
     mrfstr_short_t factor = _mrfstr_config.tsearch_size * tcount;
-    rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tsearch_size;
+    mrfstr_short_t rem = size % factor;
+    size = (size / factor) * factor;
 
-    volatile mrfstr_idx_t res = MRFSTR_INVIDX;
+    volatile mrfstr_idx_t res = size;
 
     mrfstr_mutex_t mutex;
     mrfstr_create_mutex(mutex)
     {
         mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
-            str, chr, size * tcount);
+            str, chr, size / _mrfstr_config.tsearch_size);
         if (idx != MRFSTR_INVIDX)
-            return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
-        str += inc * tcount;
+            return idx + align;
 
+        str += size;
         mrfstr_findchr_rem;
         return MRFSTR_INVIDX;
     }
@@ -133,7 +137,7 @@ mrfstr_idx_t __mrfstr_findchr(
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
                     }
 
-                    str += inc * tcount;
+                    str += size * _mrfstr_config.tsearch_size;
                     mrfstr_findchr_rem;
 
                     mrfstr_close_mutex(mutex);
@@ -145,16 +149,13 @@ mrfstr_idx_t __mrfstr_findchr(
 
             data->str = str;
             data->chr = chr;
-            data->size = size;
-            data->start = (mrfstr_idx_t)(uintptr_t)(str - base);
+            data->start = i;
+            data->step = tcount;
             data->res = &res;
             data->mutex = MRFSTR_CAST_MUTEX(mutex);
 
-            str += inc;
-
             mrfstr_create_thread(__mrfstr_findchr_threaded)
             {
-                str -= inc;
                 free(data);
 
                 if (!i)
@@ -168,7 +169,7 @@ mrfstr_idx_t __mrfstr_findchr(
                         return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
                     }
 
-                    str += inc * tcount;
+                    str += size * _mrfstr_config.tsearch_size;
                     mrfstr_findchr_rem;
 
                     mrfstr_close_mutex(mutex);
@@ -178,27 +179,33 @@ mrfstr_idx_t __mrfstr_findchr(
                 break;
             }
         }
-
-        tcount -= i;
     }
 
     mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
-        &res, (mrfstr_idx_t)(str - base), str, chr, size * tcount);
-    if (idx != MRFSTR_INVIDX)
-    {
-        mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
-        if (res > idx)
-            res = idx;
-        mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
-    }
-    str += inc * tcount;
+        &res, nthreads, str, chr, tcount);
+    mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
+    if (res > idx)
+        res = idx;
+    mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
 
-    mrfstr_findchr_rem;
+    str += size;
+
+    mrfstr_bool_t end = MRFSTR_FALSE;
+    for (; rem; rem--, str++)
+        if (*str == chr)
+        {
+            idx = (mrfstr_idx_t)(str - base);
+            end = MRFSTR_TRUE;
+            break;
+        }
 
     mrfstr_close_threads;
     mrfstr_close_mutex(mutex);
     free(threads);
-    return res;
+
+    if (end && res == size)
+        return idx;
+    return res == size ? MRFSTR_INVIDX : res + align;
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
@@ -211,14 +218,11 @@ DWORD WINAPI __mrfstr_findchr_threaded(
 {
     mrfstr_findchr_t data = (mrfstr_findchr_t)args;
     mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
-        data->res, data->start, data->str, data->chr, data->size);
-    if (idx != MRFSTR_INVIDX)
-    {
-        mrfstr_lock_mutex(data->mutex);
-        if (*data->res > idx)
-            *data->res = idx;
-        mrfstr_unlock_mutex(data->mutex);
-    }
+        data->res, data->start, data->str, data->chr, data->step);
+    mrfstr_lock_mutex(data->mutex);
+    if (*data->res > idx)
+        *data->res = idx;
+    mrfstr_unlock_mutex(data->mutex);
 
     free(data);
     return MRFSTR_TFUNC_RET;

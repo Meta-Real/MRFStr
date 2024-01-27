@@ -177,8 +177,8 @@ struct __MRFSTR_CONFIG_T
         volatile mrfstr_bool_t*,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*tfindchr_sub)(
-        volatile mrfstr_idx_t*, mrfstr_idx_t,
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+        volatile mrfstr_idx_t*, mrfstr_size_t,
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_short_t);
     mrfstr_size_t (*tcountchr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tsearch_size;

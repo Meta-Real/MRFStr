@@ -30,7 +30,7 @@ endif()
 add_library(MRFStr STATIC
     config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
     proc/copy.c proc/move.c proc/fill.c
-    proc/rev.c proc/replchr.c
+    proc/reverse.c proc/replchr.c
     proc/equal.c
     proc/contchr.c proc/findchr.c proc/countchr.c
     srcs/init.c srcs/set.c srcs/get.c

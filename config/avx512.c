@@ -371,41 +371,24 @@ mrfstr_idx_t __mrfstr_avx512_findchr(
 }
 
 mrfstr_idx_t __mrfstr_avx512_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_short_t step)
 {
-    __m512i *sblock = (__m512i*)str;
+    mrfstr_data_t sblock = (mrfstr_data_t)str;
     __m512i cblock = _mm512_set1_epi8(chr);
 
     __m512i block;
     mrfstr_longlong_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_AVX512_TFINDCHR_LOAD;
-    while (i <= lsize)
+
+    step <<= 6;
+    start <<= 6;
+    for (; start < *res; start += step)
     {
-        if (*res < start)
-            return MRFSTR_INVIDX;
-
-        ni = i + MRFSTR_AVX512_TFINDCHR_LOAD;
-        for (; i != ni; i++)
-        {
-            block = _mm512_load_si512(sblock++);
-
-            mask = _mm512_cmpeq_epi8_mask(block, cblock);
-            if (mask)
-                return start + (i << 6) + __mrfstr_ctz64(mask);
-        }
-    }
-
-    if (*res < start)
-        return MRFSTR_INVIDX;
-
-    for (; i != size; i++)
-    {
-        block = _mm512_load_si512(sblock++);
+        block = _mm512_load_si512(sblock + start);
 
         mask = _mm512_cmpeq_epi8_mask(block, cblock);
         if (mask)
-            return start + (i << 6) + __mrfstr_ctz64(mask);
+            return start + __mrfstr_ctz64(mask);
     }
 
     return MRFSTR_INVIDX;

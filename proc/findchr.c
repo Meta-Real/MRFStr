@@ -17,9 +17,6 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
-// temporary
-#include <stdlib.h>
-
 #define mrfstr_findchr_rem    \
     for (; rem; rem--, str++) \
         if (chr == *str)      \
@@ -151,9 +148,7 @@ single:
                 goto single;
             }
 
-            // temporary
-            abort();
-            break;
+            goto multi;
         }
 
         data->res = &res;
@@ -173,9 +168,7 @@ single:
                 goto single;
             }
 
-            // temporary
-            abort();
-            break;
+            goto multi;
         }
     }
 
@@ -185,24 +178,39 @@ single:
         res = idx;
     mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
 
+ret:
     str += size;
 
     endf = MRFSTR_FALSE;
-    for (j = 0; j != rem; j++)
-        if (*str++ == chr)
-        {
-            idx = align + size + j;
-            endf = MRFSTR_TRUE;
-            break;
-        }
+    if (res == size)
+        for (j = 0; j != rem; j++)
+            if (*str++ == chr)
+            {
+                idx = align + size + j;
+                endf = MRFSTR_TRUE;
+                break;
+            }
 
     mrfstr_close_threads;
     free(threads);
     mrfstr_close_mutex(mutex);
 
-    if (endf && res == size)
-        return idx;
-    return res == size ? MRFSTR_INVIDX : res + align;
+    if (res == size)
+        return endf ? idx : MRFSTR_INVIDX;
+    return res + align;
+
+multi:
+    for (j = i; j != factor; j++)
+    {
+        idx = _mrfstr_config.tfindchr_sub(&res, j, str, chr, tcount);
+        mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
+        if (res > idx)
+            res = idx;
+        mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
+    }
+
+    idx = MRFSTR_INVIDX;
+    goto ret;
 }
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))

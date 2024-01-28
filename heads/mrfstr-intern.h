@@ -38,16 +38,17 @@ copies or substantial portions of the Software.
         MRFSTR_CAPA(x) = size;                                               \
     } while (0)
 
-#define MRFSTR_REALLOC(x, size)                                      \
-    do                                                               \
-    {                                                                \
-        mrfstr_data_t block = (mrfstr_data_t)realloc(MRFSTR_DATA(x), \
-            size * sizeof(mrfstr_chr_t));                            \
-        if (!block)                                                  \
-            return MRFSTR_RES_MEM_ERROR;                             \
-                                                                     \
-        MRFSTR_DATA(x) = block;                                      \
-        MRFSTR_CAPA(x) = size;                                       \
+#define MRFSTR_REALLOC(x, size)                                                      \
+    do                                                                               \
+    {                                                                                \
+        mrfstr_data_t block;                                                         \
+                                                                                     \
+        block = (mrfstr_data_t)realloc(MRFSTR_DATA(x), size * sizeof(mrfstr_chr_t)); \
+        if (!block)                                                                  \
+            return MRFSTR_RES_MEM_ERROR;                                             \
+                                                                                     \
+        MRFSTR_DATA(x) = block;                                                      \
+        MRFSTR_CAPA(x) = size;                                                       \
     } while (0)
 
 #define MRFSTR_CLEAR_REALLOC(x, size)                                        \
@@ -178,7 +179,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*tfindchr_sub)(
         volatile mrfstr_idx_t*, mrfstr_size_t,
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_short_t);
+        mrfstr_data_ct, mrfstr_chr_t, mrfstr_short_t);
     mrfstr_size_t (*tcountchr_sub)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_byte_t tsearch_size;
@@ -186,7 +187,7 @@ struct __MRFSTR_CONFIG_T
     /* str functions */
 
     mrfstr_size_t (*strlen_sub)(
-        mrfstr_ptr_ct);
+        mrfstr_data_ct);
     mrfstr_byte_t strlen_size;
 };
 #pragma pack(pop)

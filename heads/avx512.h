@@ -78,13 +78,13 @@ mrfstr_idx_t __mrfstr_avx512_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_avx512_tfindchr(
     volatile mrfstr_idx_t *res, mrfstr_size_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_short_t step);
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step);
 
 mrfstr_size_t __mrfstr_avx512_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_size_t __mrfstr_avx512_strlen(
-    mrfstr_ptr_ct str);
+    mrfstr_data_ct str);
 
 #endif
 #endif

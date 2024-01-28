@@ -450,7 +450,7 @@ void mrfstr_config(
         case MRFSTR_CONFIG_SIMD_AVX:
 #ifdef __AVX2__
             _mrfstr_config.tcontchr_sub = __mrfstr_avx_tcontchr;
-            //_mrfstr_config.tfindchr_sub = __mrfstr_avx_tfindchr;
+            _mrfstr_config.tfindchr_sub = __mrfstr_avx_tfindchr;
             _mrfstr_config.tcountchr_sub = __mrfstr_avx_countchr;
             _mrfstr_config.tsearch_size = 32;
             break;
@@ -458,14 +458,14 @@ void mrfstr_config(
         case MRFSTR_CONFIG_SIMD_SSE:
 #ifdef __SSE2__
             _mrfstr_config.tcontchr_sub = __mrfstr_sse_tcontchr;
-            //_mrfstr_config.tfindchr_sub = __mrfstr_sse_tfindchr;
+            _mrfstr_config.tfindchr_sub = __mrfstr_sse_tfindchr;
             _mrfstr_config.tcountchr_sub = __mrfstr_sse_countchr;
             _mrfstr_config.tsearch_size = 16;
             break;
 #endif
         case MRFSTR_CONFIG_SIMD_NONE:
             _mrfstr_config.tcontchr_sub = __mrfstr_base_tcontchr;
-            //_mrfstr_config.tfindchr_sub = __mrfstr_base_tfindchr;
+            _mrfstr_config.tfindchr_sub = __mrfstr_base_tfindchr;
             _mrfstr_config.tcountchr_sub = __mrfstr_base_countchr;
             _mrfstr_config.tsearch_size = 8;
             break;

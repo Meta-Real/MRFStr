@@ -23,10 +23,10 @@ void __mrfstr_sse_bcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
-    __m128i *dblock = (__m128i*)dst;
-    __m128i *sblock = (__m128i*)src;
+    __m128i *dblock, *sblock, block;
 
-    __m128i block;
+    dblock = (__m128i*)dst;
+    sblock = (__m128i*)src;
     while (size--)
     {
         block = _mm_loadu_si128(sblock++);
@@ -38,10 +38,11 @@ void __mrfstr_sse_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
-    __m128i *dblock = (__m128i*)dst;
-    __m128i *sblock = (__m128i*)src;
+    __m128i *dblock, *sblock,
+        block1, block2, block3, block4;
 
-    __m128i block1, block2, block3, block4;
+    dblock = (__m128i*)dst;
+    sblock = (__m128i*)src;
     for (; size >= 4; size -= 4)
     {
         block1 = _mm_loadu_si128(sblock++);
@@ -64,10 +65,10 @@ void __mrfstr_sse_copy(
 void __mrfstr_sse_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m128i *dblock = (__m128i*)dst;
-    __m128i *sblock = (__m128i*)src;
+    __m128i *dblock, *sblock, block;
 
-    __m128i block;
+    dblock = (__m128i*)dst;
+    sblock = (__m128i*)src;
     while (size--)
     {
         block = _mm_loadu_si128(--sblock);
@@ -78,11 +79,12 @@ void __mrfstr_sse_brcopy(
 void __mrfstr_sse_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m128i *dblock = (__m128i*)dst;
-    __m128i *sblock = (__m128i*)src;
-
-    __m128i block1, block2, block3, block4,
+    __m128i *dblock, *sblock,
+        block1, block2, block3, block4,
         block5, block6, block7, block8;
+
+    dblock = (__m128i*)dst;
+    sblock = (__m128i*)src;
     for (; size >= 8; size -= 8)
     {
         block1 = _mm_loadu_si128(--sblock);
@@ -113,9 +115,10 @@ void __mrfstr_sse_rcopy(
 void __mrfstr_sse_bfill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *rblock = (__m128i*)res;
-    __m128i block = _mm_set1_epi8(chr);
+    __m128i *rblock, block;
 
+    rblock = (__m128i*)res;
+    block = _mm_set1_epi8(chr);
     while (size--)
         _mm_store_si128(rblock++, block);
 }
@@ -123,9 +126,10 @@ void __mrfstr_sse_bfill(
 void __mrfstr_sse_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *rblock = (__m128i*)res;
-    __m128i block = _mm_set1_epi8(chr);
+    __m128i *rblock, block;
 
+    rblock = (__m128i*)res;
+    block = _mm_set1_epi8(chr);
     while (size--)
         _mm_stream_si128(rblock++, block);
 }
@@ -134,14 +138,14 @@ void __mrfstr_sse_fill(
 void __mrfstr_sse_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
 {
-    __m128i *lblock = (__m128i*)left;
-    __m128i *rblock = (__m128i*)right;
+    __m128i *lblock, *rblock, revidx, block1, block2;
 
-    const __m128i revidx = _mm_set_epi32(
+    lblock = (__m128i*)left;
+    rblock = (__m128i*)right;
+
+    revidx = _mm_set_epi32(
         0x00010203, 0x04050607,
         0x08090a0b, 0x0c0d0e0f);
-
-    __m128i block1, block2;
     while (size--)
     {
         block1 = _mm_load_si128(lblock);
@@ -164,14 +168,14 @@ void __mrfstr_sse_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right,
     mrfstr_size_t size)
 {
-    __m128i *lblock = (__m128i*)left;
-    __m128i *rblock = (__m128i*)right;
+    __m128i *lblock, *rblock, revidx, block;
 
-    const __m128i revidx = _mm_set_epi32(
+    lblock = (__m128i*)left;
+    rblock = (__m128i*)right;
+
+    revidx = _mm_set_epi32(
         0x00010203, 0x04050607,
         0x08090a0b, 0x0c0d0e0f);
-
-    __m128i block;
     while (size--)
     {
         block = _mm_loadu_si128(--rblock);
@@ -193,16 +197,16 @@ void __mrfstr_sse_replchr(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i oblock = _mm_set1_epi8(ochr);
-    __m128i nblock = _mm_set1_epi8(nchr);
-
-    __m128i block;
+    __m128i *sblock, oblock, nblock, block;
 #ifdef __AVX512BW__
     mrfstr_short_t mask;
 #else
     __m128i mask;
 #endif
+
+    sblock = (__m128i*)str;
+    oblock = _mm_set1_epi8(ochr);
+    nblock = _mm_set1_epi8(nchr);
     for (; size; size--, sblock++)
     {
         block = _mm_load_si128(sblock);
@@ -224,17 +228,17 @@ void __mrfstr_sse_replchr2(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    __m128i *rblock = (__m128i*)res;
-    __m128i *sblock = (__m128i*)str;
-    __m128i oblock = _mm_set1_epi8(ochr);
-    __m128i nblock = _mm_set1_epi8(nchr);
-
-    __m128i block;
+    __m128i *rblock, *sblock, oblock, nblock, block;
 #ifdef __AVX512BW__
     mrfstr_short_t mask;
 #else
     __m128i mask;
 #endif
+
+    rblock = (__m128i*)res;
+    sblock = (__m128i*)str;
+    oblock = _mm_set1_epi8(ochr);
+    nblock = _mm_set1_epi8(nchr);
     while (size--)
     {
         block = _mm_loadu_si128(sblock++);
@@ -256,10 +260,10 @@ void __mrfstr_sse_replchr2(
 mrfstr_bool_t __mrfstr_sse_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    __m128i *s1block = (__m128i*)str1;
-    __m128i *s2block = (__m128i*)str2;
+    __m128i *s1block, *s2block, block1, block2;
 
-    __m128i block1, block2;
+    s1block = (__m128i*)str1;
+    s2block = (__m128i*)str2;
     while (size--)
     {
         block1 = _mm_loadu_si128(s1block++);
@@ -280,11 +284,11 @@ void __mrfstr_sse_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    __m128i *s1block = (__m128i*)str1;
-    __m128i *s2block = (__m128i*)str2;
-
-    __m128i block1, block2;
+    __m128i *s1block, *s2block, block1, block2;
     mrfstr_size_t nsize;
+
+    s1block = (__m128i*)str1;
+    s2block = (__m128i*)str2;
     while (size >= MRFSTR_SSE_TEQUAL_LOAD)
     {
         if (!*res)
@@ -331,10 +335,10 @@ void __mrfstr_sse_tequal(
 mrfstr_bool_t __mrfstr_sse_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i cblock = _mm_set1_epi8(chr);
+    __m128i *sblock, cblock, block;
 
-    __m128i block;
+    sblock = (__m128i*)str;
+    cblock = _mm_set1_epi8(chr);
     while (size--)
     {
         block = _mm_loadu_si128(sblock++);
@@ -354,11 +358,11 @@ void __mrfstr_sse_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i cblock = _mm_set1_epi8(chr);
-
-    __m128i block;
+    __m128i *sblock, cblock, block;
     mrfstr_size_t nsize;
+
+    sblock = (__m128i*)str;
+    cblock = _mm_set1_epi8(chr);
     while (size >= MRFSTR_SSE_TCONTCHR_LOAD)
     {
         if (*res)
@@ -403,12 +407,12 @@ void __mrfstr_sse_tcontchr(
 mrfstr_idx_t __mrfstr_sse_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i cblock = _mm_set1_epi8(chr);
-
-    __m128i block;
-    mrfstr_short_t mask;
+    __m128i *sblock, cblock, block;
     mrfstr_size_t i;
+    mrfstr_short_t mask;
+
+    sblock = (__m128i*)str;
+    cblock = _mm_set1_epi8(chr);
     for (i = 0; i != size; i++)
     {
         block = _mm_loadu_si128(sblock++);
@@ -426,41 +430,16 @@ mrfstr_idx_t __mrfstr_sse_findchr(
 }
 
 mrfstr_idx_t __mrfstr_sse_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i cblock = _mm_set1_epi8(chr);
-
-    __m128i block;
+    __m128i cblock, block;
     mrfstr_short_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_SSE_TFINDCHR_LOAD;
-    while (i <= lsize)
+
+    cblock = _mm_set1_epi8(chr);
+    for (start <<= 4; start < *res; start += step)
     {
-        if (*res < start)
-            return MRFSTR_INVIDX;
-
-        ni = i + MRFSTR_SSE_TFINDCHR_LOAD;
-        for (; i != ni; i++)
-        {
-            block = _mm_loadu_si128(sblock++);
-
-#ifdef __AVX512BW__
-            mask = _mm_cmpeq_epi8_mask(block, cblock);
-#else
-            mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));
-#endif
-            if (mask)
-                return start + (i << 4) + __mrfstr_ctz16(mask);
-        }
-    }
-
-    if (*res < start)
-        return MRFSTR_INVIDX;
-
-    for (; i != size; i++)
-    {
-        block = _mm_loadu_si128(sblock++);
+        block = _mm_load_si128((__m128i*)(str + start));
 
 #ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, cblock);
@@ -468,7 +447,7 @@ mrfstr_idx_t __mrfstr_sse_tfindchr(
         mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, cblock));
 #endif
         if (mask)
-            return start + (i << 4) + __mrfstr_ctz16(mask);
+            return start + __mrfstr_ctz16(mask);
     }
 
     return MRFSTR_INVIDX;
@@ -477,12 +456,13 @@ mrfstr_idx_t __mrfstr_sse_tfindchr(
 mrfstr_size_t __mrfstr_sse_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m128i *sblock = (__m128i*)str;
-    __m128i cblock = _mm_set1_epi8(chr);
-
-    __m128i block;
+    __m128i *sblock, cblock, block;
+    mrfstr_size_t count;
     mrfstr_short_t mask;
-    mrfstr_size_t count = 0;
+
+    sblock = (__m128i*)str;
+    cblock = _mm_set1_epi8(chr);
+    count = 0;
     while (size--)
     {
         block = _mm_load_si128(sblock++);
@@ -498,13 +478,15 @@ mrfstr_size_t __mrfstr_sse_countchr(
 }
 
 mrfstr_size_t __mrfstr_sse_strlen(
-    mrfstr_ptr_ct str)
+    mrfstr_data_ct str)
 {
-    mrfstr_data_ct base = (mrfstr_data_ct)str;
-    __m128i *sblock = (__m128i*)str;
-
-    __m128i block, zero = _mm_setzero_si128();
+    mrfstr_data_ct base;
+    __m128i *sblock, block, zero;
     mrfstr_short_t mask;
+
+    base = str;
+    sblock = (__m128i*)str;
+    zero = _mm_setzero_si128();
     for (;; sblock++)
     {
         block = _mm_load_si128(sblock);
@@ -515,7 +497,8 @@ mrfstr_size_t __mrfstr_sse_strlen(
         mask = (mrfstr_short_t)_mm_movemask_epi8(_mm_cmpeq_epi8(block, zero));
 #endif
         if (mask)
-            return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + __mrfstr_ctz16(mask);
+            return (mrfstr_size_t)(uintptr_t)((mrfstr_data_ct)sblock - base) +
+                __mrfstr_ctz16(mask);
     }
 }
 

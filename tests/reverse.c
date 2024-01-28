@@ -46,38 +46,35 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
+    mrfstr_t str1, str2;
+    mrfstr_data_t str, strr, ptr;
+    mrfstr_size_t i;
+    mrfstr_short_t j;
+    mrfstr_bool_t first;
+
     mrfstr_config_tcount(5);
 
-    mrfstr_t str1;
     MRFSTR_TLIB_INIT(str1,);
-
-    mrfstr_t str2;
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
-
-    mrfstr_data_t str;
     MRFSTR_TLIB_INIT_STR(str,
         mrfstr_free(str1); mrfstr_free(str2));
-
-    mrfstr_data_t strr;
     MRFSTR_TLIB_INIT_STR(strr,
         mrfstr_free(str1); mrfstr_free(str2); free(str));
 
-    mrfstr_data_t ptr = str;
-    mrfstr_size_t i;
-    mrfstr_short_t j;
-    for (i = 0; i < TEST4_SIZE; i += 0x100)
+    ptr = str;
+    for (i = 0; i != TEST4_SIZE; i += 0x100)
         for (j = 0; j != 0x100; j++)
             *ptr++ = (mrfstr_chr_t)j;
 
     ptr = strr;
-    for (i = 0; i < TEST4_SIZE; i += 0x100)
+    for (i = 0; i != TEST4_SIZE; i += 0x100)
         for (j = 0xff; j != 0xffff; j--)
             *ptr++ = (mrfstr_chr_t)j;
 
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_bool_t first = MRFSTR_TRUE;
+    first = MRFSTR_TRUE;
     MRFSTR_TLIB_ROUND(TEST1_SIZE);
     MRFSTR_TLIB_ROUND(TEST2_SIZE);
     MRFSTR_TLIB_ROUND(TEST3_SIZE);

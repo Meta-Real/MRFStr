@@ -53,7 +53,9 @@ mrfstr_bool_t mrfstr_startswith(
 mrfstr_bool_t mrfstr_startswith_str(
     mrfstr_ct str, mrfstr_data_ct substr)
 {
-    mrfstr_size_t size = mrfstr_strlen(substr);
+    mrfstr_size_t size;
+
+    size = mrfstr_strlen(substr);
     if (size > MRFSTR_SIZE(str))
         return MRFSTR_FALSE;
 
@@ -91,7 +93,9 @@ mrfstr_bool_t mrfstr_endswith(
 mrfstr_bool_t mrfstr_endswith_str(
     mrfstr_ct str, mrfstr_data_ct substr)
 {
-    mrfstr_size_t size = mrfstr_strlen(substr);
+    mrfstr_size_t size;
+
+    size = mrfstr_strlen(substr);
     if (size > MRFSTR_SIZE(str))
         return MRFSTR_FALSE;
 

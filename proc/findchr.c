@@ -32,10 +32,10 @@ struct __MRFSTR_FINDCHR_T
     mrfstr_mutex_p mutex;
 
     mrfstr_data_ct str;
-    mrfstr_chr_t chr;
-
-    mrfstr_byte_t step;
+    mrfstr_short_t step;
     mrfstr_byte_t start;
+
+    mrfstr_chr_t chr;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_FINDCHR_T *mrfstr_findchr_t;
@@ -53,8 +53,8 @@ mrfstr_idx_t __mrfstr_findchr(
 {
     mrfstr_size_t tsize;
     mrfstr_idx_t idx;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t align, tcount, i, j;
+    mrfstr_short_t rem, tcount, factor;
+    mrfstr_byte_t align, i, j;
     mrfstr_bool_t endf;
     volatile mrfstr_idx_t res;
     mrfstr_thread_t *threads;
@@ -138,6 +138,7 @@ single:
     if (!threads)
         goto single;
 
+    tcount *= _mrfstr_config.tsearch_size;
     for (i = 0; i != factor; i++)
     {
         data = (mrfstr_findchr_t)malloc(sizeof(struct __MRFSTR_FINDCHR_T));
@@ -158,9 +159,9 @@ single:
         data->res = &res;
         data->mutex = MRFSTR_CAST_MUTEX(mutex);
         data->str = str;
-        data->chr = chr;
         data->start = i;
         data->step = tcount;
+        data->chr = chr;
 
         mrfstr_create_thread(__mrfstr_findchr_threaded)
         {

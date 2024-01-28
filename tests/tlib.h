@@ -63,16 +63,18 @@ copies or substantial portions of the Software.
         }                                              \
     } while (0)
 
-#define MRFSTR_TLIB_ROUND(size)           \
-    do                                    \
-    {                                     \
-        mrfstr_bool_t obj = MRFSTR_FALSE; \
-        MRFSTR_TLIB_OBJ(size);            \
-        if (!obj)                         \
-        {                                 \
-            MRFSTR_TLIB_FREE;             \
-            MRFSTR_TLIB_ERROR;            \
-        }                                 \
+#define MRFSTR_TLIB_ROUND(size) \
+    do                          \
+    {                           \
+        mrfstr_bool_t obj;      \
+                                \
+        obj = MRFSTR_FALSE;     \
+        MRFSTR_TLIB_OBJ(size);  \
+        if (!obj)               \
+        {                       \
+            MRFSTR_TLIB_FREE;   \
+            MRFSTR_TLIB_ERROR;  \
+        }                       \
     } while (0)
 
 #define MRFSTR_TLIB_MEMCPY(x, str, size) \

@@ -18,7 +18,9 @@ copies or substantial portions of the Software.
 
 mrfstr_t mrfstr_init(void)
 {
-    mrfstr_t str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str;
+
+    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -30,7 +32,9 @@ mrfstr_t mrfstr_init(void)
 mrfstr_t mrfstr_init2(
     mrfstr_data_t data)
 {
-    mrfstr_t str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str;
+
+    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -43,7 +47,9 @@ mrfstr_t mrfstr_init2(
 mrfstr_t mrfstr_init3(
     mrfstr_data_t data, mrfstr_size_t size)
 {
-    mrfstr_t str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
+    mrfstr_t str;
+
+    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
     if (!str)
         return NULL;
 
@@ -174,11 +180,14 @@ mrfstr_res_enum_t mrfstr_clear_shrink(
 void mrfstr_swap(
     mrfstr_t str1, mrfstr_t str2)
 {
-    mrfstr_data_t data = MRFSTR_DATA(str1);
+    mrfstr_data_t data;
+    mrfstr_size_t size;
+
+    data = MRFSTR_DATA(str1);
     MRFSTR_DATA(str1) = MRFSTR_DATA(str2);
     MRFSTR_DATA(str2) = data;
 
-    mrfstr_size_t size = MRFSTR_SIZE(str1);
+    size = MRFSTR_SIZE(str1);
     MRFSTR_SIZE(str1) = MRFSTR_SIZE(str2);
     MRFSTR_SIZE(str2) = size;
 

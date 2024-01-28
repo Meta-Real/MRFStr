@@ -21,6 +21,8 @@ mrfstr_res_enum_t mrfstr_repeat(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_size_t count)
 {
+    mrfstr_size_t size;
+
     if (MRFSTR_SIZE(str) == 1)
         return mrfstr_repeat_chr(res, *MRFSTR_DATA(str), count);
 
@@ -43,7 +45,7 @@ mrfstr_res_enum_t mrfstr_repeat(
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_size_t size = MRFSTR_SIZE(str) * count;
+    size = MRFSTR_SIZE(str) * count;
     if (size / count != MRFSTR_SIZE(str))
         return MRFSTR_RES_OVERFLOW_ERROR;
 

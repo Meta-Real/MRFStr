@@ -45,9 +45,10 @@ void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
     mrfstr_size_t size)
 {
-    mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
+    mrfstr_longlong_t *dblock, *sblock;
 
+    dblock = (mrfstr_longlong_t*)dst;
+    sblock = (mrfstr_longlong_t*)src;
     while (size--)
         *dblock++ = *sblock++;
 }
@@ -55,9 +56,10 @@ void __mrfstr_base_copy(
 void __mrfstr_base_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *dblock = (mrfstr_longlong_t*)dst;
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)src;
+    mrfstr_longlong_t *dblock, *sblock;
 
+    dblock = (mrfstr_longlong_t*)dst;
+    sblock = (mrfstr_longlong_t*)src;
     while (size--)
         *--dblock = *--sblock;
 }
@@ -65,10 +67,10 @@ void __mrfstr_base_rcopy(
 void __mrfstr_base_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)res;
-    mrfstr_longlong_t cblock;
-    mrfstr_base_set1(cblock, chr);
+    mrfstr_longlong_t *rblock, cblock;
 
+    rblock = (mrfstr_longlong_t*)res;
+    mrfstr_base_set1(cblock, chr);
     while (size--)
         *rblock++ = cblock;
 }
@@ -76,10 +78,10 @@ void __mrfstr_base_fill(
 void __mrfstr_base_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
-    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
+    mrfstr_longlong_t *lblock, *rblock, block1, block2;
 
-    mrfstr_longlong_t block1, block2;
+    lblock = (mrfstr_longlong_t*)left;
+    rblock = (mrfstr_longlong_t*)right;
     while (size--)
     {
         block1 = *lblock;
@@ -97,10 +99,10 @@ void __mrfstr_base_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right,
     mrfstr_size_t size)
 {
-    mrfstr_longlong_t *lblock = (mrfstr_longlong_t*)left;
-    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)right;
+    mrfstr_longlong_t *lblock, *rblock, block;
 
-    mrfstr_longlong_t block;
+    lblock = (mrfstr_longlong_t*)left;
+    rblock = (mrfstr_longlong_t*)right;
     while (size--)
     {
         block = *--rblock;
@@ -115,11 +117,10 @@ void __mrfstr_base_replchr(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t oblock;
-    mrfstr_base_set1(oblock, ochr);
+    mrfstr_longlong_t *sblock, oblock, mask, block;
 
-    mrfstr_longlong_t mask, block;
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(oblock, ochr);
     for (; size; size--, sblock++)
     {
         block = *sblock;
@@ -140,12 +141,11 @@ void __mrfstr_base_replchr2(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_longlong_t *rblock = (mrfstr_longlong_t*)res;
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t oblock;
-    mrfstr_base_set1(oblock, ochr);
+    mrfstr_longlong_t *rblock, *sblock, oblock, mask, block;
 
-    mrfstr_longlong_t mask, block;
+    rblock = (mrfstr_longlong_t*)res;
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(oblock, ochr);
     while (size--)
     {
         block = *sblock++;
@@ -165,12 +165,14 @@ void __mrfstr_base_replchr2(
 mrfstr_bool_t __mrfstr_base_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *s1block = (mrfstr_longlong_t*)str1;
-    mrfstr_longlong_t *s2block = (mrfstr_longlong_t*)str2;
+    mrfstr_longlong_t *s1block, *s2block;
 
+    s1block = (mrfstr_longlong_t*)str1;
+    s2block = (mrfstr_longlong_t*)str2;
     while (size--)
         if (*s1block++ != *s2block++)
             return MRFSTR_FALSE;
+
     return MRFSTR_TRUE;
 }
 
@@ -178,10 +180,11 @@ void __mrfstr_base_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *s1block = (mrfstr_longlong_t*)str1;
-    mrfstr_longlong_t *s2block = (mrfstr_longlong_t*)str2;
-
+    mrfstr_longlong_t *s1block, *s2block;
     mrfstr_size_t nsize;
+
+    s1block = (mrfstr_longlong_t*)str1;
+    s2block = (mrfstr_longlong_t*)str2;
     while (size >= MRFSTR_BASE_TEQUAL_LOAD)
     {
         if (!*res)
@@ -210,11 +213,10 @@ void __mrfstr_base_tequal(
 mrfstr_bool_t __mrfstr_base_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t cblock;
-    mrfstr_base_set1(cblock, chr);
+    mrfstr_longlong_t *sblock, cblock, mask;
 
-    mrfstr_longlong_t mask;
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(cblock, chr);
     while (size--)
     {
         mask = cblock ^ *sblock++;
@@ -229,12 +231,11 @@ void __mrfstr_base_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t cblock;
-    mrfstr_base_set1(cblock, chr);
-
+    mrfstr_longlong_t *sblock, cblock, mask;
     mrfstr_size_t nsize;
-    mrfstr_longlong_t mask;
+
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(cblock, chr);
     while (size >= MRFSTR_BASE_TCONTCHR_LOAD)
     {
         if (*res)
@@ -269,12 +270,11 @@ void __mrfstr_base_tcontchr(
 mrfstr_idx_t __mrfstr_base_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t cblock;
-    mrfstr_base_set1(cblock, chr);
-
-    mrfstr_longlong_t mask;
+    mrfstr_longlong_t *sblock, cblock, mask;
     mrfstr_size_t i;
+
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(cblock, chr);
     for (i = 0; i != size; i++)
     {
         mask = cblock ^ *sblock++;
@@ -286,39 +286,17 @@ mrfstr_idx_t __mrfstr_base_findchr(
 }
 
 mrfstr_idx_t __mrfstr_base_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t cblock;
+    mrfstr_longlong_t cblock, mask;
+
     mrfstr_base_set1(cblock, chr);
-
-    mrfstr_longlong_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_BASE_TFINDCHR_LOAD;
-    while (i <= lsize)
+    for (start <<= 3; start < *res; start += step)
     {
-        if (*res < start)
-            return MRFSTR_INVIDX;
-
-        ni = i + MRFSTR_BASE_TFINDCHR_LOAD;
-        for (; i != ni; i++)
-        {
-            mask = cblock ^ *sblock++;
-            if (mrfstr_base_cmp(mask))
-                return start + (i << 3) +
-                    (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
-        }
-    }
-
-    if (*res < start)
-        return MRFSTR_INVIDX;
-
-    for (; i != size; i++)
-    {
-        mask = cblock ^ *sblock++;
+        mask = cblock ^ *(mrfstr_longlong_t*)(str + start);
         if (mrfstr_base_cmp(mask))
-            return start + (i << 3) +
-                (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
+            return start + (__mrfstr_ctz64(mrfstr_base_cmp2(mask)) >> 3);
     }
 
     return MRFSTR_INVIDX;
@@ -327,12 +305,12 @@ mrfstr_idx_t __mrfstr_base_tfindchr(
 mrfstr_size_t __mrfstr_base_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
-    mrfstr_longlong_t cblock;
-    mrfstr_base_set1(cblock, chr);
+    mrfstr_longlong_t *sblock, cblock, mask;
+    mrfstr_size_t count;
 
-    mrfstr_longlong_t mask;
-    mrfstr_size_t count = 0;
+    sblock = (mrfstr_longlong_t*)str;
+    mrfstr_base_set1(cblock, chr);
+    count = 0;
     while (size--)
     {
         mask = cblock ^ *sblock++;
@@ -344,19 +322,21 @@ mrfstr_size_t __mrfstr_base_countchr(
 }
 
 mrfstr_size_t __mrfstr_base_strlen(
-    mrfstr_ptr_ct str)
+    mrfstr_data_ct str)
 {
-    mrfstr_data_ct base = (mrfstr_data_ct)str;
-    mrfstr_longlong_t *sblock = (mrfstr_longlong_t*)str;
+    mrfstr_data_ct base;
+    mrfstr_longlong_t *sblock, mask;
 
-    mrfstr_longlong_t mask;
+    base = str;
+    sblock = (mrfstr_longlong_t*)str;
     for (;; sblock++)
     {
         mask = mrfstr_base_cmp(*sblock);
         if (mask)
         {
             mask = mrfstr_base_cmp2(*sblock);
-            return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + (__mrfstr_ctz64(mask) >> 3);
+            return (mrfstr_size_t)(uintptr_t)((mrfstr_data_ct)sblock - base) +
+                (__mrfstr_ctz64(mask) >> 3);
         }
     }
 }

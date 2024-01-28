@@ -27,7 +27,6 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_AVX_TEQUAL_LOAD 0x20000
 #define MRFSTR_AVX_TCONTCHR_LOAD 0x20000
-#define MRFSTR_AVX_TFINDCHR_LOAD 0x20000
 
 void __mrfstr_avx_bcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
@@ -77,14 +76,14 @@ void __mrfstr_avx_tcontchr(
 mrfstr_idx_t __mrfstr_avx_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_avx_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step);
 
 mrfstr_size_t __mrfstr_avx_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_size_t __mrfstr_avx_strlen(
-    mrfstr_ptr_ct str);
+    mrfstr_data_ct str);
 #endif
 
 #endif

@@ -45,15 +45,14 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
+    mrfstr_t res1, res2;
+    mrfstr_data_t str;
+    mrfstr_bool_t first;
+
     mrfstr_config_tcount(5);
 
-    mrfstr_t res1;
     MRFSTR_TLIB_INIT(res1,);
-
-    mrfstr_t res2;
     MRFSTR_TLIB_INIT(res2, mrfstr_free(res1));
-
-    mrfstr_data_t str;
     MRFSTR_TLIB_INIT_STR(str,
         mrfstr_free(res1); mrfstr_free(res2));
     memset(str, '1', TEST4_SIZE);
@@ -61,7 +60,7 @@ int main(void)
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    mrfstr_bool_t first = MRFSTR_TRUE;
+    first = MRFSTR_TRUE;
     MRFSTR_TLIB_ROUND(TEST1_SIZE);
     MRFSTR_TLIB_ROUND(TEST2_SIZE);
     MRFSTR_TLIB_ROUND(TEST3_SIZE);

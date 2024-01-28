@@ -36,13 +36,13 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
+    mrfstr_t res;
+    mrfstr_data_t str;
+
     mrfstr_config_tcount(5);
 
-    mrfstr_t res;
     MRFSTR_TLIB_INIT(res,);
     mrfstr_set_nstr(res, "00000000", 8);
-
-    mrfstr_data_t str;
     MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));
     memset(str, '0', TEST4_SIZE);
 

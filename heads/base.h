@@ -21,7 +21,6 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BASE_TEQUAL_LOAD 0x80000
 #define MRFSTR_BASE_TCONTCHR_LOAD 0x80000
-#define MRFSTR_BASE_TFINDCHR_LOAD 0x80000
 
 void __mrfstr_base_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src,
@@ -62,13 +61,13 @@ void __mrfstr_base_tcontchr(
 mrfstr_idx_t __mrfstr_base_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_base_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step);
 
 mrfstr_size_t __mrfstr_base_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_size_t __mrfstr_base_strlen(
-    mrfstr_ptr_ct str);
+    mrfstr_data_ct str);
 
 #endif

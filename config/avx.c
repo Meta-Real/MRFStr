@@ -22,10 +22,10 @@ copies or substantial portions of the Software.
 void __mrfstr_avx_bcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m256i *dblock = (__m256i*)dst;
-    __m256i *sblock = (__m256i*)src;
+    __m256i *dblock, *sblock, block;
 
-    __m256i block;
+    dblock = (__m256i*)dst;
+    sblock = (__m256i*)src;
     while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
@@ -36,10 +36,10 @@ void __mrfstr_avx_bcopy(
 void __mrfstr_avx_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m256i *dblock = (__m256i*)dst;
-    __m256i *sblock = (__m256i*)src;
+    __m256i *dblock, *sblock, block1, block2;
 
-    __m256i block1, block2;
+    dblock = (__m256i*)dst;
+    sblock = (__m256i*)src;
     for (; size >= 2; size -= 2)
     {
         block1 = _mm256_loadu_si256(sblock++);
@@ -58,10 +58,10 @@ void __mrfstr_avx_copy(
 void __mrfstr_avx_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m256i *dblock = (__m256i*)dst;
-    __m256i *sblock = (__m256i*)src;
+    __m256i *dblock, *sblock, block;
 
-    __m256i block;
+    dblock = (__m256i*)dst;
+    sblock = (__m256i*)src;
     while (size--)
     {
         block = _mm256_loadu_si256(--sblock);
@@ -72,10 +72,11 @@ void __mrfstr_avx_brcopy(
 void __mrfstr_avx_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m256i *dblock = (__m256i*)dst;
-    __m256i *sblock = (__m256i*)src;
+    __m256i *dblock, *sblock,
+        block1, block2, block3, block4;
 
-    __m256i block1, block2, block3, block4;
+    dblock = (__m256i*)dst;
+    sblock = (__m256i*)src;
     for (; size >= 4; size -= 4)
     {
         block1 = _mm256_loadu_si256(--sblock);
@@ -98,9 +99,10 @@ void __mrfstr_avx_rcopy(
 void __mrfstr_avx_bfill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *rblock = (__m256i*)res;
-    __m256i block = _mm256_set1_epi8(chr);
+    __m256i *rblock, block;
 
+    rblock = (__m256i*)res;
+    block = _mm256_set1_epi8(chr);
     while (size--)
         _mm256_store_si256(rblock++, block);
 }
@@ -108,9 +110,10 @@ void __mrfstr_avx_bfill(
 void __mrfstr_avx_fill(
     mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *rblock = (__m256i*)res;
-    __m256i block = _mm256_set1_epi8(chr);
+    __m256i *rblock, block;
 
+    rblock = (__m256i*)res;
+    block = _mm256_set1_epi8(chr);
     while (size--)
         _mm256_stream_si256(rblock++, block);
 }
@@ -119,20 +122,21 @@ void __mrfstr_avx_fill(
 void __mrfstr_avx_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
 {
-    __m256i *lblock = (__m256i*)left;
-    __m256i *rblock = (__m256i*)right;
+    __m256i *lblock, *rblock, revidx, block1, block2;
+
+    lblock = (__m256i*)left;
+    rblock = (__m256i*)right;
 
 #ifdef __AVX512VBMI__
-    const __m256i revidx = _mm256_set_epi64x(
+    revidx = _mm256_set_epi64x(
         0x0001020304050607, 0x08090a0b0c0d0e0f,
         0x1011121314151617, 0x18191a1b1c1d1e1f);
 #else
-    const __m256i revidx = _mm256_set_epi64x(
+    revidx = _mm256_set_epi64x(
         0x0001020304050607, 0x08090a0b0c0d0e0f,
         0x0001020304050607, 0x08090a0b0c0d0e0f);
 #endif
 
-    __m256i block1, block2;
     while (size--)
     {
         block1 = _mm256_load_si256(lblock);
@@ -157,20 +161,21 @@ void __mrfstr_avx_rev(
 void __mrfstr_avx_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
 {
-    __m256i *lblock = (__m256i*)left;
-    __m256i *rblock = (__m256i*)right;
+    __m256i *lblock, *rblock, revidx, block;
+
+    lblock = (__m256i*)left;
+    rblock = (__m256i*)right;
 
 #ifdef __AVX512VBMI__
-    const __m256i revidx = _mm256_set_epi64x(
+    revidx = _mm256_set_epi64x(
         0x0001020304050607, 0x08090a0b0c0d0e0f,
         0x1011121314151617, 0x18191a1b1c1d1e1f);
 #else
-    const __m256i revidx = _mm256_set_epi64x(
+    revidx = _mm256_set_epi64x(
         0x0001020304050607, 0x08090a0b0c0d0e0f,
         0x0001020304050607, 0x08090a0b0c0d0e0f);
 #endif
 
-    __m256i block;
     while (size--)
     {
         block = _mm256_loadu_si256(--rblock);
@@ -191,16 +196,16 @@ void __mrfstr_avx_replchr(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i oblock = _mm256_set1_epi8(ochr);
-    __m256i nblock = _mm256_set1_epi8(nchr);
-
-    __m256i block;
+    __m256i *sblock, oblock, nblock, block;
 #ifdef __AVX512BW__
     mrfstr_long_t mask;
 #else
     __m256i mask;
 #endif
+
+    sblock = (__m256i*)str;
+    oblock = _mm256_set1_epi8(ochr);
+    nblock = _mm256_set1_epi8(nchr);
     for (; size; size--, sblock++)
     {
         block = _mm256_load_si256(sblock);
@@ -222,17 +227,17 @@ void __mrfstr_avx_replchr2(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    __m256i *rblock = (__m256i*)res;
-    __m256i *sblock = (__m256i*)str;
-    __m256i oblock = _mm256_set1_epi8(ochr);
-    __m256i nblock = _mm256_set1_epi8(nchr);
-
-    __m256i block;
+    __m256i *rblock, *sblock, oblock, nblock, block;
 #ifdef __AVX512BW__
     mrfstr_long_t mask;
 #else
     __m256i mask;
 #endif
+
+    rblock = (__m256i*)res;
+    sblock = (__m256i*)str;
+    oblock = _mm256_set1_epi8(ochr);
+    nblock = _mm256_set1_epi8(nchr);
     while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
@@ -253,10 +258,10 @@ void __mrfstr_avx_replchr2(
 mrfstr_bool_t __mrfstr_avx_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    __m256i *s1block = (__m256i*)str1;
-    __m256i *s2block = (__m256i*)str2;
+    __m256i *s1block, *s2block, block1, block2;
 
-    __m256i block1, block2;
+    s1block = (__m256i*)str1;
+    s2block = (__m256i*)str2;
     while (size--)
     {
         block1 = _mm256_loadu_si256(s1block++);
@@ -277,11 +282,11 @@ void __mrfstr_avx_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 {
-    __m256i *s1block = (__m256i*)str1;
-    __m256i *s2block = (__m256i*)str2;
-
-    __m256i block1, block2;
+    __m256i *s1block, *s2block, block1, block2;
     mrfstr_size_t nsize;
+
+    s1block = (__m256i*)str1;
+    s2block = (__m256i*)str2;
     while (size >= MRFSTR_AVX_TEQUAL_LOAD)
     {
         if (!*res)
@@ -328,10 +333,10 @@ void __mrfstr_avx_tequal(
 mrfstr_bool_t __mrfstr_avx_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i cblock = _mm256_set1_epi8(chr);
+    __m256i *sblock, cblock, block;
 
-    __m256i block;
+    sblock = (__m256i*)str;
+    cblock = _mm256_set1_epi8(chr);
     while (size--)
     {
         block = _mm256_loadu_si256(sblock++);
@@ -351,11 +356,11 @@ void __mrfstr_avx_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i cblock = _mm256_set1_epi8(chr);
-
-    __m256i block;
+    __m256i *sblock, cblock, block;
     mrfstr_size_t nsize;
+
+    sblock = (__m256i*)str;
+    cblock = _mm256_set1_epi8(chr);
     while (size >= MRFSTR_AVX_TCONTCHR_LOAD)
     {
         if (*res)
@@ -400,12 +405,12 @@ void __mrfstr_avx_tcontchr(
 mrfstr_idx_t __mrfstr_avx_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i cblock = _mm256_set1_epi8(chr);
-
-    __m256i block;
-    mrfstr_long_t mask;
+    __m256i *sblock, cblock, block;
     mrfstr_size_t i;
+    mrfstr_long_t mask;
+
+    sblock = (__m256i*)str;
+    cblock = _mm256_set1_epi8(chr);
     for (i = 0; i != size; i++)
     {
         block = _mm256_loadu_si256(sblock++);
@@ -423,41 +428,16 @@ mrfstr_idx_t __mrfstr_avx_findchr(
 }
 
 mrfstr_idx_t __mrfstr_avx_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+    volatile mrfstr_idx_t *res, mrfstr_size_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_short_t step)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i cblock = _mm256_set1_epi8(chr);
-
-    __m256i block;
+    __m256i cblock, block;
     mrfstr_long_t mask;
-    mrfstr_size_t i = 0, ni, lsize = size - MRFSTR_AVX_TFINDCHR_LOAD;
-    while (i <= lsize)
+
+    cblock = _mm256_set1_epi8(chr);
+    for (start <<= 5; start < *res; start += step)
     {
-        if (*res < start)
-            return MRFSTR_INVIDX;
-
-        ni = i + MRFSTR_AVX_TFINDCHR_LOAD;
-        for (; i != ni; i++)
-        {
-            block = _mm256_loadu_si256(sblock++);
-
-#ifdef __AVX512BW__
-            mask = _mm256_cmpeq_epi8_mask(block, cblock);
-#else
-            mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
-#endif
-            if (mask)
-                return start + (i << 5) + __mrfstr_ctz32(mask);
-        }
-    }
-
-    if (*res < start)
-        return MRFSTR_INVIDX;
-
-    for (; i != size; i++)
-    {
-        block = _mm256_loadu_si256(sblock++);
+        block = _mm256_load_si256((__m256i*)(str + start));
 
 #ifdef __AVX512BW__
         mask = _mm256_cmpeq_epi8_mask(block, cblock);
@@ -465,7 +445,7 @@ mrfstr_idx_t __mrfstr_avx_tfindchr(
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock));
 #endif
         if (mask)
-            return start + (i << 5) + __mrfstr_ctz32(mask);
+            return start + __mrfstr_ctz32(mask);
     }
 
     return MRFSTR_INVIDX;
@@ -474,12 +454,13 @@ mrfstr_idx_t __mrfstr_avx_tfindchr(
 mrfstr_size_t __mrfstr_avx_countchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *sblock = (__m256i*)str;
-    __m256i cblock = _mm256_set1_epi8(chr);
-
-    __m256i block;
+    __m256i *sblock, cblock, block;
+    mrfstr_size_t count;
     mrfstr_long_t mask;
-    mrfstr_size_t count = 0;
+
+    sblock = (__m256i*)str;
+    cblock = _mm256_set1_epi8(chr);
+    count = 0;
     while (size--)
     {
         block = _mm256_load_si256(sblock++);
@@ -496,13 +477,15 @@ mrfstr_size_t __mrfstr_avx_countchr(
 }
 
 mrfstr_size_t __mrfstr_avx_strlen(
-    mrfstr_ptr_ct str)
+    mrfstr_data_ct str)
 {
-    mrfstr_data_ct base = (mrfstr_data_ct)str;
-    __m256i *sblock = (__m256i*)str;
-
-    __m256i block, zero = _mm256_setzero_si256();
+    mrfstr_data_ct base;
+    __m256i *sblock, block, zero;
     mrfstr_long_t mask;
+
+    base = str;
+    sblock = (__m256i*)str;
+    zero = _mm256_setzero_si256();
     for (;; sblock++)
     {
         block = _mm256_load_si256(sblock);
@@ -513,7 +496,8 @@ mrfstr_size_t __mrfstr_avx_strlen(
         mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(block, zero));
 #endif
         if (mask)
-            return (mrfstr_size_t)((mrfstr_data_ct)sblock - base) + __mrfstr_ctz32(mask);
+            return (mrfstr_size_t)(uintptr_t)((mrfstr_data_ct)sblock - base) +
+                __mrfstr_ctz32(mask);
     }
 }
 #endif

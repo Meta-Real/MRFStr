@@ -19,46 +19,50 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_TYPE_SEARCH
 
-#define MRFSTR_TLIB_OBJ(size)                                    \
-    do                                                           \
-    {                                                            \
-        MRFSTR_TLIB_MEMSET(str, '0', size);                      \
-        MRFSTR_SIZE(str) = size;                                 \
-                                                                 \
-        if (first)                                               \
-            obj = mrfstr_count_chr(str, '0') == size;            \
-        else                                                     \
-        {                                                        \
-            for (mrfstr_byte_t i = 0; i < 100;)                  \
-            {                                                    \
-                mrfstr_size_t idx = MRFSTR_GENERATE_RAND % size; \
-                if (MRFSTR_DATA(str)[idx] == '1')                \
-                    continue;                                    \
-                                                                 \
-                MRFSTR_DATA(str)[idx] = '1';                     \
-                i++;                                             \
-            }                                                    \
-                                                                 \
-            obj = mrfstr_count_chr(str, '0') == size - 100;      \
-        }                                                        \
+#define MRFSTR_TLIB_OBJ(size)                               \
+    do                                                      \
+    {                                                       \
+        MRFSTR_TLIB_MEMSET(str, '0', size);                 \
+        MRFSTR_SIZE(str) = size;                            \
+                                                            \
+        if (first)                                          \
+            obj = mrfstr_count_chr(str, '0') == size;       \
+        else                                                \
+        {                                                   \
+            mrfstr_size_t idx;                              \
+            mrfstr_byte_t i;                                \
+                                                            \
+            for (i = 0; i != 100;)                          \
+            {                                               \
+                idx = MRFSTR_GENERATE_RAND % size;          \
+                if (MRFSTR_DATA(str)[idx] == '1')           \
+                    continue;                               \
+                                                            \
+                MRFSTR_DATA(str)[idx] = '1';                \
+                i++;                                        \
+            }                                               \
+                                                            \
+            obj = mrfstr_count_chr(str, '0') == size - 100; \
+        }                                                   \
     } while (0)
 
 #define MRFSTR_TLIB_FREE mrfstr_free(str)
 
 int main(void)
 {
-    mrfstr_config_tcount(5);
-
     mrfstr_t str;
+    mrfstr_bool_t first;
+
+    mrfstr_config_tcount(5);
+    srand((mrfstr_long_t)time(NULL));
+
     MRFSTR_TLIB_INIT(str,);
     MRFSTR_TLIB_MEMSET(str, '0', TEST4_SIZE);
 
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
-    srand((mrfstr_long_t)time(NULL));
-
-    mrfstr_bool_t first = MRFSTR_TRUE;
+    first = MRFSTR_TRUE;
     MRFSTR_TLIB_ROUND(TEST1_SIZE);
     MRFSTR_TLIB_ROUND(TEST2_SIZE);
     MRFSTR_TLIB_ROUND(TEST3_SIZE);

@@ -29,11 +29,13 @@ mrfstr_byte_t __mrfstr_ctz64(
     return __builtin_ctzll(bits);
 #elif defined(_MSC_VER)
     mrfstr_byte_t count;
+
     BitScanForward64((DWORD*)&count, bits);
     return count;
 #else
-    mrfstr_byte_t count = 0;
+    mrfstr_byte_t count;
 
+    count = 0;
     if (!(bits & 0xffffffff))
     {
         count += 32;
@@ -76,8 +78,9 @@ mrfstr_byte_t __mrfstr_ctz32(
     BitScanForward((DWORD*)&count, bits);
     return count;
 #else
-    mrfstr_byte_t count = 0;
+    mrfstr_byte_t count;
 
+    count = 0;
     if (!(bits & 0xffff))
     {
         count += 16;
@@ -115,8 +118,9 @@ mrfstr_byte_t __mrfstr_ctz16(
     BitScanForward((DWORD*)&count, bits);
     return count;
 #else
-    mrfstr_byte_t count = 0;
+    mrfstr_byte_t count;
 
+    count = 0;
     if (!(bits & 0xff))
     {
         count += 8;
@@ -147,7 +151,9 @@ mrfstr_byte_t __mrfstr_popcnt64(
 #elif defined(_MSC_VER)
     return (mrfstr_byte_t)PopulationCount64(bits);
 #else
-    mrfstr_byte_t count = 0;
+    mrfstr_byte_t count;
+
+    count = 0;
     while (bits)
     {
         if (bits & 1)
@@ -167,7 +173,9 @@ mrfstr_byte_t __mrfstr_popcnt32(
 #elif defined(_MSC_VER)
     return (mrfstr_byte_t)PopulationCount64(bits);
 #else
-    mrfstr_byte_t count = 0;
+    mrfstr_byte_t count;
+
+    count = 0;
     while (bits)
     {
         if (bits & 1)

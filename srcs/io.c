@@ -40,13 +40,17 @@ void mrfstr_n_export(
 mrfstr_res_enum_t mrfstr_import(
     mrfstr_t str)
 {
+    mrfstr_data_t ptr;
+    mrfstr_size_t capa;
+    mrfstr_long_t alloc;
+    mrfstr_short_t newline_idx;
+
     MRFSTR_SIZE(str) = 0;
+    capa = MRFSTR_CAPA(str);
+    ptr = MRFSTR_DATA(str);
 
-    mrfstr_size_t capa = MRFSTR_CAPA(str);
-    mrfstr_data_t ptr = MRFSTR_DATA(str);
-
-    mrfstr_long_t alloc = (mrfstr_long_t)_mrfstr_config.stdalloc + 1;
-    mrfstr_short_t newline_idx = _mrfstr_config.stdalloc - 1;
+    alloc = (mrfstr_long_t)_mrfstr_config.stdalloc + 1;
+    newline_idx = _mrfstr_config.stdalloc - 1;
     while (capa > alloc)
     {
         capa -= alloc;

@@ -19,6 +19,8 @@ copies or substantial portions of the Software.
 mrfstr_res_enum_t mrfstr_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2)
 {
+    mrfstr_size_t size;
+
     if (res == str1)
     {
         if (!MRFSTR_SIZE(str2))
@@ -34,7 +36,7 @@ mrfstr_res_enum_t mrfstr_concat(
             return MRFSTR_RES_NOERROR;
         }
 
-        mrfstr_size_t size = MRFSTR_SIZE(res) + MRFSTR_SIZE(str2);
+        size = MRFSTR_SIZE(res) + MRFSTR_SIZE(str2);
         if (size < MRFSTR_SIZE(res))
             return MRFSTR_RES_OVERFLOW_ERROR;
 
@@ -61,7 +63,7 @@ mrfstr_res_enum_t mrfstr_concat(
             return MRFSTR_RES_NOERROR;
         }
 
-        mrfstr_size_t size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(res);
+        size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(res);
         if (size < MRFSTR_SIZE(res))
             return MRFSTR_RES_OVERFLOW_ERROR;
 
@@ -80,7 +82,7 @@ mrfstr_res_enum_t mrfstr_concat(
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_size_t size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(str2);
+    size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(str2);
     if (size < MRFSTR_SIZE(str1))
         return MRFSTR_RES_OVERFLOW_ERROR;
 
@@ -106,6 +108,8 @@ mrfstr_res_enum_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size)
 {
+    mrfstr_size_t nsize;
+
     if (size > MRFSTR_SIZE(str2))
         size = MRFSTR_SIZE(str2);
 
@@ -124,7 +128,7 @@ mrfstr_res_enum_t mrfstr_n_concat(
             return MRFSTR_RES_NOERROR;
         }
 
-        mrfstr_size_t nsize = MRFSTR_SIZE(res) + size;
+        nsize = MRFSTR_SIZE(res) + size;
         if (nsize < size)
             return MRFSTR_RES_OVERFLOW_ERROR;
 
@@ -136,7 +140,7 @@ mrfstr_res_enum_t mrfstr_n_concat(
         return MRFSTR_RES_NOERROR;
     }
 
-    mrfstr_size_t nsize = MRFSTR_SIZE(str1) + size;
+    nsize = MRFSTR_SIZE(str1) + size;
     if (nsize < size)
         return MRFSTR_RES_OVERFLOW_ERROR;
 

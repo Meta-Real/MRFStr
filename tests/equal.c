@@ -36,12 +36,11 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
+    mrfstr_t str1, str2;
+
     mrfstr_config_tcount(5);
 
-    mrfstr_t str1;
     MRFSTR_TLIB_INIT(str1,);
-
-    mrfstr_t str2;
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
 
     mrfstr_config(MRFSTR_TLIB_CONFIG,

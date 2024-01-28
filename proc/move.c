@@ -28,13 +28,16 @@ copies or substantial portions of the Software.
 void __mrfstr_move(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
+    mrfstr_byte_t rem, mask;
+
     if (size < MRFSTR_SLIMIT)
     {
         memmove(dst, src, size);
         return;
     }
 
-    mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.nmem_size;
+    mask = _mrfstr_config.nmem_size - 1;
+    rem = (uintptr_t)dst & mask;
     if (rem)
     {
         rem = _mrfstr_config.nmem_size - rem;
@@ -42,7 +45,7 @@ void __mrfstr_move(
         mrfstr_move_rem;
     }
 
-    rem = size % _mrfstr_config.nmem_size;
+    rem = size & mask;
     size -= rem;
 
     if (size < _mrfstr_config.nlimit)
@@ -58,6 +61,8 @@ void __mrfstr_move(
 void __mrfstr_rmove(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
+    mrfstr_byte_t rem, mask;
+
     if (size < MRFSTR_SLIMIT)
     {
         memmove(dst, src, size);
@@ -67,22 +72,23 @@ void __mrfstr_rmove(
     dst += size;
     src += size;
 
-    mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.nmem_size;
+    mask = _mrfstr_config.nmem_size - 1;
+    rem = (uintptr_t)dst & mask;
     if (rem)
     {
         size -= rem;
         mrfstr_rmove_rem;
     }
 
-    rem = size % _mrfstr_config.nmem_size;
+    rem = size & mask;
     size -= rem;
 
     if (size < _mrfstr_config.nlimit)
         _mrfstr_config.brcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
     else
         _mrfstr_config.nrcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
-
     dst -= size;
     src -= size;
+
     mrfstr_rmove_rem;
 }

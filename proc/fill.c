@@ -25,8 +25,8 @@ copies or substantial portions of the Software.
 struct __MRFSTR_FILL_T
 {
     mrfstr_data_t res;
-    mrfstr_chr_t chr;
     mrfstr_size_t size;
+    mrfstr_chr_t chr;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_FILL_T *mrfstr_fill_t;
@@ -42,6 +42,12 @@ DWORD WINAPI __mrfstr_fill_threaded(
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
+    mrfstr_size_t tsize, inc;
+    mrfstr_short_t rem, factor;
+    mrfstr_byte_t tcount, i;
+    mrfstr_thread_t *threads;
+    mrfstr_fill_t data;
+
     if (size < MRFSTR_SLIMIT)
     {
         memset(res, chr, size);
@@ -50,7 +56,10 @@ void __mrfstr_fill(
 
     if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
-        mrfstr_byte_t rem = (uintptr_t)res % _mrfstr_config.nmem_size;
+        mrfstr_byte_t mask;
+
+        mask = _mrfstr_config.nmem_size - 1;
+        rem = (uintptr_t)res & mask;
         if (rem)
         {
             rem = _mrfstr_config.nmem_size - rem;
@@ -58,7 +67,7 @@ void __mrfstr_fill(
             mrfstr_fill_rem;
         }
 
-        rem = size % _mrfstr_config.nmem_size;
+        rem = size & mask;
         size -= rem;
 
         if (size < _mrfstr_config.nlimit)
@@ -71,14 +80,9 @@ void __mrfstr_fill(
         return;
     }
 
-    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
-    mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * tsize)
-        tcount = _mrfstr_config.tcount;
-    else
-        tcount = (mrfstr_byte_t)(size / tsize);
+    mrfstr_set_tcount;
 
-    mrfstr_short_t rem = (uintptr_t)res % _mrfstr_config.tmem_size;
+    rem = (uintptr_t)res & _mrfstr_config.tmem_size - 1;
     if (rem)
     {
         rem = _mrfstr_config.tmem_size - rem;
@@ -86,47 +90,48 @@ void __mrfstr_fill(
         mrfstr_fill_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tmem_size * tcount;
+    factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
+    inc = (size /= factor) * _mrfstr_config.tmem_size;
 
-    mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
-    mrfstr_byte_t i = 0;
-    if (threads)
+    factor = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    if (!threads)
     {
-        mrfstr_fill_t data;
-        for (i = 0; i != nthreads; i++)
-        {
-            data = (mrfstr_fill_t)malloc(sizeof(struct __MRFSTR_FILL_T));
-            if (!data)
-                break;
+        _mrfstr_config.nfill_sub(res, chr, size * tcount);
+        res += inc * tcount;
 
-            data->res = res;
-            data->chr = chr;
-            data->size = size;
-
-            res += inc;
-
-            mrfstr_create_thread(__mrfstr_fill_threaded)
-            {
-                res -= inc;
-
-                free(data);
-                break;
-            }
-        }
-
-        tcount -= i;
+        mrfstr_fill_rem;
+        return;
     }
 
+    for (i = 0; i != factor; i++)
+    {
+        data = (mrfstr_fill_t)malloc(sizeof(struct __MRFSTR_FILL_T));
+        if (!data)
+            break;
+
+        data->res = res;
+        data->size = size;
+        data->chr = chr;
+
+        res += inc;
+        mrfstr_create_thread(__mrfstr_fill_threaded)
+        {
+            res -= inc;
+
+            free(data);
+            break;
+        }
+    }
+
+    tcount -= i;
     _mrfstr_config.tfill_sub(res, chr, size * tcount);
     res += inc * tcount;
 
     mrfstr_fill_rem;
 
-    if (i)
-        mrfstr_close_threads;
+    mrfstr_close_threads;
     free(threads);
 }
 
@@ -138,7 +143,9 @@ DWORD WINAPI __mrfstr_fill_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_fill_t data = (mrfstr_fill_t)args;
+    mrfstr_fill_t data;
+
+    data = (mrfstr_fill_t)args;
     _mrfstr_config.tfill_sub(data->res, data->chr, data->size);
 
     free(data);

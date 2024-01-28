@@ -195,6 +195,16 @@ extern mrfstr_config_t _mrfstr_config;
 
 #define MRFSTR_SLIMIT 0x800
 
+#define mrfstr_set_tcount                           \
+    do                                              \
+    {                                               \
+        tsize = _mrfstr_config.tlimit >> 1;         \
+        if (size > _mrfstr_config.tcount * tsize)   \
+            tcount = _mrfstr_config.tcount;         \
+        else                                        \
+            tcount = (mrfstr_byte_t)(size / tsize); \
+    } while (0)
+
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include <pthread.h>
 

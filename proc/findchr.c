@@ -17,6 +17,9 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
+// temporary
+#include <stdlib.h>
+
 #define mrfstr_findchr_rem    \
     for (; rem; rem--, str++) \
         if (chr == *str)      \
@@ -25,14 +28,14 @@ copies or substantial portions of the Software.
 #pragma pack(push, 1)
 struct __MRFSTR_FINDCHR_T
 {
+    volatile mrfstr_idx_t *res;
+    mrfstr_mutex_p mutex;
+
     mrfstr_data_ct str;
     mrfstr_chr_t chr;
 
     mrfstr_byte_t step;
     mrfstr_byte_t start;
-
-    volatile mrfstr_idx_t *res;
-    mrfstr_mutex_p mutex;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_FINDCHR_T *mrfstr_findchr_t;
@@ -48,141 +51,134 @@ DWORD WINAPI __mrfstr_findchr_threaded(
 mrfstr_idx_t __mrfstr_findchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
+    mrfstr_size_t tsize;
+    mrfstr_idx_t idx;
+    mrfstr_short_t rem, factor;
+    mrfstr_byte_t align, tcount, i, j;
+    mrfstr_bool_t endf;
+    volatile mrfstr_idx_t res;
+    mrfstr_thread_t *threads;
+    mrfstr_findchr_t data;
+    mrfstr_mutex_t mutex;
+
     if (size < MRFSTR_SLIMIT)
     {
-        mrfstr_data_t ptr = (mrfstr_data_t)memchr(str, chr, size);
+        mrfstr_data_t ptr;
+
+        ptr = (mrfstr_data_t)memchr(str, chr, size);
         return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
     }
 
-    mrfstr_data_ct base = str;
     if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
-        mrfstr_byte_t rem = (uintptr_t)str % _mrfstr_config.nsearch_size;
-        if (rem)
+        mrfstr_byte_t mask;
+
+        mask = _mrfstr_config.nsearch_size - 1;
+        align = (uintptr_t)str & mask;
+        if (align)
         {
-            rem = _mrfstr_config.nsearch_size - rem;
-            size -= rem;
-            mrfstr_findchr_rem;
+            align = _mrfstr_config.nsearch_size - align;
+            size -= align;
+
+            for (i = 0; i != align; i++)
+                if (*str++ == chr)
+                    return i;
         }
 
-        rem = size % _mrfstr_config.nsearch_size;
+        rem = size & mask;
         size -= rem;
 
-        mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
+        idx = _mrfstr_config.nfindchr_sub(
             str, chr, size / _mrfstr_config.nsearch_size);
         if (idx != MRFSTR_INVIDX)
-            return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
+            return idx + align;
         str += size;
 
-        mrfstr_findchr_rem;
+        for (i = 0; i != rem; i++)
+            if (*str++ == chr)
+                return align + size + i;
         return MRFSTR_INVIDX;
     }
 
-    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
-    mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * tsize)
-        tcount = _mrfstr_config.tcount;
-    else
-        tcount = (mrfstr_byte_t)(size / tsize);
+    mrfstr_set_tcount;
 
-    mrfstr_byte_t align = (uintptr_t)str % _mrfstr_config.tsearch_size;
+    align = (uintptr_t)str & _mrfstr_config.tsearch_size - 1;
     if (align)
     {
         align = _mrfstr_config.tsearch_size - align;
         size -= align;
 
-        for (mrfstr_byte_t i = 0; i < align; i++)
+        for (i = 0; i < align; i++)
             if (*str++ == chr)
                 return i;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tsearch_size * tcount;
-    mrfstr_short_t rem = size % factor;
+    factor = _mrfstr_config.tsearch_size * tcount;
+    rem = size % factor;
     size = (size / factor) * factor;
 
-    volatile mrfstr_idx_t res = size;
-
-    mrfstr_mutex_t mutex;
+    res = size;
     mrfstr_create_mutex(mutex)
     {
-        mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
+single:
+        idx = _mrfstr_config.nfindchr_sub(
             str, chr, size / _mrfstr_config.tsearch_size);
         if (idx != MRFSTR_INVIDX)
             return idx + align;
 
         str += size;
-        mrfstr_findchr_rem;
+        for (i = 0; i != rem; i++)
+            if (*str++ == chr)
+                return align + size + i;
         return MRFSTR_INVIDX;
     }
 
-    mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
-    mrfstr_byte_t i = 0;
-    if (threads)
+    factor = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    if (!threads)
+        goto single;
+
+    for (i = 0; i != factor; i++)
     {
-        mrfstr_findchr_t data;
-        for (i = 0; i != nthreads; i++)
+        data = (mrfstr_findchr_t)malloc(sizeof(struct __MRFSTR_FINDCHR_T));
+        if (!data)
         {
-            data = (mrfstr_findchr_t)malloc(sizeof(struct __MRFSTR_FINDCHR_T));
-            if (!data)
+            if (!i)
             {
-                if (!i)
-                {
-                    mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
-                        str, chr, size * tcount);
-                    if (idx != MRFSTR_INVIDX)
-                    {
-                        mrfstr_close_mutex(mutex);
-                        free(threads);
-                        return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
-                    }
-
-                    str += size * _mrfstr_config.tsearch_size;
-                    mrfstr_findchr_rem;
-
-                    mrfstr_close_mutex(mutex);
-                    free(threads);
-                    return MRFSTR_INVIDX;
-                }
-                break;
+                mrfstr_close_mutex(mutex);
+                free(threads);
+                goto single;
             }
 
-            data->str = str;
-            data->chr = chr;
-            data->start = i;
-            data->step = tcount;
-            data->res = &res;
-            data->mutex = MRFSTR_CAST_MUTEX(mutex);
+            // temporary
+            abort();
+            break;
+        }
 
-            mrfstr_create_thread(__mrfstr_findchr_threaded)
+        data->res = &res;
+        data->mutex = MRFSTR_CAST_MUTEX(mutex);
+        data->str = str;
+        data->chr = chr;
+        data->start = i;
+        data->step = tcount;
+
+        mrfstr_create_thread(__mrfstr_findchr_threaded)
+        {
+            free(data);
+            if (!i)
             {
-                free(data);
-
-                if (!i)
-                {
-                    mrfstr_idx_t idx = _mrfstr_config.nfindchr_sub(
-                        str, chr, size * tcount);
-                    if (idx != MRFSTR_INVIDX)
-                    {
-                        mrfstr_close_mutex(mutex);
-                        free(threads);
-                        return idx + (mrfstr_idx_t)(uintptr_t)(str - base);
-                    }
-
-                    str += size * _mrfstr_config.tsearch_size;
-                    mrfstr_findchr_rem;
-
-                    mrfstr_close_mutex(mutex);
-                    free(threads);
-                    return MRFSTR_INVIDX;
-                }
-                break;
+                mrfstr_close_mutex(mutex);
+                free(threads);
+                goto single;
             }
+
+            // temporary
+            abort();
+            break;
         }
     }
 
-    mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
-        &res, nthreads, str, chr, tcount);
+    idx = _mrfstr_config.tfindchr_sub(&res, factor, str, chr, tcount);
     mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
     if (res > idx)
         res = idx;
@@ -190,20 +186,20 @@ mrfstr_idx_t __mrfstr_findchr(
 
     str += size;
 
-    mrfstr_bool_t end = MRFSTR_FALSE;
-    for (; rem; rem--, str++)
-        if (*str == chr)
+    endf = MRFSTR_FALSE;
+    for (j = 0; j != rem; j++)
+        if (*str++ == chr)
         {
-            idx = (mrfstr_idx_t)(str - base);
-            end = MRFSTR_TRUE;
+            idx = align + size + j;
+            endf = MRFSTR_TRUE;
             break;
         }
 
     mrfstr_close_threads;
-    mrfstr_close_mutex(mutex);
     free(threads);
+    mrfstr_close_mutex(mutex);
 
-    if (end && res == size)
+    if (endf && res == size)
         return idx;
     return res == size ? MRFSTR_INVIDX : res + align;
 }
@@ -216,8 +212,11 @@ DWORD WINAPI __mrfstr_findchr_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_findchr_t data = (mrfstr_findchr_t)args;
-    mrfstr_idx_t idx = _mrfstr_config.tfindchr_sub(
+    mrfstr_idx_t idx;
+    mrfstr_findchr_t data;
+
+    data = (mrfstr_findchr_t)args;
+    idx = _mrfstr_config.tfindchr_sub(
         data->res, data->start, data->str, data->chr, data->step);
     mrfstr_lock_mutex(data->mutex);
     if (*data->res > idx)

@@ -41,6 +41,12 @@ void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
+    mrfstr_size_t tsize, inc;
+    mrfstr_short_t rem, factor;
+    mrfstr_byte_t tcount, i;
+    mrfstr_thread_t *threads;
+    mrfstr_copy_t data;
+
     if (size < MRFSTR_SLIMIT)
     {
         memcpy(dst, src, size);
@@ -49,7 +55,10 @@ void __mrfstr_copy(
 
     if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
     {
-        mrfstr_byte_t rem = (uintptr_t)dst % _mrfstr_config.nmem_size;
+        mrfstr_byte_t mask;
+
+        mask = _mrfstr_config.nmem_size - 1;
+        rem = (uintptr_t)dst & mask;
         if (rem)
         {
             rem = _mrfstr_config.nmem_size - rem;
@@ -57,7 +66,7 @@ void __mrfstr_copy(
             mrfstr_copy_rem;
         }
 
-        rem = size % _mrfstr_config.nmem_size;
+        rem = size & mask;
         size -= rem;
 
         if (size < _mrfstr_config.nlimit)
@@ -71,14 +80,9 @@ void __mrfstr_copy(
         return;
     }
 
-    mrfstr_size_t tsize = _mrfstr_config.tlimit >> 1;
-    mrfstr_byte_t tcount;
-    if (size > _mrfstr_config.tcount * tsize)
-        tcount = _mrfstr_config.tcount;
-    else
-        tcount = (mrfstr_byte_t)(size / tsize);
+    mrfstr_set_tcount;
 
-    mrfstr_short_t rem = (uintptr_t)dst % _mrfstr_config.tmem_size;
+    rem = (uintptr_t)dst & _mrfstr_config.tmem_size - 1;
     if (rem)
     {
         rem = _mrfstr_config.tmem_size - rem;
@@ -86,42 +90,46 @@ void __mrfstr_copy(
         mrfstr_copy_rem;
     }
 
-    mrfstr_short_t factor = _mrfstr_config.tmem_size * tcount;
+    factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    mrfstr_size_t inc = (size /= factor) * _mrfstr_config.tmem_size;
+    inc = (size /= factor) * _mrfstr_config.tmem_size;
 
-    mrfstr_byte_t nthreads = tcount - 1;
-    mrfstr_thread_t *threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
-    mrfstr_byte_t i = 0;
-    if (threads)
+    factor = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    if (!threads)
     {
-        mrfstr_copy_t data;
-        for (; i != nthreads; i++)
-        {
-            data = (mrfstr_copy_t)malloc(sizeof(struct __MRFSTR_COPY_T));
-            if (!data)
-                break;
+        _mrfstr_config.ncopy_sub(dst, src, size * tcount);
+        inc *= tcount;
+        dst += inc;
+        src += inc;
 
-            data->dst = dst;
-            data->src = src;
-            data->size = size;
-
-            dst += inc;
-            src += inc;
-
-            mrfstr_create_thread(__mrfstr_copy_threaded)
-            {
-                dst -= inc;
-                src -= inc;
-
-                free(data);
-                break;
-            }
-        }
-
-        tcount -= i;
+        mrfstr_copy_rem;
+        return;
     }
 
+    for (i = 0; i != factor; i++)
+    {
+        data = (mrfstr_copy_t)malloc(sizeof(struct __MRFSTR_COPY_T));
+        if (!data)
+            break;
+
+        data->dst = dst;
+        data->src = src;
+        data->size = size;
+
+        dst += inc;
+        src += inc;
+        mrfstr_create_thread(__mrfstr_copy_threaded)
+        {
+            dst -= inc;
+            src -= inc;
+
+            free(data);
+            break;
+        }
+    }
+
+    tcount -= i;
     _mrfstr_config.tcopy_sub(dst, src, size * tcount);
     inc *= tcount;
     dst += inc;
@@ -129,8 +137,7 @@ void __mrfstr_copy(
 
     mrfstr_copy_rem;
 
-    if (i)
-        mrfstr_close_threads;
+    mrfstr_close_threads;
     free(threads);
 }
 
@@ -142,7 +149,9 @@ DWORD WINAPI __mrfstr_copy_threaded(
     LPVOID args)
 #endif
 {
-    mrfstr_copy_t data = (mrfstr_copy_t)args;
+    mrfstr_copy_t data;
+
+    data = (mrfstr_copy_t)args;
     _mrfstr_config.tcopy_sub(data->dst, data->src, data->size);
 
     free(data);

@@ -82,7 +82,7 @@ mrfstr_bool_t __mrfstr_equal(
 
     mrfstr_set_tcount;
 
-    rem = (uintptr_t)str1 & _mrfstr_config.tcmp_size - 1;
+    rem = (uintptr_t)str1 & (_mrfstr_config.tcmp_size - 1);
     if (rem)
     {
         rem = _mrfstr_config.tcmp_size - rem;

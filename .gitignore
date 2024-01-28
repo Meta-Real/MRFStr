@@ -1,6 +1,7 @@
 .*
 *.a
 *.lib
+*.dll
 *.exe
 *.out
 heads/simddef.h

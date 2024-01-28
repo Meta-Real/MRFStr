@@ -82,7 +82,7 @@ void __mrfstr_fill(
 
     mrfstr_set_tcount;
 
-    rem = (uintptr_t)res & _mrfstr_config.tmem_size - 1;
+    rem = (uintptr_t)res & (_mrfstr_config.tmem_size - 1);
     if (rem)
     {
         rem = _mrfstr_config.tmem_size - rem;

@@ -11,6 +11,7 @@ endif()
 project(MRFStr VERSION 1.1.0
     DESCRIPTION "MetaReal Fast String library version 1.1.0"
     LANGUAGES C)
+option(BUILD_SHARED_LIBS "Shared Library")
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
@@ -27,7 +28,12 @@ elseif (MSVC)
     file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/msvcsetup)
 endif()
 
-add_library(MRFStr STATIC
+if (BUILD_SHARED_LIBS)
+    add_compile_definitions(__MRFSTR_SHARED__)
+    add_compile_definitions(__MRFSTR_COMPILE_TIME__)
+endif()
+
+add_library(MRFStr
     config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
     proc/copy.c proc/move.c proc/fill.c
     proc/reverse.c proc/replchr.c

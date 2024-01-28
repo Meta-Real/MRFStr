@@ -90,7 +90,7 @@ void __mrfstr_rev(
         }
 
         revsize = _mrfstr_config.nrev_size << 1;
-        rem = size & revsize - 1;
+        rem = size & (revsize - 1);
         size -= rem;
 
         _mrfstr_config.nrev_sub(str, right, size / revsize);
@@ -109,7 +109,7 @@ void __mrfstr_rev(
 
     mrfstr_set_tcount;
 
-    rem = (uintptr_t)str & _mrfstr_config.trev_size - 1;
+    rem = (uintptr_t)str & (_mrfstr_config.trev_size - 1);
     if (rem)
     {
         rem = _mrfstr_config.trev_size - rem;
@@ -219,7 +219,7 @@ void __mrfstr_rev2(
 
     mrfstr_set_tcount;
 
-    rem = (uintptr_t)left & _mrfstr_config.trev_size - 1;
+    rem = (uintptr_t)left & (_mrfstr_config.trev_size - 1);
     if (rem)
     {
         rem = _mrfstr_config.trev_size - rem;

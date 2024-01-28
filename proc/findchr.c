@@ -99,7 +99,7 @@ mrfstr_idx_t __mrfstr_findchr(
 
     mrfstr_set_tcount;
 
-    align = (uintptr_t)str & _mrfstr_config.tsearch_size - 1;
+    align = (uintptr_t)str & (_mrfstr_config.tsearch_size - 1);
     if (align)
     {
         align = _mrfstr_config.tsearch_size - align;

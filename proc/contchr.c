@@ -81,7 +81,7 @@ mrfstr_bool_t __mrfstr_contchr(
 
     mrfstr_set_tcount;
 
-    rem = (uintptr_t)str & _mrfstr_config.tsearch_size - 1;
+    rem = (uintptr_t)str & (_mrfstr_config.tsearch_size - 1);
     if (rem)
     {
         rem = _mrfstr_config.tsearch_size - rem;

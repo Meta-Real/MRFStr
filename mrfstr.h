@@ -26,6 +26,10 @@ extern "C"
 #include <stddef.h>
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
+#   if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#       define __USE_LARGEFILE64
+#   endif
+
 #include <stdio.h>
 #endif
 
@@ -35,21 +39,26 @@ extern "C"
 #define MRFSTR_VERSION_PATCH 0
 
 #if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
-#define __MRFSTR_DECLSPEC_EXPORT __declspec(dllexport)
-#define __MRFSTR_DECLSPEC_IMPORT __declspec(dllimport)
+#   ifdef _WIN32
+#       define __MRFSTR_DECLSPEC_EXPORT __declspec(dllexport)
+#       define __MRFSTR_DECLSPEC_IMPORT __declspec(dllimport)
+#   else
+#       define __MRFSTR_DECLSPEC_EXPORT
+#       define __MRFSTR_DECLSPEC_IMPORT
+#   endif
 #else
-#define __MRFSTR_DECLSPEC_EXPORT
-#define __MRFSTR_DECLSPEC_IMPORT
+#   define __MRFSTR_DECLSPEC_EXPORT
+#   define __MRFSTR_DECLSPEC_IMPORT
 #endif
 
 #ifdef __MRFSTR_SHARED__
-#ifdef __MRFSTR_COMPILE_TIME__
-#define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_EXPORT
+#   ifdef __MRFSTR_COMPILE_TIME__
+#       define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_EXPORT
+#   else
+#       define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_IMPORT
+#   endif
 #else
-#define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_IMPORT
-#endif
-#else
-#define __MRFSTR_DECLSPEC
+#   define __MRFSTR_DECLSPEC
 #endif
 
 /* data types */

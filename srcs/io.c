@@ -134,9 +134,15 @@ mrfstr_res_enum_t mrfstr_fimport(
     if (!stream || stream == stdin)
         return mrfstr_import(str);
 
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+    fseeko64(stream, 0, SEEK_END);
+    MRFSTR_SIZE(str) = ftello64(stream);
+    fseeko64(stream, 0, SEEK_END);
+#elif defined(_MSC_VER)
     _fseeki64(stream, 0, SEEK_END);
     MRFSTR_SIZE(str) = _ftelli64(stream);
     _fseeki64(stream, 0, SEEK_END);
+#endif
 
     if (MRFSTR_CAPA(str) < MRFSTR_SIZE(str))
         MRFSTR_CLEAR_REALLOC(str, MRFSTR_SIZE(str));

@@ -161,3 +161,107 @@ mrfstr_res_enum_t mrfstr_n_concat(
     MRFSTR_SIZE(res) = nsize;
     return MRFSTR_RES_NOERROR;
 }
+
+mrfstr_res_enum_t mrfstr_insert(
+    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
+    mrfstr_idx_t idx)
+{
+    mrfstr_data_t ptr;
+    mrfstr_size_t size;
+
+    if (idx > MRFSTR_SIZE(str1))
+        return MRFSTR_RES_IDXOUT_ERROR;
+
+    if (res == str1)
+    {
+        if (!MRFSTR_SIZE(str2))
+            return MRFSTR_RES_NOERROR;
+
+        size = MRFSTR_SIZE(res) - idx;
+        MRFSTR_SIZE(res) += MRFSTR_SIZE(str2);
+        if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
+            MRFSTR_REALLOC(res, MRFSTR_SIZE(res));
+
+        ptr = MRFSTR_DATA(res) + idx;
+        if (res == str2)
+        {
+            mrfstr_data_t tail;
+
+            tail = ptr + MRFSTR_SIZE(str2);
+            if (size)
+                __mrfstr_copy(tail, ptr, size);
+
+            __mrfstr_copy(ptr, MRFSTR_DATA(res), idx);
+            __mrfstr_copy(ptr + idx, tail, size);
+            return MRFSTR_RES_NOERROR;
+        }
+
+        if (size)
+        {
+            if (size <= MRFSTR_SIZE(str2))
+                __mrfstr_copy(ptr + MRFSTR_SIZE(str2), ptr, size);
+            else
+                __mrfstr_rmove(ptr + MRFSTR_SIZE(str2), ptr, size);
+        }
+
+        __mrfstr_copy(ptr, MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (res == str2)
+    {
+        if (!MRFSTR_SIZE(str1))
+            return MRFSTR_RES_NOERROR;
+
+        size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(res);
+        if (MRFSTR_CAPA(res) < size)
+            MRFSTR_REALLOC(res, size);
+
+        if (!MRFSTR_SIZE(res))
+        {
+            __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
+            MRFSTR_SIZE(res) = MRFSTR_SIZE(str1);
+            return MRFSTR_RES_NOERROR;
+        }
+
+        ptr = MRFSTR_DATA(res) + idx;
+        size = MRFSTR_SIZE(str1) - idx;
+        if (MRFSTR_SIZE(res) <= idx)
+            __mrfstr_copy(ptr, MRFSTR_DATA(res), MRFSTR_SIZE(res));
+        else
+            __mrfstr_rmove(ptr, MRFSTR_DATA(res), MRFSTR_SIZE(res));
+
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), idx);
+        __mrfstr_copy(ptr + MRFSTR_SIZE(res), MRFSTR_DATA(str2) + idx, size);
+        MRFSTR_SIZE(res) += MRFSTR_SIZE(str1);
+        return MRFSTR_RES_NOERROR;
+    }
+
+    MRFSTR_SIZE(res) = MRFSTR_SIZE(str1) + MRFSTR_SIZE(str2);
+    if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
+        MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(res));
+
+    if (!MRFSTR_SIZE(str1))
+    {
+        if (!MRFSTR_SIZE(str2))
+            return MRFSTR_RES_NOERROR;
+
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (!MRFSTR_SIZE(str2))
+    {
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (idx)
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), idx);
+
+    ptr = MRFSTR_DATA(res) + idx;
+    __mrfstr_copy(ptr, MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
+    __mrfstr_copy(ptr + MRFSTR_SIZE(str2), MRFSTR_DATA(str1) + idx,
+        MRFSTR_SIZE(str1) - idx);
+    return MRFSTR_RES_NOERROR;
+}

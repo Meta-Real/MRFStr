@@ -172,6 +172,10 @@ __MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size);
 
+__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_insert(
+    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
+    mrfstr_idx_t idx);
+
 /* remove functions */
 
 __MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_remove(
@@ -190,6 +194,13 @@ __MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_repeat(
 __MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_repeat_chr(
     mrfstr_t res, mrfstr_chr_t chr,
     mrfstr_size_t count);
+
+__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_fill(
+    mrfstr_t res, mrfstr_ct str,
+    mrfstr_chr_t chr, mrfstr_size_t size);
+__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_rfill(
+    mrfstr_t res, mrfstr_ct str,
+    mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* reverse functions */
 

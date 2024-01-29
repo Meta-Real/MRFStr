@@ -33,9 +33,9 @@ extern "C"
 #include <stdio.h>
 #endif
 
-#define MRFSTR_VERSION "1.1.0"
+#define MRFSTR_VERSION "1.2.0"
 #define MRFSTR_VERSION_MAJOR 1
-#define MRFSTR_VERSION_MINOR 1
+#define MRFSTR_VERSION_MINOR 2
 #define MRFSTR_VERSION_PATCH 0
 
 #if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)

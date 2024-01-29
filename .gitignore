@@ -3,8 +3,8 @@
 *.lib
 *.so
 *.dll
-*.exe
 *.out
+*.exe
 heads/simddef.h
 
 build

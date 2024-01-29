@@ -8,8 +8,8 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-project(MRFStr VERSION 1.1.0
-    DESCRIPTION "MetaReal Fast String library version 1.1.0"
+project(MRFStr VERSION 1.2.0
+    DESCRIPTION "MetaReal Fast String library version 1.2.0"
     LANGUAGES C)
 option(BUILD_SHARED_LIBS "Shared Library")
 
@@ -50,9 +50,6 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 enable_testing()
 add_subdirectory(tests)
-
-add_executable(Test test.c)
-target_link_libraries(Test PRIVATE MRFStr)
 
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
 install(TARGETS MRFStr

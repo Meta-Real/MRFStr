@@ -81,7 +81,7 @@ void __mrfstr_rev(
     {
         mrfstr_byte_t revsize;
 
-        rem = (uintptr_t)str & _mrfstr_config.nrev_size;
+        rem = (uintptr_t)str & (_mrfstr_config.nrev_size - 1);
         if (rem)
         {
             rem = _mrfstr_config.nrev_size - rem;

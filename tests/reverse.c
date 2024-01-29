@@ -52,7 +52,7 @@ int main(void)
     mrfstr_short_t j;
     mrfstr_bool_t first;
 
-    mrfstr_config_tcount(5);
+    mrfstr_config_thread_count(5);
 
     MRFSTR_TLIB_INIT(str1,);
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));

@@ -280,16 +280,38 @@ __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_n_count_chr(
 
 /* data functions */
 
-__MRFSTR_DECLSPEC mrfstr_data_t mrfstr_get_data(
-    mrfstr_ct str);
-__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_get_size(
-    mrfstr_ct str);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_get_chr(
-    mrfstr_chr_t *chr,
-    mrfstr_ct str, mrfstr_size_t idx);
+inline mrfstr_data_t mrfstr_get_data(
+    mrfstr_ct str)
+{
+    return MRFSTR_DATA(str);
+}
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_modify_chr(
-    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx);
+inline mrfstr_size_t mrfstr_get_size(
+    mrfstr_ct str)
+{
+    return MRFSTR_SIZE(str);
+}
+
+inline mrfstr_res_enum_t mrfstr_get_chr(
+    mrfstr_chr_t *chr,
+    mrfstr_ct str, mrfstr_size_t idx)
+{
+    if (idx >= MRFSTR_SIZE(str))
+        return MRFSTR_RES_IDXOUT_ERROR;
+
+    *chr = MRFSTR_DATA(str)[idx];
+    return MRFSTR_RES_NOERROR;
+}
+
+inline mrfstr_res_enum_t mrfstr_modify_chr(
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx)
+{
+    if (idx >= MRFSTR_SIZE(str))
+        return MRFSTR_RES_IDXOUT_ERROR;
+
+    MRFSTR_DATA(str)[idx] = chr;
+    return MRFSTR_RES_NOERROR;
+}
 
 /* io functions */
 
@@ -348,11 +370,11 @@ enum __MRFSTR_CONFIG_SIMD_ENUM
 };
 typedef mrfstr_byte_t mrfstr_config_simd_enum_t;
 
-__MRFSTR_DECLSPEC void mrfstr_config_tcount(
+__MRFSTR_DECLSPEC void mrfstr_config_thread_count(
     mrfstr_byte_t tcount);
-__MRFSTR_DECLSPEC void mrfstr_config_nlimit(
+__MRFSTR_DECLSPEC void mrfstr_config_normal_limit(
     mrfstr_size_t nlimit);
-__MRFSTR_DECLSPEC void mrfstr_config_tlimit(
+__MRFSTR_DECLSPEC void mrfstr_config_thread_limit(
     mrfstr_size_t tlimit);
 __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
     mrfstr_short_t stdalloc);

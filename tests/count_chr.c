@@ -53,7 +53,7 @@ int main(void)
     mrfstr_t str;
     mrfstr_bool_t first;
 
-    mrfstr_config_tcount(5);
+    mrfstr_config_thread_count(5);
     srand((mrfstr_long_t)time(NULL));
 
     MRFSTR_TLIB_INIT(str,);

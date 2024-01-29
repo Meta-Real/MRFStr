@@ -37,7 +37,7 @@ int main(void)
     mrfstr_t res;
     mrfstr_data_t str;
 
-    mrfstr_config_tcount(5);
+    mrfstr_config_thread_count(5);
 
     MRFSTR_TLIB_INIT(res,);
     MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));

@@ -118,13 +118,13 @@ mrfstr_config_t _mrfstr_config =
 #endif
 };
 
-void mrfstr_config_tcount(
+void mrfstr_config_thread_count(
     mrfstr_byte_t tcount)
 {
     _mrfstr_config.tcount = tcount + 1;
 }
 
-void mrfstr_config_nlimit(
+void mrfstr_config_normal_limit(
     mrfstr_size_t nlimit)
 {
     _mrfstr_config.nlimit = nlimit;
@@ -132,7 +132,7 @@ void mrfstr_config_nlimit(
         _mrfstr_config.tlimit = nlimit;
 }
 
-void mrfstr_config_tlimit(
+void mrfstr_config_thread_limit(
     mrfstr_size_t tlimit)
 {
     _mrfstr_config.tlimit = tlimit;

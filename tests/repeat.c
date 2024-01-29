@@ -39,7 +39,7 @@ int main(void)
     mrfstr_t res;
     mrfstr_data_t str;
 
-    mrfstr_config_tcount(5);
+    mrfstr_config_thread_count(5);
 
     MRFSTR_TLIB_INIT(res,);
     mrfstr_set_nstr(res, "00000000", 8);

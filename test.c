@@ -9,7 +9,7 @@
 
 int main(void)
 {
-    mrfstr_config_tcount(6);
+    mrfstr_config_thread_count(6);
 
     mrfstr_t a = mrfstr_init();
     mrfstr_repeat_chr(a, '1', SIZE);

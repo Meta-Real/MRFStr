@@ -27,6 +27,7 @@ extern "C"
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
 #   if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#       define MRFSTR_BUILD_UNIX
 #       define __USE_LARGEFILE64
 #   endif
 
@@ -381,6 +382,13 @@ __MRFSTR_DECLSPEC void mrfstr_config_thread_limit(
     mrfstr_size_t tlimit);
 __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
     mrfstr_short_t stdalloc);
+
+__MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(void);
+
+__MRFSTR_DECLSPEC mrfstr_byte_t mrfstr_config_get_thread_count(void);
+__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get_normal_limit(void);
+__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get_thread_limit(void);
+__MRFSTR_DECLSPEC mrfstr_short_t mrfstr_config_get_stdalloc(void);
 
 __MRFSTR_DECLSPEC void mrfstr_config(
     mrfstr_config_type_enum_t type,

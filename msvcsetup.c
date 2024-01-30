@@ -18,6 +18,10 @@ copies or substantial portions of the Software.
 #include <stdlib.h>
 
 #if defined(__GNUC__) || defined(__clang__)
+#define MRFSTR_GCC_CLANG
+#endif
+
+#ifdef MRFSTR_GCC_CLANG
 #include <cpuid.h>
 #elif defined(_MSC_VER)
 #include <intrin.h>
@@ -27,7 +31,7 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     FILE *header = fopen("heads/simddef.h", "w");
 #elif defined(_MSC_VER)
     FILE *header;
@@ -42,7 +46,7 @@ int main(void)
 
     int data[4];
 
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     __cpuid(0, data[0], data[1], data[2], data[3]);
 #elif defined(_MSC_VER)
     __cpuid(data, 0);

@@ -134,7 +134,7 @@ mrfstr_res_enum_t mrfstr_fimport(
     if (!stream || stream == stdin)
         return mrfstr_import(str);
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
     fseeko64(stream, 0, SEEK_END);
     MRFSTR_SIZE(str) = ftello64(stream);
     fseeko64(stream, 0, SEEK_END);

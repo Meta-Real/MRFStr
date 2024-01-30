@@ -17,6 +17,10 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
+#ifdef MRFSTR_BUILD_UNIX
+#include <unistd.h>
+#endif
+
 mrfstr_config_t _mrfstr_config =
 {
     1, 0x200000, 0x8000000, 64,
@@ -121,12 +125,17 @@ mrfstr_config_t _mrfstr_config =
 void mrfstr_config_thread_count(
     mrfstr_byte_t tcount)
 {
+    if (tcount == 255)
+        tcount = 254;
     _mrfstr_config.tcount = tcount + 1;
 }
 
 void mrfstr_config_normal_limit(
     mrfstr_size_t nlimit)
 {
+    if (nlimit < MRFSTR_SLIMIT)
+        nlimit = MRFSTR_SLIMIT;
+
     _mrfstr_config.nlimit = nlimit;
     if (_mrfstr_config.tlimit < nlimit)
         _mrfstr_config.tlimit = nlimit;
@@ -135,6 +144,9 @@ void mrfstr_config_normal_limit(
 void mrfstr_config_thread_limit(
     mrfstr_size_t tlimit)
 {
+    if (tlimit < MRFSTR_SLIMIT)
+        tlimit = MRFSTR_SLIMIT;
+
     _mrfstr_config.tlimit = tlimit;
     if (_mrfstr_config.nlimit > tlimit)
         _mrfstr_config.nlimit = tlimit;
@@ -146,6 +158,38 @@ void mrfstr_config_stdalloc(
     if (!stdalloc)
         stdalloc = 1;
     _mrfstr_config.stdalloc = stdalloc;
+}
+
+void mrfstr_config_thread_count_max(void)
+{
+#ifdef MRFSTR_BUILD_UNIX
+    _mrfstr_config.tcount = sysconf(_SC_NPROCESSORS_ONLN);
+#elif defined(_WIN32)
+    SYSTEM_INFO info;
+
+    GetSystemInfo(&info);
+    _mrfstr_config.tcount = (mrfstr_byte_t)info.dwNumberOfProcessors;
+#endif
+}
+
+mrfstr_byte_t mrfstr_config_get_thread_count(void)
+{
+    return _mrfstr_config.tcount;
+}
+
+mrfstr_size_t mrfstr_config_get_normal_limit(void)
+{
+    return _mrfstr_config.nlimit;
+}
+
+mrfstr_size_t mrfstr_config_get_thread_limit(void)
+{
+    return _mrfstr_config.tlimit;
+}
+
+mrfstr_short_t mrfstr_config_get_stdalloc(void)
+{
+    return _mrfstr_config.stdalloc;
 }
 
 void mrfstr_config(

@@ -22,10 +22,14 @@ copies or substantial portions of the Software.
 #include <intrin.h>
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define MRFSTR_GCC_CLANG
+#endif
+
 mrfstr_byte_t __mrfstr_ctz64(
     mrfstr_longlong_t bits)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     return __builtin_ctzll(bits);
 #elif defined(_MSC_VER)
     mrfstr_byte_t count;
@@ -71,7 +75,7 @@ mrfstr_byte_t __mrfstr_ctz64(
 mrfstr_byte_t __mrfstr_ctz32(
     mrfstr_long_t bits)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     return __builtin_ctz(bits);
 #elif defined(_MSC_VER)
     mrfstr_byte_t count;
@@ -111,7 +115,7 @@ mrfstr_byte_t __mrfstr_ctz32(
 mrfstr_byte_t __mrfstr_ctz16(
     mrfstr_short_t bits)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     return __builtin_ctz(bits);
 #elif defined(_MSC_VER)
     mrfstr_byte_t count;
@@ -146,7 +150,7 @@ mrfstr_byte_t __mrfstr_ctz16(
 mrfstr_byte_t __mrfstr_popcnt64(
     mrfstr_longlong_t bits)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     return __builtin_popcountll(bits);
 #elif defined(_MSC_VER)
     return (mrfstr_byte_t)PopulationCount64(bits);
@@ -168,7 +172,7 @@ mrfstr_byte_t __mrfstr_popcnt64(
 mrfstr_byte_t __mrfstr_popcnt32(
     mrfstr_long_t bits)
 {
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef MRFSTR_GCC_CLANG
     return __builtin_popcount(bits);
 #elif defined(_MSC_VER)
     return (mrfstr_byte_t)PopulationCount64(bits);

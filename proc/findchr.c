@@ -37,7 +37,7 @@ struct __MRFSTR_FINDCHR_T
 #pragma pack(pop)
 typedef struct __MRFSTR_FINDCHR_T *mrfstr_findchr_t;
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 mrfstr_ptr_t __mrfstr_findchr_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -213,7 +213,7 @@ multi:
     goto ret;
 }
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 mrfstr_ptr_t __mrfstr_findchr_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

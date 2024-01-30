@@ -31,7 +31,7 @@ struct __MRFSTR_FILL_T
 #pragma pack(pop)
 typedef struct __MRFSTR_FILL_T *mrfstr_fill_t;
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 mrfstr_ptr_t __mrfstr_fill_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -135,7 +135,7 @@ void __mrfstr_fill(
     free(threads);
 }
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 mrfstr_ptr_t __mrfstr_fill_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

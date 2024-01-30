@@ -206,7 +206,7 @@ extern mrfstr_config_t _mrfstr_config;
             tcount = (mrfstr_byte_t)(size / tsize); \
     } while (0)
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 #include <pthread.h>
 
 typedef pthread_t mrfstr_thread_t;
@@ -262,7 +262,7 @@ typedef HANDLE mrfstr_mutex_p;
 #define mrfstr_unlock_mutex ReleaseMutex
 
 #else
-#error Your os is not yet supported for multithreading
+#error Your os is not yet supported by MRFStr library
 #endif
 
 void __mrfstr_copy(

@@ -29,7 +29,7 @@ struct __MRFSTR_COPY_T
 };
 typedef struct __MRFSTR_COPY_T *mrfstr_copy_t;
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_copy_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -141,7 +141,7 @@ void __mrfstr_copy(
     free(threads);
 }
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_copy_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

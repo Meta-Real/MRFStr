@@ -34,7 +34,7 @@ struct __MRFSTR_EQUAL_T
 #pragma pack(pop)
 typedef struct __MRFSTR_EQUAL_T *mrfstr_equal_t;
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_equal_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -170,7 +170,7 @@ single:
     return res;
 }
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_equal_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

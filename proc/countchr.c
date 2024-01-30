@@ -34,7 +34,7 @@ struct __MRFSTR_COUNTCHR_T
 #pragma pack(pop)
 typedef struct __MRFSTR_COUNTCHR_T *mrfstr_countchr_t;
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_countchr_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -159,7 +159,7 @@ single:
     return count;
 }
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_countchr_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

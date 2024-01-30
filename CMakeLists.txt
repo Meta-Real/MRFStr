@@ -10,7 +10,7 @@ endif()
 
 project(MRFStr VERSION 1.2.0
     DESCRIPTION "MetaReal Fast String library version 1.2.0"
-    LANGUAGES C)
+    LANGUAGES C CXX)
 option(BUILD_SHARED_LIBS "Shared Library")
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
@@ -44,12 +44,15 @@ add_library(MRFStr
     srcs/reverse.c srcs/replace_chr.c
     srcs/equal.c
     srcs/contain.c srcs/find.c srcs/count_chr.c
-    srcs/data.c srcs/io.c
+    srcs/io.c
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
+find_package(benchmark REQUIRED)
+
 enable_testing()
 add_subdirectory(tests)
+add_subdirectory(benchmarks)
 
 set_target_properties(MRFStr PROPERTIES PUBLIC_HEADER mrfstr.h)
 install(TARGETS MRFStr

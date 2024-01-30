@@ -21,10 +21,10 @@ copies or substantial portions of the Software.
 #include <string.h>
 #include <stdlib.h>
 
-#define TEST1_SIZE 0x100
-#define TEST2_SIZE 0x100000
-#define TEST3_SIZE 0x1000000
-#define TEST4_SIZE 0x10000000
+#define MRFSTR_TEST1_SIZE 0x100
+#define MRFSTR_TEST2_SIZE 0x100000
+#define MRFSTR_TEST3_SIZE 0x1000000
+#define MRFSTR_TEST4_SIZE 0x10000000
 
 #define MRFSTR_TLIB_ERROR                                     \
     do                                                        \
@@ -34,33 +34,33 @@ copies or substantial portions of the Software.
         return EXIT_FAILURE;                                  \
     } while (0)
 
-#define MRFSTR_TLIB_INIT(x, fr)          \
-    do                                   \
-    {                                    \
-        x = mrfstr_init();               \
-        if (!x)                          \
-        {                                \
-            fr;                          \
-            MRFSTR_TLIB_ERROR;           \
-        }                                \
-                                         \
-        if (mrfstr_alloc(x, TEST4_SIZE)) \
-        {                                \
-            mrfstr_free(x);              \
-            fr;                          \
-            MRFSTR_TLIB_ERROR;           \
-        }                                \
+#define MRFSTR_TLIB_INIT(x, fr)                 \
+    do                                          \
+    {                                           \
+        x = mrfstr_init();                      \
+        if (!x)                                 \
+        {                                       \
+            fr;                                 \
+            MRFSTR_TLIB_ERROR;                  \
+        }                                       \
+                                                \
+        if (mrfstr_alloc(x, MRFSTR_TEST4_SIZE)) \
+        {                                       \
+            mrfstr_free(x);                     \
+            fr;                                 \
+            MRFSTR_TLIB_ERROR;                  \
+        }                                       \
     } while (0)
 
-#define MRFSTR_TLIB_INIT_STR(x, fr)                    \
-    do                                                 \
-    {                                                  \
-        x = malloc(TEST4_SIZE * sizeof(mrfstr_chr_t)); \
-        if (!x)                                        \
-        {                                              \
-            fr;                                        \
-            MRFSTR_TLIB_ERROR;                         \
-        }                                              \
+#define MRFSTR_TLIB_INIT_STR(x, fr)                           \
+    do                                                        \
+    {                                                         \
+        x = malloc(MRFSTR_TEST4_SIZE * sizeof(mrfstr_chr_t)); \
+        if (!x)                                               \
+        {                                                     \
+            fr;                                               \
+            MRFSTR_TLIB_ERROR;                                \
+        }                                                     \
     } while (0)
 
 #define MRFSTR_TLIB_ROUND(size) \

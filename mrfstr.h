@@ -26,7 +26,7 @@ extern "C"
 #include <stddef.h>
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
-#   if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#   if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #       define __USE_LARGEFILE64
 #   endif
 
@@ -72,6 +72,9 @@ typedef int32_t mrfstr_slong_t;
 typedef uint32_t mrfstr_long_t;
 typedef int64_t mrfstr_slonglong_t;
 typedef uint64_t mrfstr_longlong_t;
+
+typedef float mrfstr_float_t;
+typedef double mrfstr_double_t;
 
 typedef size_t mrfstr_idx_t;
 typedef size_t mrfstr_size_t;

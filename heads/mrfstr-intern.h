@@ -194,7 +194,7 @@ struct __MRFSTR_CONFIG_T
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
-#define MRFSTR_SLIMIT 0x800
+#define MRFSTR_SLIMIT 0x8000
 
 #define mrfstr_set_tcount                           \
     do                                              \
@@ -206,7 +206,7 @@ extern mrfstr_config_t _mrfstr_config;
             tcount = (mrfstr_byte_t)(size / tsize); \
     } while (0)
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #include <pthread.h>
 
 typedef pthread_t mrfstr_thread_t;

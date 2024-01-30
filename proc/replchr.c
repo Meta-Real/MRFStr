@@ -50,7 +50,7 @@ struct __MRFSTR_REPLCHR2_T
 #pragma pack(pop)
 typedef struct __MRFSTR_REPLCHR2_T *mrfstr_replchr2_t;
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_replchr_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -58,7 +58,7 @@ DWORD WINAPI __mrfstr_replchr_threaded(
     LPVOID args);
 #endif
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_replchr2_threaded(
     mrfstr_ptr_t args);
 #elif defined(_WIN32)
@@ -274,7 +274,7 @@ void __mrfstr_replchr2(
     free(threads);
 }
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_replchr_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)
@@ -291,7 +291,7 @@ DWORD WINAPI __mrfstr_replchr_threaded(
     return MRFSTR_TFUNC_RET;
 }
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 mrfstr_ptr_t __mrfstr_replchr2_threaded(
     mrfstr_ptr_t args)
 #elif defined(_WIN32)

@@ -333,18 +333,33 @@ void __mrfstr_avx_tequal(
 mrfstr_bool_t __mrfstr_avx_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    __m256i *sblock, cblock, block;
+    __m256i *sblock, cblock, block1, block2;
 
     sblock = (__m256i*)str;
     cblock = _mm256_set1_epi8(chr);
-    while (size--)
+    for (; size >= 2; size -= 2)
     {
-        block = _mm256_loadu_si256(sblock++);
+        block1 = _mm256_load_si256(sblock++);
+        block2 = _mm256_load_si256(sblock++);
 
 #ifdef __AVX512BW__
-        if (_mm256_cmpeq_epi8_mask(block, cblock))
+        if (_mm256_cmpeq_epi8_mask(block1, cblock) ||
+            _mm256_cmpeq_epi8_mask(block2, cblock))
 #else
-        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block, cblock)))
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, cblock)) ||
+            _mm256_movemask_epi8(_mm256_cmpeq_epi8(block2, cblock)))
+#endif
+            return MRFSTR_TRUE;
+    }
+
+    if (size)
+    {
+        block1 = _mm256_load_si256(sblock);
+
+#ifdef __AVX512BW__
+        if (_mm256_cmpeq_epi8_mask(block1, cblock))
+#else
+        if (_mm256_movemask_epi8(_mm256_cmpeq_epi8(block1, cblock)))
 #endif
             return MRFSTR_TRUE;
     }
@@ -369,7 +384,7 @@ void __mrfstr_avx_tcontchr(
         nsize = size - MRFSTR_AVX_TCONTCHR_LOAD;
         for (; size != nsize; size--)
         {
-            block = _mm256_loadu_si256(sblock++);
+            block = _mm256_load_si256(sblock++);
 
 #ifdef __AVX512BW__
             if (_mm256_cmpeq_epi8_mask(block, cblock))

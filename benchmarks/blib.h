@@ -78,71 +78,79 @@ mrfstr_data_ct mrfstr_test_labels[7] =
         mrfstr_config_thread_limit(0x2000000); \
     } while (0)
 
-#define MRFSTR_BLIB_ROUND_CSTR                                                          \
-    do                                                                                  \
-    {                                                                                   \
-        LARGE_INTEGER start, end, total;                                                \
-        mrfstr_size_t count;                                                            \
-        mrfstr_byte_t i;                                                                \
-                                                                                        \
-        for (i = 0; i < 7; i++)                                                         \
-        {                                                                               \
-            total.QuadPart = 0;                                                         \
-            count = 0;                                                                  \
-            while (total.QuadPart < freq.QuadPart)                                      \
-            {                                                                           \
-                QueryPerformanceCounter(&start);                                        \
-                MRFSTR_BLIB_CSTR(mrfstr_test_sizes[i]);                                 \
-                QueryPerformanceCounter(&end);                                          \
-                                                                                        \
-                total.QuadPart += end.QuadPart - start.QuadPart;                        \
-                count++;                                                                \
-            }                                                                           \
-                                                                                        \
-            cstr[i] = ((mrfstr_double_t)total.QuadPart / count) * 1000 / freq.QuadPart; \
-            printf("CSTR    %s: %lf ms"                                                 \
-                "\tspeed: %lf GB/s\t(%zu times)\n",                                     \
-                mrfstr_test_labels[i], cstr[i],                                         \
-                mrfstr_test_sizes[i] / (cstr[i] * 1073741.824), count);                 \
-        }                                                                               \
-                                                                                        \
-        puts("---------------------------------------");                                \
+#define MRFSTR_BLIB_ROUND_CSTR                                                  \
+    do                                                                          \
+    {                                                                           \
+        LARGE_INTEGER _start, _end, _total;                                     \
+        mrfstr_size_t _count;                                                   \
+        mrfstr_byte_t _i;                                                       \
+                                                                                \
+        for (_i = 0; _i < 7; _i++)                                              \
+        {                                                                       \
+            _total.QuadPart = 0;                                                \
+            _count = 0;                                                         \
+            while (_total.QuadPart < freq.QuadPart)                             \
+            {                                                                   \
+                MRFSTR_BLIB_CSTR_PRE(mrfstr_test_sizes[_i]);                    \
+                                                                                \
+                QueryPerformanceCounter(&_start);                               \
+                MRFSTR_BLIB_CSTR(mrfstr_test_sizes[_i]);                        \
+                QueryPerformanceCounter(&_end);                                 \
+                                                                                \
+                MRFSTR_BLIB_CSTR_POST(mrfstr_test_sizes[_i]);                   \
+                                                                                \
+                _total.QuadPart += _end.QuadPart - _start.QuadPart;             \
+                _count++;                                                       \
+            }                                                                   \
+                                                                                \
+            benchmark[_i] = ((mrfstr_double_t)_total.QuadPart / _count) *       \
+                1000 / freq.QuadPart;                                           \
+            printf("CSTR    %s: %lf ms"                                         \
+                "\tspeed: %lf GB/s\t(%zu times)\n",                             \
+                mrfstr_test_labels[_i], benchmark[_i],                          \
+                mrfstr_test_sizes[_i] / (benchmark[_i] * 1073741.824), _count); \
+        }                                                                       \
+                                                                                \
+        puts("---------------------------------------");                        \
     } while (0)
 
-#define MRFSTR_BLIB_ROUND(name)                                                     \
-    do                                                                              \
-    {                                                                               \
-        LARGE_INTEGER start, end, total;                                            \
-        mrfstr_size_t count;                                                        \
-        mrfstr_double_t msc;                                                        \
-        mrfstr_byte_t i;                                                            \
-                                                                                    \
-        for (i = 0; i < 7; i++)                                                     \
-        {                                                                           \
-            total.QuadPart = 0;                                                     \
-            count = 0;                                                              \
-            while (total.QuadPart < freq.QuadPart)                                  \
-            {                                                                       \
-                MRFSTR_BLIB_PRE(mrfstr_test_sizes[i]);                              \
-                                                                                    \
-                QueryPerformanceCounter(&start);                                    \
-                MRFSTR_BLIB_OBJ(mrfstr_test_sizes[i]);                              \
-                QueryPerformanceCounter(&end);                                      \
-                                                                                    \
-                total.QuadPart += end.QuadPart - start.QuadPart;                    \
-                count++;                                                            \
-            }                                                                       \
-                                                                                    \
-            msc = ((mrfstr_double_t)total.QuadPart / count) * 1000 / freq.QuadPart; \
-            printf(name "  %s: %lf ms"                                              \
-                "\tspeed: %lf GB/s\t(%zu times)"                                    \
-                "       \timprovement: %lfx\n",                                     \
-                mrfstr_test_labels[i], msc,                                         \
-                mrfstr_test_sizes[i] / (msc * 1073741.824), count,                  \
-                cstr[i] / msc);                                                     \
-        }                                                                           \
-                                                                                    \
-        puts("---------------------------------------");                            \
+#define MRFSTR_BLIB_ROUND(name)                                       \
+    do                                                                \
+    {                                                                 \
+        LARGE_INTEGER _start, _end, _total;                           \
+        mrfstr_size_t _count;                                         \
+        mrfstr_double_t _msc;                                         \
+        mrfstr_byte_t _i;                                             \
+                                                                      \
+        for (_i = 0; _i < 7; _i++)                                    \
+        {                                                             \
+            _total.QuadPart = 0;                                      \
+            _count = 0;                                               \
+            while (_total.QuadPart < freq.QuadPart)                   \
+            {                                                         \
+                MRFSTR_BLIB_PRE(mrfstr_test_sizes[_i]);               \
+                                                                      \
+                QueryPerformanceCounter(&_start);                     \
+                MRFSTR_BLIB_OBJ(mrfstr_test_sizes[_i]);               \
+                QueryPerformanceCounter(&_end);                       \
+                                                                      \
+                MRFSTR_BLIB_POST(mrfstr_test_sizes[_i]);              \
+                                                                      \
+                _total.QuadPart += _end.QuadPart - _start.QuadPart;   \
+                _count++;                                             \
+            }                                                         \
+                                                                      \
+            _msc = ((mrfstr_double_t)_total.QuadPart / _count) *      \
+                1000 / freq.QuadPart;                                 \
+            printf(name "  %s: %lf ms"                                \
+                "\tspeed: %lf GB/s\t(%zu times)"                      \
+                "       \timprovement: %lfx\n",                       \
+                mrfstr_test_labels[_i], _msc,                         \
+                mrfstr_test_sizes[_i] / (_msc * 1073741.824), _count, \
+                benchmark[_i] / _msc);                                \
+        }                                                             \
+                                                                      \
+        puts("---------------------------------------");              \
     } while (0)
 
 #endif

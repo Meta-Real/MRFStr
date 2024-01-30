@@ -21,17 +21,25 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_TYPE_COMPARE
 
-#define MRFSTR_BLIB_CSTR(size) cstr[i] = memcmp(cstr1, cstr2, size)
+#define MRFSTR_BLIB_CSTR_PRE(size) mrfstr_bool_t res
+#define MRFSTR_BLIB_CSTR(size) res = (mrfstr_bool_t)memcmp(cstr1, cstr2, size)
+#define MRFSTR_BLIB_CSTR_POST(size) benchmark[_i] = res
 
-#define MRFSTR_BLIB_PRE(size)
-#define MRFSTR_BLIB_OBJ(size) mrfstr_n_equal(str1, str2, size)
+#define MRFSTR_BLIB_PRE(size)     \
+    do                            \
+    {                             \
+        MRFSTR_SIZE(str1) = size; \
+        MRFSTR_SIZE(str2) = size; \
+    } while (0)
+#define MRFSTR_BLIB_OBJ(size) mrfstr_equal(str1, str2)
+#define MRFSTR_BLIB_POST(size)
 
 int main(void)
 {
     mrfstr_t str1, str2;
     mrfstr_data_t cstr1, cstr2;
     LARGE_INTEGER freq;
-    mrfstr_double_t cstr[7];
+    mrfstr_double_t benchmark[7];
 
     MRFSTR_BLIB_FIRST;
 

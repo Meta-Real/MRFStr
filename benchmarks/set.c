@@ -21,17 +21,20 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
 
+#define MRFSTR_BLIB_CSTR_PRE(size)
 #define MRFSTR_BLIB_CSTR(size) memcpy(cdst, csrc, size)
+#define MRFSTR_BLIB_CSTR_POST(size)
 
 #define MRFSTR_BLIB_PRE(size) MRFSTR_SIZE(src) = size
 #define MRFSTR_BLIB_OBJ(size) mrfstr_set(dst, src)
+#define MRFSTR_BLIB_POST(size)
 
 int main(void)
 {
     mrfstr_t src, dst;
     mrfstr_data_t csrc, cdst;
     LARGE_INTEGER freq;
-    mrfstr_double_t cstr[7];
+    mrfstr_double_t benchmark[7];
 
     MRFSTR_BLIB_FIRST;
 

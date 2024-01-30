@@ -213,10 +213,35 @@ void __mrfstr_base_tequal(
 mrfstr_bool_t __mrfstr_base_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_longlong_t *sblock, cblock, mask;
+    mrfstr_longlong_t *sblock, cblock, mask,
+        block1, block2, block3, block4;
 
     sblock = (mrfstr_longlong_t*)str;
     mrfstr_base_set1(cblock, chr);
+    for (; size >= 4; size -= 4)
+    {
+        block1 = *sblock++;
+        block2 = *sblock++;
+        block3 = *sblock++;
+        block4 = *sblock++;
+
+        mask = cblock ^ block1;
+        if (mrfstr_base_cmp(mask))
+            return MRFSTR_TRUE;
+
+        mask = cblock ^ block2;
+        if (mrfstr_base_cmp(mask))
+            return MRFSTR_TRUE;
+
+        mask = cblock ^ block3;
+        if (mrfstr_base_cmp(mask))
+            return MRFSTR_TRUE;
+
+        mask = cblock ^ block4;
+        if (mrfstr_base_cmp(mask))
+            return MRFSTR_TRUE;
+    }
+
     while (size--)
     {
         mask = cblock ^ *sblock++;

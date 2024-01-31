@@ -295,6 +295,15 @@ inline mrfstr_size_t mrfstr_get_size(
     return MRFSTR_SIZE(str);
 }
 
+inline void mrfstr_resize(
+    mrfstr_t str, mrfstr_size_t size)
+{
+    if (size > MRFSTR_CAPA(str))
+        size = MRFSTR_CAPA(str);
+
+    MRFSTR_SIZE(str) = size;
+}
+
 inline mrfstr_res_enum_t mrfstr_get_chr(
     mrfstr_chr_t *chr,
     mrfstr_ct str, mrfstr_size_t idx)

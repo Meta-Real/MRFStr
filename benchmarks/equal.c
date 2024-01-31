@@ -56,17 +56,23 @@ int main(void)
     mrfstr_repeat_chr(str1, '0', mrfstr_test_sizes[6]);
     mrfstr_repeat_chr(str2, '0', mrfstr_test_sizes[6]);
 
+#ifdef __AVX512F__
     mrfstr_config(MRFSTR_BLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
     MRFSTR_BLIB_ROUND("AVX512");
+#endif
 
+#ifdef __AVX2__
     mrfstr_config(MRFSTR_BLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
     MRFSTR_BLIB_ROUND("AVX   ");
+#endif
 
+#ifdef __SSE2__
     mrfstr_config(MRFSTR_BLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
     MRFSTR_BLIB_ROUND("SSE   ");
+#endif
 
     mrfstr_config(MRFSTR_BLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);

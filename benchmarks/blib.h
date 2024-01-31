@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #ifndef __MRFSTR_BLIB__
 #define __MRFSTR_BLIB__
 
-#include <mrfstr.h>
+#include <mrfstr-intern.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -70,7 +70,7 @@ mrfstr_data_ct mrfstr_test_labels[7] =
         }                                                        \
     } while (0)
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#ifdef MRFSTR_BUILD_UNIX
 #include <sys/time.h>
 
 #define MRFSTR_BLIB_FIRST                      \

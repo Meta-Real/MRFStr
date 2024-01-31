@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #ifndef __MRFSTR_TLIB__
 #define __MRFSTR_TLIB__
 
-#include <mrfstr.h>
+#include <mrfstr-intern.h>
 #include <string.h>
 #include <stdlib.h>
 

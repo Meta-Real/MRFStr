@@ -39,13 +39,14 @@ int main(void)
     mrfstr_t res;
     mrfstr_data_t str;
 
-    mrfstr_config_thread_count(5);
+    mrfstr_config_thread_count_max();
 
     MRFSTR_TLIB_INIT(res,);
     mrfstr_set_nstr(res, "00000000", 8);
     MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));
     memset(str, '0', MRFSTR_TEST4_SIZE);
 
+#ifdef __AVX512F__
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
 
@@ -53,7 +54,9 @@ int main(void)
     MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST3_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
+#endif
 
+#ifdef __AVX__
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
 
@@ -61,7 +64,9 @@ int main(void)
     MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST3_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
+#endif
 
+#ifdef __SSE2__
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
 
@@ -69,6 +74,7 @@ int main(void)
     MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST3_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
+#endif
 
     mrfstr_config(MRFSTR_TLIB_CONFIG,
         MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);

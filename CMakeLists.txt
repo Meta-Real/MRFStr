@@ -48,8 +48,6 @@ add_library(MRFStr
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
-find_package(benchmark REQUIRED)
-
 enable_testing()
 add_subdirectory(tests)
 add_subdirectory(benchmarks)

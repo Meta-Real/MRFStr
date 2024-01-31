@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BLIB_CSTR_PRE(size) mrfstr_ptr_t ptr
 #define MRFSTR_BLIB_CSTR(size) ptr = memchr(cstr, '1', size)
-#define MRFSTR_BLIB_CSTR_POST(size) benchmark[_i] = (mrfstr_double_t)(uintptr_t)ptr
+#define MRFSTR_BLIB_CSTR_POST(size) _count += (uintptr_t)ptr
 
 #define MRFSTR_BLIB_PRE(size) MRFSTR_SIZE(str) = size
 #define MRFSTR_BLIB_OBJ(size) mrfstr_contain_chr(str, '1')

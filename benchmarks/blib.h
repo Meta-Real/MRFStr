@@ -70,8 +70,8 @@ mrfstr_data_ct mrfstr_test_labels[7] =
         }                                                        \
     } while (0)
 
-#ifdef MRFSTR_BUILD_UNIX
-#include <time.h>
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#include <sys/time.h>
 
 #define MRFSTR_BLIB_FIRST                      \
     do                                         \
@@ -83,7 +83,7 @@ mrfstr_data_ct mrfstr_test_labels[7] =
 #define MRFSTR_BLIB_ROUND_CSTR                                                  \
     do                                                                          \
     {                                                                           \
-        struct timespec _start, _end;                                           \
+        struct timeval _start, _end;                                            \
         mrfstr_longlong_t _total;                                               \
         mrfstr_size_t _count;                                                   \
         mrfstr_byte_t _i;                                                       \
@@ -92,69 +92,69 @@ mrfstr_data_ct mrfstr_test_labels[7] =
         {                                                                       \
             _total = 0;                                                         \
             _count = 0;                                                         \
-            while (_total < 1000000000)                                         \
+            while (_total < 1000000)                                            \
             {                                                                   \
                 MRFSTR_BLIB_CSTR_PRE(mrfstr_test_sizes[_i]);                    \
                                                                                 \
-                clock_gettime(CLOCK_REALTIME, &_start);                         \
+                gettimeofday(&_start, NULL);                                    \
                 MRFSTR_BLIB_CSTR(mrfstr_test_sizes[_i]);                        \
-                clock_gettime(CLOCK_REALTIME, &_end);                           \
+                gettimeofday(&_end, NULL);                                      \
                                                                                 \
                 MRFSTR_BLIB_CSTR_POST(mrfstr_test_sizes[_i]);                   \
                                                                                 \
-                _total += (_end.tv_sec - _start.tv_sec) * 1000000000 +          \
-                    (_end.tv_nsec - _start.tv_nsec);                            \
+                _total += (_end.tv_sec - _start.tv_sec) * 1000000 +             \
+                    (_end.tv_usec - _start.tv_usec);                            \
                 _count++;                                                       \
             }                                                                   \
                                                                                 \
-            benchmark[_i] = (mrfstr_double_t)_total / _count / 1000000;         \
+            benchmark[_i] = (mrfstr_double_t)_total / _count / 1000;            \
             printf("CSTR    %s: %lf ms"                                         \
                 "\tspeed: %lf GB/s\t(%zu times)\n",                             \
                 mrfstr_test_labels[_i], benchmark[_i],                          \
-                mrfstr_test_sizes[_i] / (benchmark[_i] * 1073.741824), _count); \
+                mrfstr_test_sizes[_i] / (benchmark[_i] * 1073741.824), _count); \
         }                                                                       \
                                                                                 \
         puts("---------------------------------------");                        \
     } while (0)
 
-#define MRFSTR_BLIB_ROUND(name)                                         \
-    do                                                                  \
-    {                                                                   \
-        struct timespec _start, _end;                                   \
-        mrfstr_longlong_t _total;                                       \
-        mrfstr_size_t _count;                                           \
-        mrfstr_byte_t _i;                                               \
-        mrfstr_double_t _msc;                                           \
-                                                                        \
-        for (_i = 0; _i < 7; _i++)                                      \
-        {                                                               \
-            _total = 0;                                                 \
-            _count = 0;                                                 \
-            while (_total < 1000000000)                                 \
-            {                                                           \
-                MRFSTR_BLIB_PRE(mrfstr_test_sizes[_i]);                 \
-                                                                        \
-                clock_gettime(CLOCK_REALTIME, &_start);                 \
-                MRFSTR_BLIB_OBJ(mrfstr_test_sizes[_i]);                 \
-                clock_gettime(CLOCK_REALTIME, &_end);                   \
-                                                                        \
-                MRFSTR_BLIB_POST(mrfstr_test_sizes[_i]);                \
-                                                                        \
-                _total += (_end.tv_sec - _start.tv_sec) * 1000000000 +  \
-                    (_end.tv_nsec - _start.tv_nsec);                    \
-                _count++;                                               \
-            }                                                           \
-                                                                        \
-            _msc = (mrfstr_double_t)_total.QuadPart / _count / 1000000; \
-            printf(name "  %s: %lf ms"                                  \
-                "\tspeed: %lf GB/s\t(%zu times)"                        \
-                "       \timprovement: %lfx\n",                         \
-                mrfstr_test_labels[_i], _msc,                           \
-                mrfstr_test_sizes[_i] / (_msc * 1073.741824), _count,   \
-                benchmark[_i] / _msc);                                  \
-        }                                                               \
-                                                                        \
-        puts("---------------------------------------");                \
+#define MRFSTR_BLIB_ROUND(name)                                       \
+    do                                                                \
+    {                                                                 \
+        struct timeval _start, _end;                                  \
+        mrfstr_longlong_t _total;                                     \
+        mrfstr_size_t _count;                                         \
+        mrfstr_byte_t _i;                                             \
+        mrfstr_double_t _msc;                                         \
+                                                                      \
+        for (_i = 0; _i < 7; _i++)                                    \
+        {                                                             \
+            _total = 0;                                               \
+            _count = 0;                                               \
+            while (_total < 1000000)                                  \
+            {                                                         \
+                MRFSTR_BLIB_PRE(mrfstr_test_sizes[_i]);               \
+                                                                      \
+                gettimeofday(&_start, NULL);                          \
+                MRFSTR_BLIB_OBJ(mrfstr_test_sizes[_i]);               \
+                gettimeofday(&_end, NULL);                            \
+                                                                      \
+                MRFSTR_BLIB_POST(mrfstr_test_sizes[_i]);              \
+                                                                      \
+                _total += (_end.tv_sec - _start.tv_sec) * 1000000 +   \
+                    (_end.tv_usec - _start.tv_usec);                  \
+                _count++;                                             \
+            }                                                         \
+                                                                      \
+            _msc = (mrfstr_double_t)_total / _count / 1000;           \
+            printf(name "  %s: %lf ms"                                \
+                "\tspeed: %lf GB/s\t(%zu times)"                      \
+                "       \timprovement: %lfx\n",                       \
+                mrfstr_test_labels[_i], _msc,                         \
+                mrfstr_test_sizes[_i] / (_msc * 1073741.824), _count, \
+                benchmark[_i] / _msc);                                \
+        }                                                             \
+                                                                      \
+        puts("---------------------------------------");              \
     } while (0)
 
 #elif defined(_WIN32)

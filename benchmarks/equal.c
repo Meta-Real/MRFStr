@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BLIB_CSTR_PRE(size) mrfstr_bool_t res
 #define MRFSTR_BLIB_CSTR(size) res = (mrfstr_bool_t)memcmp(cstr1, cstr2, size)
-#define MRFSTR_BLIB_CSTR_POST(size) benchmark[_i] = res
+#define MRFSTR_BLIB_CSTR_POST(size) _count += res
 
 #define MRFSTR_BLIB_PRE(size)     \
     do                            \

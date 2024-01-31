@@ -393,7 +393,7 @@ void __mrfstr_sse_tcontchr(
         nsize = size - MRFSTR_SSE_TCONTCHR_LOAD;
         for (; size != nsize; size--)
         {
-            block = _mm_loadu_si128(sblock++);
+            block = _mm_load_si128(sblock++);
 
 #ifdef __AVX512BW__
             if (_mm_cmpeq_epi8_mask(block, cblock))
@@ -412,7 +412,7 @@ void __mrfstr_sse_tcontchr(
 
     while (size--)
     {
-        block = _mm_loadu_si128(sblock++);
+        block = _mm_load_si128(sblock++);
 
 #ifdef __AVX512BW__
         if (_mm_cmpeq_epi8_mask(block, cblock))
@@ -437,7 +437,7 @@ mrfstr_idx_t __mrfstr_sse_findchr(
     cblock = _mm_set1_epi8(chr);
     for (i = 0; i != size; i++)
     {
-        block = _mm_loadu_si128(sblock++);
+        block = _mm_load_si128(sblock++);
 
 #ifdef __AVX512BW__
         mask = _mm_cmpeq_epi8_mask(block, cblock);
@@ -503,7 +503,7 @@ mrfstr_size_t __mrfstr_sse_strlen(
     mrfstr_data_ct str)
 {
     mrfstr_data_ct base;
-    __m128i *sblock, block, zero;
+    __m128i *sblock, zero, block;
     mrfstr_short_t mask;
 
     base = str;

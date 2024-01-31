@@ -253,7 +253,7 @@ mrfstr_bool_t __mrfstr_avx512_equal(
     s2block = (__m512i*)str2;
     while (size--)
     {
-        block1 = _mm512_load_si512(s1block++);
+        block1 = _mm512_loadu_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
         if (_mm512_cmpneq_epi64_mask(block1, block2))
             return MRFSTR_FALSE;
@@ -279,7 +279,7 @@ void __mrfstr_avx512_tequal(
         nsize = size - MRFSTR_AVX512_TEQUAL_LOAD;
         for (; size != nsize; size--)
         {
-            block1 = _mm512_load_si512(s1block++);
+            block1 = _mm512_loadu_si512(s1block++);
             block2 = _mm512_loadu_si512(s2block++);
             if (_mm512_cmpneq_epi64_mask(block1, block2))
             {
@@ -294,7 +294,7 @@ void __mrfstr_avx512_tequal(
 
     while (size--)
     {
-        block1 = _mm512_load_si512(s1block++);
+        block1 = _mm512_loadu_si512(s1block++);
         block2 = _mm512_loadu_si512(s2block++);
         if (_mm512_cmpneq_epi64_mask(block1, block2))
         {
@@ -372,7 +372,7 @@ mrfstr_idx_t __mrfstr_avx512_findchr(
     cblock = _mm512_set1_epi8(chr);
     for (i = 0; i != size; i++)
     {
-        block = _mm512_loadu_si512(sblock++);
+        block = _mm512_load_si512(sblock++);
 
         mask = _mm512_cmpeq_epi8_mask(block, cblock);
         if (mask)
@@ -426,7 +426,7 @@ mrfstr_size_t __mrfstr_avx512_strlen(
     mrfstr_data_ct str)
 {
     mrfstr_data_ct base;
-    __m512i *sblock, block, zero;
+    __m512i *sblock, zero, block;
     mrfstr_longlong_t mask;
 
     base = str;

@@ -403,7 +403,7 @@ void __mrfstr_avx_tcontchr(
 
     while (size--)
     {
-        block = _mm256_loadu_si256(sblock++);
+        block = _mm256_load_si256(sblock++);
 
 #ifdef __AVX512BW__
         if (_mm256_cmpeq_epi8_mask(block, cblock))
@@ -428,7 +428,7 @@ mrfstr_idx_t __mrfstr_avx_findchr(
     cblock = _mm256_set1_epi8(chr);
     for (i = 0; i != size; i++)
     {
-        block = _mm256_loadu_si256(sblock++);
+        block = _mm256_load_si256(sblock++);
 
 #ifdef __AVX512BW__
         mask = _mm256_cmpeq_epi8_mask(block, cblock);
@@ -495,7 +495,7 @@ mrfstr_size_t __mrfstr_avx_strlen(
     mrfstr_data_ct str)
 {
     mrfstr_data_ct base;
-    __m256i *sblock, block, zero;
+    __m256i *sblock, zero, block;
     mrfstr_long_t mask;
 
     base = str;

@@ -27,7 +27,6 @@ extern "C"
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
 #   if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-#       define MRFSTR_BUILD_UNIX
 #       define __USE_LARGEFILE64
 #   endif
 

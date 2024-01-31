@@ -16,9 +16,6 @@ copies or substantial portions of the Software.
 
 #include "blib.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
 #define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
 
 #define MRFSTR_BLIB_CSTR_PRE(size)
@@ -33,7 +30,9 @@ int main(void)
 {
     mrfstr_t res;
     mrfstr_data_t cres;
+#ifdef _WIN32
     LARGE_INTEGER freq;
+#endif
     mrfstr_double_t benchmark[7];
 
     MRFSTR_BLIB_FIRST;

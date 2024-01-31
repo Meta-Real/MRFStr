@@ -206,7 +206,9 @@ extern mrfstr_config_t _mrfstr_config;
             tcount = (mrfstr_byte_t)(size / tsize); \
     } while (0)
 
-#ifdef MRFSTR_BUILD_UNIX
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#define MRFSTR_BUILD_UNIX
+
 #include <pthread.h>
 
 typedef pthread_t mrfstr_thread_t;

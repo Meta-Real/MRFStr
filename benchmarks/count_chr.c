@@ -28,7 +28,7 @@ copies or substantial portions of the Software.
             if (cstr[i] == '0')    \
                 count++;           \
     } while (0)
-#define MRFSTR_BLIB_CSTR_POST(size) _count += (mrfstr_double_t)(count - size)
+#define MRFSTR_BLIB_CSTR_POST(size) _count += count - size
 
 #define MRFSTR_BLIB_PRE(size) MRFSTR_SIZE(str) = size
 #define MRFSTR_BLIB_OBJ(size) mrfstr_count_chr(str, '0')

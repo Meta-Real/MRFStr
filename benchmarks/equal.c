@@ -31,7 +31,7 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_equal(str1, str2)
 #define MRFSTR_BLIB_POST(size)
 
-int main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
+int main(int argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str1, str2;
     mrfstr_data_t cstr1, cstr2;

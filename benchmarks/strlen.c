@@ -36,7 +36,7 @@ copies or substantial portions of the Software.
     _count += len - size + 1;  \
     str[size - 1] = '0'
 
-int main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
+int main(int argc, mrfstr_data_ct *argv)
 {
     mrfstr_data_t str;
     mrfstr_data_ct *mrfstr_labels;

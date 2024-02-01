@@ -26,7 +26,7 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_repeat_chr(res, '0', size)
 #define MRFSTR_BLIB_POST(size)
 
-mrfstr_byte_t main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
+int main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
 {
     mrfstr_t res;
     mrfstr_data_t cres;

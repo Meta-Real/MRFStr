@@ -34,7 +34,7 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_replace_chr(str, str, '0', '1')
 #define MRFSTR_BLIB_POST(size) mrfstr_repeat_chr(str, '0', size)
 
-mrfstr_byte_t main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
+int main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str;
     mrfstr_data_t cstr;

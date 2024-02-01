@@ -37,15 +37,20 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_repeat(str, str, count)
 #define MRFSTR_BLIB_POST(size)
 
-int main(void)
+mrfstr_byte_t main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str;
     mrfstr_data_t cstr;
+    mrfstr_data_ct *mrfstr_labels;
 #ifdef _WIN32
     LARGE_INTEGER freq;
 #endif
-    mrfstr_double_t benchmark[7];
+    mrfstr_size_t *mrfstr_sizes;
+    mrfstr_short_t *mrfstr_size_labels;
+    mrfstr_byte_t scount, tcount;
+    mrfstr_double_t *benchmark;
 
+    MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
 
     MRFSTR_BLIB_INIT_STR(cstr,);

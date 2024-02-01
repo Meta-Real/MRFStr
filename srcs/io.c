@@ -56,7 +56,8 @@ mrfstr_res_enum_t mrfstr_import(
         capa -= alloc;
 
         ptr[_mrfstr_config.stdalloc] = EOF;
-        fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin);
+        if (!fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin))
+            return MRFSTR_RES_READ_ERROR;
 
         if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
         {
@@ -75,7 +76,8 @@ mrfstr_res_enum_t mrfstr_import(
         ptr = MRFSTR_DATA(str) + MRFSTR_SIZE(str);
 
         ptr[_mrfstr_config.stdalloc] = EOF;
-        fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin);
+        if (!fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin))
+            return MRFSTR_RES_READ_ERROR;
 
         if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
         {
@@ -99,7 +101,9 @@ mrfstr_res_enum_t mrfstr_n_import(
     if (MRFSTR_CAPA(str) < size)
         MRFSTR_CLEAR_REALLOC(str, size);
 
-    fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stdin);
+    if (!fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stdin))
+        return MRFSTR_RES_READ_ERROR;
+
     MRFSTR_SIZE(str) = size;
     return MRFSTR_RES_NOERROR;
 }
@@ -147,7 +151,8 @@ mrfstr_res_enum_t mrfstr_fimport(
     if (MRFSTR_CAPA(str) < MRFSTR_SIZE(str))
         MRFSTR_CLEAR_REALLOC(str, MRFSTR_SIZE(str));
 
-    fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), MRFSTR_SIZE(str), stream);
+    if (!fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), MRFSTR_SIZE(str), stream))
+        return MRFSTR_RES_READ_ERROR;
     return MRFSTR_RES_NOERROR;
 }
 
@@ -167,7 +172,8 @@ mrfstr_res_enum_t mrfstr_n_fimport(
     if (!stream)
         stream = stdin;
 
-    fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stream);
+    if (!fread(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stream))
+        return MRFSTR_RES_READ_ERROR;
     MRFSTR_SIZE(str) = size;
     return MRFSTR_RES_NOERROR;
 }

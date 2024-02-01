@@ -26,20 +26,25 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_set(dst, src)
 #define MRFSTR_BLIB_POST(size)
 
-int main(void)
+mrfstr_byte_t main(mrfstr_byte_t argc, mrfstr_data_ct *argv)
 {
     mrfstr_t src, dst;
     mrfstr_data_t csrc, cdst;
+    mrfstr_data_ct *mrfstr_labels;
 #ifdef _WIN32
     LARGE_INTEGER freq;
 #endif
-    mrfstr_double_t benchmark[7];
+    mrfstr_size_t *mrfstr_sizes;
+    mrfstr_short_t *mrfstr_size_labels;
+    mrfstr_byte_t scount, tcount;
+    mrfstr_double_t *benchmark;
 
+    MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
 
     MRFSTR_BLIB_INIT_STR(csrc,);
     MRFSTR_BLIB_INIT_STR(cdst, free(csrc));
-    memset(csrc, '0', mrfstr_test_sizes[6]);
+    memset(csrc, '0', mrfstr_sizes[scount - 1]);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(csrc);
@@ -47,7 +52,7 @@ int main(void)
 
     MRFSTR_BLIB_INIT(src,);
     MRFSTR_BLIB_INIT(dst, mrfstr_free(src));
-    mrfstr_repeat_chr(src, '0', mrfstr_test_sizes[6]);
+    mrfstr_repeat_chr(src, '0', mrfstr_sizes[scount - 1]);
 
 #ifdef __AVX512F__
     mrfstr_config(MRFSTR_BLIB_CONFIG,

@@ -194,7 +194,7 @@ struct __MRFSTR_CONFIG_T
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
-#define MRFSTR_SLIMIT 0x8000
+#define MRFSTR_SLIMIT 0x1000
 
 #define mrfstr_set_tcount                           \
     do                                              \

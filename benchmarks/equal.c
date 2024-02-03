@@ -35,22 +35,15 @@ int main(int argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str1, str2;
     mrfstr_data_t cstr1, cstr2;
-    mrfstr_data_ct *mrfstr_labels;
-#ifdef _WIN32
-    LARGE_INTEGER freq;
-#endif
-    mrfstr_size_t *mrfstr_sizes;
-    mrfstr_short_t *mrfstr_size_labels;
-    mrfstr_byte_t scount, tcount;
-    mrfstr_double_t *benchmark;
+    MRFSTR_BLIB_VARS;
 
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
 
     MRFSTR_BLIB_INIT_STR(cstr1,);
     MRFSTR_BLIB_INIT_STR(cstr2, free(cstr1));
-    memset(cstr1, '0', mrfstr_sizes[scount - 1]);
-    memset(cstr2, '0', mrfstr_sizes[scount - 1]);
+    memset(cstr1, '0', tests[nsec - 1].size);
+    memset(cstr2, '0', tests[nsec - 1].size);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(cstr1);
@@ -58,8 +51,8 @@ int main(int argc, mrfstr_data_ct *argv)
 
     MRFSTR_BLIB_INIT(str1,);
     MRFSTR_BLIB_INIT(str2, mrfstr_free(str1));
-    mrfstr_repeat_chr(str1, '0', mrfstr_sizes[scount - 1]);
-    mrfstr_repeat_chr(str2, '0', mrfstr_sizes[scount - 1]);
+    mrfstr_repeat_chr(str1, '0', tests[nsec - 1].size);
+    mrfstr_repeat_chr(str2, '0', tests[nsec - 1].size);
 
 #ifdef __AVX512F__
     mrfstr_config(MRFSTR_BLIB_CONFIG,
@@ -85,5 +78,5 @@ int main(int argc, mrfstr_data_ct *argv)
 
     mrfstr_free(str1);
     mrfstr_free(str2);
-    return 0;
+    MRFSTR_BLIB_RETURN;
 }

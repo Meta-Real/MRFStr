@@ -42,20 +42,13 @@ int main(int argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str;
     mrfstr_data_t cstr;
-    mrfstr_data_ct *mrfstr_labels;
-#ifdef _WIN32
-    LARGE_INTEGER freq;
-#endif
-    mrfstr_size_t *mrfstr_sizes;
-    mrfstr_short_t *mrfstr_size_labels;
-    mrfstr_byte_t scount, tcount;
-    mrfstr_double_t *benchmark;
+    MRFSTR_BLIB_VARS;
 
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
 
     MRFSTR_BLIB_INIT_STR(cstr,);
-    memset(cstr, '0', mrfstr_sizes[scount - 1]);
+    memset(cstr, '0', tests[nsec - 1].size);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(cstr);
@@ -85,5 +78,5 @@ int main(int argc, mrfstr_data_ct *argv)
     MRFSTR_BLIB_ROUND("INT64 ");
 
     mrfstr_free(str);
-    return 0;
+    MRFSTR_BLIB_RETURN;
 }

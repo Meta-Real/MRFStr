@@ -30,21 +30,14 @@ int main(int argc, mrfstr_data_ct *argv)
 {
     mrfstr_t src, dst;
     mrfstr_data_t csrc, cdst;
-    mrfstr_data_ct *mrfstr_labels;
-#ifdef _WIN32
-    LARGE_INTEGER freq;
-#endif
-    mrfstr_size_t *mrfstr_sizes;
-    mrfstr_short_t *mrfstr_size_labels;
-    mrfstr_byte_t scount, tcount;
-    mrfstr_double_t *benchmark;
+    MRFSTR_BLIB_VARS;
 
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
 
     MRFSTR_BLIB_INIT_STR(csrc,);
     MRFSTR_BLIB_INIT_STR(cdst, free(csrc));
-    memset(csrc, '0', mrfstr_sizes[scount - 1]);
+    memset(csrc, '0', tests[nsec - 1].size);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(csrc);
@@ -52,7 +45,7 @@ int main(int argc, mrfstr_data_ct *argv)
 
     MRFSTR_BLIB_INIT(src,);
     MRFSTR_BLIB_INIT(dst, mrfstr_free(src));
-    mrfstr_repeat_chr(src, '0', mrfstr_sizes[scount - 1]);
+    mrfstr_repeat_chr(src, '0', tests[nsec - 1].size);
 
 #ifdef __AVX512F__
     mrfstr_config(MRFSTR_BLIB_CONFIG,
@@ -78,5 +71,5 @@ int main(int argc, mrfstr_data_ct *argv)
 
     mrfstr_free(src);
     mrfstr_free(dst);
-    return 0;
+    MRFSTR_BLIB_RETURN;
 }

@@ -31,13 +31,7 @@ copies or substantial portions of the Software.
 
 int main(void)
 {
-#ifdef MRFSTR_GCC_CLANG
     FILE *header = fopen("heads/simddef.h", "w");
-#elif defined(_MSC_VER)
-    FILE *header;
-    fopen_s(&header, "heads/simddef.h", "w");
-#endif
-
     if (!header)
         return EXIT_FAILURE;
 

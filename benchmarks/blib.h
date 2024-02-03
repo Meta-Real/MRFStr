@@ -360,7 +360,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         {                                                           \
             _total = 0;                                             \
             _count = 0;                                             \
-            while (_total < tcount * 1000000 || _count < ncount)    \
+            while (_total < ntime * 1000000 || _count < ncount)     \
             {                                                       \
                 MRFSTR_BLIB_PRE(tests[_i].size);                    \
                                                                     \

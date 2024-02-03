@@ -24,7 +24,7 @@ copies or substantial portions of the Software.
 #include <math.h>
 
 #pragma pack(push, 1)
-struct __MRFSTR_BLIB_TEST
+struct __MRFSTR_BLIB_TEST_T
 {
     mrfstr_data_ct label;
     mrfstr_float_t label_size;
@@ -32,7 +32,13 @@ struct __MRFSTR_BLIB_TEST
     mrfstr_double_t ctest;
 };
 #pragma pack(pop)
-typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
+typedef struct __MRFSTR_BLIB_TEST_T mrfstr_blib_test_t;
+
+enum __MRFSTR_BLIB_FORMAT_ENUM
+{
+    MRFSTR_BLIB_FORMAT_NORM,
+    MRFSTR_BLIB_FORMAT_CSV
+};
 
 #define MRFSTR_BLIB_ERROR                                          \
     do                                                             \
@@ -85,6 +91,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         exponential = MRFSTR_TRUE;                                              \
         ntime = 1;                                                              \
         ncount = 2;                                                             \
+        format = MRFSTR_BLIB_FORMAT_NORM;                                       \
+        file = NULL;                                                            \
         for (i = 1; i < argc; i++)                                              \
         {                                                                       \
             ptr = (mrfstr_data_t)argv[i];                                       \
@@ -197,7 +205,22 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
             }                                                                   \
                                                                                 \
             if (!memcmp(ptr, "count=", 6))                                      \
+            {                                                                   \
                 ncount = (mrfstr_short_t)strtoull(ptr + 6, NULL, 10);           \
+                continue;                                                       \
+            }                                                                   \
+                                                                                \
+            if (!memcmp(ptr, "format=csv", 10))                                 \
+            {                                                                   \
+                format = MRFSTR_BLIB_FORMAT_CSV;                                \
+                continue;                                                       \
+            }                                                                   \
+                                                                                \
+            if (!memcmp(ptr, "format=norm", 11))                                \
+            {                                                                   \
+                format = MRFSTR_BLIB_FORMAT_NORM;                               \
+                continue;                                                       \
+            }                                                                   \
         }                                                                       \
                                                                                 \
         if (exponential)                                                        \
@@ -209,6 +232,9 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         tests = (mrfstr_blib_test_t*)malloc(nsec * sizeof(mrfstr_blib_test_t)); \
         if (!tests)                                                             \
             MRFSTR_BLIB_ERROR;                                                  \
+                                                                                \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                                   \
+            file = fopen("benchmarks", "wb");                                   \
                                                                                 \
         for (i = 0; i < nsec; i++)                                              \
         {                                                                       \
@@ -241,11 +267,14 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         }                                                                       \
     } while (0)
 
-#define MRFSTR_BLIB_RETURN \
-    do                     \
-    {                      \
-        free(tests);       \
-        return 0;          \
+#define MRFSTR_BLIB_RETURN                    \
+    do                                        \
+    {                                         \
+        free(tests);                          \
+                                              \
+        if (format == MRFSTR_BLIB_FORMAT_CSV) \
+            fclose(file);                     \
+        return 0;                             \
     } while (0)
 
 #ifdef MRFSTR_BUILD_UNIX
@@ -253,6 +282,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
 
 #define MRFSTR_BLIB_VARS                \
     mrfstr_short_t nsec, ntime, ncount; \
+    mrfstr_byte_t format;               \
+    FILE *file;                         \
     mrfstr_blib_test_t *tests
 
 #define MRFSTR_BLIB_FIRST                      \
@@ -270,6 +301,14 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         mrfstr_size_t _count;                                              \
         mrfstr_byte_t _i;                                                  \
                                                                            \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
+        {                                                                  \
+            fputc('\t', file);                                             \
+            for (_i = 0; _i < nsec; _i++)                                  \
+                fprintf(file, "%.2f%s\t",                                  \
+                    tests[_i].label_size, tests[_i].label);                \
+            fputs("\nCSTR\t", file);                                       \
+        }                                                                  \
         for (_i = 0; _i < nsec; _i++)                                      \
         {                                                                  \
             _total = 0;                                                    \
@@ -290,12 +329,19 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
             }                                                              \
                                                                            \
             tests[_i].ctest = (mrfstr_double_t)_total / _count / 1000;     \
+                                                                           \
+            if (format == MRFSTR_BLIB_FORMAT_CSV)                          \
+                fprintf(file, "%lf\t",                                     \
+                    tests[_i].size / (tests[_i].ctest * 1073741.824));     \
+                                                                           \
             printf("CSTR    %.2f%s: %lf ms"                                \
                 "\tspeed: %lf GB/s\t(%zu times)\n",                        \
                 tests[_i].label_size, tests[_i].label, tests[_i].ctest,    \
                 tests[_i].size / (tests[_i].ctest * 1073741.824), _count); \
         }                                                                  \
                                                                            \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
+            fputc('\n', file);                                             \
         puts("---------------------------------------");                   \
     } while (0)
 
@@ -308,6 +354,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         mrfstr_byte_t _i;                                           \
         mrfstr_double_t _msc;                                       \
                                                                     \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                       \
+            fprintf(file, "%s\t", name);                            \
         for (_i = 0; _i < nsec; _i++)                               \
         {                                                           \
             _total = 0;                                             \
@@ -328,6 +376,11 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
             }                                                       \
                                                                     \
             _msc = (mrfstr_double_t)_total / _count / 1000;         \
+                                                                    \
+            if (format == MRFSTR_BLIB_FORMAT_CSV)                   \
+                fprintf(file, "%lf\t",                              \
+                    tests[_i].size / (_msc * 1073741.824));         \
+                                                                    \
             printf(name "  %.2f%s: %lf ms"                          \
                 "\tspeed: %lf GB/s\t(%zu times)"                    \
                 "       \timprovement: %lfx\n",                     \
@@ -336,6 +389,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
                 tests[_i].ctest / _msc);                            \
         }                                                           \
                                                                     \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                       \
+            fputc('\n', file);                                      \
         puts("---------------------------------------");            \
     } while (0)
 
@@ -346,6 +401,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
 #define MRFSTR_BLIB_VARS                \
     LARGE_INTEGER freq;                 \
     mrfstr_short_t nsec, ntime, ncount; \
+    mrfstr_byte_t format;               \
+    FILE *file;                         \
     mrfstr_blib_test_t *tests
 
 #define MRFSTR_BLIB_FIRST                      \
@@ -363,6 +420,14 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         mrfstr_size_t _count;                                                  \
         mrfstr_byte_t _i;                                                      \
                                                                                \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
+        {                                                                      \
+            fputc('\t', file);                                                 \
+            for (_i = 0; _i < nsec; _i++)                                      \
+                fprintf(file, "%.2f%s\t",                                      \
+                    tests[_i].label_size, tests[_i].label);                    \
+            fputs("\nCSTR\t", file);                                           \
+        }                                                                      \
         for (_i = 0; _i < nsec; _i++)                                          \
         {                                                                      \
             _total.QuadPart = 0;                                               \
@@ -383,12 +448,19 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
                                                                                \
             tests[_i].ctest = (mrfstr_double_t)_total.QuadPart / _count *      \
                 1000 / freq.QuadPart;                                          \
+                                                                               \
+            if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
+                fprintf(file, "%lf\t",                                         \
+                    tests[_i].size / (tests[_i].ctest * 1073741.824));         \
+                                                                               \
             printf("CSTR   %.2f%s: %lf ms"                                     \
                 "\tspeed: %lf GB/s\t(%zu times)\n",                            \
                 tests[_i].label_size, tests[_i].label, tests[_i].ctest,        \
                 tests[_i].size / (tests[_i].ctest * 1073741.824), _count);     \
         }                                                                      \
                                                                                \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
+            fputc('\n', file);                                                 \
         puts("---------------------------------------");                       \
     } while (0)
 
@@ -400,6 +472,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
         mrfstr_double_t _msc;                                                  \
         mrfstr_byte_t _i;                                                      \
                                                                                \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
+            fprintf(file, "%s\t", name);                                       \
         for (_i = 0; _i < nsec; _i++)                                          \
         {                                                                      \
             _total.QuadPart = 0;                                               \
@@ -420,6 +494,11 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
                                                                                \
             _msc = (mrfstr_double_t)_total.QuadPart / _count *                 \
                 1000 / freq.QuadPart;                                          \
+                                                                               \
+            if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
+                fprintf(file, "%lf\t",                                         \
+                    tests[_i].size / (_msc * 1073741.824));                    \
+                                                                               \
             printf(name " %.2f%s: %lf ms"                                      \
                 "\tspeed: %lf GB/s\t(%zu times)"                               \
                 "       \timprovement: %lfx\n",                                \
@@ -428,6 +507,8 @@ typedef struct __MRFSTR_BLIB_TEST mrfstr_blib_test_t;
                 tests[_i].ctest / _msc);                                       \
         }                                                                      \
                                                                                \
+        if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
+            fputc('\n', file);                                                 \
         puts("---------------------------------------");                       \
     } while (0)
 

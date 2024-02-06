@@ -22,6 +22,8 @@ elseif (MSVC)
     set(CMAKE_C_FLAGS_DEBUG "/Od")
     set(CMAKE_C_FLAGS_RELEASE "/O2")
 
+    enable_language(ASM_MASM)
+
     try_run(_ _ ${PROJECT_SOURCE_DIR}/msvcsetup
         ${PROJECT_SOURCE_DIR}/msvcsetup.c
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
@@ -47,6 +49,12 @@ add_library(MRFStr
     srcs/io.c
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
+
+if (MSVC)
+    target_sources(MRFStr
+        PUBLIC cpuid/get_cputype.asm
+        PUBLIC cpuid/get_simdset.asm)
+endif()
 
 enable_testing()
 add_subdirectory(tests)

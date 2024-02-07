@@ -24,9 +24,16 @@ elseif (MSVC)
 
     enable_language(ASM_MASM)
 
-    try_run(_ _ ${PROJECT_SOURCE_DIR}/msvcsetup
-        ${PROJECT_SOURCE_DIR}/msvcsetup.c
+    try_run(RRES CRES ${PROJECT_SOURCE_DIR}/msvcsetup
+        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c ${PROJECT_SOURCE_DIR}/cpuid/get_simdset.asm
+        CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${PROJECT_SOURCE_DIR}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    if (NOT CRES)
+        message("Failed to compile the msvcsetup")
+    elseif (RRES)
+        message("Failed to run the msvcsetup")
+    endif()
+
     file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/msvcsetup)
 endif()
 
@@ -52,8 +59,8 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 if (MSVC)
     target_sources(MRFStr
-        PUBLIC cpuid/get_cputype.asm
-        PUBLIC cpuid/get_simdset.asm)
+        PRIVATE cpuid/get_cputype.asm
+        PRIVATE cpuid/get_simdset.asm)
 endif()
 
 enable_testing()

@@ -12,10 +12,15 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-; mrfstr_byte_t mrfstr_get_cputype(mrfstr_byte_t *family, mrfstr_byte_t *model)
+; mrfstr_byte_t mrfstr_cpuid_cputype(
+;     mrfstr_byte_t *family, mrfstr_byte_t *model)
+
+.data
+    _mrfstr_is_intel db 0
+    public _mrfstr_is_intel
 
 .code
-mrfstr_get_cputype proc
+mrfstr_cpuid_cputype proc
     push rbx
     mov r8, rcx
     mov r9, rdx
@@ -34,6 +39,7 @@ mrfstr_get_cputype proc
 
 VINTEL:
     mov r10d, 1         ; Set vendor id to 1 (Intel)
+    mov byte ptr [_mrfstr_is_intel], 1
     jmp FAMILY_MODEL
 
 VAMD:
@@ -45,12 +51,12 @@ FAMILY_MODEL:
     cpuid
 
     mov ebx, eax
-    mov r11d, eax
+    mov esi, eax
     shr ebx, 8
     and ebx, 0fh        ; FamilyID
-    shr r11d, 20
-    and r11d, 0ffh      ; ExtendedFamilyID
-    add ebx, r11d       ; FamilyID + ExtendedFamilyID
+    shr esi, 20
+    and esi, 0ffh      ; ExtendedFamilyID
+    lea ebx, [ebx+esi] ; FamilyID + ExtendedFamilyID
     mov [r8], ebx
 
     mov r11d, eax
@@ -64,5 +70,5 @@ FAMILY_MODEL:
     mov eax, r10d
     pop rbx
     ret
-mrfstr_get_cputype endp
+mrfstr_cpuid_cputype endp
 end

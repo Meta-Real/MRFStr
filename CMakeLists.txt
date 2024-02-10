@@ -27,7 +27,7 @@ elseif (MSVC)
     enable_language(ASM_MASM)
 
     try_run(RRES CRES ${PROJECT_SOURCE_DIR}/msvcsetup
-        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c ${PROJECT_SOURCE_DIR}/cpuid/get_simdset.asm
+        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c ${PROJECT_SOURCE_DIR}/cpuid/simdset.asm
         CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${PROJECT_SOURCE_DIR}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     if (NOT CRES)
@@ -61,14 +61,16 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_sources(MRFStr
-        PRIVATE cpuid/get_cputype.S
-        PRIVATE cpuid/get_simdset.S
-        PRIVATE cpuid/get_proccnt.S)
+        PRIVATE cpuid/cputype.S
+        PRIVATE cpuid/funccnt.S
+        PRIVATE cpuid/simdset.S
+        PRIVATE cpuid/proccnt.S)
 elseif (MSVC)
     target_sources(MRFStr
-        PRIVATE cpuid/get_cputype.asm
-        PRIVATE cpuid/get_simdset.asm
-        PRIVATE cpuid/get_proccnt.asm)
+        PRIVATE cpuid/cputype.asm
+        PRIVATE cpuid/funccnt.asm
+        PRIVATE cpuid/simdset.asm
+        PRIVATE cpuid/proccnt.asm)
 endif()
 
 enable_testing()

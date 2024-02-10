@@ -17,10 +17,6 @@ copies or substantial portions of the Software.
 #include <stdio.h>
 #include <cpuid/cpuid.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-#define MRFSTR_GCC_CLANG
-#endif
-
 int main(void)
 {
     FILE *header = fopen("heads/simddef.h", "w");
@@ -30,7 +26,7 @@ int main(void)
     fputs("#ifndef __MRFSTR_SIMDDEF__\n"
         "#define __MRFSTR_SIMDDEF__\n\n", header);
 
-    mrfstr_byte_t simd = mrfstr_get_simdset();
+    mrfstr_byte_t simd = mrfstr_cpuid_simdset();
     if (simd >= 1)
         fputs("#ifndef __SSE2__\n"
             "#define __SSE2__\n"

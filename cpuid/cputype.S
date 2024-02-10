@@ -12,11 +12,17 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-# mrfstr_byte_t mrfstr_get_cputype(mrfstr_byte_t *family, mrfstr_byte_t *model)
+# mrfstr_byte_t mrfstr_cpuid_cputype(
+#     mrfstr_byte_t *family, mrfstr_byte_t *model)
 
-    .globl mrfstr_get_cputype
+    .globl _mrfstr_is_intel
+    .bss
+_mrfstr_is_intel:
+    .space 1
 
-mrfstr_get_cputype:
+    .text
+    .globl mrfstr_cpuid_cputype
+mrfstr_cpuid_cputype:
     push %rbx
 #ifdef WIN32
     mov %rcx, %r8
@@ -37,6 +43,7 @@ mrfstr_get_cputype:
 
 VINTEL:
     mov $1, %r10d           # Set vendor id to 1 (Intel)
+    movb $1, _mrfstr_is_intel(%rip)
     jmp FAMILY_MODEL
 
 VAMD:

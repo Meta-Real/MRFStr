@@ -12,20 +12,36 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-# mrfstr_byte_t mrfstr_get_proccnt(mrfstr_byte_t *logical, mrfstr_bool_t is_intel)
+# mrfstr_byte_t mrfstr_cpuid_proccnt(
+#     mrfstr_byte_t *logical)
 
-    .globl mrfstr_get_proccnt
+    .extern _mrfstr_is_intel
 
-mrfstr_get_proccnt:
+    .globl mrfstr_cpuid_proccnt
+mrfstr_cpuid_proccnt:
     push %rbx
-
 #ifdef WIN32
     mov %rcx, %r8
 #endif
 
-    bt $0, %edx
-    jc INTEL
+    btw $0, _mrfstr_is_intel(%rip)
+    jnc AMD
 
+    mov $0xb, %eax
+    mov $1, %ecx
+    cpuid
+
+#ifdef WIN32
+    mov %ebx, (%r8)         # logical processors (on Intel)
+#else
+    mov %ebx, (%rsi)        # logical processors (on Intel)
+#endif
+#   mov %eax, %eax          # cores (on Intel)
+
+    pop %rbx
+    ret
+
+AMD:
     mov $1, %eax
     cpuid
 
@@ -42,21 +58,6 @@ mrfstr_get_proccnt:
 
     and $0xff, %ecx
     lea 1(%ecx), %eax       # cores (on AMD)
-
-    pop %rbx
-    ret
-
-INTEL:
-    mov $0xb, %eax
-    mov $1, %ecx
-    cpuid
-
-#ifdef WIN32
-    mov %ebx, (%r8)         # logical processors (on Intel)
-#else
-    mov %ebx, (%rsi)        # logical processors (on Intel)
-#endif
-#   mov %eax, %eax          # cores (on Intel)
 
     pop %rbx
     ret

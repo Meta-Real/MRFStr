@@ -12,16 +12,31 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-; mrfstr_byte_t mrfstr_get_proccnt(mrfstr_byte_t *logical, mrfstr_bool_t is_intel)
+; mrfstr_byte_t mrfstr_cpuid_proccnt(
+;     mrfstr_byte_t *logical)
+
+.data
+    extern _mrfstr_is_intel : db
 
 .code
-mrfstr_get_proccnt proc
+mrfstr_cpuid_proccnt proc
     push rbx
     mov r8, rcx
 
-    bt edx, 0
-    jc INTEL
+    bt word ptr [_mrfstr_is_intel], 0
+    jnc AMD
 
+    mov eax, 0bh
+    mov ecx, 1
+    cpuid
+
+    mov [r8], ebx       ; logical processors (on Intel)
+;   mov eax, eax        ; cores (on Intel)
+
+    pop rbx
+    ret
+
+AMD:
     mov eax, 1
     cpuid
 
@@ -37,16 +52,5 @@ mrfstr_get_proccnt proc
 
     pop rbx
     ret
-
-INTEL:
-    mov eax, 0bh
-    mov ecx, 1
-    cpuid
-
-    mov [r8], ebx       ; logical processors (on Intel)
-;   mov eax, eax        ; cores (on Intel)
-
-    pop rbx
-    ret
-mrfstr_get_proccnt endp
+mrfstr_cpuid_proccnt endp
 end

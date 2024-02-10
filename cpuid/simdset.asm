@@ -12,7 +12,7 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-; mrfstr_byte_t mrfstr_get_simdset(void)
+; mrfstr_byte_t mrfstr_cpuid_simdset(void)
 
 ; 1: SSE2 (guaranteed on x64 processors)
 ; 2: SSSE3
@@ -23,8 +23,11 @@
 ; 7: AVX512BW, AVX512VL
 ; 8: AVX512VBMI
 
+.data
+    extern _mrfstr_funccnt : db
+
 .code
-mrfstr_get_simdset proc
+mrfstr_cpuid_simdset proc
     push rbx
     mov r8d, 1
 
@@ -49,6 +52,9 @@ mrfstr_get_simdset proc
     cmp eax, 6
     jne LASTINST
     inc r8d             ; AVX
+
+    cmp byte ptr [_mrfstr_funccnt], 7
+    jb LASTINST
 
     mov eax, 7
     xor ecx, ecx
@@ -83,5 +89,5 @@ LASTINST:
     mov eax, r8d
     pop rbx
     ret
-mrfstr_get_simdset endp
+mrfstr_cpuid_simdset endp
 end

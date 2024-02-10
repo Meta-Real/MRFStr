@@ -26,8 +26,13 @@ enum __MRFSTR_CPUID_VENDOR_ENUM
     MRFSTR_CPUID_VENDOR_AMD
 };
 
-mrfstr_byte_t mrfstr_get_cputype(mrfstr_byte_t *family, mrfstr_byte_t *model);
-mrfstr_byte_t mrfstr_get_simdset(void);
-mrfstr_byte_t mrfstr_get_proccnt(mrfstr_byte_t *logical, mrfstr_bool_t is_intel);
+mrfstr_byte_t mrfstr_cpuid_cputype(
+    mrfstr_byte_t *family, mrfstr_byte_t *model);
+mrfstr_byte_t mrfstr_cpuid_funccnt(void);
+
+mrfstr_byte_t mrfstr_cpuid_simdset(void);
+
+mrfstr_byte_t mrfstr_cpuid_proccnt(
+    mrfstr_byte_t *logical);
 
 #endif

@@ -14,7 +14,7 @@
 
 ; mrfstr_byte_t mrfstr_get_simdset(void)
 
-; 1: SSE2
+; 1: SSE2 (guaranteed on x64 processors)
 ; 2: SSSE3
 ; 3: SSE4.1
 ; 4: AVX
@@ -26,18 +26,18 @@
 .code
 mrfstr_get_simdset proc
     push rbx
-    mov esi, 1
+    mov r8d, 1
 
     mov eax, 1
     cpuid
 
     bt ecx, 9
     jnc LASTINST
-    inc esi             ; SSSE3
+    inc r8d             ; SSSE3
 
     bt ecx, 19
     jnc LASTINST
-    inc esi             ; SSE4.1
+    inc r8d             ; SSE4.1
 
     bt ecx, 28
     jnc LASTINST
@@ -48,7 +48,7 @@ mrfstr_get_simdset proc
     and eax, 6
     cmp eax, 6
     jne LASTINST
-    inc esi             ; AVX
+    inc r8d             ; AVX
 
     mov eax, 7
     xor ecx, ecx
@@ -56,7 +56,7 @@ mrfstr_get_simdset proc
 
     bt ebx, 5
     jnc LASTINST
-    inc esi             ; AVX2
+    inc r8d             ; AVX2
 
     bt ebx, 16
     jnc LASTINST
@@ -67,21 +67,20 @@ mrfstr_get_simdset proc
     and eax, 0e0h
     cmp eax, 0e0h
     jne LASTINST
-    inc esi             ; AVX512F
+    inc r8d             ; AVX512F
 
     bt ebx, 30
     jnc LASTINST
     bt ebx, 31
     jnc LASTINST
-    inc esi             ; AVX512BW, AVX512VL
+    inc r8d             ; AVX512BW, AVX512VL
 
     bt ecx, 1
     jnc LASTINST
-    inc esi             ; AVX512VBMI
+    inc r8d             ; AVX512VBMI
 
 LASTINST:
-    mov eax, esi
-
+    mov eax, r8d
     pop rbx
     ret
 mrfstr_get_simdset endp

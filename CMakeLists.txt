@@ -17,6 +17,8 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
     set(CMAKE_C_FLAGS_DEBUG "-g")
     set(CMAKE_C_FLAGS_RELEASE "-O3")
+
+    enable_language(ASM)
 elseif (MSVC)
     set(CMAKE_C_FLAGS "/Wall /wd5045 /wd5105 /wd4324 /wd4820 /wd4710 /wd4711 /wd4996 /Zi /WX")
     set(CMAKE_C_FLAGS_DEBUG "/Od")
@@ -57,7 +59,11 @@ add_library(MRFStr
     srcs/str.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
-if (MSVC)
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    target_sources(MRFStr
+        PRIVATE cpuid/get_cputype.S
+        PRIVATE cpuid/get_simdset.S)
+elseif (MSVC)
     target_sources(MRFStr
         PRIVATE cpuid/get_cputype.asm
         PRIVATE cpuid/get_simdset.asm)

@@ -17,7 +17,6 @@
 .code
 mrfstr_get_cputype proc
     push rbx
-
     mov r8, rcx
     mov r9, rdx
 
@@ -30,15 +29,15 @@ mrfstr_get_cputype proc
     cmp ecx, 444d4163h  ; cAMD
     je VAMD
 
-    xor esi, esi        ; Set vendor id to 0 (unknown vendor)
+    xor r10d, r10d      ; Set vendor id to 0 (unknown vendor)
     jmp FAMILY_MODEL
 
 VINTEL:
-    mov esi, 1          ; Set vendor id to 1 (Intel)
+    mov r10d, 1         ; Set vendor id to 1 (Intel)
     jmp FAMILY_MODEL
 
 VAMD:
-    mov esi, 2          ; Set vendor id to 2 (AMD)
+    mov r10d, 2         ; Set vendor id to 2 (AMD)
     jmp FAMILY_MODEL
 
 FAMILY_MODEL:
@@ -46,25 +45,23 @@ FAMILY_MODEL:
     cpuid
 
     mov ebx, eax
-    mov edi, eax
-
+    mov r11d, eax
     shr ebx, 8
     and ebx, 0fh        ; FamilyID
-    shr edi, 20
-    and edi, 0ffh       ; ExtendedFamilyID
-    add ebx, edi        ; FamilyID + ExtendedFamilyID
+    shr r11d, 20
+    and r11d, 0ffh      ; ExtendedFamilyID
+    add ebx, r11d       ; FamilyID + ExtendedFamilyID
     mov [r8], ebx
 
-    mov edi, eax
-    shr edi, 4
-    and edi, 0fh        ; Model
+    mov r11d, eax
+    shr r11d, 4
+    and r11d, 0fh       ; Model
     shr eax, 12
     and eax, 0f0h       ; ExtendedModelId << 8
-    or eax, edi         ; (ExtendedModelId << 8) | Model
+    or eax, r11d        ; (ExtendedModelId << 8) | Model
     mov [r9], eax
 
-    mov eax, esi
-
+    mov eax, r10d
     pop rbx
     ret
 mrfstr_get_cputype endp

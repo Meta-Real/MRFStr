@@ -27,7 +27,10 @@ elseif (MSVC)
     enable_language(ASM_MASM)
 
     try_run(RRES CRES ${PROJECT_SOURCE_DIR}/msvcsetup
-        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c ${PROJECT_SOURCE_DIR}/cpuid/simdset.asm
+        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c
+        ${PROJECT_SOURCE_DIR}/cpuid/cputype.asm
+        ${PROJECT_SOURCE_DIR}/cpuid/funccnt.asm
+        ${PROJECT_SOURCE_DIR}/cpuid/simdset.asm
         CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${PROJECT_SOURCE_DIR}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     if (NOT CRES)

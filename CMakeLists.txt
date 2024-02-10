@@ -62,11 +62,13 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_sources(MRFStr
         PRIVATE cpuid/get_cputype.S
-        PRIVATE cpuid/get_simdset.S)
+        PRIVATE cpuid/get_simdset.S
+        PRIVATE cpuid/get_proccnt.S)
 elseif (MSVC)
     target_sources(MRFStr
         PRIVATE cpuid/get_cputype.asm
-        PRIVATE cpuid/get_simdset.asm)
+        PRIVATE cpuid/get_simdset.asm
+        PRIVATE cpuid/get_proccnt.asm)
 endif()
 
 enable_testing()

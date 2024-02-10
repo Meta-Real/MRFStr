@@ -28,5 +28,6 @@ enum __MRFSTR_CPUID_VENDOR_ENUM
 
 mrfstr_byte_t mrfstr_get_cputype(mrfstr_byte_t *family, mrfstr_byte_t *model);
 mrfstr_byte_t mrfstr_get_simdset(void);
+mrfstr_byte_t mrfstr_get_proccnt(mrfstr_byte_t *logical, mrfstr_bool_t is_intel);
 
 #endif

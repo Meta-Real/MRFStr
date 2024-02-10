@@ -18,7 +18,6 @@
 
 mrfstr_get_cputype:
     push %rbx
-
 #ifdef WIN32
     mov %rcx, %r8
     mov %rdx, %r9

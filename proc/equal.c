@@ -144,6 +144,8 @@ single:
             }
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;

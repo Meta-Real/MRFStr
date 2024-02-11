@@ -286,11 +286,11 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
-#define MRFSTR_BLIB_FIRST                      \
-    do                                         \
-    {                                          \
-        mrfstr_config_thread_count_max();      \
-        mrfstr_config_thread_limit(0x2000000); \
+#define MRFSTR_BLIB_FIRST                            \
+    do                                               \
+    {                                                \
+        mrfstr_config_thread_count_max(MRFSTR_TRUE); \
+        mrfstr_config_thread_limit(0x2000000);       \
     } while (0)
 
 #define MRFSTR_BLIB_ROUND_CSTR                                             \
@@ -405,12 +405,12 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
-#define MRFSTR_BLIB_FIRST                      \
-    do                                         \
-    {                                          \
-        QueryPerformanceFrequency(&freq);      \
-        mrfstr_config_thread_count_max();      \
-        mrfstr_config_thread_limit(0x1000000); \
+#define MRFSTR_BLIB_FIRST                            \
+    do                                               \
+    {                                                \
+        QueryPerformanceFrequency(&freq);            \
+        mrfstr_config_thread_count_max(MRFSTR_TRUE); \
+        mrfstr_config_thread_limit(0x1000000);       \
     } while (0)
 
 #define MRFSTR_BLIB_ROUND_CSTR                                                 \

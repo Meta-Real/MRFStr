@@ -51,7 +51,7 @@ int main(void)
     mrfstr_t str;
     mrfstr_bool_t first;
 
-    mrfstr_config_thread_count_max();
+    mrfstr_config_thread_count_max(MRFSTR_TRUE);
 
     MRFSTR_TLIB_INIT(str,);
     MRFSTR_TLIB_MEMSET(str, '0', MRFSTR_TEST4_SIZE);

@@ -15,11 +15,8 @@ copies or substantial portions of the Software.
 */
 
 #include <mrfstr-intern.h>
+#include <cpuid/cpuid.h>
 #include <string.h>
-
-#ifdef MRFSTR_BUILD_UNIX
-#include <unistd.h>
-#endif
 
 mrfstr_config_t _mrfstr_config =
 {
@@ -160,36 +157,34 @@ void mrfstr_config_stdalloc(
     _mrfstr_config.stdalloc = stdalloc;
 }
 
-void mrfstr_config_thread_count_max(void)
+void mrfstr_config_thread_count_max(
+    mrfstr_bool_t use_logical)
 {
-#ifdef MRFSTR_BUILD_UNIX
-    _mrfstr_config.tcount = sysconf(_SC_NPROCESSORS_ONLN);
-#elif defined(_WIN32)
-    SYSTEM_INFO info;
-
-    GetSystemInfo(&info);
-    _mrfstr_config.tcount = (mrfstr_byte_t)info.dwNumberOfProcessors;
-#endif
+    if (use_logical)
+        mrfstr_cpuid_proccnt(&_mrfstr_config.tcount);
+    else
+    {
+        mrfstr_byte_t dummy;
+        _mrfstr_config.tcount = mrfstr_cpuid_proccnt(&dummy);
+    }
 }
 
-mrfstr_byte_t mrfstr_config_get_thread_count(void)
+mrfstr_size_t mrfstr_config_get(
+    mrfstr_config_data_enum_t type)
 {
-    return _mrfstr_config.tcount;
-}
-
-mrfstr_size_t mrfstr_config_get_normal_limit(void)
-{
-    return _mrfstr_config.nlimit;
-}
-
-mrfstr_size_t mrfstr_config_get_thread_limit(void)
-{
-    return _mrfstr_config.tlimit;
-}
-
-mrfstr_short_t mrfstr_config_get_stdalloc(void)
-{
-    return _mrfstr_config.stdalloc;
+    switch (type)
+    {
+    case MRFSTR_CONFIG_DATA_THREAD_COUNT:
+        return _mrfstr_config.tcount - 1;
+    case MRFSTR_CONFIG_DATA_NORMAL_LIMIT:
+        return _mrfstr_config.nlimit;
+    case MRFSTR_CONFIG_DATA_THREAD_LIMIT:
+        return _mrfstr_config.tlimit;
+    case MRFSTR_CONFIG_DATA_STDALLOC:
+        return _mrfstr_config.stdalloc;
+    default:
+        return 0;
+    }
 }
 
 void mrfstr_config(

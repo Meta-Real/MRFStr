@@ -139,6 +139,8 @@ single:
             free(data);
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;

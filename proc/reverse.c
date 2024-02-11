@@ -157,6 +157,8 @@ void __mrfstr_rev(
             free(data);
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;
@@ -263,6 +265,8 @@ void __mrfstr_rev2(
             free(data);
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;

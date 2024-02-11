@@ -123,6 +123,8 @@ void __mrfstr_fill(
             free(data);
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;

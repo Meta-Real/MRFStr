@@ -383,6 +383,15 @@ enum __MRFSTR_CONFIG_SIMD_ENUM
 };
 typedef mrfstr_byte_t mrfstr_config_simd_enum_t;
 
+enum __MRFSTR_CONFIG_DATA_ENUM
+{
+    MRFSTR_CONFIG_DATA_THREAD_COUNT,
+    MRFSTR_CONFIG_DATA_NORMAL_LIMIT,
+    MRFSTR_CONFIG_DATA_THREAD_LIMIT,
+    MRFSTR_CONFIG_DATA_STDALLOC
+};
+typedef mrfstr_byte_t mrfstr_config_data_enum_t; 
+
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count(
     mrfstr_byte_t tcount);
 __MRFSTR_DECLSPEC void mrfstr_config_normal_limit(
@@ -392,12 +401,11 @@ __MRFSTR_DECLSPEC void mrfstr_config_thread_limit(
 __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
     mrfstr_short_t stdalloc);
 
-__MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(void);
+__MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(
+    mrfstr_bool_t use_logical);
 
-__MRFSTR_DECLSPEC mrfstr_byte_t mrfstr_config_get_thread_count(void);
-__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get_normal_limit(void);
-__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get_thread_limit(void);
-__MRFSTR_DECLSPEC mrfstr_short_t mrfstr_config_get_stdalloc(void);
+__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
+    mrfstr_config_data_enum_t type);
 
 __MRFSTR_DECLSPEC void mrfstr_config(
     mrfstr_config_type_enum_t type,

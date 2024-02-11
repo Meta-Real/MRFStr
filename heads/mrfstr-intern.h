@@ -247,6 +247,9 @@ typedef HANDLE mrfstr_mutex_p;
     threads[i] = CreateThread(NULL, 0, f, data, 0, NULL); \
     if (!threads[i])
 
+#define mrfstr_thread_priority \
+    SetThreadPriority(threads[i], THREAD_PRIORITY_HIGHEST)
+
 #define mrfstr_close_threads                                \
     do                                                      \
     {                                                       \

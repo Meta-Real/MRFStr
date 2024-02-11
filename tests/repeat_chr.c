@@ -37,7 +37,7 @@ int main(void)
     mrfstr_t res;
     mrfstr_data_t str;
 
-    mrfstr_config_thread_count_max();
+    mrfstr_config_thread_count_max(MRFSTR_TRUE);
 
     MRFSTR_TLIB_INIT(res,);
     MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));

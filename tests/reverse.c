@@ -52,7 +52,7 @@ int main(void)
     mrfstr_short_t j;
     mrfstr_bool_t first;
 
-    mrfstr_config_thread_count_max();
+    mrfstr_config_thread_count_max(MRFSTR_TRUE);
 
     MRFSTR_TLIB_INIT(str1,);
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));

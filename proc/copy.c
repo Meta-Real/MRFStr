@@ -127,6 +127,8 @@ void __mrfstr_copy(
             free(data);
             break;
         }
+
+        mrfstr_thread_priority;
     }
 
     tcount -= i;

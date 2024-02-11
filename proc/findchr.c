@@ -170,6 +170,8 @@ single:
 
             goto multi;
         }
+
+        mrfstr_thread_priority;
     }
 
     idx = _mrfstr_config.tfindchr_sub(&res, factor, str, chr, tcount);

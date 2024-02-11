@@ -24,23 +24,27 @@
 ; 8: AVX512VBMI
 
 .data
-    extern _mrfstr_funccnt : db
+    extern _funccnt : db
+    _simdset db 0
 
 .code
 mrfstr_cpuid_simdset proc
+    cmp byte ptr [_simdset], 0
+    jne SAVED
+
     push rbx
-    mov r8d, 1
+    mov r8b, 1
 
     mov eax, 1
     cpuid
 
     bt ecx, 9
     jnc LASTINST
-    inc r8d             ; SSSE3
+    inc r8b             ; SSSE3
 
     bt ecx, 19
     jnc LASTINST
-    inc r8d             ; SSE4.1
+    inc r8b             ; SSE4.1
 
     bt ecx, 28
     jnc LASTINST
@@ -51,9 +55,9 @@ mrfstr_cpuid_simdset proc
     and eax, 6
     cmp eax, 6
     jne LASTINST
-    inc r8d             ; AVX
+    inc r8b             ; AVX
 
-    cmp byte ptr [_mrfstr_funccnt], 7
+    cmp byte ptr [_funccnt], 7
     jb LASTINST
 
     mov eax, 7
@@ -62,7 +66,7 @@ mrfstr_cpuid_simdset proc
 
     bt ebx, 5
     jnc LASTINST
-    inc r8d             ; AVX2
+    inc r8b             ; AVX2
 
     bt ebx, 16
     jnc LASTINST
@@ -73,21 +77,27 @@ mrfstr_cpuid_simdset proc
     and eax, 0e0h
     cmp eax, 0e0h
     jne LASTINST
-    inc r8d             ; AVX512F
+    inc r8b             ; AVX512F
 
     bt ebx, 30
     jnc LASTINST
     bt ebx, 31
     jnc LASTINST
-    inc r8d             ; AVX512BW, AVX512VL
+    inc r8b             ; AVX512BW, AVX512VL
 
     bt ecx, 1
     jnc LASTINST
-    inc r8d             ; AVX512VBMI
+    inc r8b             ; AVX512VBMI
 
 LASTINST:
-    mov eax, r8d
+    mov al, r8b
+    mov [_simdset], al
+
     pop rbx
+    ret
+
+SAVED:
+    mov al, [_simdset]
     ret
 mrfstr_cpuid_simdset endp
 end

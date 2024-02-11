@@ -16,22 +16,28 @@
 ;     mrfstr_byte_t *logical)
 
 .data
-    extern _mrfstr_is_intel : db
+    extern _is_intel : db
+    _corecnt db 0
+    _logicnt db ?
 
 .code
 mrfstr_cpuid_proccnt proc
+    cmp byte ptr [_corecnt], 0
+    jne SAVED
+
     push rbx
     mov r8, rcx
 
-    bt word ptr [_mrfstr_is_intel], 0
+    bt word ptr [_is_intel], 0
     jnc AMD
 
     mov eax, 0bh
     mov ecx, 1
     cpuid
 
-    mov [r8], ebx       ; logical processors (on Intel)
-;   mov eax, eax        ; cores (on Intel)
+    mov [r8], bl        ; logical processors (on Intel)
+    mov [_logicnt], bl
+    mov [_corecnt], al  ; cores (on Intel)
 
     pop rbx
     ret
@@ -41,16 +47,22 @@ AMD:
     cpuid
 
     shr ebx, 16
-    and ebx, 0ffh
-    mov [r8], ebx       ; logical processors (on AMD)
+    mov [r8], bl        ; logical processors (on AMD)
+    mov [_logicnt], bl
 
     mov eax, 80000008h
     cpuid
 
-    and ecx, 0ffh
     lea eax, [ecx+1]    ; cores (on AMD)
+    mov [_corecnt], al
 
     pop rbx
+    ret
+
+SAVED:
+    mov dl, [_logicnt]
+    mov [rcx], dl
+    mov al, [_corecnt]
     ret
 mrfstr_cpuid_proccnt endp
 end

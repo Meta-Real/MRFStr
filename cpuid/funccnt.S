@@ -14,24 +14,28 @@
 
 # mrfstr_byte_t mrfstr_cpuid_funccnt(void)
 
-    .extern _mrfstr_is_intel
-    .globl _mrfstr_funccnt
+    .extern _is_intel
+
     .bss
-_mrfstr_funccnt:
-    .space 1
+    .globl _funccnt
+_funccnt:
+    .zero 1
 
     .text
     .globl mrfstr_cpuid_funccnt
 mrfstr_cpuid_funccnt:
+    cmpb $0, _funccnt(%rip)
+    jne SAVED
+
     push %rbx
 
-    btw $0, _mrfstr_is_intel(%rip)
+    btw $0, _is_intel(%rip)
     jnc AMD
 
     xor %eax, %eax
     cpuid
 
-    movb %al, _mrfstr_funccnt(%rip)
+    movb %al, _funccnt(%rip)
     pop %rbx
     ret
 
@@ -39,6 +43,10 @@ AMD:
     mov $0x80000000, %eax
     cpuid
 
-    movb %al, _mrfstr_funccnt(%rip)
+    movb %al, _funccnt(%rip)
     pop %rbx
+    ret
+
+SAVED:
+    mov _funccnt(%rip), %al
     ret

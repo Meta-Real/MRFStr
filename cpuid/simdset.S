@@ -23,23 +23,31 @@
 # 7: AVX512BW, AVX512VL
 # 8: AVX512VBMI
 
-    .extern _mrfstr_funccnt
+    .extern _funccnt
 
+    .bss
+_simdset:
+    .zero 1
+
+    .text
     .globl mrfstr_cpuid_simdset
 mrfstr_cpuid_simdset:
+    cmpb $0, _simdset(%rip)
+    jne SAVED
+
     push %rbx
-    mov $1, %r8d
+    mov $1, %r8b
 
     mov $1, %eax
     cpuid
 
     bt $9, %ecx
     jnc LASTINST
-    inc %r8d                # SSSE3
+    inc %r8b                # SSSE3
 
     bt $19, %ecx
     jnc LASTINST
-    inc %r8d                # SSE4.1
+    inc %r8b                # SSE4.1
 
     bt $28, %ecx
     jnc LASTINST
@@ -50,9 +58,9 @@ mrfstr_cpuid_simdset:
     and $6, %eax
     cmp $6, %eax
     jne LASTINST
-    inc %r8d                # AVX
+    inc %r8b                # AVX
 
-    cmpb $7, _mrfstr_funccnt(%rip)
+    cmpb $7, _funccnt(%rip)
     jb LASTINST
 
     mov $7, %eax
@@ -61,7 +69,7 @@ mrfstr_cpuid_simdset:
 
     bt $5, %ebx
     jnc LASTINST
-    inc %r8d                # AVX2
+    inc %r8b                # AVX2
 
     bt $16, %ebx
     jnc LASTINST
@@ -72,19 +80,23 @@ mrfstr_cpuid_simdset:
     and $0xe0, %eax
     cmp $0xe0, %eax
     jne LASTINST
-    inc %r8d                # AVX512F
+    inc %r8b                # AVX512F
 
     bt $30, %ebx
     jnc LASTINST
     bt $31, %ebx
     jnc LASTINST
-    inc %r8d                # AVX512BW, AVX512VL
+    inc %r8b                # AVX512BW, AVX512VL
 
     bt $1, %ecx
     jnc LASTINST
-    inc %r8d                # AVX512VBMI
+    inc %r8b                # AVX512VBMI
 
 LASTINST:
-    mov %r8d, %eax
+    mov %r8b, %al
     pop %rbx
+    ret
+
+SAVED:
+    mov _simdset(%rip), %al
     ret

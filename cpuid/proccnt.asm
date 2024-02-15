@@ -36,8 +36,8 @@ mrfstr_cpuid_proccnt proc
     cpuid
 
     mov [r8], bl        ; logical processors (on Intel)
-    mov [_logicnt], bl
     mov [_corecnt], al  ; cores (on Intel)
+    mov [_logicnt], bl
 
     pop rbx
     ret
@@ -60,8 +60,8 @@ AMD:
     ret
 
 SAVED:
-    mov dl, [_logicnt]
-    mov [rcx], dl
+    mov al, [_logicnt]
+    mov [rcx], al
     mov al, [_corecnt]
     ret
 mrfstr_cpuid_proccnt endp

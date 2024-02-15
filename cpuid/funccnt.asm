@@ -16,12 +16,12 @@
 
 .data
     extern _is_intel : db
-    _funccnt db 0ffh
+    _funccnt db 0
     public _funccnt
 
 .code
 mrfstr_cpuid_funccnt proc
-    cmp byte ptr [_funccnt], 0ffh
+    cmp byte ptr [_funccnt], 0
     jne SAVED
 
     push rbx

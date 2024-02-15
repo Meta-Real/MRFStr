@@ -15,18 +15,29 @@
 # mrfstr_byte_t mrfstr_cpuid_cputype(
 #     mrfstr_byte_t *family, mrfstr_byte_t *model)
 
-    .globl _mrfstr_is_intel
+    .data
+    .globl _is_intel
+_is_intel:
+    .byte 0xff
+
     .bss
-_mrfstr_is_intel:
-    .space 1
+_vendor:
+    .zero 1
+_family:
+    .zero 1
+_model:
+    .zero 1
 
     .text
     .globl mrfstr_cpuid_cputype
 mrfstr_cpuid_cputype:
+    cmpb $0xff, _is_intel(%rip)
+    jne SAVED
+
     push %rbx
 #ifdef WIN32
-    mov %rcx, %r8
-    mov %rdx, %r9
+    mov %rcx, %r10
+    mov %rdx, %r11
 #endif
 
     xor %eax, %eax
@@ -38,47 +49,69 @@ mrfstr_cpuid_cputype:
     cmp $0x444d4163, %ecx   # cAMD
     je VAMD
 
-    xor %r10d, %r10d        # Set vendor id to 0 (unknown vendor)
+    xor %r8b, %r8b          # Set vendor id to 0 (unknown vendor)
+    movb $0, _is_intel(%rip)
     jmp FAMILY_MODEL
 
 VINTEL:
-    mov $1, %r10d           # Set vendor id to 1 (Intel)
-    movb $1, _mrfstr_is_intel(%rip)
+    mov $1, %r8b            # Set vendor id to 1 (Intel)
+    movb $1, _is_intel(%rip)
     jmp FAMILY_MODEL
 
 VAMD:
-    mov $2, %r10d           # Set vendor id to 2 (AMD)
+    mov $2, %r8b            # Set vendor id to 2 (AMD)
+    movb $0, _is_intel(%rip)
     jmp FAMILY_MODEL
 
 FAMILY_MODEL:
+    mov %r8b, _vendor(%rip)
+
     mov $1, %eax
     cpuid
 
     mov %eax, %ebx
-    mov %eax, %r11d
+    mov %eax, %r9d
     shr $8, %ebx
     and $0xf, %ebx          # FamilyID
-    shr $20, %r11d
-    and $0xff, %r11d        # ExtendedFamilyID
-    add %r11d, %ebx         # FamilyID + ExtendedFamilyID
-#ifdef WIN32
-    mov %ebx, (%r8)
-#else
-    mov %ebx, (%rsi)
-#endif
+    shr $20, %r9d
+    and $0xff, %r9d         # ExtendedFamilyID
+    lea (%ebx, %r9d), %ebx  # FamilyID + ExtendedFamilyID
 
-    mov %eax, %ebx
-    shr $4, %ebx
-    and $0xf, %ebx          # Model
+#ifdef WIN32
+    mov %bl, (%r10)
+#else
+    mov %bl, (%rsi)
+#endif
+    mov %bl, _family(%rip)
+
+    mov %al, %bl
+    shr $4, %bl             # Model
     shr $12, %eax
-    and $0xf0, %eax         # ExtendedModelId << 8
-    or %ebx, %eax           # (ExtendedModelId << 8) | Model
+    and $0xf0, %al          # ExtendedModelId << 8
+    or %bl, %al             # (ExtendedModelId << 8) | Model
+
 #ifdef WIN32
-    mov %eax, (%r9)
+    mov %al, (%r11)
 #else
-    mov %eax, (%rdi)
+    mov %al, (%rdi)
+#endif
+    mov %al, _model(%rip)
+
+    mov %r8b, %al
+    pop %rbx
+    ret
+
+SAVED:
+    mov _family(%rip), %al
+#ifdef WIN32
+    mov %al, (%rcx)
+    mov _model(%rip), %al
+    mov %al, (%rdx)
+#else
+    mov %al, (%rsi)
+    mov _model(%rip), %al
+    mov %al, (%rdi)
 #endif
 
-    mov %r10d, %eax
-    pop %rbx
+    mov _vendor(%rip), %al
     ret

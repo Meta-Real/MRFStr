@@ -15,16 +15,26 @@
 # mrfstr_byte_t mrfstr_cpuid_proccnt(
 #     mrfstr_byte_t *logical)
 
-    .extern _mrfstr_is_intel
+    .extern _is_intel
 
+    .bss
+_corecnt:
+    .zero 1
+_logicnt:
+    .zero 1
+
+    .text
     .globl mrfstr_cpuid_proccnt
 mrfstr_cpuid_proccnt:
+    cmpb $0, _corecnt(%rip)
+    jne SAVED
+
     push %rbx
 #ifdef WIN32
     mov %rcx, %r8
 #endif
 
-    btw $0, _mrfstr_is_intel(%rip)
+    btw $0, _is_intel(%rip)
     jnc AMD
 
     mov $0xb, %eax
@@ -32,11 +42,12 @@ mrfstr_cpuid_proccnt:
     cpuid
 
 #ifdef WIN32
-    mov %ebx, (%r8)         # logical processors (on Intel)
+    mov %bl, (%r8)
 #else
-    mov %ebx, (%rsi)        # logical processors (on Intel)
+    mov %bl, (%rsi)         # logical processors (on Intel)
 #endif
-#   mov %eax, %eax          # cores (on Intel)
+    mov %al, _corecnt(%rip) # cores (on Intel)
+    mov %bl, _logicnt(%rip)
 
     pop %rbx
     ret
@@ -46,18 +57,30 @@ AMD:
     cpuid
 
     shr $16, %ebx
-    and $0xff, %ebx
+
 #ifdef WIN32
-    mov %ebx, (%r8)         # logical processors (on AMD)
+    mov %bl, (%r8)
 #else
-    mov %ebx, (%rsi)        # logical processors (on AMD)
+    mov %bl, (%rsi)         # logical processors (on AMD)
 #endif
+    mov %bl, _logicnt(%rip)
 
     mov $0x80000008, %eax
     cpuid
 
-    and $0xff, %ecx
     lea 1(%ecx), %eax       # cores (on AMD)
+    mov %al, _corecnt(%rip)
 
     pop %rbx
+    ret
+
+SAVED:
+    mov _logicnt(%rip), %al
+#ifdef WIN32
+    mov %al, (%rcx)
+#else
+    mov %al, (%rsi)
+#endif
+
+    mov _corecnt(%rip), %al
     ret

@@ -29,8 +29,8 @@ mrfstr_cpuid_cputype proc
     jne SAVED
 
     push rbx
-    mov r8, rcx
-    mov r9, rdx
+    mov r9, rcx
+    mov r10, rdx
 
     xor eax, eax
     cpuid
@@ -41,22 +41,22 @@ mrfstr_cpuid_cputype proc
     cmp ecx, 444d4163h  ; cAMD
     je VAMD
 
-    xor sil, sil        ; Set vendor id to 0 (unknown vendor)
+    xor r8b, r8b        ; Set vendor id to 0 (unknown vendor)
     mov byte ptr [_is_intel], 0
     jmp FAMILY_MODEL
 
 VINTEL:
-    mov sil, 1          ; Set vendor id to 1 (Intel)
+    mov r8b, 1          ; Set vendor id to 1 (Intel)
     mov byte ptr [_is_intel], 1
     jmp FAMILY_MODEL
 
 VAMD:
-    mov sil, 2          ; Set vendor id to 2 (AMD)
+    mov r8b, 2          ; Set vendor id to 2 (AMD)
     mov byte ptr [_is_intel], 0
     jmp FAMILY_MODEL
 
 FAMILY_MODEL:
-    mov [_vendor], sil
+    mov [_vendor], r8b
 
     mov eax, 1
     cpuid
@@ -67,26 +67,26 @@ FAMILY_MODEL:
     and ebx, 0fh        ; FamilyID
     shr edi, 20         ; ExtendedFamilyID
     lea ebx, [ebx+edi]  ; FamilyID + ExtendedFamilyID
-    mov [r8], bl
+    mov [r9], bl
     mov [_family], bl
 
-    mov dil, al
-    shr dil, 4          ; Model
+    mov bl, al
+    shr bl, 4           ; Model
     shr eax, 12
     and al, 0f0h        ; ExtendedModelId << 8
-    or al, dil          ; (ExtendedModelId << 8) | Model
-    mov [r9], al
+    or al, bl           ; (ExtendedModelId << 8) | Model
+    mov [r10], al
     mov [_model], al
 
-    mov al, sil
+    mov al, r8b
     pop rbx
     ret
 
 SAVED:
-    mov sil, [_family]
-    mov [rcx], sil
-    mov sil, [_model]
-    mov [rdx], sil
+    mov al, [_family]
+    mov [rcx], al
+    mov al, [_model]
+    mov [rdx], al
     mov al, [_vendor]
     ret
 mrfstr_cpuid_cputype endp

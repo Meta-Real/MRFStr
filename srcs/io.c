@@ -37,7 +37,7 @@ void mrfstr_n_export(
     fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stdout);
 }
 
-mrfstr_res_enum_t mrfstr_import(
+mrfstr_res_t mrfstr_import(
     mrfstr_t str)
 {
     mrfstr_data_t ptr;
@@ -89,7 +89,7 @@ mrfstr_res_enum_t mrfstr_import(
     }
 }
 
-mrfstr_res_enum_t mrfstr_n_import(
+mrfstr_res_t mrfstr_n_import(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (!size)
@@ -131,7 +131,7 @@ void mrfstr_n_fexport(
     fwrite(MRFSTR_DATA(str), sizeof(mrfstr_chr_t), size, stream);
 }
 
-mrfstr_res_enum_t mrfstr_fimport(
+mrfstr_res_t mrfstr_fimport(
     mrfstr_t str,
     FILE *stream)
 {
@@ -156,7 +156,7 @@ mrfstr_res_enum_t mrfstr_fimport(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_n_fimport(
+mrfstr_res_t mrfstr_n_fimport(
     mrfstr_t str,
     FILE *stream, mrfstr_size_t size)
 {

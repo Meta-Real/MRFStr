@@ -59,7 +59,7 @@ mrfstr_t mrfstr_init3(
     return str;
 }
 
-mrfstr_res_enum_t mrfstr_alloc(
+mrfstr_res_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size)
 {
     if (!size)
@@ -83,7 +83,7 @@ void mrfstr_clear(
     MRFSTR_FREE(str);
 }
 
-mrfstr_res_enum_t mrfstr_realloc(
+mrfstr_res_t mrfstr_realloc(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (size == MRFSTR_CAPA(str))
@@ -107,7 +107,7 @@ mrfstr_res_enum_t mrfstr_realloc(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_realloc(
+mrfstr_res_t mrfstr_clear_realloc(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (MRFSTR_CAPA(str) == size)
@@ -127,7 +127,7 @@ mrfstr_res_enum_t mrfstr_clear_realloc(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_expand(
+mrfstr_res_t mrfstr_expand(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (!MRFSTR_SIZE(str))
@@ -140,7 +140,7 @@ mrfstr_res_enum_t mrfstr_expand(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_expand(
+mrfstr_res_t mrfstr_clear_expand(
     mrfstr_t str, mrfstr_size_t size)
 {
     MRFSTR_CLEAR_REALLOC(str, size);
@@ -148,7 +148,7 @@ mrfstr_res_enum_t mrfstr_clear_expand(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_shrink(
+mrfstr_res_t mrfstr_shrink(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (!size)
@@ -163,7 +163,7 @@ mrfstr_res_enum_t mrfstr_shrink(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_clear_shrink(
+mrfstr_res_t mrfstr_clear_shrink(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (!size)

@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include <mrfstr-intern.h>
 
-mrfstr_res_enum_t mrfstr_replace_chr(
+mrfstr_res_t mrfstr_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr)
 {
@@ -53,7 +53,7 @@ mrfstr_res_enum_t mrfstr_replace_chr(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_n_replace_chr(
+mrfstr_res_t mrfstr_n_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)

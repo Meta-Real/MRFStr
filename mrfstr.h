@@ -112,7 +112,7 @@ enum __MRFSTR_RES_ENUM
     MRFSTR_RES_IDXOUT_ERROR,
     MRFSTR_RES_READ_ERROR
 };
-typedef mrfstr_byte_t mrfstr_res_enum_t;
+typedef mrfstr_byte_t mrfstr_res_t;
 
 /* init functions */
 
@@ -122,26 +122,26 @@ __MRFSTR_DECLSPEC mrfstr_t mrfstr_init2(
 __MRFSTR_DECLSPEC mrfstr_t mrfstr_init3(
     mrfstr_data_t data, mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_alloc(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size);
 __MRFSTR_DECLSPEC void mrfstr_free(
     mrfstr_t str);
 __MRFSTR_DECLSPEC void mrfstr_clear(
     mrfstr_t str);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_realloc(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_realloc(
     mrfstr_t str, mrfstr_size_t size);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_clear_realloc(
-    mrfstr_t str, mrfstr_size_t size);
-
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_expand(
-    mrfstr_t str, mrfstr_size_t size);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_clear_expand(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_clear_realloc(
     mrfstr_t str, mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_shrink(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_expand(
     mrfstr_t str, mrfstr_size_t size);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_clear_shrink(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_clear_expand(
+    mrfstr_t str, mrfstr_size_t size);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_shrink(
+    mrfstr_t str, mrfstr_size_t size);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_clear_shrink(
     mrfstr_t str, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC void mrfstr_swap(
@@ -149,16 +149,16 @@ __MRFSTR_DECLSPEC void mrfstr_swap(
 
 /* set functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_set(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_set_str(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_set_nstr(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src,
     mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_set_chr(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src);
 
 /* get functions */
@@ -170,53 +170,53 @@ __MRFSTR_DECLSPEC mrfstr_data_t mrfstr_n_get_str(
 
 /* concat functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_concat(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_concat(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_insert(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_idx_t idx);
 
 /* remove functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_remove(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_remove(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_idx_t idx);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_remove(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_remove(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_idx_t idx, mrfstr_size_t count);
 
 /* repeat functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_repeat(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_repeat(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_size_t count);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_repeat_chr(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_repeat_chr(
     mrfstr_t res, mrfstr_chr_t chr,
     mrfstr_size_t count);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_fill(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_fill(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t chr, mrfstr_size_t size);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_rfill(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_rfill(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* reverse functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_reverse(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_reverse(
     mrfstr_t res, mrfstr_ct str);
 
 /* replace functions */
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_replace_chr(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_replace_chr(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_replace_chr(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
@@ -305,7 +305,7 @@ inline void mrfstr_resize(
     MRFSTR_SIZE(str) = size;
 }
 
-inline mrfstr_res_enum_t mrfstr_get_chr(
+inline mrfstr_res_t mrfstr_get_chr(
     mrfstr_chr_t *chr,
     mrfstr_ct str, mrfstr_size_t idx)
 {
@@ -316,7 +316,7 @@ inline mrfstr_res_enum_t mrfstr_get_chr(
     return MRFSTR_RES_NOERROR;
 }
 
-inline mrfstr_res_enum_t mrfstr_modify_chr(
+inline mrfstr_res_t mrfstr_modify_chr(
     mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx)
 {
     if (idx >= MRFSTR_SIZE(str))
@@ -333,9 +333,9 @@ __MRFSTR_DECLSPEC void mrfstr_export(
 __MRFSTR_DECLSPEC void mrfstr_n_export(
     mrfstr_ct str, mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_import(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_import(
     mrfstr_t str);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_import(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_import(
     mrfstr_t str, mrfstr_size_t size);
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
@@ -346,10 +346,10 @@ __MRFSTR_DECLSPEC void mrfstr_n_fexport(
     FILE *stream,
     mrfstr_ct str, mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_fimport(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_fimport(
     mrfstr_t str,
     FILE *stream);
-__MRFSTR_DECLSPEC mrfstr_res_enum_t mrfstr_n_fimport(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_fimport(
     mrfstr_t str,
     FILE *stream, mrfstr_size_t size);
 #endif
@@ -372,7 +372,7 @@ enum __MRFSTR_CONFIG_TYPE_ENUM
 
     MRFSTR_CONFIG_TYPE_STRLEN
 };
-typedef mrfstr_byte_t mrfstr_config_type_enum_t;
+typedef mrfstr_byte_t mrfstr_config_type_t;
 
 enum __MRFSTR_CONFIG_SIMD_ENUM
 {
@@ -381,7 +381,7 @@ enum __MRFSTR_CONFIG_SIMD_ENUM
     MRFSTR_CONFIG_SIMD_SSE,
     MRFSTR_CONFIG_SIMD_NONE
 };
-typedef mrfstr_byte_t mrfstr_config_simd_enum_t;
+typedef mrfstr_byte_t mrfstr_config_simd_t;
 
 enum __MRFSTR_CONFIG_DATA_ENUM
 {
@@ -390,7 +390,17 @@ enum __MRFSTR_CONFIG_DATA_ENUM
     MRFSTR_CONFIG_DATA_THREAD_LIMIT,
     MRFSTR_CONFIG_DATA_STDALLOC
 };
-typedef mrfstr_byte_t mrfstr_config_data_enum_t; 
+typedef mrfstr_byte_t mrfstr_config_data_t; 
+
+enum __MRFSTR_CONFIG_PRIORITY_ENUM
+{
+    MRFSTR_CONFIG_PRIORITY_LOWEST,
+    MRFSTR_CONFIG_PRIORITY_LOW,
+    MRFSTR_CONFIG_PRIORITY_NORMAL,
+    MRFSTR_CONFIG_PRIORITY_HIGH,
+    MRFSTR_CONFIG_PRIORITY_HIGHEST
+};
+typedef mrfstr_byte_t mrfstr_config_priority_t;
 
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count(
     mrfstr_byte_t tcount);
@@ -403,17 +413,19 @@ __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
 
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(
     mrfstr_bool_t use_logical);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_thread_priority(
+    mrfstr_config_priority_t priority);
 
 __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
-    mrfstr_config_data_enum_t type);
+    mrfstr_config_data_t type);
 
 __MRFSTR_DECLSPEC void mrfstr_config(
-    mrfstr_config_type_enum_t type,
-    mrfstr_config_simd_enum_t normal,
-    mrfstr_config_simd_enum_t threaded);
+    mrfstr_config_type_t type,
+    mrfstr_config_simd_t normal,
+    mrfstr_config_simd_t threaded);
 __MRFSTR_DECLSPEC void mrfstr_config_str(
-    mrfstr_config_type_enum_t type,
-    mrfstr_config_simd_enum_t simd);
+    mrfstr_config_type_t type,
+    mrfstr_config_simd_t simd);
 
 #ifdef __cplusplus
 }

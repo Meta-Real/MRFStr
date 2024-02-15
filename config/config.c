@@ -43,7 +43,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_countchr, 64,
     __mrfstr_avx512_tcontchr, __mrfstr_avx512_tfindchr,
     __mrfstr_avx512_countchr, 64,
-    __mrfstr_avx512_strlen, 64
+    __mrfstr_avx512_strlen, 64,
 #elif defined(__AVX__)
     __mrfstr_avx_bcopy, __mrfstr_avx_copy,
     __mrfstr_avx_brcopy, __mrfstr_avx_rcopy,
@@ -72,7 +72,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_countchr, 16,
     __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr,
     __mrfstr_sse_countchr, 16,
-    __mrfstr_sse_strlen, 16
+    __mrfstr_sse_strlen, 16,
 #endif
 #elif defined(__SSE2__)
     __mrfstr_sse_bcopy, __mrfstr_sse_copy,
@@ -99,7 +99,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_countchr, 16,
     __mrfstr_sse_tcontchr, __mrfstr_sse_tfindchr,
     __mrfstr_sse_countchr, 16,
-    __mrfstr_sse_strlen, 16
+    __mrfstr_sse_strlen, 16,
 #else
     __mrfstr_base_copy, __mrfstr_base_copy,
     __mrfstr_base_rcopy, __mrfstr_base_rcopy,
@@ -115,7 +115,12 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_base_countchr, 8,
     __mrfstr_base_tcontchr, __mrfstr_base_tfindchr,
     __mrfstr_base_countchr, 8,
-    __mrfstr_base_strlen, 8
+    __mrfstr_base_strlen, 8,
+#endif
+#ifdef MRFSTR_BUILD_UNIX
+    0
+#elif defined(_WIN32)
+    THREAD_PRIORITY_NORMAL
 #endif
 };
 
@@ -169,8 +174,73 @@ void mrfstr_config_thread_count_max(
     }
 }
 
+mrfstr_res_t mrfstr_config_thread_priority(
+    mrfstr_config_priority_t priority)
+{
+#ifdef MRFSTR_BUILD_UNIX
+    int policy;
+    mrfstr_byte_t pmax, pmin;
+    pthread_attr_t attr;
+
+    if (priority == MRFSTR_CONFIG_PRIORITY_NORMAL)
+    {
+        _mrfstr_config.tprior = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (pthread_attr_init(&attr))
+        return MRFSTR_RES_MEM_ERROR;
+
+    policy = 0;
+    pthread_attr_getschedpolicy(&attr, &policy);
+    pthread_attr_destroy(&attr);
+
+    pmin = sched_get_priority_max(policy);
+    pmax = sched_get_priority_min(policy);
+
+    switch (priority)
+    {
+    case MRFSTR_CONFIG_PRIORITY_LOWEST:
+        _mrfstr_config.tprior = pmin;
+        break;
+    case MRFSTR_CONFIG_PRIORITY_LOW:
+        _mrfstr_config.tprior = (mrfstr_byte_t)
+            ((((mrfstr_short_t)pmin << 1) + pmax) / 3);
+        break;
+    case MRFSTR_CONFIG_PRIORITY_HIGH:
+        _mrfstr_config.tprior = (mrfstr_byte_t)
+            ((pmin + ((mrfstr_short_t)pmax << 1)) / 3);
+        break;
+    case MRFSTR_CONFIG_PRIORITY_HIGHEST:
+        _mrfstr_config.tprior = pmax;
+        break;
+    }
+#elif defined(_WIN32)
+    switch (priority)
+    {
+    case MRFSTR_CONFIG_PRIORITY_LOWEST:
+        _mrfstr_config.tprior = THREAD_PRIORITY_LOWEST;
+        break;
+    case MRFSTR_CONFIG_PRIORITY_LOW:
+        _mrfstr_config.tprior = THREAD_PRIORITY_BELOW_NORMAL;
+        break;
+    case MRFSTR_CONFIG_PRIORITY_NORMAL:
+        _mrfstr_config.tprior = THREAD_PRIORITY_NORMAL;
+        break;
+    case MRFSTR_CONFIG_PRIORITY_HIGH:
+        _mrfstr_config.tprior = THREAD_PRIORITY_ABOVE_NORMAL;
+        break;
+    case MRFSTR_CONFIG_PRIORITY_HIGHEST:
+        _mrfstr_config.tprior = THREAD_PRIORITY_HIGHEST;
+        break;
+    }
+#endif
+
+    return MRFSTR_RES_NOERROR;
+}
+
 mrfstr_size_t mrfstr_config_get(
-    mrfstr_config_data_enum_t type)
+    mrfstr_config_data_t type)
 {
     switch (type)
     {
@@ -188,9 +258,9 @@ mrfstr_size_t mrfstr_config_get(
 }
 
 void mrfstr_config(
-    mrfstr_config_type_enum_t type,
-    mrfstr_config_simd_enum_t normal,
-    mrfstr_config_simd_enum_t threaded)
+    mrfstr_config_type_t type,
+    mrfstr_config_simd_t normal,
+    mrfstr_config_simd_t threaded)
 {
     switch (type)
     {
@@ -514,8 +584,8 @@ void mrfstr_config(
 }
 
 void mrfstr_config_str(
-    mrfstr_config_type_enum_t type,
-    mrfstr_config_simd_enum_t simd)
+    mrfstr_config_type_t type,
+    mrfstr_config_simd_t simd)
 {
     switch (type)
     {

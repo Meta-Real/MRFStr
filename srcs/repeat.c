@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
-mrfstr_res_enum_t mrfstr_repeat(
+mrfstr_res_t mrfstr_repeat(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_size_t count)
 {
@@ -72,7 +72,7 @@ mrfstr_res_enum_t mrfstr_repeat(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_repeat_chr(
+mrfstr_res_t mrfstr_repeat_chr(
     mrfstr_t res, mrfstr_chr_t chr,
     mrfstr_size_t count)
 {
@@ -87,7 +87,7 @@ mrfstr_res_enum_t mrfstr_repeat_chr(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_fill(
+mrfstr_res_t mrfstr_fill(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t chr, mrfstr_size_t size)
 {
@@ -140,7 +140,7 @@ mrfstr_res_enum_t mrfstr_fill(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_rfill(
+mrfstr_res_t mrfstr_rfill(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_chr_t chr, mrfstr_size_t size)
 {

@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include <mrfstr-intern.h>
 
-mrfstr_res_enum_t mrfstr_reverse(
+mrfstr_res_t mrfstr_reverse(
     mrfstr_t res, mrfstr_ct str)
 {
     if (res == str)

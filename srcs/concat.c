@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include <mrfstr-intern.h>
 
-mrfstr_res_enum_t mrfstr_concat(
+mrfstr_res_t mrfstr_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2)
 {
     mrfstr_size_t size;
@@ -104,7 +104,7 @@ mrfstr_res_enum_t mrfstr_concat(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_n_concat(
+mrfstr_res_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_size_t size)
 {
@@ -162,7 +162,7 @@ mrfstr_res_enum_t mrfstr_n_concat(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_insert(
+mrfstr_res_t mrfstr_insert(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
     mrfstr_idx_t idx)
 {

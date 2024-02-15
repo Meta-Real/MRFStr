@@ -1,5 +1,5 @@
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_FLAGS "-lm")
+    set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -O3 -lm -march=native")
 endif()
 
 add_executable(BSet set.c)

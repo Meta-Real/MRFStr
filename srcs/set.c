@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 #include <string.h>
 
-mrfstr_res_enum_t mrfstr_set(
+mrfstr_res_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src)
 {
     if (dst == src)
@@ -34,7 +34,7 @@ mrfstr_res_enum_t mrfstr_set(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_str(
+mrfstr_res_t mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src)
 {
     MRFSTR_SIZE(dst) = mrfstr_strlen(src);
@@ -48,7 +48,7 @@ mrfstr_res_enum_t mrfstr_set_str(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_nstr(
+mrfstr_res_t mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
@@ -63,7 +63,7 @@ mrfstr_res_enum_t mrfstr_set_nstr(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_enum_t mrfstr_set_chr(
+mrfstr_res_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src)
 {
     if (!MRFSTR_CAPA(dst))

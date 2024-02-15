@@ -189,6 +189,8 @@ struct __MRFSTR_CONFIG_T
     mrfstr_size_t (*strlen_sub)(
         mrfstr_data_ct);
     mrfstr_byte_t strlen_size;
+
+    mrfstr_sbyte_t tprior;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
@@ -221,6 +223,20 @@ typedef mrfstr_mutex_t *mrfstr_mutex_p;
 #define mrfstr_create_thread(f) \
     if (pthread_create(threads + i, NULL, f, data))
 
+#define mrfstr_thread_priority                                  \
+    do                                                          \
+    {                                                           \
+        if (_mrfstr_config.tprior)                              \
+        {                                                       \
+            int policy;                                         \
+            struct sched_param param;                           \
+                                                                \
+            pthread_getschedparam(threads[i], &policy, &param); \
+            param.sched_priority = _mrfstr_config.tprior;       \
+            pthread_setschedparam(threads[i], policy, &param);  \
+        }                                                       \
+    } while (0)
+
 #define mrfstr_close_threads \
     while (i)                \
         pthread_join(threads[--i], NULL)
@@ -247,8 +263,12 @@ typedef HANDLE mrfstr_mutex_p;
     threads[i] = CreateThread(NULL, 0, f, data, 0, NULL); \
     if (!threads[i])
 
-#define mrfstr_thread_priority \
-    SetThreadPriority(threads[i], THREAD_PRIORITY_HIGHEST)
+#define mrfstr_thread_priority                                    \
+    do                                                            \
+    {                                                             \
+        if (_mrfstr_config.tprior != THREAD_PRIORITY_NORMAL)      \
+            SetThreadPriority(threads[i], _mrfstr_config.tprior); \
+    } while (0)
 
 #define mrfstr_close_threads                                \
     do                                                      \

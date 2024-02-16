@@ -28,11 +28,14 @@ enum __MRFSTR_CPUID_VENDOR_ENUM
 
 mrfstr_byte_t mrfstr_cpuid_cputype(
     mrfstr_byte_t *family, mrfstr_byte_t *model);
-mrfstr_byte_t mrfstr_cpuid_funccnt(void);
+mrfstr_byte_t mrfstr_cpuid_funccnt(
+    mrfstr_byte_t *ext);
 
 mrfstr_byte_t mrfstr_cpuid_simdset(void);
 
 mrfstr_byte_t mrfstr_cpuid_proccnt(
     mrfstr_byte_t *logical);
+
+mrfstr_short_t mrfstr_cpuid_cacheline(void);
 
 #endif

@@ -26,9 +26,8 @@ int main(void)
     fputs("#ifndef __MRFSTR_SIMDDEF__\n"
         "#define __MRFSTR_SIMDDEF__\n\n", header);
 
-    mrfstr_byte_t dummy;
-    mrfstr_cpuid_cputype(&dummy, &dummy);
-    mrfstr_cpuid_funccnt();
+    mrfstr_cpuid_cputype(NULL, NULL);
+    mrfstr_cpuid_funccnt(NULL);
 
     mrfstr_byte_t simd = mrfstr_cpuid_simdset();
     if (simd >= 1)

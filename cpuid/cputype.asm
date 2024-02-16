@@ -67,7 +67,12 @@ FAMILY_MODEL:
     and ebx, 0fh        ; FamilyID
     shr edi, 20         ; ExtendedFamilyID
     lea ebx, [ebx+edi]  ; FamilyID + ExtendedFamilyID
+
+    test r9, r9
+    jz _FAMILY_ 
     mov [r9], bl
+
+_FAMILY_:
     mov [_family], bl
 
     mov bl, al
@@ -75,7 +80,12 @@ FAMILY_MODEL:
     shr eax, 12
     and al, 0f0h        ; ExtendedModelId << 8
     or al, bl           ; (ExtendedModelId << 8) | Model
+
+    test r10, r10
+    jz _MODEL_
     mov [r10], al
+
+_MODEL_:
     mov [_model], al
 
     mov al, r8b
@@ -83,10 +93,20 @@ FAMILY_MODEL:
     ret
 
 SAVED:
+    test rcx, rcx
+    jz _MODEL_S
+
     mov al, [_family]
     mov [rcx], al
+
+_MODEL_S:
+    test rcx, rcx
+    jz _VENDOR_S
+
     mov al, [_model]
     mov [rdx], al
+
+_VENDOR_S:
     mov al, [_vendor]
     ret
 mrfstr_cpuid_cputype endp

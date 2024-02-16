@@ -35,7 +35,11 @@ mrfstr_cpuid_proccnt proc
     mov ecx, 1
     cpuid
 
+    test r8, r8
+    jz _CORECNT_
     mov [r8], bl        ; logical processors (on Intel)
+
+_CORECNT_:
     mov [_corecnt], al  ; cores (on Intel)
     mov [_logicnt], bl
 
@@ -47,7 +51,12 @@ AMD:
     cpuid
 
     shr ebx, 16
+
+    test r8, r8
+    jz _LOGICNT_
     mov [r8], bl        ; logical processors (on AMD)
+
+_LOGICNT_:
     mov [_logicnt], bl
 
     mov eax, 80000008h
@@ -60,8 +69,13 @@ AMD:
     ret
 
 SAVED:
+    test rcx, rcx
+    jz _CORECNT_S
+
     mov al, [_logicnt]
     mov [rcx], al
+
+_CORECNT_S:
     mov al, [_corecnt]
     ret
 mrfstr_cpuid_proccnt endp

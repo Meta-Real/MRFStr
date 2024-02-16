@@ -12,51 +12,41 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-; mrfstr_byte_t mrfstr_cpuid_funccnt(
-;     mrfstr_byte_t *ext)
+; mrfstr_short_t mrfstr_cpuid_cacheline(void)
 
 .data
-    _funccnt db 0
-    _extcnt db ?
-    public _funccnt
-    public _extcnt
+    _cacheline dw 0
 
 .code
-mrfstr_cpuid_funccnt proc
-    cmp byte ptr [_funccnt], 0
+mrfstr_cpuid_cacheline proc
+    cmp word ptr [_cacheline], 0
     jne SAVED
 
     push rbx
-    mov r8, rcx
 
-    xor eax, eax
+    mov eax, 1
     cpuid
 
-    mov [_funccnt], al  ; function count
+    bt edx, 19
+    jnc NOCLFSH
 
-    mov eax, 80000000h
-    cpuid
+    shr bx, 5
+    and bx, 7f8h
+    mov ax, bx
+    mov word ptr [_cacheline], bx
 
-    test r8, r8
-    jz _EXTCNT_
-    mov [r8], al       ; extended function count
+    pop rbx
+    ret
 
-_EXTCNT_:
-    mov [_extcnt], al
+NOCLFSH:
+    mov ax, 32
+    mov word ptr [_cacheline], ax
 
-    mov al, [_funccnt]
     pop rbx
     ret
 
 SAVED:
-    test rcx, rcx
-    jz _FUNCCNT_S
-
-    mov al, [_extcnt]
-    mov [rcx], al
-
-_FUNCCNT_S:
-    mov al, [_funccnt]
+    mov ax, word ptr [_cacheline]
     ret
-mrfstr_cpuid_funccnt endp
+mrfstr_cpuid_cacheline endp
 end

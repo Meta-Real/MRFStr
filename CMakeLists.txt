@@ -73,7 +73,8 @@ elseif (MSVC)
         PRIVATE cpuid/cputype.asm
         PRIVATE cpuid/funccnt.asm
         PRIVATE cpuid/simdset.asm
-        PRIVATE cpuid/proccnt.asm)
+        PRIVATE cpuid/proccnt.asm
+        PRIVATE cpuid/cacheline.asm)
 endif()
 
 enable_testing()

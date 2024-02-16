@@ -168,10 +168,7 @@ void mrfstr_config_thread_count_max(
     if (use_logical)
         mrfstr_cpuid_proccnt(&_mrfstr_config.tcount);
     else
-    {
-        mrfstr_byte_t dummy;
-        _mrfstr_config.tcount = mrfstr_cpuid_proccnt(&dummy);
-    }
+        _mrfstr_config.tcount = mrfstr_cpuid_proccnt(NULL);
 }
 
 mrfstr_res_t mrfstr_config_thread_priority(

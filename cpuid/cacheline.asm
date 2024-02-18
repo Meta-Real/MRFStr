@@ -39,7 +39,7 @@ mrfstr_cpuid_cacheline proc
     ret
 
 NOCLFSH:
-    mov ax, 32
+    mov ax, 64
     mov word ptr [_cacheline], ax
 
     pop rbx

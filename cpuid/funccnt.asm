@@ -29,11 +29,6 @@ mrfstr_cpuid_funccnt proc
     push rbx
     mov r8, rcx
 
-    xor eax, eax
-    cpuid
-
-    mov [_funccnt], al  ; function count
-
     mov eax, 80000000h
     cpuid
 
@@ -44,7 +39,11 @@ mrfstr_cpuid_funccnt proc
 _EXTCNT_:
     mov [_extcnt], al
 
-    mov al, [_funccnt]
+    xor eax, eax
+    cpuid
+
+    mov [_funccnt], al  ; function count
+
     pop rbx
     ret
 

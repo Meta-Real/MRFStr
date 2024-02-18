@@ -15,12 +15,12 @@
 # mrfstr_byte_t mrfstr_cpuid_cputype(
 #     mrfstr_byte_t *family, mrfstr_byte_t *model)
 
-    .data
+.data
     .globl _is_intel
 _is_intel:
     .byte 0xff
 
-    .bss
+.bss
 _vendor:
     .zero 1
 _family:
@@ -28,7 +28,7 @@ _family:
 _model:
     .zero 1
 
-    .text
+.text
     .globl mrfstr_cpuid_cputype
 mrfstr_cpuid_cputype:
     cmpb $0xff, _is_intel(%rip)
@@ -78,10 +78,16 @@ FAMILY_MODEL:
     lea (%ebx, %r9d), %ebx  # FamilyID + ExtendedFamilyID
 
 #ifdef WIN32
+    test %r10, %r10
+    jz _FAMILY_
     mov %bl, (%r10)
 #else
+    test %rsi, %rsi
+    jz _FAMILY_
     mov %bl, (%rsi)
 #endif
+
+_FAMILY_:
     mov %bl, _family(%rip)
 
     mov %al, %bl
@@ -91,10 +97,16 @@ FAMILY_MODEL:
     or %bl, %al             # (ExtendedModelId << 8) | Model
 
 #ifdef WIN32
+    test %r11, %r11
+    jz _MODEL_
     mov %al, (%r11)
 #else
+    test %rdi, %rdi
+    jz _MODEL_
     mov %al, (%rdi)
 #endif
+
+_MODEL_:
     mov %al, _model(%rip)
 
     mov %r8b, %al
@@ -102,16 +114,34 @@ FAMILY_MODEL:
     ret
 
 SAVED:
-    mov _family(%rip), %al
 #ifdef WIN32
+    test %rcx, %rcx
+    jz _MODEL_S
+
+    mov _family(%rip), %al
     mov %al, (%rcx)
+
+_MODEL_S:
+    test %rdx, %rdx
+    jz _VENDOR_S
+
     mov _model(%rip), %al
     mov %al, (%rdx)
 #else
+    test %rsi, %rsi
+    jz _MODEL_S
+
+    mov _family(%rip), %al
     mov %al, (%rsi)
+
+_MODEL_S:
+    test %rdi, %rdi
+    jz _VENDOR_S
+
     mov _model(%rip), %al
     mov %al, (%rdi)
 #endif
 
+_VENDOR_S:
     mov _vendor(%rip), %al
     ret

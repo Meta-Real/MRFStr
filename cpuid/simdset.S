@@ -25,11 +25,11 @@
 
     .extern _funccnt
 
-    .bss
+.bss
 _simdset:
     .zero 1
 
-    .text
+.text
     .globl mrfstr_cpuid_simdset
 mrfstr_cpuid_simdset:
     cmpb $0, _simdset(%rip)

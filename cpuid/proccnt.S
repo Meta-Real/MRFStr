@@ -17,13 +17,13 @@
 
     .extern _is_intel
 
-    .bss
+.bss
 _corecnt:
-    .zero 1
+    .byte 0
 _logicnt:
     .zero 1
 
-    .text
+.text
     .globl mrfstr_cpuid_proccnt
 mrfstr_cpuid_proccnt:
     cmpb $0, _corecnt(%rip)
@@ -42,10 +42,16 @@ mrfstr_cpuid_proccnt:
     cpuid
 
 #ifdef WIN32
+    test %r8, %r8
+    jz _CORECNT_
     mov %bl, (%r8)
 #else
+    test %rsi, %rsi
+    jz _CORECNT_
     mov %bl, (%rsi)         # logical processors (on Intel)
 #endif
+
+_CORECNT_:
     mov %al, _corecnt(%rip) # cores (on Intel)
     mov %bl, _logicnt(%rip)
 
@@ -59,10 +65,16 @@ AMD:
     shr $16, %ebx
 
 #ifdef WIN32
+    test %r8, %r8
+    jz _LOGICNT_
     mov %bl, (%r8)
 #else
+    test %rsi, %rsi
+    jz _LOGICNT_
     mov %bl, (%rsi)         # logical processors (on AMD)
 #endif
+
+_LOGICNT_:
     mov %bl, _logicnt(%rip)
 
     mov $0x80000008, %eax
@@ -75,12 +87,20 @@ AMD:
     ret
 
 SAVED:
-    mov _logicnt(%rip), %al
 #ifdef WIN32
+    test %rcx, %rcx
+    jz _CORECNT_S
+
+    mov _logicnt(%rip), %al
     mov %al, (%rcx)
 #else
+    test %rsi, %rsi
+    jz _CORECNT_S
+
+    mov _logicnt(%rip), %al
     mov %al, (%rsi)
 #endif
 
+_CORECNT_S:
     mov _corecnt(%rip), %al
     ret

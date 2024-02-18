@@ -12,41 +12,67 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-# mrfstr_byte_t mrfstr_cpuid_funccnt(void)
+# mrfstr_byte_t mrfstr_cpuid_funccnt(
+#     mrfstr_byte_t *ext)
 
-    .extern _is_intel
-
-    .bss
+.bss
     .globl _funccnt
+    .globl _extcnt
 _funccnt:
+    .byte 0
+_extcnt:
     .zero 1
 
-    .text
+.text
     .globl mrfstr_cpuid_funccnt
 mrfstr_cpuid_funccnt:
     cmpb $0, _funccnt(%rip)
     jne SAVED
 
     push %rbx
+#ifdef WIN32
+    mov %rcx, %r8
+#endif
 
-    btw $0, _is_intel(%rip)
-    jnc AMD
+    mov $0x80000000, %eax
+    cpuid
+
+#ifdef WIN32
+    test %r8, %r8
+    jz _EXTCNT_
+    mov %al, (%r8)          # extended function count
+#else
+    test %rsi, %rsi
+    jz _EXTCNT_
+    mov %al, (%rsi)
+#endif
+
+_EXTCNT_:
+    mov %al, _extcnt(%rip)
 
     xor %eax, %eax
     cpuid
 
-    movb %al, _funccnt(%rip)
-    pop %rbx
-    ret
+    mov %al, _funccnt(%rip) # function count
 
-AMD:
-    mov $0x80000000, %eax
-    cpuid
-
-    movb %al, _funccnt(%rip)
     pop %rbx
     ret
 
 SAVED:
+#ifdef WIN32
+    test %rcx, %rcx
+    jz _FUNCCNT_S
+
+    mov _extcnt(%rip), %al
+    mov %al, (%rcx)
+#else
+    test %rsi, %rsi
+    jz _FUNCCNT_S
+
+    mov _extcnt(%rip), %al
+    mov %al, (%rsi)
+#endif
+
+_FUNCCNT_S:
     mov _funccnt(%rip), %al
     ret

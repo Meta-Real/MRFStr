@@ -67,7 +67,8 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         PRIVATE cpuid/cputype.S
         PRIVATE cpuid/funccnt.S
         PRIVATE cpuid/simdset.S
-        PRIVATE cpuid/proccnt.S)
+        PRIVATE cpuid/proccnt.S
+        PRIVATE cpuid/cacheline.S)
 elseif (MSVC)
     target_sources(MRFStr
         PRIVATE cpuid/cputype.asm

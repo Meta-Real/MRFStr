@@ -41,7 +41,7 @@ void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     mrfstr_thread_t *threads;
@@ -69,12 +69,14 @@ void __mrfstr_copy(
         rem = size & mask;
         size -= rem;
 
-        if (size < _mrfstr_config.nlimit)
-            _mrfstr_config.bcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
-        else
-            _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.nmem_size);
         dst += size;
         src += size;
+        if (size < _mrfstr_config.nlimit)
+            _mrfstr_config.bcopy_sub(dst, src,
+                (mrfstr_size_t)-(mrfstr_slonglong_t)size);
+        else
+            _mrfstr_config.ncopy_sub(dst, src,
+                (mrfstr_size_t)-(mrfstr_slonglong_t)size);
 
         mrfstr_copy_rem;
         return;
@@ -92,16 +94,17 @@ void __mrfstr_copy(
 
     factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.tmem_size;
+    size = (mrfstr_size_t)-(mrfstr_slonglong_t)
+        ((size / factor) * _mrfstr_config.tmem_size);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.ncopy_sub(dst, src, size * tcount);
-        inc *= tcount;
-        dst += inc;
-        src += inc;
+        size *= tcount;
+        dst -= size;
+        src -= size;
+        _mrfstr_config.ncopy_sub(dst, src, size);
 
         mrfstr_copy_rem;
         return;
@@ -113,16 +116,17 @@ void __mrfstr_copy(
         if (!data)
             break;
 
+        dst -= size;
+        src -= size;
+
         data->dst = dst;
         data->src = src;
         data->size = size;
 
-        dst += inc;
-        src += inc;
         mrfstr_create_thread(__mrfstr_copy_threaded)
         {
-            dst -= inc;
-            src -= inc;
+            dst += size;
+            src += size;
 
             free(data);
             break;
@@ -132,10 +136,11 @@ void __mrfstr_copy(
     }
 
     tcount -= i;
-    _mrfstr_config.tcopy_sub(dst, src, size * tcount);
-    inc *= tcount;
-    dst += inc;
-    src += inc;
+
+    size *= tcount;
+    dst -= size;
+    src -= size;
+    _mrfstr_config.tcopy_sub(dst, src, size);
 
     mrfstr_copy_rem;
 

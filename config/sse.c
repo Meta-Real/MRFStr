@@ -19,49 +19,6 @@ copies or substantial portions of the Software.
 
 #ifdef __SSE2__
 
-void __mrfstr_sse_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size)
-{
-    __m128i *dblock, *sblock, block;
-
-    dblock = (__m128i*)dst;
-    sblock = (__m128i*)src;
-    while (size--)
-    {
-        block = _mm_loadu_si128(sblock++);
-        _mm_store_si128(dblock++, block);
-    }
-}
-
-void __mrfstr_sse_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size)
-{
-    __m128i *dblock, *sblock,
-        block1, block2, block3, block4;
-
-    dblock = (__m128i*)dst;
-    sblock = (__m128i*)src;
-    for (; size >= 4; size -= 4)
-    {
-        block1 = _mm_loadu_si128(sblock++);
-        block2 = _mm_loadu_si128(sblock++);
-        block3 = _mm_loadu_si128(sblock++);
-        block4 = _mm_loadu_si128(sblock++);
-        _mm_stream_si128(dblock++, block1);
-        _mm_stream_si128(dblock++, block2);
-        _mm_stream_si128(dblock++, block3);
-        _mm_stream_si128(dblock++, block4);
-    }
-
-    while (size--)
-    {
-        block1 = _mm_loadu_si128(sblock++);
-        _mm_stream_si128(dblock++, block1);
-    }
-}
-
 void __mrfstr_sse_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {

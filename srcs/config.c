@@ -22,7 +22,7 @@ mrfstr_config_t _mrfstr_config =
 {
     1, 0x200000, 0x8000000, 64,
 #ifdef __AVX512F__
-    __mrfstr_avx512_bcopy, __mrfstr_avx512_copy,
+    __mrfstr_avx512_copy, __mrfstr_avx512_ntcopy,
     __mrfstr_avx512_brcopy, __mrfstr_avx512_rcopy,
     __mrfstr_avx512_bfill, __mrfstr_avx512_fill, 64,
     __mrfstr_avx512_copy, __mrfstr_avx512_fill, 64,
@@ -45,7 +45,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_avx512_countchr, 64,
     __mrfstr_avx512_strlen, 64,
 #elif defined(__AVX__)
-    __mrfstr_avx_bcopy, __mrfstr_avx_copy,
+    __mrfstr_avx_copy, __mrfstr_avx_ntcopy,
     __mrfstr_avx_brcopy, __mrfstr_avx_rcopy,
     __mrfstr_avx_bfill, __mrfstr_avx_fill, 32,
     __mrfstr_avx_copy, __mrfstr_avx_fill, 32,
@@ -75,7 +75,7 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_sse_strlen, 16,
 #endif
 #elif defined(__SSE2__)
-    __mrfstr_sse_bcopy, __mrfstr_sse_copy,
+    __mrfstr_sse_copy, __mrfstr_sse_ntcopy,
     __mrfstr_sse_brcopy, __mrfstr_sse_rcopy,
     __mrfstr_sse_bfill, __mrfstr_sse_fill, 16,
     __mrfstr_sse_copy, __mrfstr_sse_fill, 16,
@@ -266,8 +266,8 @@ void mrfstr_config(
         {
         case MRFSTR_CONFIG_SIMD_AVX512:
 #ifdef __AVX512F__
-            _mrfstr_config.bcopy_sub = __mrfstr_avx512_bcopy;
-            _mrfstr_config.ncopy_sub = __mrfstr_avx512_copy;
+            _mrfstr_config.bcopy_sub = __mrfstr_avx512_copy;
+            _mrfstr_config.ncopy_sub = __mrfstr_avx512_ntcopy;
             _mrfstr_config.brcopy_sub = __mrfstr_avx512_brcopy;
             _mrfstr_config.nrcopy_sub = __mrfstr_avx512_rcopy;
             _mrfstr_config.bfill_sub = __mrfstr_avx512_bfill;
@@ -277,8 +277,8 @@ void mrfstr_config(
 #endif
         case MRFSTR_CONFIG_SIMD_AVX:
 #ifdef __AVX__
-            _mrfstr_config.bcopy_sub = __mrfstr_avx_bcopy;
-            _mrfstr_config.ncopy_sub = __mrfstr_avx_copy;
+            _mrfstr_config.bcopy_sub = __mrfstr_avx_copy;
+            _mrfstr_config.ncopy_sub = __mrfstr_avx_ntcopy;
             _mrfstr_config.brcopy_sub = __mrfstr_avx_brcopy;
             _mrfstr_config.nrcopy_sub = __mrfstr_avx_rcopy;
             _mrfstr_config.bfill_sub = __mrfstr_avx_bfill;
@@ -288,8 +288,8 @@ void mrfstr_config(
 #endif
         case MRFSTR_CONFIG_SIMD_SSE:
 #ifdef __SSE2__
-            _mrfstr_config.bcopy_sub = __mrfstr_sse_bcopy;
-            _mrfstr_config.ncopy_sub = __mrfstr_sse_copy;
+            _mrfstr_config.bcopy_sub = __mrfstr_sse_copy;
+            _mrfstr_config.ncopy_sub = __mrfstr_sse_ntcopy;
             _mrfstr_config.brcopy_sub = __mrfstr_sse_brcopy;
             _mrfstr_config.nrcopy_sub = __mrfstr_sse_rcopy;
             _mrfstr_config.bfill_sub = __mrfstr_sse_bfill;

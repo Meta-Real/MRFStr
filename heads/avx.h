@@ -28,12 +28,12 @@ copies or substantial portions of the Software.
 #define MRFSTR_AVX_TEQUAL_LOAD 0x20000
 #define MRFSTR_AVX_TCONTCHR_LOAD 0x20000
 
-void __mrfstr_avx_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size);
 void __mrfstr_avx_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size);
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void __mrfstr_avx_ntcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
+/* old */
 
 void __mrfstr_avx_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);

@@ -28,12 +28,12 @@ copies or substantial portions of the Software.
 #define MRFSTR_SSE_TEQUAL_LOAD 0x40000
 #define MRFSTR_SSE_TCONTCHR_LOAD 0x40000
 
-void __mrfstr_sse_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size);
 void __mrfstr_sse_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size);
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+void __mrfstr_sse_ntcopy(
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
+/* old */
 
 void __mrfstr_sse_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);

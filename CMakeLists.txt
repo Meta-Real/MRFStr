@@ -48,7 +48,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 add_library(MRFStr
-    config/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
+    srcs/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
     proc/copy.c proc/move.c proc/fill.c
     proc/reverse.c proc/replchr.c
     proc/equal.c
@@ -71,6 +71,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         PRIVATE cpuid/cacheline.S)
 elseif (MSVC)
     target_sources(MRFStr
+        PRIVATE core/scopy.asm
         PRIVATE cpuid/cputype.asm
         PRIVATE cpuid/funccnt.asm
         PRIVATE cpuid/simdset.asm

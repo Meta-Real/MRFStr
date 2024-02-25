@@ -19,42 +19,6 @@ copies or substantial portions of the Software.
 
 #ifdef __AVX__
 
-void __mrfstr_avx_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m256i *dblock, *sblock, block;
-
-    dblock = (__m256i*)dst;
-    sblock = (__m256i*)src;
-    while (size--)
-    {
-        block = _mm256_loadu_si256(sblock++);
-        _mm256_store_si256(dblock++, block);
-    }
-}
-
-void __mrfstr_avx_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m256i *dblock, *sblock, block1, block2;
-
-    dblock = (__m256i*)dst;
-    sblock = (__m256i*)src;
-    for (; size >= 2; size -= 2)
-    {
-        block1 = _mm256_loadu_si256(sblock++);
-        block2 = _mm256_loadu_si256(sblock++);
-        _mm256_stream_si256(dblock++, block1);
-        _mm256_stream_si256(dblock++, block2);
-    }
-
-    if (size)
-    {
-        block1 = _mm256_loadu_si256(sblock++);
-        _mm256_stream_si256(dblock++, block1);
-    }
-}
-
 void __mrfstr_avx_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {

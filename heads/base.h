@@ -23,8 +23,10 @@ copies or substantial portions of the Software.
 #define MRFSTR_BASE_TCONTCHR_LOAD 0x80000
 
 void __mrfstr_base_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size);
+    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
+/* old */
+
 void __mrfstr_base_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 

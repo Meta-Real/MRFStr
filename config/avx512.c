@@ -19,34 +19,6 @@ copies or substantial portions of the Software.
 
 #ifdef __AVX512F__
 
-void __mrfstr_avx512_bcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m512i *dblock, *sblock, block;
-
-    dblock = (__m512i*)dst;
-    sblock = (__m512i*)src;
-    while (size--)
-    {
-        block = _mm512_loadu_si512(sblock++);
-        _mm512_store_si512(dblock++, block);
-    }
-}
-
-void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m512i *dblock, *sblock, block;
-
-    dblock = (__m512i*)dst;
-    sblock = (__m512i*)src;
-    while (size--)
-    {
-        block = _mm512_loadu_si512(sblock++);
-        _mm512_stream_si512(dblock++, block);
-    }
-}
-
 void __mrfstr_avx512_brcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
@@ -64,16 +36,16 @@ void __mrfstr_avx512_brcopy(
 void __mrfstr_avx512_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {
-    __m512i *dblock, *sblock, block1, block2;
+    __m512i *dblock, *sblock, block1;
 
     dblock = (__m512i*)dst;
     sblock = (__m512i*)src;
-    for (; size >= 2; size -= 2)
+    for (; size; size--)
     {
         block1 = _mm512_loadu_si512(--sblock);
-        block2 = _mm512_loadu_si512(--sblock);
+        //block2 = _mm512_loadu_si512(--sblock);
         _mm512_stream_si512(--dblock, block1);
-        _mm512_stream_si512(--dblock, block2);
+        //_mm512_stream_si512(--dblock, block2);
     }
 
     if (size)

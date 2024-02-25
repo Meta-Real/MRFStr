@@ -41,18 +41,6 @@ copies or substantial portions of the Software.
 
 #define mrfstr_base_idx(mask) (mrfstr_base_cmp2(mask) >> 7)
 
-void __mrfstr_base_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src,
-    mrfstr_size_t size)
-{
-    mrfstr_longlong_t *dblock, *sblock;
-
-    dblock = (mrfstr_longlong_t*)dst;
-    sblock = (mrfstr_longlong_t*)src;
-    while (size--)
-        *dblock++ = *sblock++;
-}
-
 void __mrfstr_base_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 {

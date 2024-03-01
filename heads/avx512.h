@@ -28,23 +28,6 @@ copies or substantial portions of the Software.
 #define MRFSTR_AVX512_TEQUAL_LOAD 0x10000
 #define MRFSTR_AVX512_TCONTCHR_LOAD 0x10000
 
-void __mrfstr_avx512_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-void __mrfstr_avx512_ntcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-
-/* old */
-
-void __mrfstr_avx512_brcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-void __mrfstr_avx512_rcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-
-void __mrfstr_avx512_bfill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
-void __mrfstr_avx512_fill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
-
 #ifdef __AVX512BW__
 void __mrfstr_avx512_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);

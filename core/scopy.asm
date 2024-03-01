@@ -14,37 +14,92 @@
 
 .code
 
-; void __mrfstr_avx512_copy(
+; void __mrfstr_avx512f_copy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
 
-__mrfstr_avx512_copy proc
+__mrfstr_avx512f_copy proc
 LHEAD:
-    vmovdqu32 zmm0, [rcx+r8]
-    vmovdqa32 [rdx+r8], zmm0
+    vmovdqu64 zmm16, [rcx+r8]
+    vmovdqa64 [rdx+r8], zmm16
 
     add r8, 64
     jnz LHEAD
 
     ret
-__mrfstr_avx512_copy endp
+__mrfstr_avx512f_copy endp
 
-; void __mrfstr_avx512_ntcopy(
+; void __mrfstr_avx512f_ntcopy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
 
-__mrfstr_avx512_ntcopy proc
+__mrfstr_avx512f_ntcopy proc
 LHEAD:
-    vmovdqu64 zmm0, [rcx+r8]
-    vmovntdq zmmword ptr [rdx+r8], zmm0
+    vmovdqu64 zmm16, [rcx+r8]
+    vmovntdq zmmword ptr [rdx+r8], zmm16
 
     add r8, 64
     jnz LHEAD
 
     sfence
     ret
-__mrfstr_avx512_ntcopy endp
+__mrfstr_avx512f_ntcopy endp
+
+; void __mrfstr_avx512f_rcopy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
+
+__mrfstr_avx512f_rcopy proc
+    sub rcx, 64
+    sub rdx, 64
+
+LHEAD:
+    vmovdqu64 zmm16, [rcx+r8]
+    vmovdqa64 [rdx+r8], zmm16
+
+    sub r8, 64
+    jnz LHEAD
+
+    ret
+__mrfstr_avx512f_rcopy endp
+
+; void __mrfstr_avx512f_ntrcopy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
+
+__mrfstr_avx512f_ntrcopy proc
+    sub rcx, 64
+    sub rdx, 64
+
+LHEAD:
+    vmovdqu64 zmm16, [rcx+r8]
+    vmovntdq zmmword ptr [rdx+r8], zmm16
+
+    sub r8, 64
+    jnz LHEAD
+
+    sfence
+    ret
+__mrfstr_avx512f_ntrcopy endp
 
 ; void __mrfstr_avx_copy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
 
 __mrfstr_avx_copy proc
 LHEAD:
@@ -54,11 +109,16 @@ LHEAD:
     add r8, 32
     jnz LHEAD
 
+    vzeroupper
     ret
 __mrfstr_avx_copy endp
 
 ; void __mrfstr_avx_ntcopy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
 
 __mrfstr_avx_ntcopy proc
 LHEAD:
@@ -69,42 +129,143 @@ LHEAD:
     jnz LHEAD
 
     sfence
+    vzeroupper
     ret
 __mrfstr_avx_ntcopy endp
 
-; void __mrfstr_sse_copy(
+; void __mrfstr_avx_rcopy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
 
-__mrfstr_sse_copy proc
+__mrfstr_avx_rcopy proc
+    sub rcx, 32
+    sub rdx, 32
+
 LHEAD:
     vmovdqu ymm0, ymmword ptr [rcx+r8]
     vmovdqa ymmword ptr [rdx+r8], ymm0
 
-    add r8, 32
+    sub r8, 32
     jnz LHEAD
 
+    vzeroupper
     ret
-__mrfstr_sse_copy endp
+__mrfstr_avx_rcopy endp
 
-; void __mrfstr_sse_ntcopy(
+; void __mrfstr_avx_ntrcopy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
 
-__mrfstr_sse_ntcopy proc
+__mrfstr_avx_ntrcopy proc
+    sub rcx, 32
+    sub rdx, 32
+
 LHEAD:
     vmovdqu ymm0, ymmword ptr [rcx+r8]
     vmovntdq ymmword ptr [rdx+r8], ymm0
 
-    add r8, 32
+    sub r8, 32
+    jnz LHEAD
+
+    sfence
+    vzeroupper
+    ret
+__mrfstr_avx_ntrcopy endp
+
+; void __mrfstr_sse2_copy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
+
+__mrfstr_sse2_copy proc
+LHEAD:
+    movdqu xmm0, xmmword ptr [rcx+r8]
+    movdqa xmmword ptr [rdx+r8], xmm0
+
+    add r8, 16
+    jnz LHEAD
+
+    ret
+__mrfstr_sse2_copy endp
+
+; void __mrfstr_sse2_ntcopy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
+
+__mrfstr_sse2_ntcopy proc
+LHEAD:
+    movdqu xmm0, xmmword ptr [rcx+r8]
+    movntdq xmmword ptr [rdx+r8], xmm0
+
+    add r8, 16
     jnz LHEAD
 
     sfence
     ret
-__mrfstr_sse_ntcopy endp
+__mrfstr_sse2_ntcopy endp
 
-; void __mrfstr_base_copy(
+; void __mrfstr_sse2_rcopy(
 ;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
 
-__mrfstr_base_copy proc
+__mrfstr_sse2_rcopy proc
+    sub rcx, 16
+    sub rdx, 16
+
+LHEAD:
+    movdqu xmm0, xmmword ptr [rcx+r8]
+    movdqa xmmword ptr [rdx+r8], xmm0
+
+    sub r8, 16
+    jnz LHEAD
+
+    ret
+__mrfstr_sse2_rcopy endp
+
+; void __mrfstr_sse2_ntrcopy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
+
+__mrfstr_sse2_ntrcopy proc
+    sub rcx, 16
+    sub rdx, 16
+
+LHEAD:
+    movdqu xmm0, xmmword ptr [rcx+r8]
+    movntdq xmmword ptr [rdx+r8], xmm0
+
+    sub r8, 16
+    jnz LHEAD
+
+    sfence
+    ret
+__mrfstr_sse2_ntrcopy endp
+
+; void __mrfstr_i64_copy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; src = SRC+SIZE
+; size = -SIZE
+
+__mrfstr_i64_copy proc
 LHEAD:
     mov rax, [rcx+r8]
     mov [rdx+r8], rax
@@ -113,6 +274,27 @@ LHEAD:
     jnz LHEAD
 
     ret
-__mrfstr_base_copy endp
+__mrfstr_i64_copy endp
+
+; void __mrfstr_i64_rcopy(
+;     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+;
+; dst = DST
+; src = SRC
+; size = SIZE
+
+__mrfstr_i64_rcopy proc
+    sub rcx, 8
+    sub rdx, 8
+
+LHEAD:
+    mov rax, [rcx+r8]
+    mov [rdx+r8], rax
+
+    sub r8, 8
+    jnz LHEAD
+
+    ret
+__mrfstr_i64_rcopy endp
 
 end

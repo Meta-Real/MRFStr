@@ -42,7 +42,7 @@ DWORD WINAPI __mrfstr_fill_threaded(
 void __mrfstr_fill(
     mrfstr_data_t res, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     mrfstr_thread_t *threads;
@@ -70,11 +70,11 @@ void __mrfstr_fill(
         rem = size & mask;
         size -= rem;
 
-        if (size < _mrfstr_config.nlimit)
-            _mrfstr_config.bfill_sub(res, chr, size / _mrfstr_config.nmem_size);
-        else
-            _mrfstr_config.nfill_sub(res, chr, size / _mrfstr_config.nmem_size);
         res += size;
+        if (size < _mrfstr_config.nlimit)
+            _mrfstr_config.bfill_sub(res, chr, (mrfstr_size_t)-(mrfstr_slonglong_t)size);
+        else
+            _mrfstr_config.nfill_sub(res, chr, (mrfstr_size_t)-(mrfstr_slonglong_t)size);
 
         mrfstr_fill_rem;
         return;
@@ -92,14 +92,16 @@ void __mrfstr_fill(
 
     factor = _mrfstr_config.tmem_size * tcount;
     rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.tmem_size;
+    size = (mrfstr_size_t)-(mrfstr_slonglong_t)
+        ((size / factor) * _mrfstr_config.tmem_size);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.nfill_sub(res, chr, size * tcount);
-        res += inc * tcount;
+        size *= tcount;
+        res -= size;
+        _mrfstr_config.nfill_sub(res, chr, size);
 
         mrfstr_fill_rem;
         return;
@@ -111,14 +113,15 @@ void __mrfstr_fill(
         if (!data)
             break;
 
+        res -= size;
+
         data->res = res;
         data->size = size;
         data->chr = chr;
 
-        res += inc;
         mrfstr_create_thread(__mrfstr_fill_threaded)
         {
-            res -= inc;
+            res += size;
 
             free(data);
             break;
@@ -128,8 +131,10 @@ void __mrfstr_fill(
     }
 
     tcount -= i;
-    _mrfstr_config.tfill_sub(res, chr, size * tcount);
-    res += inc * tcount;
+
+    size *= tcount;
+    res -= size;
+    _mrfstr_config.tfill_sub(res, chr, size);
 
     mrfstr_fill_rem;
 

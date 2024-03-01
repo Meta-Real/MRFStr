@@ -22,17 +22,6 @@ copies or substantial portions of the Software.
 #define MRFSTR_BASE_TEQUAL_LOAD 0x80000
 #define MRFSTR_BASE_TCONTCHR_LOAD 0x80000
 
-void __mrfstr_base_copy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-
-/* old */
-
-void __mrfstr_base_rcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
-
-void __mrfstr_base_fill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size);
-
 void __mrfstr_base_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_base_rev2(

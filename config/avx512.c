@@ -19,64 +19,6 @@ copies or substantial portions of the Software.
 
 #ifdef __AVX512F__
 
-void __mrfstr_avx512_brcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m512i *dblock, *sblock, block;
-
-    dblock = (__m512i*)dst;
-    sblock = (__m512i*)src;
-    while (size--)
-    {
-        block = _mm512_loadu_si512(--sblock);
-        _mm512_store_si512(--dblock, block);
-    }
-}
-
-void __mrfstr_avx512_rcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m512i *dblock, *sblock, block1;
-
-    dblock = (__m512i*)dst;
-    sblock = (__m512i*)src;
-    for (; size; size--)
-    {
-        block1 = _mm512_loadu_si512(--sblock);
-        //block2 = _mm512_loadu_si512(--sblock);
-        _mm512_stream_si512(--dblock, block1);
-        //_mm512_stream_si512(--dblock, block2);
-    }
-
-    if (size)
-    {
-        block1 = _mm512_loadu_si512(--sblock);
-        _mm512_stream_si512(--dblock, block1);
-    }
-}
-
-void __mrfstr_avx512_bfill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
-{
-    __m512i *rblock, block;
-
-    rblock = (__m512i*)res;
-    block = _mm512_set1_epi8(chr);
-    while (size--)
-        _mm512_store_si512(rblock++, block);
-}
-
-void __mrfstr_avx512_fill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
-{
-    __m512i *rblock, block;
-
-    rblock = (__m512i*)res;
-    block = _mm512_set1_epi8(chr);
-    while (size--)
-        _mm512_stream_si512(rblock++, block);
-}
-
 #ifdef __AVX512BW__
 void __mrfstr_avx512_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)

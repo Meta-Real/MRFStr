@@ -19,69 +19,6 @@ copies or substantial portions of the Software.
 
 #ifdef __AVX__
 
-void __mrfstr_avx_brcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m256i *dblock, *sblock, block;
-
-    dblock = (__m256i*)dst;
-    sblock = (__m256i*)src;
-    while (size--)
-    {
-        block = _mm256_loadu_si256(--sblock);
-        _mm256_store_si256(--dblock, block);
-    }
-}
-
-void __mrfstr_avx_rcopy(
-    mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
-{
-    __m256i *dblock, *sblock,
-        block1, block2, block3, block4;
-
-    dblock = (__m256i*)dst;
-    sblock = (__m256i*)src;
-    for (; size >= 4; size -= 4)
-    {
-        block1 = _mm256_loadu_si256(--sblock);
-        block2 = _mm256_loadu_si256(--sblock);
-        block3 = _mm256_loadu_si256(--sblock);
-        block4 = _mm256_loadu_si256(--sblock);
-        _mm256_stream_si256(--dblock, block1);
-        _mm256_stream_si256(--dblock, block2);
-        _mm256_stream_si256(--dblock, block3);
-        _mm256_stream_si256(--dblock, block4);
-    }
-
-    while (size--)
-    {
-        block1 = _mm256_loadu_si256(--sblock);
-        _mm256_stream_si256(--dblock, block1);
-    }
-}
-
-void __mrfstr_avx_bfill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
-{
-    __m256i *rblock, block;
-
-    rblock = (__m256i*)res;
-    block = _mm256_set1_epi8(chr);
-    while (size--)
-        _mm256_store_si256(rblock++, block);
-}
-
-void __mrfstr_avx_fill(
-    mrfstr_ptr_t res, mrfstr_chr_t chr, mrfstr_size_t size)
-{
-    __m256i *rblock, block;
-
-    rblock = (__m256i*)res;
-    block = _mm256_set1_epi8(chr);
-    while (size--)
-        _mm256_stream_si256(rblock++, block);
-}
-
 #ifdef __AVX2__
 void __mrfstr_avx_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)

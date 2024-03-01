@@ -18,15 +18,11 @@ copies or substantial portions of the Software.
 #define __MRFSTR_INTERN__
 
 #include <mrfstr.h>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 #include <simddef.h>
 #endif
-
-#include <avx512.h>
-#include <avx.h>
-#include <sse.h>
-#include <base.h>
 
 #define MRFSTR_ALLOC(x, size)                                                \
     do                                                                       \
@@ -83,11 +79,6 @@ copies or substantial portions of the Software.
 #pragma pack(push, 1)
 struct __MRFSTR_CONFIG_T
 {
-    mrfstr_byte_t tcount;
-    mrfstr_size_t nlimit;
-    mrfstr_size_t tlimit;
-    mrfstr_short_t stdalloc;
-
     /* memory functions */
 
     void (*bcopy_sub)(
@@ -190,6 +181,10 @@ struct __MRFSTR_CONFIG_T
         mrfstr_data_ct);
     mrfstr_byte_t strlen_size;
 
+    mrfstr_byte_t tcount;
+    mrfstr_size_t nlimit;
+    mrfstr_size_t tlimit;
+    mrfstr_short_t stdalloc;
     mrfstr_sbyte_t tprior;
 };
 #pragma pack(pop)

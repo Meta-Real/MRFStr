@@ -37,7 +37,7 @@ mrfstr_res_t mrfstr_set(
 mrfstr_res_t mrfstr_set_str(
     mrfstr_t dst, mrfstr_data_ct src)
 {
-    MRFSTR_SIZE(dst) = mrfstr_strlen(src);
+    MRFSTR_SIZE(dst) = strlen(src); //mrfstr_strlen(src);
     if (!MRFSTR_SIZE(dst))
         return MRFSTR_RES_NOERROR;
 

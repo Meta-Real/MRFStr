@@ -14,6 +14,7 @@
 
 ; mrfstr_byte_t mrfstr_cpuid_proccnt(
 ;     mrfstr_byte_t *logical)
+; PRE: mrfstr_cpuid_cputype
 
 .data
     extern _is_intel : db

@@ -110,7 +110,9 @@ enum __MRFSTR_RES_ENUM
     MRFSTR_RES_MEM_ERROR,
     MRFSTR_RES_OVERFLOW_ERROR,
     MRFSTR_RES_IDXOUT_ERROR,
-    MRFSTR_RES_READ_ERROR
+    MRFSTR_RES_READ_ERROR,
+    MRFSTR_RES_TYPE_ERROR,
+    MRFSTR_RES_SUPPORT_ERROR
 };
 typedef mrfstr_byte_t mrfstr_res_t;
 
@@ -361,36 +363,44 @@ __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_strlen(
 
 /* config functions */
 
-enum __MRFSTR_CONFIG_TYPE_ENUM
+enum __MRFSTR_CONFIG_LEVEL_ENUM
 {
-    MRFSTR_CONFIG_TYPE_MEMORY,
-    MRFSTR_CONFIG_TYPE_REPLACE,
-    MRFSTR_CONFIG_TYPE_REVERSE,
-
-    MRFSTR_CONFIG_TYPE_COMPARE,
-    MRFSTR_CONFIG_TYPE_SEARCH,
-
-    MRFSTR_CONFIG_TYPE_STRLEN
+    MRFSTR_CONFIG_LEVEL_EXTREME,
+    MRFSTR_CONFIG_LEVEL_EFFICIENT,
+    MRFSTR_CONFIG_LEVEL_MODERATE,
+    MRFSTR_CONFIG_LEVEL_LIMITED,
+    MRFSTR_CONFIG_LEVEL_OFF
 };
-typedef mrfstr_byte_t mrfstr_config_type_t;
+typedef mrfstr_byte_t mrfstr_config_level_t;
+
+enum __MRFSTR_CONFIG_FUNC_ENUM
+{
+    MRFSTR_CONFIG_FUNC_MEMORY,
+    MRFSTR_CONFIG_FUNC_REPLACE,
+    MRFSTR_CONFIG_FUNC_REVERSE,
+
+    MRFSTR_CONFIG_FUNC_COMPARE,
+    MRFSTR_CONFIG_FUNC_SEARCH,
+
+    MRFSTR_CONFIG_FUNC_STRLEN
+};
+typedef mrfstr_byte_t mrfstr_config_func_t;
+
+enum __MRFSTR_CONFIG_DATA_ENUM
+{
+    MRFSTR_CONFIG_DATA_THREAD_COUNT,
+    MRFSTR_CONFIG_DATA_STDALLOC
+};
+typedef mrfstr_byte_t mrfstr_config_data_t; 
 
 enum __MRFSTR_CONFIG_SIMD_ENUM
 {
     MRFSTR_CONFIG_SIMD_AVX512,
     MRFSTR_CONFIG_SIMD_AVX,
     MRFSTR_CONFIG_SIMD_SSE,
-    MRFSTR_CONFIG_SIMD_NONE
+    MRFSTR_CONFIG_SIMD_INT64
 };
 typedef mrfstr_byte_t mrfstr_config_simd_t;
-
-enum __MRFSTR_CONFIG_DATA_ENUM
-{
-    MRFSTR_CONFIG_DATA_THREAD_COUNT,
-    MRFSTR_CONFIG_DATA_NORMAL_LIMIT,
-    MRFSTR_CONFIG_DATA_THREAD_LIMIT,
-    MRFSTR_CONFIG_DATA_STDALLOC
-};
-typedef mrfstr_byte_t mrfstr_config_data_t; 
 
 enum __MRFSTR_CONFIG_PRIORITY_ENUM
 {
@@ -402,30 +412,31 @@ enum __MRFSTR_CONFIG_PRIORITY_ENUM
 };
 typedef mrfstr_byte_t mrfstr_config_priority_t;
 
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config(
+    mrfstr_config_level_t type);
+
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count(
     mrfstr_byte_t tcount);
-__MRFSTR_DECLSPEC void mrfstr_config_normal_limit(
-    mrfstr_size_t nlimit);
-__MRFSTR_DECLSPEC void mrfstr_config_thread_limit(
-    mrfstr_size_t tlimit);
-__MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
-    mrfstr_short_t stdalloc);
-
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(
     mrfstr_bool_t use_logical);
+__MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
+    mrfstr_short_t stdalloc);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_thread_priority(
     mrfstr_config_priority_t priority);
 
 __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
     mrfstr_config_data_t type);
 
-__MRFSTR_DECLSPEC void mrfstr_config(
-    mrfstr_config_type_t type,
-    mrfstr_config_simd_t normal,
-    mrfstr_config_simd_t threaded);
-__MRFSTR_DECLSPEC void mrfstr_config_str(
-    mrfstr_config_type_t type,
-    mrfstr_config_simd_t simd);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_func(
+    mrfstr_config_func_t type,
+    mrfstr_config_simd_t single, mrfstr_config_simd_t multi);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits(
+    mrfstr_config_func_t type,
+    mrfstr_size_t tlimit, mrfstr_size_t ntlimit);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *tlimit, mrfstr_size_t *ntlimit);
 
 #ifdef __cplusplus
 }

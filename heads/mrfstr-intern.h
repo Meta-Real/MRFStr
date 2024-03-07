@@ -20,10 +20,6 @@ copies or substantial portions of the Software.
 #include <mrfstr.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
-#include <simddef.h>
-#endif
-
 #define MRFSTR_ALLOC(x, size)                                                \
     do                                                                       \
     {                                                                        \
@@ -76,127 +72,76 @@ copies or substantial portions of the Software.
         }                         \
     } while (0)
 
+enum __MRFSTR_SIMD_ENUM
+{
+    MRFSTR_SIMD_INT64,
+    MRFSTR_SIMD_SSE2,
+    MRFSTR_SIMD_SSSE3,
+    MRFSTR_SIMD_SSE4_1,
+    MRFSTR_SIMD_AVX,
+    MRFSTR_SIMD_AVX2,
+    MRFSTR_SIMD_AVX512F,
+    MRFSTR_SIMD_AVX512BW,
+    MRFSTR_SIMD_AVX512VL = 7,
+    MRFSTR_SIMD_AVX512VBMI
+};
+
+#define MRFSTR_SUPPORTS_SIMD(x) (simdset >= x)
+
+#define MRFSTR_SLIMIT 0x800
+#define MRFSTR_ALIGN_SIZE 64
+#define MRFSTR_ALIGN_MASK (MRFSTR_ALIGN_SIZE - 1)
+
 #pragma pack(push, 1)
 struct __MRFSTR_CONFIG_T
 {
-    /* memory functions */
+    /* mem functions */
 
-    void (*bcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_size_t);
-    void (*ncopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_size_t);
-
-    void (*brcopy_sub)(
+    void (*copy_func)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
-    void (*nrcopy_sub)(
+    void (*rcopy_func)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*fill_func)(
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+
+    void (*copy_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*rcopy_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+    void (*fill_tfunc)(
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
+
+    mrfstr_size_t mem_tlimit;
+
+    /* rev functions */
+
+    void (*rev_func)(
+        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
+    void (*rev2_func)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
 
-    void (*bfill_sub)(
-        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
-    void (*nfill_sub)(
-        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t nmem_size;
-
-    void (*tcopy_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_size_t);
-    void (*tfill_sub)(
-        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tmem_size;
-
-    /* reverse function */
-
-    void (*nrev_sub)(
+    void (*rev_tfunc)(
         mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
-    void (*nrev2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_size_t);
-    mrfstr_byte_t nrev_size;
+    void (*rev2_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
 
-    void (*trev_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
-    void (*trev2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_size_t);
-    mrfstr_byte_t trev_size;
+    mrfstr_size_t rev_tlimit;
 
-    /* replace functions */
-
-    void (*nreplchr_sub)(
-        mrfstr_ptr_t,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
-    void (*nreplchr2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
-    mrfstr_byte_t nrepl_size;
-
-    void (*treplchr_sub)(
-        mrfstr_ptr_t,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
-    void (*treplchr2_sub)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
-    mrfstr_byte_t trepl_size;
-
-    /* compare functions */
-
-    mrfstr_bool_t (*nequal_sub)(
-        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t ncmp_size;
-
-    void (*tequal_sub)(
-        volatile mrfstr_bool_t*,
-        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
-    mrfstr_byte_t tcmp_size;
-
-    /* search functions */
-
-    mrfstr_bool_t (*ncontchr_sub)(
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_idx_t (*nfindchr_sub)(
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_size_t (*ncountchr_sub)(
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t nsearch_size;
-
-    void (*tcontchr_sub)(
-        volatile mrfstr_bool_t*,
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_idx_t (*tfindchr_sub)(
-        volatile mrfstr_idx_t*, mrfstr_size_t,
-        mrfstr_data_ct, mrfstr_chr_t, mrfstr_short_t);
-    mrfstr_size_t (*tcountchr_sub)(
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
-    mrfstr_byte_t tsearch_size;
-
-    /* str functions */
-
-    mrfstr_size_t (*strlen_sub)(
-        mrfstr_data_ct);
-    mrfstr_byte_t strlen_size;
+    /* general */
 
     mrfstr_byte_t tcount;
-    mrfstr_size_t nlimit;
-    mrfstr_size_t tlimit;
-    mrfstr_short_t stdalloc;
+
     mrfstr_sbyte_t tprior;
+    mrfstr_short_t stdalloc;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
-#define MRFSTR_SLIMIT 0x1000
-
-#define mrfstr_set_tcount                           \
+#define mrfstr_set_tcount(tlimit)                   \
     do                                              \
     {                                               \
-        tsize = _mrfstr_config.tlimit >> 1;         \
+        tsize = tlimit >> 1;                        \
         if (size > _mrfstr_config.tcount * tsize)   \
             tcount = _mrfstr_config.tcount;         \
         else                                        \

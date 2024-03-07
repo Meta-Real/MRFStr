@@ -34,7 +34,7 @@ mrfstr_cpuid_funccnt proc
 
     test r8, r8
     jz _EXTCNT_
-    mov [r8], al       ; extended function count
+    mov [r8], al        ; extended function count
 
 _EXTCNT_:
     mov [_extcnt], al

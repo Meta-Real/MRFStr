@@ -28,7 +28,7 @@ copies or substantial portions of the Software.
 void __mrfstr_move(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-    mrfstr_byte_t rem, mask;
+    mrfstr_byte_t rem;
 
     if (size < MRFSTR_SLIMIT)
     {
@@ -36,24 +36,20 @@ void __mrfstr_move(
         return;
     }
 
-    mask = _mrfstr_config.nmem_size - 1;
-    rem = (uintptr_t)dst & mask;
+    rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.nmem_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_move_rem;
     }
 
-    rem = size & mask;
+    rem = size & MRFSTR_ALIGN_MASK;
     size -= rem;
 
-    if (size < _mrfstr_config.nlimit)
-        _mrfstr_config.bcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
-    else
-        _mrfstr_config.ncopy_sub(dst, src, size / _mrfstr_config.nmem_size);
     dst += size;
     src += size;
+    _mrfstr_config.copy_func(dst, src, size);
 
     mrfstr_move_rem;
 }
@@ -61,7 +57,7 @@ void __mrfstr_move(
 void __mrfstr_rmove(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-    mrfstr_byte_t rem, mask;
+    mrfstr_byte_t rem;
 
     if (size < MRFSTR_SLIMIT)
     {
@@ -72,23 +68,19 @@ void __mrfstr_rmove(
     dst += size;
     src += size;
 
-    mask = _mrfstr_config.nmem_size - 1;
-    rem = (uintptr_t)dst & mask;
+    rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         size -= rem;
         mrfstr_rmove_rem;
     }
 
-    rem = size & mask;
+    rem = size & MRFSTR_ALIGN_MASK;
     size -= rem;
 
-    if (size < _mrfstr_config.nlimit)
-        _mrfstr_config.brcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
-    else
-        _mrfstr_config.nrcopy_sub(dst, src, size / _mrfstr_config.nmem_size);
     dst -= size;
     src -= size;
+    _mrfstr_config.rcopy_func(dst, src, size);
 
     mrfstr_rmove_rem;
 }

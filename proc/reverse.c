@@ -59,7 +59,7 @@ void __mrfstr_rev(
 {
     mrfstr_data_t right;
     mrfstr_chr_t chr;
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem;
     mrfstr_byte_t tcount, i, nthreads;
     mrfstr_thread_t *threads;
@@ -77,24 +77,20 @@ void __mrfstr_rev(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.rev_tlimit)
     {
-        mrfstr_byte_t revsize;
-
-        rem = (uintptr_t)str & (_mrfstr_config.nrev_size - 1);
+        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nrev_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_rev_rem;
         }
 
-        revsize = _mrfstr_config.nrev_size << 1;
-        rem = size & (revsize - 1);
-        size -= rem;
+        rem = size & ((MRFSTR_ALIGN_SIZE << 1) - 1);
+        size = (size - rem) >> 1;
 
-        _mrfstr_config.nrev_sub(str, right, size / revsize);
-        size >>= 1;
+        _mrfstr_config.rev_func(str, right, size);
         str += size;
         right -= size;
 
@@ -107,27 +103,26 @@ void __mrfstr_rev(
         return;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.rev_tlimit);
 
-    rem = (uintptr_t)str & (_mrfstr_config.trev_size - 1);
+    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.trev_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_rev_rem;
     }
 
-    size /= (_mrfstr_config.trev_size << 1) * tcount;
-    inc = size * _mrfstr_config.trev_size;
+    size = (size - rem) / (tcount << 1);
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.trev_sub(str, right, size * tcount);
-        inc *= tcount;
-        str += inc;
-        right -= inc;
+        size *= tcount;
+        _mrfstr_config.rev_tfunc(str, right, size);
+        str += size;
+        right -= size;
 
         while (str < right)
         {
@@ -148,12 +143,12 @@ void __mrfstr_rev(
         data->right = right;
         data->size = size;
 
-        str += inc;
-        right -= inc;
+        str += size;
+        right -= size;
         mrfstr_create_thread(__mrfstr_rev_threaded)
         {
-            str -= inc;
-            right += inc;
+            str -= size;
+            right += size;
             free(data);
             break;
         }
@@ -162,10 +157,11 @@ void __mrfstr_rev(
     }
 
     tcount -= i;
-    _mrfstr_config.trev_sub(str, right, size * tcount);
-    inc *= tcount;
-    str += inc;
-    right -= inc;
+    size *= tcount;
+
+    _mrfstr_config.rev_tfunc(str, right, size);
+    str += size;
+    right -= size;
 
     while (str < right)
     {
@@ -182,7 +178,7 @@ void __mrfstr_rev2(
     mrfstr_data_t left, mrfstr_data_ct right,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     mrfstr_thread_t *threads;
@@ -195,23 +191,20 @@ void __mrfstr_rev2(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.rev_tlimit)
     {
-        mrfstr_byte_t mask;
-
-        mask = _mrfstr_config.nrev_size - 1;
-        rem = (uintptr_t)left & mask;
+        rem = (uintptr_t)left & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nrev_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_rev2_rem;
         }
 
-        rem = size & mask;
+        rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
-        _mrfstr_config.nrev2_sub(left, right, size / _mrfstr_config.nrev_size);
+        _mrfstr_config.rev2_func(left, right, size);
         left += size;
         right -= size;
 
@@ -219,28 +212,27 @@ void __mrfstr_rev2(
         return;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.rev_tlimit);
 
-    rem = (uintptr_t)left & (_mrfstr_config.trev_size - 1);
+    rem = (uintptr_t)left & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.trev_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_rev2_rem;
     }
 
-    factor = _mrfstr_config.trev_size * tcount;
-    rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.trev_size;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (size - rem) / tcount;
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.trev2_sub(left, right, size * tcount);
-        inc *= tcount;
-        left += inc;
-        right -= inc;
+        size *= tcount;
+        _mrfstr_config.rev2_tfunc(left, right, size);
+        left += size;
+        right -= size;
 
         mrfstr_rev2_rem;
     }
@@ -255,12 +247,12 @@ void __mrfstr_rev2(
         data->right = (mrfstr_data_t)right;
         data->size = size;
 
-        left += inc;
-        right -= inc;
+        left += size;
+        right -= size;
         mrfstr_create_thread(__mrfstr_rev2_threaded)
         {
-            left -= inc;
-            right += inc;
+            left -= size;
+            right += size;
 
             free(data);
             break;
@@ -270,10 +262,11 @@ void __mrfstr_rev2(
     }
 
     tcount -= i;
-    _mrfstr_config.trev2_sub(left, right, size * tcount);
-    inc *= tcount;
-    left += inc;
-    right -= inc;
+    size *= tcount;
+
+    _mrfstr_config.rev2_tfunc(left, right, size);
+    left += size;
+    right -= size;
 
     mrfstr_rev2_rem;
 
@@ -292,7 +285,7 @@ DWORD WINAPI __mrfstr_rev_threaded(
     mrfstr_rev_t data;
 
     data = (mrfstr_rev_t)args;
-    _mrfstr_config.trev_sub(data->left, data->right, data->size);
+    _mrfstr_config.rev_tfunc(data->left, data->right, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;
@@ -309,7 +302,7 @@ DWORD WINAPI __mrfstr_rev2_threaded(
     mrfstr_rev_t data;
 
     data = (mrfstr_rev_t)args;
-    _mrfstr_config.trev2_sub(data->left, data->right, data->size);
+    _mrfstr_config.rev2_tfunc(data->left, data->right, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

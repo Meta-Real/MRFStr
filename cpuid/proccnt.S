@@ -14,6 +14,7 @@
 
 # mrfstr_byte_t mrfstr_cpuid_proccnt(
 #     mrfstr_byte_t *logical)
+# PRE: mrfstr_cpuid_cputype
 
     .extern _is_intel
 

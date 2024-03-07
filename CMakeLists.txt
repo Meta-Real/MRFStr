@@ -14,7 +14,7 @@ project(MRFStr VERSION 1.2.0
 option(BUILD_SHARED_LIBS "Shared Library")
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic -march=native")
+    set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wpedantic")
     set(CMAKE_C_FLAGS_DEBUG "-g")
     set(CMAKE_C_FLAGS_RELEASE "-O3")
     set(CMAKE_C_FLAGS_MINSIZEREL "-Os")
@@ -29,21 +29,6 @@ elseif (MSVC)
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "/O2 /Zi")
 
     enable_language(ASM_MASM)
-
-    try_run(RRES CRES ${PROJECT_SOURCE_DIR}/msvcsetup
-        SOURCES ${PROJECT_SOURCE_DIR}/msvcsetup.c
-        ${PROJECT_SOURCE_DIR}/cpuid/cputype.asm
-        ${PROJECT_SOURCE_DIR}/cpuid/funccnt.asm
-        ${PROJECT_SOURCE_DIR}/cpuid/simdset.asm
-        CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${PROJECT_SOURCE_DIR}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-    if (NOT CRES)
-        message("Failed to compile the msvcsetup")
-    elseif (RRES)
-        message("Failed to run the msvcsetup")
-    endif()
-
-    file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/msvcsetup)
 endif()
 
 if (BUILD_SHARED_LIBS)
@@ -52,18 +37,18 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 add_library(MRFStr
-    srcs/config.c config/avx512.c config/avx.c config/sse.c config/base.c config/binary.c
     proc/copy.c proc/move.c proc/fill.c
-    proc/reverse.c proc/replchr.c
-    proc/equal.c
-    proc/contchr.c proc/findchr.c proc/countchr.c
+    proc/reverse.c #proc/replchr.c
+    #proc/equal.c
+    #proc/contchr.c proc/findchr.c proc/countchr.c
     srcs/init.c srcs/set.c srcs/get.c
     srcs/concat.c srcs/remove.c srcs/repeat.c
-    srcs/reverse.c srcs/replace_chr.c
-    srcs/equal.c
-    srcs/contain.c srcs/find.c srcs/count_chr.c
+    srcs/reverse.c #srcs/replace_chr.c
+    #srcs/equal.c
+    #srcs/contain.c srcs/find.c srcs/count_chr.c
     srcs/io.c
-    srcs/str.c)
+    #srcs/str.c
+    srcs/config.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")

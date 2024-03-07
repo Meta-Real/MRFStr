@@ -21,7 +21,7 @@ mrfstr_res_t mrfstr_repeat(
     mrfstr_t res, mrfstr_ct str,
     mrfstr_size_t count)
 {
-    mrfstr_size_t size;
+    mrfstr_size_t size, diff;
 
     if (MRFSTR_SIZE(str) == 1)
         return mrfstr_repeat_chr(res, *MRFSTR_DATA(str), count);
@@ -58,15 +58,19 @@ mrfstr_res_t mrfstr_repeat(
         MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
     }
 
-    while (MRFSTR_SIZE(res) <= size - MRFSTR_SIZE(res))
+    diff = size - MRFSTR_SIZE(res);
+    while (MRFSTR_SIZE(res) <= diff)
     {
+        printf("%zu\n", MRFSTR_SIZE(res));
+        mrfstr_n_export(res, 10);
+        printf("\n");
         __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
         MRFSTR_SIZE(res) <<= 1;
+        diff = size - MRFSTR_SIZE(res);
     }
 
-    MRFSTR_SIZE(res) = size - MRFSTR_SIZE(res);
-    if (MRFSTR_SIZE(res))
-        __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
+    if (diff)
+        __mrfstr_copy(MRFSTR_DATA(res) + diff, MRFSTR_DATA(res), diff);
 
     MRFSTR_SIZE(res) = size;
     return MRFSTR_RES_NOERROR;

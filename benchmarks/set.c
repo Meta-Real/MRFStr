@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include "blib.h"
 
-#define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_TYPE_MEMORY
+#define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_FUNC_MEMORY
 
 #define MRFSTR_BLIB_CSTR_PRE(size)
 #define MRFSTR_BLIB_CSTR(size) memcpy(cdst, csrc, size)
@@ -34,7 +34,6 @@ int main(int argc, mrfstr_data_ct *argv)
 
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
-
     MRFSTR_BLIB_INIT_STR(csrc,);
     MRFSTR_BLIB_INIT_STR(cdst, free(csrc));
     memset(csrc, '0', tests[nsec - 1].size);
@@ -47,26 +46,20 @@ int main(int argc, mrfstr_data_ct *argv)
     MRFSTR_BLIB_INIT(dst, mrfstr_free(src));
     mrfstr_repeat_chr(src, '0', tests[nsec - 1].size);
 
-#ifdef __AVX512F__
-    mrfstr_config(MRFSTR_BLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512);
-    MRFSTR_BLIB_ROUND("AVX512");
-#endif
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
+            MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
+        MRFSTR_BLIB_ROUND("AVX512");
 
-#ifdef __AVX__
-    mrfstr_config(MRFSTR_BLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX);
-    MRFSTR_BLIB_ROUND("AVX   ");
-#endif
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
+            MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
+        MRFSTR_BLIB_ROUND("AVX   ");
 
-#ifdef __SSE2__
-    mrfstr_config(MRFSTR_BLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE);
-    MRFSTR_BLIB_ROUND("SSE   ");
-#endif
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
+            MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
+        MRFSTR_BLIB_ROUND("SSE   ");
 
-    mrfstr_config(MRFSTR_BLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_NONE, MRFSTR_CONFIG_SIMD_NONE);
+    mrfstr_config_func(MRFSTR_BLIB_CONFIG,
+        MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
     MRFSTR_BLIB_ROUND("INT64 ");
 
     mrfstr_free(src);

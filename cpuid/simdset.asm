@@ -13,6 +13,7 @@
 ; copies or substantial portions of the Software.
 
 ; mrfstr_byte_t mrfstr_cpuid_simdset(void)
+; PRE: mrfstr_cpuid_funccnt
 
 ; 1: SSE2 (guaranteed on x64 processors)
 ; 2: SSSE3

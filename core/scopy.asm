@@ -12,6 +12,9 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
+.data
+    extern _mrfstr_mem_ntlimit : dq
+
 .code
 
 ; void __mrfstr_avx512f_copy(
@@ -19,16 +22,34 @@
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_avx512f_copy proc
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTSTORE
+
+    neg r8
+
 LHEAD:
-    vmovdqu64 zmm16, [rcx+r8]
-    vmovdqa64 [rdx+r8], zmm16
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovdqa64 [rcx+r8], zmm16
 
     add r8, 64
     jnz LHEAD
 
+    ret
+
+NTSTORE:
+    neg r8
+
+NTLHEAD:
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovntdq zmmword ptr [rcx+r8], zmm16
+
+    add r8, 64
+    jnz NTLHEAD
+
+    sfence
     ret
 __mrfstr_avx512f_copy endp
 
@@ -37,12 +58,14 @@ __mrfstr_avx512f_copy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_avx512f_ntcopy proc
+    neg r8
+
 LHEAD:
-    vmovdqu64 zmm16, [rcx+r8]
-    vmovntdq zmmword ptr [rdx+r8], zmm16
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovntdq zmmword ptr [rcx+r8], zmm16
 
     add r8, 64
     jnz LHEAD
@@ -62,13 +85,26 @@ __mrfstr_avx512f_rcopy proc
     sub rcx, 64
     sub rdx, 64
 
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTLHEAD
+
 LHEAD:
-    vmovdqu64 zmm16, [rcx+r8]
-    vmovdqa64 [rdx+r8], zmm16
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovdqa64 [rcx+r8], zmm16
 
     sub r8, 64
     jnz LHEAD
 
+    ret
+
+NTLHEAD:
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovntdq zmmword ptr [rcx+r8], zmm16
+
+    sub r8, 64
+    jnz NTLHEAD
+
+    sfence
     ret
 __mrfstr_avx512f_rcopy endp
 
@@ -84,8 +120,8 @@ __mrfstr_avx512f_ntrcopy proc
     sub rdx, 64
 
 LHEAD:
-    vmovdqu64 zmm16, [rcx+r8]
-    vmovntdq zmmword ptr [rdx+r8], zmm16
+    vmovdqu64 zmm16, [rdx+r8]
+    vmovntdq zmmword ptr [rcx+r8], zmm16
 
     sub r8, 64
     jnz LHEAD
@@ -99,16 +135,35 @@ __mrfstr_avx512f_ntrcopy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_avx_copy proc
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTSTORE
+
+    neg r8
+
 LHEAD:
-    vmovdqu ymm0, ymmword ptr [rcx+r8]
-    vmovdqa ymmword ptr [rdx+r8], ymm0
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovdqa ymmword ptr [rcx+r8], ymm0
 
     add r8, 32
     jnz LHEAD
 
+    vzeroupper
+    ret
+
+NTSTORE:
+    neg r8
+
+NTLHEAD:
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovntdq ymmword ptr [rcx+r8], ymm0
+
+    add r8, 32
+    jnz NTLHEAD
+
+    sfence
     vzeroupper
     ret
 __mrfstr_avx_copy endp
@@ -118,12 +173,14 @@ __mrfstr_avx_copy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_avx_ntcopy proc
+    neg r8
+
 LHEAD:
-    vmovdqu ymm0, ymmword ptr [rcx+r8]
-    vmovntdq ymmword ptr [rdx+r8], ymm0
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovntdq ymmword ptr [rcx+r8], ymm0
 
     add r8, 32
     jnz LHEAD
@@ -144,13 +201,27 @@ __mrfstr_avx_rcopy proc
     sub rcx, 32
     sub rdx, 32
 
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTLHEAD
+
 LHEAD:
-    vmovdqu ymm0, ymmword ptr [rcx+r8]
-    vmovdqa ymmword ptr [rdx+r8], ymm0
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovdqa ymmword ptr [rcx+r8], ymm0
 
     sub r8, 32
     jnz LHEAD
 
+    vzeroupper
+    ret
+
+NTLHEAD:
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovntdq ymmword ptr [rcx+r8], ymm0
+
+    sub r8, 32
+    jnz NTLHEAD
+
+    sfence
     vzeroupper
     ret
 __mrfstr_avx_rcopy endp
@@ -167,8 +238,8 @@ __mrfstr_avx_ntrcopy proc
     sub rdx, 32
 
 LHEAD:
-    vmovdqu ymm0, ymmword ptr [rcx+r8]
-    vmovntdq ymmword ptr [rdx+r8], ymm0
+    vmovdqu ymm0, ymmword ptr [rdx+r8]
+    vmovntdq ymmword ptr [rcx+r8], ymm0
 
     sub r8, 32
     jnz LHEAD
@@ -183,16 +254,34 @@ __mrfstr_avx_ntrcopy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_sse2_copy proc
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTSTORE
+
+    neg r8
+
 LHEAD:
-    movdqu xmm0, xmmword ptr [rcx+r8]
-    movdqa xmmword ptr [rdx+r8], xmm0
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movdqa xmmword ptr [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD
 
+    ret
+
+NTSTORE:
+    neg r8
+
+NTLHEAD:
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movntdq xmmword ptr [rcx+r8], xmm0
+
+    add r8, 16
+    jnz NTLHEAD
+
+    sfence
     ret
 __mrfstr_sse2_copy endp
 
@@ -201,12 +290,14 @@ __mrfstr_sse2_copy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_sse2_ntcopy proc
+    neg r8
+
 LHEAD:
-    movdqu xmm0, xmmword ptr [rcx+r8]
-    movntdq xmmword ptr [rdx+r8], xmm0
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movntdq xmmword ptr [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD
@@ -226,13 +317,26 @@ __mrfstr_sse2_rcopy proc
     sub rcx, 16
     sub rdx, 16
 
+    cmp r8, [_mrfstr_mem_ntlimit]
+    ja NTLHEAD
+
 LHEAD:
-    movdqu xmm0, xmmword ptr [rcx+r8]
-    movdqa xmmword ptr [rdx+r8], xmm0
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movdqa xmmword ptr [rcx+r8], xmm0
 
     sub r8, 16
     jnz LHEAD
 
+    ret
+
+NTLHEAD:
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movntdq xmmword ptr [rcx+r8], xmm0
+
+    sub r8, 16
+    jnz NTLHEAD
+
+    sfence
     ret
 __mrfstr_sse2_rcopy endp
 
@@ -248,8 +352,8 @@ __mrfstr_sse2_ntrcopy proc
     sub rdx, 16
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rcx+r8]
-    movntdq xmmword ptr [rdx+r8], xmm0
+    movdqu xmm0, xmmword ptr [rdx+r8]
+    movntdq xmmword ptr [rcx+r8], xmm0
 
     sub r8, 16
     jnz LHEAD
@@ -263,14 +367,16 @@ __mrfstr_sse2_ntrcopy endp
 ;
 ; dst = DST+SIZE
 ; src = SRC+SIZE
-; size = -SIZE
+; size = SIZE
 
 __mrfstr_i64_copy proc
-LHEAD:
-    mov rax, [rcx+r8]
-    mov [rdx+r8], rax
+    neg r8
 
-    add r8, 32
+LHEAD:
+    mov rax, [rdx+r8]
+    mov [rcx+r8], rax
+
+    add r8, 8
     jnz LHEAD
 
     ret
@@ -288,8 +394,8 @@ __mrfstr_i64_rcopy proc
     sub rdx, 8
 
 LHEAD:
-    mov rax, [rcx+r8]
-    mov [rdx+r8], rax
+    mov rax, [rdx+r8]
+    mov [rcx+r8], rax
 
     sub r8, 8
     jnz LHEAD

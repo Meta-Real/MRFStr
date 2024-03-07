@@ -39,7 +39,7 @@ mrfstr_t mrfstr_init2(
         return NULL;
 
     MRFSTR_DATA(str) = data;
-    MRFSTR_SIZE(str) = mrfstr_strlen(data);
+    MRFSTR_SIZE(str) = strlen(data); //mrfstr_strlen(data);
     MRFSTR_CAPA(str) = MRFSTR_SIZE(str);
     return str;
 }

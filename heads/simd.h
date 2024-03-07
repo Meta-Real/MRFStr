@@ -25,6 +25,7 @@ void __mrfstr_avx512f_copy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_avx512f_ntcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
+
 void __mrfstr_avx512f_rcopy(
     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size);
 void __mrfstr_avx512f_ntrcopy(
@@ -65,11 +66,6 @@ void __mrfstr_avx_fill(
 void __mrfstr_avx_ntfill(
     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size);
 
-void __mrfstr_avx2_fill(
-    mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size);
-void __mrfstr_avx2_ntfill(
-    mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size);
-
 void __mrfstr_sse2_fill(
     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_sse2_ntfill(
@@ -84,28 +80,20 @@ void __mrfstr_avx512vbmi_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_avx512vbmi_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
-void __mrfstr_avx512vbmi_ntrev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
 void __mrfstr_avx512bw_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_avx512bw_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
-void __mrfstr_avx512bw_ntrev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
 void __mrfstr_avx2_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_avx2_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
-void __mrfstr_avx2_ntrev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
 void __mrfstr_ssse3_rev(
     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size);
 void __mrfstr_ssse3_rev2(
-    mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
-void __mrfstr_ssse3_ntrev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
 void __mrfstr_i64_rev(

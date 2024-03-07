@@ -48,22 +48,22 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         return EXIT_FAILURE;                                       \
     } while (0)
 
-#define MRFSTR_BLIB_INIT(x, fr)                    \
-    do                                             \
-    {                                              \
-        x = mrfstr_init();                         \
-        if (!x)                                    \
-        {                                          \
-            fr;                                    \
-            MRFSTR_BLIB_ERROR;                     \
-        }                                          \
-                                                   \
-        if (mrfstr_alloc(x, tests[nsec - 1].size)) \
-        {                                          \
-            mrfstr_free(x);                        \
-            fr;                                    \
-            MRFSTR_BLIB_ERROR;                     \
-        }                                          \
+#define MRFSTR_BLIB_INIT(x, fr)                        \
+    do                                                 \
+    {                                                  \
+        x = mrfstr_init();                             \
+        if (!x)                                        \
+        {                                              \
+            fr;                                        \
+            MRFSTR_BLIB_ERROR;                         \
+        }                                              \
+                                                       \
+        if (mrfstr_alloc(x, (tests + nsec - 1)->size)) \
+        {                                              \
+            mrfstr_free(x);                            \
+            fr;                                        \
+            MRFSTR_BLIB_ERROR;                         \
+        }                                              \
     } while (0)
 
 #define MRFSTR_BLIB_INIT_STR(x, fr)                              \
@@ -140,7 +140,6 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                     end *= 0x40000000;                                          \
                     break;                                                      \
                 }                                                               \
-                                                                                \
                 continue;                                                       \
             }                                                                   \
                                                                                 \
@@ -166,7 +165,6 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                     step *= 0x40000000;                                         \
                     break;                                                      \
                 }                                                               \
-                                                                                \
                 continue;                                                       \
             }                                                                   \
                                                                                 \
@@ -200,7 +198,6 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                     ntime *= 3600;                                              \
                     break;                                                      \
                 }                                                               \
-                                                                                \
                 continue;                                                       \
             }                                                                   \
                                                                                 \
@@ -286,13 +283,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
-#define MRFSTR_BLIB_FIRST                                              \
-    do                                                                 \
-    {                                                                  \
-        mrfstr_config_thread_count_max(MRFSTR_TRUE);                   \
-        mrfstr_config_thread_priority(MRFSTR_CONFIG_PRIORITY_HIGHEST); \
-        mrfstr_config_thread_limit(0x2000000);                         \
-    } while (0)
+#define MRFSTR_BLIB_FIRST mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME)
 
 #define MRFSTR_BLIB_ROUND_CSTR                                             \
     do                                                                     \
@@ -406,13 +397,11 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
-#define MRFSTR_BLIB_FIRST                                              \
-    do                                                                 \
-    {                                                                  \
-        QueryPerformanceFrequency(&freq);                              \
-        mrfstr_config_thread_count_max(MRFSTR_TRUE);                   \
-        mrfstr_config_thread_priority(MRFSTR_CONFIG_PRIORITY_HIGHEST); \
-        mrfstr_config_thread_limit(0x1000000);                         \
+#define MRFSTR_BLIB_FIRST                           \
+    do                                              \
+    {                                               \
+        QueryPerformanceFrequency(&freq);           \
+        mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME); \
     } while (0)
 
 #define MRFSTR_BLIB_ROUND_CSTR                                                 \

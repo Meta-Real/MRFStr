@@ -54,54 +54,46 @@ void __mrfstr_fill(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.mem_tlimit)
     {
-        mrfstr_byte_t mask;
-
-        mask = _mrfstr_config.nmem_size - 1;
-        rem = (uintptr_t)res & mask;
+        rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nmem_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_fill_rem;
         }
 
-        rem = size & mask;
+        rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
         res += size;
-        if (size < _mrfstr_config.nlimit)
-            _mrfstr_config.bfill_sub(res, chr, (mrfstr_size_t)-(mrfstr_slonglong_t)size);
-        else
-            _mrfstr_config.nfill_sub(res, chr, (mrfstr_size_t)-(mrfstr_slonglong_t)size);
+        _mrfstr_config.fill_func(res, chr, size);
 
         mrfstr_fill_rem;
         return;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.mem_tlimit);
 
-    rem = (uintptr_t)res & (_mrfstr_config.tmem_size - 1);
+    rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.tmem_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_fill_rem;
     }
 
-    factor = _mrfstr_config.tmem_size * tcount;
-    rem = size % factor;
-    size = (mrfstr_size_t)-(mrfstr_slonglong_t)
-        ((size / factor) * _mrfstr_config.tmem_size);
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (size - rem) / tcount;
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
-        res -= size;
-        _mrfstr_config.nfill_sub(res, chr, size);
+        res += size;
+        _mrfstr_config.fill_func(res, chr, size);
 
         mrfstr_fill_rem;
         return;
@@ -113,7 +105,7 @@ void __mrfstr_fill(
         if (!data)
             break;
 
-        res -= size;
+        res += size;
 
         data->res = res;
         data->size = size;
@@ -121,7 +113,7 @@ void __mrfstr_fill(
 
         mrfstr_create_thread(__mrfstr_fill_threaded)
         {
-            res += size;
+            res -= size;
 
             free(data);
             break;
@@ -133,8 +125,8 @@ void __mrfstr_fill(
     tcount -= i;
 
     size *= tcount;
-    res -= size;
-    _mrfstr_config.tfill_sub(res, chr, size);
+    res += size;
+    _mrfstr_config.fill_tfunc(res, chr, size);
 
     mrfstr_fill_rem;
 
@@ -153,7 +145,7 @@ DWORD WINAPI __mrfstr_fill_threaded(
     mrfstr_fill_t data;
 
     data = (mrfstr_fill_t)args;
-    _mrfstr_config.tfill_sub(data->res, data->chr, data->size);
+    _mrfstr_config.fill_tfunc(data->res, data->chr, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

@@ -428,6 +428,7 @@ void mrfstr_config_func_all(
         break;
     case MRFSTR_CONFIG_LEVEL_LIMITED:
         simdset = MRFSTR_SIMD_SSE2 * MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE2);
+        break;
     case MRFSTR_CONFIG_LEVEL_OFF:
         simdset = MRFSTR_SIMD_INT64;
         break;

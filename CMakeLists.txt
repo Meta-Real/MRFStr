@@ -53,6 +53,9 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_sources(MRFStr
+        PRIVATE core/scopy.S
+        PRIVATE core/sfill.S
+        PRIVATE core/srev.S
         PRIVATE cpuid/cputype.S
         PRIVATE cpuid/funccnt.S
         PRIVATE cpuid/simdset.S

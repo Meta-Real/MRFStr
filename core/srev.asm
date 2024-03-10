@@ -38,7 +38,6 @@ simdd ends
 __mrfstr_avx512vbmi_rev proc
     mov rax, r8
     neg rax
-
     sub rcx, 64
     vmovdqa64 zmm18, [_avx512vbmi]
 
@@ -69,7 +68,6 @@ __mrfstr_avx512vbmi_rev endp
 __mrfstr_avx512vbmi_rev2 proc
     mov rax, r8
     neg rax
-
     sub rcx, 64
     vmovdqa64 zmm17, [_avx512vbmi]
 
@@ -95,7 +93,6 @@ __mrfstr_avx512vbmi_rev2 endp
 __mrfstr_avx512bw_rev proc
     mov rax, r8
     neg rax
-
     sub rcx, 64
     vmovdqa64 zmm18, [_avx512bw1]
     vmovdqa64 zmm19, [_avx512bw2]
@@ -129,7 +126,6 @@ __mrfstr_avx512bw_rev endp
 __mrfstr_avx512bw_rev2 proc
     mov rax, r8
     neg rax
-
     sub rcx, 64
     vmovdqa64 zmm17, [_avx512bw1]
     vmovdqa64 zmm18, [_avx512bw2]
@@ -159,7 +155,6 @@ __mrfstr_avx512bw_rev2 endp
 __mrfstr_avx2_rev proc
     mov rax, r8
     neg rax
-
     sub rcx, 32
     vmovdqa ymm2, ymmword ptr [_avx2]
 
@@ -193,7 +188,6 @@ __mrfstr_avx2_rev endp
 __mrfstr_avx2_rev2 proc
     mov rax, r8
     neg rax
-
     sub rcx, 32
     vmovdqa ymm1, ymmword ptr [_avx2]
 

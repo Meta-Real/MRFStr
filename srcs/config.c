@@ -28,6 +28,9 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_i64_rev, __mrfstr_i64_rev2,
     __mrfstr_i64_rev, __mrfstr_i64_rev2,
     (mrfstr_size_t)-1,
+    __mrfstr_sse4_1_replchr, __mrfstr_sse4_1_replchr2,
+    __mrfstr_sse4_1_replchr, __mrfstr_sse4_1_replchr2,
+    (mrfstr_size_t)-1,
     1,
 #ifdef MRFSTR_BUILD_UNIX
     0,
@@ -55,6 +58,7 @@ mrfstr_res_t mrfstr_config(
         _mrfstr_mem_ntlimit = 0x200000;
         _mrfstr_config.mem_tlimit = 0x8000000;
         _mrfstr_config.rev_tlimit = 0x8000000;
+        _mrfstr_config.repl_tlimit = 0x8000000;
         break;
     case MRFSTR_CONFIG_LEVEL_OFF:
         _mrfstr_config.tcount = 1;
@@ -63,6 +67,7 @@ mrfstr_res_t mrfstr_config(
         _mrfstr_mem_ntlimit = (mrfstr_size_t)-1;
         _mrfstr_config.mem_tlimit = (mrfstr_size_t)-1;
         _mrfstr_config.rev_tlimit = (mrfstr_size_t)-1;
+        _mrfstr_config.repl_tlimit = (mrfstr_size_t)-1;
         break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
@@ -225,7 +230,7 @@ mrfstr_res_t mrfstr_config_func(
             _mrfstr_config.fill_func = __mrfstr_i64_fill;
             break;
         default:
-            return MRFSTR_RES_SUPPORT_ERROR;
+            return MRFSTR_RES_TYPE_ERROR;
         }
         switch (multi)
         {
@@ -265,7 +270,7 @@ mrfstr_res_t mrfstr_config_func(
             _mrfstr_config.fill_tfunc = __mrfstr_i64_fill;
             break;
         default:
-            return MRFSTR_RES_SUPPORT_ERROR;
+            return MRFSTR_RES_TYPE_ERROR;
         }
         break;
     case MRFSTR_CONFIG_FUNC_REVERSE:
@@ -308,7 +313,7 @@ mrfstr_res_t mrfstr_config_func(
             _mrfstr_config.rev2_func = __mrfstr_i64_rev2;
             break;
         default:
-            return MRFSTR_RES_SUPPORT_ERROR;
+            return MRFSTR_RES_TYPE_ERROR;
         }
         switch (multi)
         {
@@ -349,7 +354,79 @@ mrfstr_res_t mrfstr_config_func(
             _mrfstr_config.rev2_tfunc = __mrfstr_i64_rev2;
             break;
         default:
+            return MRFSTR_RES_TYPE_ERROR;
+        }
+        break;
+    case MRFSTR_CONFIG_FUNC_REPLACE:
+        switch (single)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX512BW))
+            {
+                _mrfstr_config.replchr_func = __mrfstr_avx512bw_replchr;
+                _mrfstr_config.replchr2_func = __mrfstr_avx512bw_replchr2;
+                break;
+            }
+
             return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_AVX:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX2))
+            {
+                _mrfstr_config.replchr_func = __mrfstr_avx2_replchr;
+                _mrfstr_config.replchr2_func = __mrfstr_avx2_replchr2;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_SSE:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE4_1))
+            {
+                _mrfstr_config.replchr_func = __mrfstr_sse4_1_replchr;
+                _mrfstr_config.replchr2_func = __mrfstr_sse4_1_replchr2;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_INT64:
+            _mrfstr_config.replchr_func = __mrfstr_sse4_1_replchr;
+            _mrfstr_config.replchr2_func = __mrfstr_sse4_1_replchr2;
+            break;
+        default:
+            return MRFSTR_RES_TYPE_ERROR;
+        }
+        switch (multi)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX512BW))
+            {
+                _mrfstr_config.replchr_tfunc = __mrfstr_avx512bw_replchr;
+                _mrfstr_config.replchr2_tfunc = __mrfstr_avx512bw_replchr2;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_AVX:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX2))
+            {
+                _mrfstr_config.replchr_tfunc = __mrfstr_avx2_replchr;
+                _mrfstr_config.replchr2_tfunc = __mrfstr_avx2_replchr2;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_SSE:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE4_1))
+            {
+                _mrfstr_config.replchr_tfunc = __mrfstr_sse4_1_replchr;
+                _mrfstr_config.replchr2_tfunc = __mrfstr_sse4_1_replchr2;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_INT64:
+            _mrfstr_config.replchr_tfunc = __mrfstr_sse4_1_replchr;
+            _mrfstr_config.replchr2_tfunc = __mrfstr_sse4_1_replchr2;
+            break;
+        default:
+            return MRFSTR_RES_TYPE_ERROR;
         }
         break;
     default:
@@ -375,6 +452,10 @@ mrfstr_res_t mrfstr_config_limits(
         if (tlimit)
             _mrfstr_config.rev_tlimit = tlimit;
         break;
+    case MRFSTR_CONFIG_FUNC_REPLACE:
+        if (tlimit)
+            _mrfstr_config.repl_tlimit = tlimit;
+        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -398,6 +479,10 @@ mrfstr_res_t mrfstr_config_limits_get(
         if (tlimit)
             *tlimit = _mrfstr_config.rev_tlimit;
         break;
+    case MRFSTR_CONFIG_FUNC_REPLACE:
+        if (tlimit)
+            *tlimit = _mrfstr_config.repl_tlimit;
+        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -419,15 +504,10 @@ void mrfstr_config_func_all(
     case MRFSTR_CONFIG_LEVEL_MODERATE:
         if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX2))
             simdset = MRFSTR_SIMD_AVX2;
-        else if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX))
-            simdset = MRFSTR_SIMD_AVX;
-        else if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE2))
-            simdset = MRFSTR_SIMD_SSE2;
-        else
-            simdset = MRFSTR_SIMD_INT64;
         break;
     case MRFSTR_CONFIG_LEVEL_LIMITED:
-        simdset = MRFSTR_SIMD_SSE2 * MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE2);
+        if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE4_1))
+            simdset = MRFSTR_SIMD_SSE4_1;
         break;
     case MRFSTR_CONFIG_LEVEL_OFF:
         simdset = MRFSTR_SIMD_INT64;
@@ -447,6 +527,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_avx512vbmi_rev;
         _mrfstr_config.rev2_func = __mrfstr_avx512vbmi_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_avx512vbmi_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_avx512bw_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_avx512bw_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_avx512bw_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_avx512bw_replchr2;
         break;
     case MRFSTR_SIMD_AVX512BW:
         _mrfstr_config.copy_func = __mrfstr_avx512f_copy;
@@ -459,6 +543,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_avx512bw_rev;
         _mrfstr_config.rev2_func = __mrfstr_avx512bw_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_avx512bw_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_avx512bw_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_avx512bw_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_avx512bw_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_avx512bw_replchr2;
         break;
     case MRFSTR_SIMD_AVX512F:
         _mrfstr_config.copy_func = __mrfstr_avx512f_copy;
@@ -471,6 +559,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_avx2_rev;
         _mrfstr_config.rev2_func = __mrfstr_avx2_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_avx2_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_avx2_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_avx2_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_avx2_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_avx2_replchr2;
         break;
     case MRFSTR_SIMD_AVX2:
         _mrfstr_config.copy_func = __mrfstr_avx_copy;
@@ -483,6 +575,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_avx2_rev;
         _mrfstr_config.rev2_func = __mrfstr_avx2_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_avx2_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_avx2_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_avx2_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_avx2_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_avx2_replchr2;
         break;
     case MRFSTR_SIMD_AVX:
         _mrfstr_config.copy_func = __mrfstr_avx_copy;
@@ -495,8 +591,27 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_ssse3_rev;
         _mrfstr_config.rev2_func = __mrfstr_ssse3_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_ssse3_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_sse4_1_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_sse4_1_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_sse4_1_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_sse4_1_replchr2;
         break;
     case MRFSTR_SIMD_SSE4_1:
+        _mrfstr_config.copy_func = __mrfstr_sse2_copy;
+        _mrfstr_config.copy_tfunc = __mrfstr_sse2_ntcopy;
+        _mrfstr_config.rcopy_func = __mrfstr_sse2_rcopy;
+        _mrfstr_config.rcopy_tfunc = __mrfstr_sse2_ntrcopy;
+        _mrfstr_config.fill_func = __mrfstr_sse2_fill;
+        _mrfstr_config.fill_tfunc = __mrfstr_sse2_ntfill;
+        _mrfstr_config.rev_func = __mrfstr_ssse3_rev;
+        _mrfstr_config.rev_tfunc = __mrfstr_ssse3_rev;
+        _mrfstr_config.rev2_func = __mrfstr_ssse3_rev2;
+        _mrfstr_config.rev2_tfunc = __mrfstr_ssse3_rev2;
+        _mrfstr_config.replchr_func = __mrfstr_sse4_1_replchr;
+        _mrfstr_config.replchr_tfunc = __mrfstr_sse4_1_replchr;
+        _mrfstr_config.replchr2_func = __mrfstr_sse4_1_replchr2;
+        _mrfstr_config.replchr2_tfunc = __mrfstr_sse4_1_replchr2;
+        break;
     case MRFSTR_SIMD_SSSE3:
         _mrfstr_config.copy_func = __mrfstr_sse2_copy;
         _mrfstr_config.copy_tfunc = __mrfstr_sse2_ntcopy;
@@ -508,6 +623,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_ssse3_rev;
         _mrfstr_config.rev2_func = __mrfstr_ssse3_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_ssse3_rev2;
+        //_mrfstr_config.replchr_func = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr_tfunc = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr2_func = __mrfstr_i64_replchr2;
+        //_mrfstr_config.replchr2_tfunc = __mrfstr_i64_replchr2;
         break;
     case MRFSTR_SIMD_SSE2:
         _mrfstr_config.copy_func = __mrfstr_sse2_copy;
@@ -520,6 +639,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_i64_rev;
         _mrfstr_config.rev2_func = __mrfstr_i64_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_i64_rev2;
+        //_mrfstr_config.replchr_func = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr_tfunc = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr2_func = __mrfstr_i64_replchr2;
+        //_mrfstr_config.replchr2_tfunc = __mrfstr_i64_replchr2;
         break;
     case MRFSTR_SIMD_INT64:
         _mrfstr_config.copy_func = __mrfstr_i64_copy;
@@ -532,6 +655,10 @@ void mrfstr_config_func_all(
         _mrfstr_config.rev_tfunc = __mrfstr_i64_rev;
         _mrfstr_config.rev2_func = __mrfstr_i64_rev2;
         _mrfstr_config.rev2_tfunc = __mrfstr_i64_rev2;
+        //_mrfstr_config.replchr_func = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr_tfunc = __mrfstr_i64_replchr;
+        //_mrfstr_config.replchr2_func = __mrfstr_i64_replchr2;
+        //_mrfstr_config.replchr2_tfunc = __mrfstr_i64_replchr2;
         break;
     }
 }

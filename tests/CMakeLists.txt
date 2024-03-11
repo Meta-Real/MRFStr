@@ -14,9 +14,9 @@ add_executable(TReverse reverse.c)
 target_link_libraries(TReverse PRIVATE MRFStr)
 add_test(TReverse TReverse)
 
-#add_executable(TReplaceChr replace_chr.c)
-#target_link_libraries(TReplaceChr PRIVATE MRFStr)
-#add_test(TReplaceChr TReplaceChr)
+add_executable(TReplaceChr replace_chr.c)
+target_link_libraries(TReplaceChr PRIVATE MRFStr)
+add_test(TReplaceChr TReplaceChr)
 
 #add_executable(TEqual equal.c)
 #target_link_libraries(TEqual PRIVATE MRFStr)

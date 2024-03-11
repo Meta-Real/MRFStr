@@ -101,4 +101,42 @@ void __mrfstr_i64_rev(
 void __mrfstr_i64_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
+/* replace chr functions */
+
+void __mrfstr_avx512bw_replchr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+void __mrfstr_avx512bw_replchr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+
+void __mrfstr_avx2_replchr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+void __mrfstr_avx2_replchr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+
+void __mrfstr_sse4_1_replchr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+void __mrfstr_sse4_1_replchr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+
+void __mrfstr_i64_replchr(
+    mrfstr_ptr_t str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+void __mrfstr_i64_replchr2(
+    mrfstr_ptr_t res, mrfstr_ptr_ct str,
+    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+    mrfstr_size_t size);
+
 #endif

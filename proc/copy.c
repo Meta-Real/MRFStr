@@ -106,11 +106,8 @@ void __mrfstr_copy(
         if (!data)
             break;
 
-        dst += size;
-        src += size;
-
-        data->dst = dst;
-        data->src = src;
+        data->dst = dst += size;
+        data->src = src += size;
         data->size = size;
 
         mrfstr_create_thread(__mrfstr_copy_threaded)

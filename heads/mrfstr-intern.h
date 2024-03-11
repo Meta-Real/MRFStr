@@ -127,6 +127,28 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_size_t rev_tlimit;
 
+    /* repl functions */
+
+    void (*replchr_func)(
+        mrfstr_ptr_t,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    void (*replchr2_func)(
+        mrfstr_ptr_t, mrfstr_ptr_ct,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+
+    void (*replchr_tfunc)(
+        mrfstr_ptr_t,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+    void (*replchr2_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_ct,
+        mrfstr_chr_t, mrfstr_chr_t,
+        mrfstr_size_t);
+
+    mrfstr_size_t repl_tlimit;
+
     /* general */
 
     mrfstr_byte_t tcount;

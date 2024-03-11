@@ -48,22 +48,22 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         return EXIT_FAILURE;                                       \
     } while (0)
 
-#define MRFSTR_BLIB_INIT(x, fr)                        \
-    do                                                 \
-    {                                                  \
-        x = mrfstr_init();                             \
-        if (!x)                                        \
-        {                                              \
-            fr;                                        \
-            MRFSTR_BLIB_ERROR;                         \
-        }                                              \
-                                                       \
-        if (mrfstr_alloc(x, (tests + nsec - 1)->size)) \
-        {                                              \
-            mrfstr_free(x);                            \
-            fr;                                        \
-            MRFSTR_BLIB_ERROR;                         \
-        }                                              \
+#define MRFSTR_BLIB_INIT(x, fr)                    \
+    do                                             \
+    {                                              \
+        x = mrfstr_init();                         \
+        if (!x)                                    \
+        {                                          \
+            fr;                                    \
+            MRFSTR_BLIB_ERROR;                     \
+        }                                          \
+                                                   \
+        if (mrfstr_alloc(x, tests[nsec - 1].size)) \
+        {                                          \
+            mrfstr_free(x);                        \
+            fr;                                    \
+            MRFSTR_BLIB_ERROR;                     \
+        }                                          \
     } while (0)
 
 #define MRFSTR_BLIB_INIT_STR(x, fr)                              \

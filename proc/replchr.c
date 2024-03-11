@@ -71,7 +71,7 @@ void __mrfstr_replchr(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     mrfstr_thread_t *threads;
@@ -85,51 +85,47 @@ void __mrfstr_replchr(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.repl_tlimit)
     {
-        mrfstr_byte_t mask;
-
-        mask = _mrfstr_config.nrepl_size - 1;
-        rem = (uintptr_t)str & mask;
+        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nrepl_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_replchr_rem;
         }
 
-        rem = size & mask;
+        rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
-        _mrfstr_config.nreplchr_sub(
-            str, ochr, nchr, size / _mrfstr_config.nrepl_size);
         str += size;
+        _mrfstr_config.replchr_func(str, ochr, nchr,
+            (mrfstr_size_t)-(mrfstr_slonglong_t)size);
 
         mrfstr_replchr_rem;
         return;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.repl_tlimit);
 
-    rem = (uintptr_t)str & (_mrfstr_config.trepl_size - 1);
+    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.trepl_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_replchr_rem;
     }
 
-    factor = _mrfstr_config.trepl_size * tcount;
-    rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.trepl_size;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (mrfstr_size_t)-(mrfstr_slonglong_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.treplchr_sub(str, ochr, nchr, size * tcount);
-        inc *= tcount;
-        str += inc;
+        size *= tcount;
+        str -= size;
+        _mrfstr_config.replchr_tfunc(str, ochr, nchr, size);
 
         mrfstr_replchr_rem;
         return;
@@ -141,15 +137,14 @@ void __mrfstr_replchr(
         if (!data)
             break;
 
-        data->str = str;
+        data->str = str -= size;
         data->size = size;
         data->ochr = ochr;
         data->nchr = nchr;
 
-        str += inc;
         mrfstr_create_thread(__mrfstr_replchr_threaded)
         {
-            str -= inc;
+            str += size;
 
             free(data);
             break;
@@ -159,9 +154,10 @@ void __mrfstr_replchr(
     }
 
     tcount -= i;
-    _mrfstr_config.treplchr_sub(str, ochr, nchr, size * tcount);
-    inc *= tcount;
-    str += inc;
+
+    size *= tcount;
+    str -= size;
+    _mrfstr_config.replchr_tfunc(str, ochr, nchr, size);
 
     mrfstr_replchr_rem;
 
@@ -174,7 +170,7 @@ void __mrfstr_replchr2(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     mrfstr_thread_t *threads;
@@ -187,53 +183,49 @@ void __mrfstr_replchr2(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.repl_tlimit)
     {
-        mrfstr_byte_t mask;
-
-        mask = _mrfstr_config.nrepl_size - 1;
-        rem = (uintptr_t)str & mask;
+        rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nrepl_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_replchr2_rem;
         }
 
-        rem = size & mask;
+        rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
-        _mrfstr_config.nreplchr2_sub(
-            res, str, ochr, nchr, size / _mrfstr_config.nrepl_size);
         res += size;
         str += size;
+        _mrfstr_config.replchr2_func(res, str, ochr, nchr,
+            (mrfstr_size_t)-(mrfstr_slonglong_t)size);
 
         mrfstr_replchr2_rem;
         return;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.repl_tlimit);
 
-    rem = (uintptr_t)res & (_mrfstr_config.trepl_size - 1);
+    rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.trepl_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_replchr2_rem;
     }
 
-    factor = _mrfstr_config.trepl_size * tcount;
-    rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.trepl_size;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (mrfstr_size_t)-(mrfstr_slonglong_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-        _mrfstr_config.treplchr2_sub(res, str, ochr, nchr, size * tcount);
-        inc *= tcount;
-        res += inc;
-        str += inc;
+        size *= tcount;
+        res -= size;
+        str -= size;
+        _mrfstr_config.replchr2_tfunc(res, str, ochr, nchr, size);
 
         mrfstr_replchr2_rem;
         return;
@@ -245,18 +237,16 @@ void __mrfstr_replchr2(
         if (!data)
             break;
 
-        data->res = res;
-        data->str = str;
+        data->res = res -= size;
+        data->str = str -= size;
         data->size = size;
         data->ochr = ochr;
         data->nchr = nchr;
 
-        res += inc;
-        str += inc;
         mrfstr_create_thread(__mrfstr_replchr2_threaded)
         {
-            res -= inc;
-            str -= inc;
+            res += size;
+            str += size;
 
             free(data);
             break;
@@ -267,10 +257,10 @@ void __mrfstr_replchr2(
 
     tcount -= i;
 
-    _mrfstr_config.treplchr2_sub(res, str, ochr, nchr, size * tcount);
-    inc *= tcount;
-    res += inc;
-    str += inc;
+    size *= tcount;
+    res -= size;
+    str -= size;
+    _mrfstr_config.replchr2_tfunc(res, str, ochr, nchr, size);
 
     mrfstr_replchr2_rem;
 
@@ -289,7 +279,7 @@ DWORD WINAPI __mrfstr_replchr_threaded(
     mrfstr_replchr_t data;
 
     data = (mrfstr_replchr_t)args;
-    _mrfstr_config.treplchr_sub(data->str, data->ochr, data->nchr, data->size);
+    _mrfstr_config.replchr_tfunc(data->str, data->ochr, data->nchr, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;
@@ -306,7 +296,7 @@ DWORD WINAPI __mrfstr_replchr2_threaded(
     mrfstr_replchr2_t data;
 
     data = (mrfstr_replchr2_t)args;
-    _mrfstr_config.treplchr2_sub(
+    _mrfstr_config.replchr2_tfunc(
         data->res, data->str, data->ochr, data->nchr, data->size);
 
     free(data);

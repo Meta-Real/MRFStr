@@ -61,9 +61,6 @@ mrfstr_res_t mrfstr_repeat(
     diff = size - MRFSTR_SIZE(res);
     while (MRFSTR_SIZE(res) <= diff)
     {
-        printf("%zu\n", MRFSTR_SIZE(res));
-        mrfstr_n_export(res, 10);
-        printf("\n");
         __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(res), MRFSTR_SIZE(res));
         MRFSTR_SIZE(res) <<= 1;
         diff = size - MRFSTR_SIZE(res);

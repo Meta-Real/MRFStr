@@ -220,4 +220,107 @@ LHEAD:
     ret
 __mrfstr_sse4_1_replchr2 endp
 
+; void __mrfstr_i64_replchr(
+;     mrfstr_ptr_t str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_i64_replchr proc
+    push rbx
+
+    imul edx, 01010101h
+    mov r11d, edx
+    shl r11, 32
+    or r11, rdx
+    mov rbx, 7f7f7f7f7f7f7f7fh
+
+LHEAD:
+    mov r10, [rcx+r9]
+    mov rdx, r10
+
+    xor rdx, r11
+    mov rax, rdx
+
+    and rax, rbx
+    lea rax, [rax+rbx]
+    or rax, rdx
+    or rax, rbx
+    not rax
+    shr rax, 7
+
+    mov rdx, rax
+    imul rdx, 255
+    not rdx
+    and r10, rdx
+
+    imul rax, r8
+    or r10, rax
+    mov [rcx+r9], r10
+
+    add r9, 8
+    jnz LHEAD
+
+    pop rbx
+    ret
+__mrfstr_i64_replchr endp
+
+; void __mrfstr_i64_replchr2(
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; res = RES+SIZE
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_i64_replchr2 proc
+    push rbx
+    push rbp
+
+    imul r8d, 01010101h
+    mov eax, r8d
+    shl r8, 32
+    or r8, rax
+    mov rbx, 7f7f7f7f7f7f7f7fh
+
+    mov rbp, [rsp+56]
+
+LHEAD:
+    mov r10, [rdx+rbp]
+    mov r11, r10
+
+    xor r11, r8
+    mov rax, r11
+
+    and rax, rbx
+    lea rax, [rax+rbx]
+    or rax, r11
+    or rax, rbx
+    not rax
+    shr rax, 7
+
+    mov r11, rax
+    imul r11, 255
+    not r11
+    and r10, r11
+
+    imul rax, r9
+    or r10, rax
+    mov [rcx+rbp], r10
+
+    add rbp, 8
+    jnz LHEAD
+
+    pop rbp
+    pop rbx
+    ret
+__mrfstr_i64_replchr2 endp
+
 end

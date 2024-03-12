@@ -48,40 +48,40 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         return EXIT_FAILURE;                                       \
     } while (0)
 
-#define MRFSTR_BLIB_INIT(x, fr)                    \
-    do                                             \
-    {                                              \
-        x = mrfstr_init();                         \
-        if (!x)                                    \
-        {                                          \
-            fr;                                    \
-            MRFSTR_BLIB_ERROR;                     \
-        }                                          \
-                                                   \
-        if (mrfstr_alloc(x, tests[nsec - 1].size)) \
-        {                                          \
-            mrfstr_free(x);                        \
-            fr;                                    \
-            MRFSTR_BLIB_ERROR;                     \
-        }                                          \
+#define MRFSTR_BLIB_INIT(x, fr)   \
+    do                            \
+    {                             \
+        x = mrfstr_init();        \
+        if (!x)                   \
+        {                         \
+            fr;                   \
+            MRFSTR_BLIB_ERROR;    \
+        }                         \
+                                  \
+        if (mrfstr_alloc(x, end)) \
+        {                         \
+            mrfstr_free(x);       \
+            fr;                   \
+            MRFSTR_BLIB_ERROR;    \
+        }                         \
     } while (0)
 
-#define MRFSTR_BLIB_INIT_STR(x, fr)                              \
-    do                                                           \
-    {                                                            \
-        x = malloc(tests[nsec - 1].size * sizeof(mrfstr_chr_t)); \
-        if (!x)                                                  \
-        {                                                        \
-            fr;                                                  \
-            MRFSTR_BLIB_ERROR;                                   \
-        }                                                        \
+#define MRFSTR_BLIB_INIT_STR(x, fr)             \
+    do                                          \
+    {                                           \
+        x = malloc(end * sizeof(mrfstr_chr_t)); \
+        if (!x)                                 \
+        {                                       \
+            fr;                                 \
+            MRFSTR_BLIB_ERROR;                  \
+        }                                       \
     } while (0)
 
 #define MRFSTR_BLIB_ARGS                                                        \
     do                                                                          \
     {                                                                           \
         mrfstr_data_t ptr;                                                      \
-        mrfstr_size_t start, end, step;                                         \
+        mrfstr_size_t start, step;                                              \
         mrfstr_short_t i;                                                       \
         mrfstr_bool_t exponential;                                              \
                                                                                 \
@@ -93,7 +93,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         ncount = 2;                                                             \
         format = MRFSTR_BLIB_FORMAT_NORM;                                       \
         file = NULL;                                                            \
-        for (i = 1; i < argc; i++)                                              \
+        for (i = 1; i != argc; i++)                                             \
         {                                                                       \
             ptr = (mrfstr_data_t)argv[i];                                       \
             if (!memcmp(ptr, "start=", 6))                                      \
@@ -233,7 +233,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         if (format == MRFSTR_BLIB_FORMAT_CSV)                                   \
             file = fopen("benchmarks", "wb");                                   \
                                                                                 \
-        for (i = 0; i < nsec; i++)                                              \
+        for (i = 0; i != nsec; i++)                                             \
         {                                                                       \
             tests[i].size = start;                                              \
             if (start < 1024)                                                   \
@@ -278,6 +278,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
 #include <sys/time.h>
 
 #define MRFSTR_BLIB_VARS                \
+    mrfstr_size_t end;                  \
     mrfstr_short_t nsec, ntime, ncount; \
     mrfstr_byte_t format;               \
     FILE *file;                         \
@@ -296,12 +297,12 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
         {                                                                  \
             fputc('\t', file);                                             \
-            for (_i = 0; _i < nsec; _i++)                                  \
+            for (_i = 0; _i != nsec; _i++)                                 \
                 fprintf(file, "%.2f%s\t",                                  \
                     tests[_i].label_size, tests[_i].label);                \
             fputs("\nCSTR\t", file);                                       \
         }                                                                  \
-        for (_i = 0; _i < nsec; _i++)                                      \
+        for (_i = 0; _i != nsec; _i++)                                     \
         {                                                                  \
             _total = 0;                                                    \
             _count = 0;                                                    \
@@ -348,7 +349,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                                                                     \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                       \
             fprintf(file, "%s\t", name);                            \
-        for (_i = 0; _i < nsec; _i++)                               \
+        for (_i = 0; _i != nsec; _i++)                              \
         {                                                           \
             _total = 0;                                             \
             _count = 0;                                             \
@@ -392,6 +393,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
 
 #define MRFSTR_BLIB_VARS                \
     LARGE_INTEGER freq;                 \
+    mrfstr_size_t end;                  \
     mrfstr_short_t nsec, ntime, ncount; \
     mrfstr_byte_t format;               \
     FILE *file;                         \
@@ -414,12 +416,12 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
         {                                                                      \
             fputc('\t', file);                                                 \
-            for (_i = 0; _i < nsec; _i++)                                      \
+            for (_i = 0; _i != nsec; _i++)                                     \
                 fprintf(file, "%.2f%s\t",                                      \
                     tests[_i].label_size, tests[_i].label);                    \
             fputs("\nCSTR\t", file);                                           \
         }                                                                      \
-        for (_i = 0; _i < nsec; _i++)                                          \
+        for (_i = 0; _i != nsec; _i++)                                         \
         {                                                                      \
             _total.QuadPart = 0;                                               \
             _count = 0;                                                        \
@@ -465,7 +467,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                                                                                \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
             fprintf(file, "%s\t", name);                                       \
-        for (_i = 0; _i < nsec; _i++)                                          \
+        for (_i = 0; _i != nsec; _i++)                                         \
         {                                                                      \
             _total.QuadPart = 0;                                               \
             _count = 0;                                                        \

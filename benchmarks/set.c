@@ -36,7 +36,7 @@ int main(int argc, mrfstr_data_ct *argv)
     MRFSTR_BLIB_FIRST;
     MRFSTR_BLIB_INIT_STR(csrc,);
     MRFSTR_BLIB_INIT_STR(cdst, free(csrc));
-    memset(csrc, '0', tests[nsec - 1].size);
+    memset(csrc, '0', end);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(csrc);
@@ -44,7 +44,7 @@ int main(int argc, mrfstr_data_ct *argv)
 
     MRFSTR_BLIB_INIT(src,);
     MRFSTR_BLIB_INIT(dst, mrfstr_free(src));
-    mrfstr_repeat_chr(src, '0', tests[nsec - 1].size);
+    mrfstr_repeat_chr(src, '0', end);
 
     if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
             MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)

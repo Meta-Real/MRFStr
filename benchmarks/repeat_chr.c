@@ -35,7 +35,7 @@ int main(int argc, mrfstr_data_ct *argv)
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
     MRFSTR_BLIB_INIT_STR(cres,);
-    memset(cres, '0', tests[nsec - 1].size);
+    memset(cres, '0', end);
 
     MRFSTR_BLIB_ROUND_CSTR;
     free(cres);

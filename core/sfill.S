@@ -15,13 +15,13 @@
     .extern _mrfstr_mem_ntlimit
 
 #ifdef WIN32
-.set dst, %rcx
-.set chr, %edx
-.set size, %r8
+#define dst %rcx
+#define chr %edx
+#define size %r8
 #else
-.set dst, %rsi
-.set chr, %edi
-.set size, %rcx
+#define dst %rsi
+#define chr %edi
+#define size %rcx
 #endif
 
 .text
@@ -34,6 +34,10 @@
 
     .globl __mrfstr_avx512f_fill
 __mrfstr_avx512f_fill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     vpbroadcastd chr, %zmm16
 
@@ -70,6 +74,10 @@ NTLHEAD1:
 
     .globl __mrfstr_avx512f_ntfill
 __mrfstr_avx512f_ntfill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     vpbroadcastd chr, %zmm16
     neg size
@@ -91,6 +99,10 @@ LHEAD2:
 
     .globl __mrfstr_avx_fill
 __mrfstr_avx_fill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     movd chr, %xmm0
     pshufd $0, %xmm0, %xmm0
@@ -131,6 +143,10 @@ NTLHEAD2:
 
     .globl __mrfstr_avx_ntfill
 __mrfstr_avx_ntfill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     movd chr, %xmm0
     pshufd $0, %xmm0, %xmm0
@@ -155,6 +171,10 @@ LHEAD4:
 
     .globl __mrfstr_sse2_fill
 __mrfstr_sse2_fill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     movd chr, %xmm0
     pshufd $0, %xmm0, %xmm0
@@ -192,6 +212,10 @@ NTLHEAD3:
 
     .globl __mrfstr_sse2_ntfill
 __mrfstr_sse2_ntfill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     movd chr, %xmm0
     pshufd $0, %xmm0, %xmm0
@@ -214,6 +238,10 @@ LHEAD6:
 
     .globl __mrfstr_i64_fill
 __mrfstr_i64_fill:
+#ifdef __clang__
+    and $255, chr
+#endif
+
     imul $0x01010101, chr
     mov chr, %eax
     neg size

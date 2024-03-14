@@ -15,23 +15,23 @@
     .extern _mrfstr_cmp_load
 
 #ifdef WIN32
-.set str1, %rcx
-.set str2, %rdx
-.set size, %r8
+#define str1 %rcx
+#define str2 %rdx
+#define size %r8
 
-.set res2, %rcx
-.set str12, %rdx
-.set str22, %r8
-.set size2, %r9
+#define res2 %rcx
+#define str12 %rdx
+#define str22 %r8
+#define size2 %r9
 #else
-.set str1, %rsi
-.set str2, %rdi
-.set size, %rcx
+#define str1 %rsi
+#define str2 %rdi
+#define size %rcx
 
-.set res2, %rsi
-.set str12, %rdi
-.set str22, %rcx
-.set size2, %rdx
+#define res2 %rsi
+#define str12 %rdi
+#define str22 %rcx
+#define size2 %rdx
 #endif
 
 .text

@@ -15,13 +15,13 @@
     .extern _mrfstr_mem_ntlimit
 
 #ifdef WIN32
-.set dst, %rcx
-.set src, %rdx
-.set size, %r8
+#define dst %rcx
+#define src %rdx
+#define size %r8
 #else
-.set dst, %rsi
-.set src, %rdi
-.set size, %rcx
+#define dst %rsi
+#define src %rdi
+#define size %rcx
 #endif
 
 .text

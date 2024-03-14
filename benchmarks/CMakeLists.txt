@@ -1,7 +1,3 @@
-if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lm")
-endif()
-
 add_executable(BSet set.c)
 target_link_libraries(BSet PRIVATE MRFStr)
 

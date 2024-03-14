@@ -13,13 +13,13 @@
 # copies or substantial portions of the Software.
 
 #ifdef WIN32
-.set left, %rcx
-.set right, %rdx
-.set size, %r8
+#define left %rcx
+#define right %rdx
+#define size %r8
 #else
-.set left, %rsi
-.set right, %rdi
-.set size, %rcx
+#define left %rsi
+#define right %rdi
+#define size %rcx
 #endif
 
 .text

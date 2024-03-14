@@ -13,39 +13,39 @@
 # copies or substantial portions of the Software.
 
 #ifdef WIN32
-.set str, %rcx
-.set ochr, %edx
-.set nchr, %r8d
-.set size, %r9
+#define str %rcx
+#define ochr %edx
+#define nchr %r8d
+#define size %r9
 
-.set rochr, %rdx
-.set rnchr, %r8
+#define rochr %rdx
+#define rnchr %r8
 
-.set res2, %rcx
-.set str2, %rdx
-.set ochr2, %r8d
-.set nchr2, %r9d
-.set size2, %rax
+#define res2 %rcx
+#define str2 %rdx
+#define ochr2 %r8d
+#define nchr2 %r9d
+#define size2 %rax
 
-.set rochr2, %r8
-.set rnchr2, %r9
+#define rochr2 %r8
+#define rnchr2 %r9
 #else
-.set str, %rsi
-.set ochr, %edi
-.set nchr, %ecx
-.set size, %rdx
+#define str %rsi
+#define ochr %edi
+#define nchr %ecx
+#define size %rdx
 
-.set rochr, %rdi
-.set rnchr, %rcx
+#define rochr %rdi
+#define rnchr %rcx
 
-.set res2, %rsi
-.set str2, %rdi
-.set ochr2, %ecx
-.set nchr2, %edx
-.set size2, %r8
+#define res2 %rsi
+#define str2 %rdi
+#define ochr2 %ecx
+#define nchr2 %edx
+#define size2 %r8
 
-.set rochr2, %rcx
-.set rnchr2, %rdx
+#define rochr2 %rcx
+#define rnchr2 %rdx
 #endif
 
 .text
@@ -62,6 +62,11 @@
 
     .globl __mrfstr_avx512bw_replchr
 __mrfstr_avx512bw_replchr:
+#ifdef __clang__
+    and $255, ochr
+    and $255, nchr
+#endif
+
     imul $0x01010101, ochr
     vpbroadcastd ochr, %zmm16
     imul $0x01010101, nchr
@@ -89,6 +94,11 @@ LHEAD1:
 
     .globl __mrfstr_avx512bw_replchr2
 __mrfstr_avx512bw_replchr2:
+#ifdef __clang__
+    and $255, ochr2
+    and $255, nchr2
+#endif
+
     imul $0x01010101, ochr2
     vpbroadcastd ochr2, %zmm17
     imul $0x01010101, nchr2
@@ -123,6 +133,11 @@ LHEAD2:
 
     .globl __mrfstr_avx2_replchr
 __mrfstr_avx2_replchr:
+#ifdef __clang__
+    and $255, ochr
+    and $255, nchr
+#endif
+
     imul $0x01010101, ochr
     movd ochr, %xmm1
     pshufd $0, %xmm1, %xmm1
@@ -160,6 +175,11 @@ LHEAD3:
 
     .globl __mrfstr_avx2_replchr2
 __mrfstr_avx2_replchr2:
+#ifdef __clang__
+    and $255, ochr2
+    and $255, nchr2
+#endif
+
     imul $0x01010101, ochr2
     movd ochr2, %xmm1
     pshufd $0, %xmm1, %xmm1
@@ -200,6 +220,11 @@ LHEAD4:
 
     .globl __mrfstr_sse4_1_replchr
 __mrfstr_sse4_1_replchr:
+#ifdef __clang__
+    and $255, ochr
+    and $255, nchr
+#endif
+
     imul $0x01010101, ochr
     movd ochr, %xmm2
     pshufd $0, %xmm2, %xmm2
@@ -235,6 +260,11 @@ LHEAD5:
 
     .globl __mrfstr_sse4_1_replchr2
 __mrfstr_sse4_1_replchr2:
+#ifdef __clang__
+    and $255, ochr2
+    and $255, nchr2
+#endif
+
     imul $0x01010101, ochr2
     movd ochr2, %xmm2
     pshufd $0, %xmm2, %xmm2
@@ -273,6 +303,11 @@ LHEAD6:
 
     .globl __mrfstr_i64_replchr
 __mrfstr_i64_replchr:
+#ifdef __clang__
+    and $255, ochr
+    and $255, rnchr
+#endif
+
     push %rbx
 
     imul $0x01010101, ochr
@@ -323,6 +358,11 @@ LHEAD7:
 
     .globl __mrfstr_i64_replchr2
 __mrfstr_i64_replchr2:
+#ifdef __clang__
+    and $255, ochr2
+    and $255, rnchr2
+#endif
+
     push %rbx
     push %rbp
 

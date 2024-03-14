@@ -155,7 +155,7 @@ __mrfstr_sse2_fill proc
     neg r8
 
 LHEAD:
-    movdqa xmmword ptr [rcx+r8], xmm0
+    movdqa [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD
@@ -166,7 +166,7 @@ NTSTORE:
     neg r8
 
 NTLHEAD:
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movntdq [rcx+r8], xmm0
 
     add r8, 16
     jnz NTLHEAD
@@ -188,7 +188,7 @@ __mrfstr_sse2_ntfill proc
     neg r8
 
 LHEAD:
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movntdq [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD

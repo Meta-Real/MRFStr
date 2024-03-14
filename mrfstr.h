@@ -432,11 +432,11 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_func(
     mrfstr_config_simd_t single, mrfstr_config_simd_t multi);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits(
     mrfstr_config_func_t type,
-    mrfstr_size_t tlimit, mrfstr_size_t ntlimit);
+    mrfstr_size_t tlimit, mrfstr_size_t limit);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits_get(
     mrfstr_config_func_t type,
-    mrfstr_size_t *tlimit, mrfstr_size_t *ntlimit);
+    mrfstr_size_t *tlimit, mrfstr_size_t *limit);
 
 #ifdef __cplusplus
 }

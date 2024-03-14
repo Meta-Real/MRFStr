@@ -54,7 +54,7 @@ void __mrfstr_fill(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.mem_tlimit)
+    if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1)
     {
         rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
         if (rem)

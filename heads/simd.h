@@ -101,7 +101,7 @@ void __mrfstr_i64_rev(
 void __mrfstr_i64_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
-/* replace chr functions */
+/* replace functions */
 
 void __mrfstr_avx512bw_replchr(
     mrfstr_ptr_t str,
@@ -138,5 +138,37 @@ void __mrfstr_i64_replchr2(
     mrfstr_ptr_t res, mrfstr_ptr_ct str,
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size);
+
+/* compare functions */
+
+mrfstr_bool_t __mrfstr_avx512dq_equal(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void __mrfstr_avx512dq_tequal(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+
+mrfstr_bool_t __mrfstr_avx512f_equal(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void __mrfstr_avx512f_tequal(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+
+mrfstr_bool_t __mrfstr_avx2_equal(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void __mrfstr_avx2_tequal(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+
+mrfstr_bool_t __mrfstr_sse2_equal(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void __mrfstr_sse2_tequal(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+
+mrfstr_bool_t __mrfstr_i64_equal(
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+void __mrfstr_i64_tequal(
+    volatile mrfstr_bool_t *res,
+    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 #endif

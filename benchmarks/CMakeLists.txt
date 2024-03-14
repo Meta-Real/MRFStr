@@ -17,8 +17,8 @@ target_link_libraries(BReverse PRIVATE MRFStr)
 add_executable(BReplaceChr replace_chr.c)
 target_link_libraries(BReplaceChr PRIVATE MRFStr)
 
-#add_executable(BEqual equal.c)
-#target_link_libraries(BEqual PRIVATE MRFStr)
+add_executable(BEqual equal.c)
+target_link_libraries(BEqual PRIVATE MRFStr)
 
 #add_executable(BContainChr contain_chr.c)
 #target_link_libraries(BContainChr PRIVATE MRFStr)

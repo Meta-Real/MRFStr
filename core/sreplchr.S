@@ -63,14 +63,13 @@
     .globl __mrfstr_avx512bw_replchr
 __mrfstr_avx512bw_replchr:
     imul $0x01010101, ochr
-    vpbroadcastd ochr, %zmm17
+    vpbroadcastd ochr, %zmm16
     imul $0x01010101, nchr
-    vpbroadcastd nchr, %zmm18
+    vpbroadcastd nchr, %zmm17
 
 LHEAD1:
-    vmovdqa64 (str, size), %zmm16
-    vpcmpb $0, %zmm17, %zmm16, %k1
-    vmovdqu8 %zmm18, (str, size){%k1}
+    vpcmpb $0, %zmm16, (str, size), %k1
+    vmovdqu8 %zmm17, (str, size){%k1}
 
     add $64, size
     jnz LHEAD1

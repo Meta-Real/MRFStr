@@ -222,14 +222,14 @@ __mrfstr_ssse3_rev proc
     movdqa xmm2, xmmword ptr [_ssse3]
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+rax]
-    movdqa xmm1, xmmword ptr [rcx+r8]
+    movdqu xmm0, [rdx+rax]
+    movdqa xmm1, [rcx+r8]
 
     pshufb xmm0, xmm2
     pshufb xmm1, xmm2
 
-    movdqu xmmword ptr [rdx+rax], xmm1
-    movdqa xmmword ptr [rcx+r8], xmm0
+    movdqu [rdx+rax], xmm1
+    movdqa [rcx+r8], xmm0
 
     add rax, 16
     sub r8, 16
@@ -253,9 +253,9 @@ __mrfstr_ssse3_rev2 proc
     movdqa xmm1, xmmword ptr [_ssse3]
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+rax]
+    movdqu xmm0, [rdx+rax]
     pshufb xmm0, xmm1
-    movdqa xmmword ptr [rcx+r8], xmm0
+    movdqa [rcx+r8], xmm0
 
     add rax, 16
     sub r8, 16

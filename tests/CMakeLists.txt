@@ -18,9 +18,9 @@ add_executable(TReplaceChr replace_chr.c)
 target_link_libraries(TReplaceChr PRIVATE MRFStr)
 add_test(TReplaceChr TReplaceChr)
 
-#add_executable(TEqual equal.c)
-#target_link_libraries(TEqual PRIVATE MRFStr)
-#add_test(TEqual TEqual)
+add_executable(TEqual equal.c)
+target_link_libraries(TEqual PRIVATE MRFStr)
+add_test(TEqual TEqual)
 
 #add_executable(TContainChr contain_chr.c)
 #target_link_libraries(TContainChr PRIVATE MRFStr)

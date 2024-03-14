@@ -77,7 +77,7 @@ void __mrfstr_rev(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.rev_tlimit)
+    if (size < _mrfstr_config.rev_tlimit || _mrfstr_config.tcount == 1)
     {
         rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
@@ -191,7 +191,7 @@ void __mrfstr_rev2(
         return;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.rev_tlimit)
+    if (size < _mrfstr_config.rev_tlimit || _mrfstr_config.tcount == 1)
     {
         rem = (uintptr_t)left & MRFSTR_ALIGN_MASK;
         if (rem)

@@ -26,14 +26,13 @@
 
 __mrfstr_avx512bw_replchr proc
     imul edx, 01010101h
-    vpbroadcastd zmm17, edx
+    vpbroadcastd zmm16, edx
     imul r8d, 01010101h
-    vpbroadcastd zmm18, r8d
+    vpbroadcastd zmm17, r8d
 
 LHEAD:
-    vmovdqa64 zmm16, [rcx+r9]
-    vpcmpb k1, zmm16, zmm17, 0
-    vmovdqu8 [rcx+r9]{k1}, zmm18
+    vpcmpb k1, zmm16, [rcx+r9], 0
+    vmovdqu8 [rcx+r9]{k1}, zmm17
 
     add r9, 64
     jnz LHEAD

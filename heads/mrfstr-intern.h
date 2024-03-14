@@ -82,7 +82,8 @@ enum __MRFSTR_SIMD_ENUM
     MRFSTR_SIMD_AVX2,
     MRFSTR_SIMD_AVX512F,
     MRFSTR_SIMD_AVX512BW,
-    MRFSTR_SIMD_AVX512VL = 7,
+    MRFSTR_SIMD_AVX512DQ = MRFSTR_SIMD_AVX512BW,
+    MRFSTR_SIMD_AVX512VL = MRFSTR_SIMD_AVX512BW,
     MRFSTR_SIMD_AVX512VBMI
 };
 
@@ -148,6 +149,17 @@ struct __MRFSTR_CONFIG_T
         mrfstr_size_t);
 
     mrfstr_size_t repl_tlimit;
+
+    /* cmp functions */
+
+    mrfstr_bool_t (*equal_func)(
+        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
+
+    void (*equal_tfunc)(
+        volatile mrfstr_bool_t*,
+        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
+
+    mrfstr_size_t cmp_tlimit;
 
     /* general */
 

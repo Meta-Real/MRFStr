@@ -263,8 +263,8 @@ __mrfstr_sse2_copy proc
     neg r8
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movdqa xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movdqa [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD
@@ -275,8 +275,8 @@ NTSTORE:
     neg r8
 
 NTLHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movntdq [rcx+r8], xmm0
 
     add r8, 16
     jnz NTLHEAD
@@ -296,8 +296,8 @@ __mrfstr_sse2_ntcopy proc
     neg r8
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movntdq [rcx+r8], xmm0
 
     add r8, 16
     jnz LHEAD
@@ -321,8 +321,8 @@ __mrfstr_sse2_rcopy proc
     ja NTLHEAD
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movdqa xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movdqa [rcx+r8], xmm0
 
     sub r8, 16
     jnz LHEAD
@@ -330,8 +330,8 @@ LHEAD:
     ret
 
 NTLHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movntdq [rcx+r8], xmm0
 
     sub r8, 16
     jnz NTLHEAD
@@ -352,8 +352,8 @@ __mrfstr_sse2_ntrcopy proc
     sub rdx, 16
 
 LHEAD:
-    movdqu xmm0, xmmword ptr [rdx+r8]
-    movntdq xmmword ptr [rcx+r8], xmm0
+    movdqu xmm0, [rdx+r8]
+    movntdq [rcx+r8], xmm0
 
     sub r8, 16
     jnz LHEAD

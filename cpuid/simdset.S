@@ -21,7 +21,7 @@
 # 4: AVX
 # 5: AVX2
 # 6: AVX512F
-# 7: AVX512BW, AVX512VL
+# 7: AVX512BW, AVX512DQ, AVX512VL
 # 8: AVX512VBMI
 
     .extern _funccnt
@@ -85,9 +85,11 @@ mrfstr_cpuid_simdset:
 
     bt $30, %ebx
     jnc LASTINST
+    bt $17, %ebx
+    jnc LASTINST
     bt $31, %ebx
     jnc LASTINST
-    inc %r8b                # AVX512BW, AVX512VL
+    inc %r8b                # AVX512BW, AVX512DQ, AVX512VL
 
     bt $1, %ecx
     jnc LASTINST

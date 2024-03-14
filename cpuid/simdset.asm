@@ -21,7 +21,7 @@
 ; 4: AVX
 ; 5: AVX2
 ; 6: AVX512F
-; 7: AVX512BW, AVX512VL
+; 7: AVX512BW, AVX512DQ, AVX512VL
 ; 8: AVX512VBMI
 
 .data
@@ -82,9 +82,11 @@ mrfstr_cpuid_simdset proc
 
     bt ebx, 30
     jnc LASTINST
+    bt ebx, 17
+    jnc LASTINST
     bt ebx, 31
     jnc LASTINST
-    inc r8b             ; AVX512BW, AVX512VL
+    inc r8b             ; AVX512BW, AVX512DQ, AVX512VL
 
     bt ecx, 1
     jnc LASTINST

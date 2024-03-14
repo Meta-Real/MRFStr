@@ -68,7 +68,7 @@ __mrfstr_avx512bw_replchr:
     vpbroadcastd nchr, %zmm17
 
 LHEAD1:
-    vpcmpb $0, %zmm16, (str, size), %k1
+    vpcmpb $0, (str, size), %zmm16, %k1
     vmovdqu8 %zmm17, (str, size){%k1}
 
     add $64, size

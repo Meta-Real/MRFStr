@@ -200,9 +200,9 @@ __mrfstr_avx512f_tequal endp
 __mrfstr_avx2_equal proc
 LHEAD:
     vmovdqu ymm0, ymmword ptr [rcx+r8]
-    vpcmpeqq ymm1, ymm0, [rdx+r8]
+    vpcmpeqq ymm0, ymm0, [rdx+r8]
 
-    vpmovmskb eax, ymm1
+    vpmovmskb eax, ymm0
     cmp eax, 0ffffffffh
     jne FALSE
 
@@ -244,9 +244,9 @@ OLHEAD:
 
 ILHEAD:
     vmovdqu ymm0, ymmword ptr [rdx+r9]
-    vpcmpeqq ymm1, ymm0, [r8+r9]
+    vpcmpeqq ymm0, ymm0, [r8+r9]
 
-    vpmovmskb r11d, ymm1
+    vpmovmskb r11d, ymm0
     cmp r11d, 0ffffffffh
     jne FALSE
 
@@ -263,9 +263,9 @@ ILHEAD:
 
 LASTLOAD:
     vmovdqu ymm0, ymmword ptr [rdx+r9]
-    vpcmpeqq ymm1, ymm0, [r8+r9]
+    vpcmpeqq ymm0, ymm0, [r8+r9]
 
-    vpmovmskb r11d, ymm1
+    vpmovmskb r11d, ymm0
     cmp r11d, 0ffffffffh
     jne FALSE
 

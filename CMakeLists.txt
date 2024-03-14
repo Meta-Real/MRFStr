@@ -57,6 +57,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         PRIVATE core/sfill.S
         PRIVATE core/srev.S
         PRIVATE core/sreplchr.S
+        PRIVATE core/sequal.S
         PRIVATE cpuid/cputype.S
         PRIVATE cpuid/funccnt.S
         PRIVATE cpuid/simdset.S

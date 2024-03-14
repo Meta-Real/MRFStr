@@ -135,12 +135,12 @@ __mrfstr_avx2_replchr2 proc
     mov rax, [rsp+40]
 
 LHEAD:
-    vmovdqu ymm0, ymmword ptr [rcx+rax]
+    vmovdqu ymm0, ymmword ptr [rdx+rax]
 
     vpcmpeqb ymm3, ymm0, ymm1
     vpblendvb ymm0, ymm0, ymm2, ymm3
 
-    vmovdqa ymmword ptr [rdx+rax], ymm0
+    vmovdqa ymmword ptr [rcx+rax], ymm0
 
     add rax, 32
     jnz LHEAD
@@ -206,13 +206,13 @@ __mrfstr_sse4_1_replchr2 proc
     mov rax, [rsp+40]
 
 LHEAD:
-    movdqu xmm1, [rcx+rax]
+    movdqu xmm1, [rdx+rax]
     movdqa xmm0, xmm1
 
     pcmpeqb xmm0, xmm2
     pblendvb xmm1, xmm3, xmm0
 
-    movdqa [rdx+rax], xmm1
+    movdqa [rcx+rax], xmm1
 
     add rax, 16
     jnz LHEAD

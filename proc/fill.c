@@ -66,9 +66,8 @@ void __mrfstr_fill(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
-        res += size;
-        _mrfstr_config.fill_func(res, chr, size);
+        _mrfstr_config.fill_func(res += size, chr,
+            (mrfstr_size_t)-(mrfstr_ssize_t)size);
 
         mrfstr_fill_rem;
         return;
@@ -85,15 +84,14 @@ void __mrfstr_fill(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (size - rem) / tcount;
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
-        res += size;
-        _mrfstr_config.fill_func(res, chr, size);
+        _mrfstr_config.fill_func(res -= size, chr, size);
 
         mrfstr_fill_rem;
         return;
@@ -105,15 +103,13 @@ void __mrfstr_fill(
         if (!data)
             break;
 
-        res += size;
-
-        data->res = res;
+        data->res = res -= size;
         data->size = size;
         data->chr = chr;
 
         mrfstr_create_thread(__mrfstr_fill_threaded)
         {
-            res -= size;
+            res += size;
 
             free(data);
             break;
@@ -123,10 +119,8 @@ void __mrfstr_fill(
     }
 
     tcount -= i;
-
     size *= tcount;
-    res += size;
-    _mrfstr_config.fill_tfunc(res, chr, size);
+    _mrfstr_config.fill_tfunc(res -= size, chr, size);
 
     mrfstr_fill_rem;
 

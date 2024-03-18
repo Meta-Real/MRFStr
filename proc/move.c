@@ -46,10 +46,8 @@ void __mrfstr_move(
 
     rem = size & MRFSTR_ALIGN_MASK;
     size -= rem;
-
-    dst += size;
-    src += size;
-    _mrfstr_config.copy_func(dst, src, size);
+    _mrfstr_config.copy_func(dst += size, src += size,
+        (mrfstr_size_t)-(mrfstr_ssize_t)size);
 
     mrfstr_move_rem;
 }
@@ -77,10 +75,7 @@ void __mrfstr_rmove(
 
     rem = size & MRFSTR_ALIGN_MASK;
     size -= rem;
-
-    dst -= size;
-    src -= size;
-    _mrfstr_config.rcopy_func(dst, src, size);
+    _mrfstr_config.rcopy_func(dst -= size, src -= size, size);
 
     mrfstr_rmove_rem;
 }

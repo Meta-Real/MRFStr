@@ -65,10 +65,8 @@ void __mrfstr_copy(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
-        dst += size;
-        src += size;
-        _mrfstr_config.copy_func(dst, src, size);
+        _mrfstr_config.copy_func(dst += size, src += size,
+            (mrfstr_size_t)-(mrfstr_ssize_t)size);
 
         mrfstr_copy_rem;
         return;
@@ -85,16 +83,14 @@ void __mrfstr_copy(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (size - rem) / tcount;
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
-        dst += size;
-        src += size;
-        _mrfstr_config.copy_tfunc(dst, src, size);
+        _mrfstr_config.copy_tfunc(dst -= size, src -= size, size);
 
         mrfstr_copy_rem;
         return;
@@ -106,14 +102,14 @@ void __mrfstr_copy(
         if (!data)
             break;
 
-        data->dst = dst += size;
-        data->src = src += size;
+        data->dst = dst -= size;
+        data->src = src -= size;
         data->size = size;
 
         mrfstr_create_thread(__mrfstr_copy_threaded)
         {
-            dst -= size;
-            src -= size;
+            dst += size;
+            src += size;
 
             free(data);
             break;
@@ -123,11 +119,8 @@ void __mrfstr_copy(
     }
 
     tcount -= i;
-
     size *= tcount;
-    dst += size;
-    src += size;
-    _mrfstr_config.copy_tfunc(dst, src, size);
+    _mrfstr_config.copy_tfunc(dst -= size, src -= size, size);
 
     mrfstr_copy_rem;
 

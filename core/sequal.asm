@@ -12,7 +12,6 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-.data
     extern _mrfstr_cmp_load : dq
 
 .code
@@ -27,9 +26,9 @@
 __mrfstr_avx512dq_equal proc
 LHEAD:
     vmovdqu64 zmm16, [rcx+r8]
-    vpcmpq k1, zmm16, [rdx+r8], 4
+    vpcmpq k0, zmm16, [rdx+r8], 4
 
-    kortestb k1, k1
+    kortestb k0, k0
     jnz FALSE
 
     add r8, 64
@@ -53,14 +52,13 @@ __mrfstr_avx512dq_equal endp
 ; size = -SIZE
 
 __mrfstr_avx512dq_tequal proc
-    mov rax, [_mrfstr_cmp_load]
-
-    cmp r9, rax
-    jg LASTLOAD
-
     mov r10b, [rcx]
     test r10b, r10b
     jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -68,9 +66,9 @@ OLHEAD:
 
 ILHEAD:
     vmovdqu64 zmm16, [rdx+r9]
-    vpcmpq k1, zmm16, [r8+r9], 4
+    vpcmpq k0, zmm16, [r8+r9], 4
 
-    kortestb k1, k1
+    kortestb k0, k0
     jnz FALSE
 
     add r9, 64
@@ -82,13 +80,13 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     vmovdqu64 zmm16, [rdx+r9]
-    vpcmpq k1, zmm16, [r8+r9], 4
+    vpcmpq k0, zmm16, [r8+r9], 4
 
-    kortestb k1, k1
+    kortestb k0, k0
     jnz FALSE
 
     add r9, 64
@@ -112,9 +110,9 @@ __mrfstr_avx512dq_tequal endp
 __mrfstr_avx512f_equal proc
 LHEAD:
     vmovdqu64 zmm16, [rcx+r8]
-    vpcmpq k1, zmm16, [rdx+r8], 4
+    vpcmpq k0, zmm16, [rdx+r8], 4
 
-    kmovw eax, k1
+    kmovw eax, k0
     test al, al
     jnz FALSE
 
@@ -139,14 +137,13 @@ __mrfstr_avx512f_equal endp
 ; size = -SIZE
 
 __mrfstr_avx512f_tequal proc
-    mov rax, [_mrfstr_cmp_load]
-
-    cmp r9, rax
-    jg LASTLOAD
-
     mov r10b, [rcx]
     test r10b, r10b
     jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -154,9 +151,9 @@ OLHEAD:
 
 ILHEAD:
     vmovdqu64 zmm16, [rdx+r9]
-    vpcmpq k1, zmm16, [r8+r9], 4
+    vpcmpq k0, zmm16, [r8+r9], 4
 
-    kmovw r11d, k1
+    kmovw r11d, k0
     test r11b, r11b
     jnz FALSE
 
@@ -169,13 +166,13 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     vmovdqu64 zmm16, [rdx+r9]
-    vpcmpq k1, zmm16, [r8+r9], 4
+    vpcmpq k0, zmm16, [r8+r9], 4
 
-    kmovw r11d, k1
+    kmovw r11d, k0
     test r11b, r11b
     jnz FALSE
 
@@ -189,6 +186,90 @@ FALSE:
     mov byte ptr [rcx], 0
     ret
 __mrfstr_avx512f_tequal endp
+
+; mrfstr_bool_t __mrfstr_avx2_avx512vl_equal(
+;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+;
+; str1 = STR1+SIZE
+; str2 = STR2+SIZE
+; size = -SIZE
+
+__mrfstr_avx2_avx512vl_equal proc
+LHEAD:
+    vmovdqu64 ymm16, [rcx+r8]
+    vpcmpq k0, ymm16, [rdx+r8], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r8, 32
+    jnz LHEAD
+
+    mov al, 1
+    ret
+
+FALSE:
+    xor al, al
+    ret
+__mrfstr_avx2_avx512vl_equal endp
+
+; void __mrfstr_avx2_avx512vl_tequal(
+;     volatile mrfstr_bool_t *res,
+;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+;
+; res = RES
+; str1 = STR1+SIZE
+; str2 = STR2+SIZE
+; size = -SIZE
+
+__mrfstr_avx2_avx512vl_tequal proc
+    mov r10b, [rcx]
+    test r10b, r10b
+    jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
+
+OLHEAD:
+    mov r10, r9
+    sub r10, rax
+
+ILHEAD:
+    vmovdqu64 ymm16, [rdx+r9]
+    vpcmpq k0, ymm16, [r8+r9], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r9, 64
+    cmp r9, r10
+    jne ILHEAD
+
+    mov r10b, [rcx]
+    test r10b, r10b
+    jz RETURN
+
+    cmp r9, rax
+    ja OLHEAD
+
+LASTLOAD:
+    vmovdqu64 ymm16, [rdx+r9]
+    vpcmpq k0, ymm16, [r8+r9], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r9, 32
+    jnz LASTLOAD
+
+RETURN:
+    ret
+
+FALSE:
+    mov byte ptr [rcx], 0
+    ret
+__mrfstr_avx2_avx512vl_tequal endp
 
 ; mrfstr_bool_t __mrfstr_avx2_equal(
 ;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
@@ -229,14 +310,13 @@ __mrfstr_avx2_equal endp
 ; size = -SIZE
 
 __mrfstr_avx2_tequal proc
-    mov rax, [_mrfstr_cmp_load]
-
-    cmp r9, rax
-    jg LASTLOAD
-
     mov r10b, [rcx]
     test r10b, r10b
     jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -259,7 +339,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     vmovdqu ymm0, ymmword ptr [rdx+r9]
@@ -281,6 +361,90 @@ FALSE:
     vzeroupper
     ret
 __mrfstr_avx2_tequal endp
+
+; mrfstr_bool_t __mrfstr_sse2_avx512vl_equal(
+;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+;
+; str1 = STR1+SIZE
+; str2 = STR2+SIZE
+; size = -SIZE
+
+__mrfstr_sse2_avx512vl_equal proc
+LHEAD:
+    vmovdqu64 xmm0, [rcx+r8]
+    vpcmpq k0, xmm0, [rdx+r8], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r8, 16
+    jnz LHEAD
+
+    mov al, 1
+    ret
+
+FALSE:
+    xor al, al
+    ret
+__mrfstr_sse2_avx512vl_equal endp
+
+; void __mrfstr_sse2_avx512vl_tequal(
+;     volatile mrfstr_bool_t *res,
+;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+;
+; res = RES
+; str1 = STR1+SIZE
+; str2 = STR2+SIZE
+; size = -SIZE
+
+__mrfstr_sse2_avx512vl_tequal proc
+    mov r10b, [rcx]
+    test r10b, r10b
+    jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
+
+OLHEAD:
+    mov r10, r9
+    sub r10, rax
+
+ILHEAD:
+    vmovdqu64 xmm0, [rdx+r9]
+    vpcmpq k0, xmm0, [r8+r9], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r9, 16
+    cmp r9, r10
+    jne ILHEAD
+
+    mov r10b, [rcx]
+    test r10b, r10b
+    jz RETURN
+
+    cmp r9, rax
+    ja OLHEAD
+
+LASTLOAD:
+    vmovdqu64 xmm0, [rdx+r9]
+    vpcmpq k0, xmm0, [r8+r9], 4
+
+    kortestb k0, k0
+    jnz FALSE
+
+    add r9, 16
+    jnz LASTLOAD
+
+RETURN:
+    ret
+
+FALSE:
+    mov byte ptr [rcx], 0
+    ret
+__mrfstr_sse2_avx512vl_tequal endp
 
 ; mrfstr_bool_t __mrfstr_sse2_equal(
 ;     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
@@ -319,14 +483,13 @@ __mrfstr_sse2_equal endp
 ; size = -SIZE
 
 __mrfstr_sse2_tequal proc
-    mov rax, [_mrfstr_cmp_load]
-
-    cmp r9, rax
-    jg LASTLOAD
-
     mov r10b, [rcx]
     test r10b, r10b
     jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -349,7 +512,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     movdqu xmm0, [rdx+r9]
@@ -404,14 +567,13 @@ __mrfstr_i64_equal endp
 ; size = -SIZE
 
 __mrfstr_i64_tequal proc
-    mov rax, [_mrfstr_cmp_load]
-
-    cmp r9, rax
-    jg LASTLOAD
-
     mov r10b, [rcx]
     test r10b, r10b
     jz RETURN
+
+    mov rax, [_mrfstr_cmp_load]
+    cmp r9, rax
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -431,7 +593,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     mov r11, [rdx+r9]

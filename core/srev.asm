@@ -15,15 +15,14 @@
 simdd segment read align(64)
 align 64
     _avx512vbmi dq 38393a3b3c3d3e3fh, 3031323334353637h,
-        28292a2b2c2d2e2fh, 2021222324252627h,
-        18191a1b1c1d1e1fh, 1011121314151617h,
+        28292a2b2c2d2e2fh, 2021222324252627h
+    _avx2_avx512vbmi dq 18191a1b1c1d1e1fh, 1011121314151617h,
         08090a0b0c0d0e0fh, 0001020304050607h
-    _avx512bw1 dq 0001020304050607h, 08090a0b0c0d0e0fh,
-        0001020304050607h, 08090a0b0c0d0e0fh
-    _avx2 dq 0001020304050607h, 08090a0b0c0d0e0fh,
-        0001020304050607h, 08090a0b0c0d0e0fh
-    _avx512bw2 dq 7, 6, 5, 4, 3, 2, 1, 0
+    _avx512bw1 dq 08090a0b0c0d0e0fh, 0001020304050607h,
+        08090a0b0c0d0e0fh, 0001020304050607h
+    _avx2 dq 08090a0b0c0d0e0fh, 0001020304050607h
     _ssse3 dq 08090a0b0c0d0e0fh, 0001020304050607h
+    _avx512bw2 dq 6, 7, 4, 5, 2, 3, 0, 1
 simdd ends
 
 .code
@@ -42,11 +41,8 @@ __mrfstr_avx512vbmi_rev proc
     vmovdqa64 zmm18, [_avx512vbmi]
 
 LHEAD:
-    vmovdqu64 zmm16, [rdx+rax]
-    vmovdqa64 zmm17, [rcx+r8]
-
-    vpermb zmm16, zmm18, zmm16
-    vpermb zmm17, zmm18, zmm17
+    vpermb zmm16, zmm18, [rdx+rax]
+    vpermb zmm17, zmm18, [rcx+r8]
 
     vmovdqu64 [rdx+rax], zmm17
     vmovdqa64 [rcx+r8], zmm16
@@ -72,8 +68,7 @@ __mrfstr_avx512vbmi_rev2 proc
     vmovdqa64 zmm17, [_avx512vbmi]
 
 LHEAD:
-    vmovdqu64 zmm16, [rdx+rax]
-    vpermb zmm16, zmm17, zmm16
+    vpermb zmm16, zmm17, [rdx+rax]
     vmovdqa64 [rcx+r8], zmm16
 
     add rax, 64
@@ -102,8 +97,8 @@ LHEAD:
     vmovdqa64 zmm17, [rcx+r8]
 
     vpshufb zmm16, zmm16, zmm18
-    vpermq zmm16, zmm19, zmm16
     vpshufb zmm17, zmm17, zmm18
+    vpermq zmm16, zmm19, zmm16
     vpermq zmm17, zmm19, zmm17
 
     vmovdqu64 [rdx+rax], zmm17
@@ -145,6 +140,57 @@ LHEAD:
     ret
 __mrfstr_avx512bw_rev2 endp
 
+; void __mrfstr_avx2_avx512vbmi_rev(
+;     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
+;
+; left = LEFT
+; right = RIGHT
+; size = SIZE
+
+__mrfstr_avx2_avx512vbmi_rev proc
+    mov rax, r8
+    neg rax
+    sub rcx, 32
+    vmovdqa64 ymm18, [_avx2_avx512vbmi]
+
+LHEAD:
+    vpermb ymm16, ymm18, [rdx+rax]
+    vpermb ymm17, ymm18, [rcx+r8]
+
+    vmovdqu64 [rdx+rax], ymm17
+    vmovdqa64 [rcx+r8], ymm16
+
+    add rax, 32
+    sub r8, 32
+    jnz LHEAD
+
+    ret
+__mrfstr_avx2_avx512vbmi_rev endp
+
+; void __mrfstr_avx2_avx512vbmi_rev2(
+;     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+;
+; left = LEFT
+; right = RIGHT
+; size = SIZE
+
+__mrfstr_avx2_avx512vbmi_rev2 proc
+    mov rax, r8
+    neg rax
+    sub rcx, 32
+    vmovdqa64 ymm17, [_avx2_avx512vbmi]
+
+LHEAD:
+    vpermb ymm16, ymm17, [rdx+rax]
+    vmovdqa64 [rcx+r8], ymm16
+
+    add rax, 32
+    sub r8, 32
+    jnz LHEAD
+
+    ret
+__mrfstr_avx2_avx512vbmi_rev2 endp
+
 ; void __mrfstr_avx2_rev(
 ;     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
 ;
@@ -163,8 +209,8 @@ LHEAD:
     vmovdqa ymm1, ymmword ptr [rcx+r8]
 
     vpshufb ymm0, ymm0, ymm2
-    vperm2i128 ymm0, ymm0, ymm0, 1
     vpshufb ymm1, ymm1, ymm2
+    vperm2i128 ymm0, ymm0, ymm0, 1
     vperm2i128 ymm1, ymm1, ymm1, 1
 
     vmovdqu ymmword ptr [rdx+rax], ymm1

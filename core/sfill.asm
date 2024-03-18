@@ -12,25 +12,24 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-.data
     extern _mrfstr_mem_ntlimit : dq
 
 .code
 
-; void __mrfstr_avx512_fill(
+; void __mrfstr_avx512f_fill(
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
-; size = SIZE
+; chr = CHR
+; size = -SIZE
 
 __mrfstr_avx512f_fill proc
-    imul edx, 01010101h
-    vpbroadcastd zmm16, edx
+    vmovd xmm16, edx
+    vpbroadcastb ymm16, xmm16
+    vinserti64x4 zmm16, zmm16, ymm16, 1
 
     cmp r8, [_mrfstr_mem_ntlimit]
-    ja NTSTORE
-
-    neg r8
+    jb NTLHEAD
 
 LHEAD:
     vmovdqa64 [rcx+r8], zmm16
@@ -40,29 +39,48 @@ LHEAD:
 
     ret
 
-NTSTORE:
-    neg r8
-
 NTLHEAD:
     vmovntdq zmmword ptr [rcx+r8], zmm16
 
     add r8, 64
-    jnz LHEAD
+    jnz NTLHEAD
 
     sfence
     ret
 __mrfstr_avx512f_fill endp
 
+; void __mrfstr_avx512f_vfill(
+;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; chr = CHR
+; size = -SIZE
+
+__mrfstr_avx512f_vfill proc
+    vmovd xmm16, edx
+    vpbroadcastb ymm16, xmm16
+    vinserti64x4 zmm16, zmm16, ymm16, 1
+
+LHEAD:
+    vmovdqa64 [rcx+r8], zmm16
+
+    add r8, 64
+    jnz LHEAD
+
+    ret
+__mrfstr_avx512f_vfill endp
+
 ; void __mrfstr_avx512f_ntfill(
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
-; size = SIZE
+; chr = CHR
+; size = -SIZE
 
 __mrfstr_avx512f_ntfill proc
-    imul edx, 01010101h
-    vpbroadcastd zmm16, edx
-    neg r8
+    vmovd xmm16, edx
+    vpbroadcastb ymm16, xmm16
+    vinserti64x4 zmm16, zmm16, ymm16, 1
 
 LHEAD:
     vmovntdq zmmword ptr [rcx+r8], zmm16
@@ -78,7 +96,8 @@ __mrfstr_avx512f_ntfill endp
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
-; size = SIZE
+; chr = CHR
+; size = -SIZE
 
 __mrfstr_avx_fill proc
     imul edx, 01010101h
@@ -87,9 +106,7 @@ __mrfstr_avx_fill proc
     vinsertf128 ymm0, ymm0, xmm0, 1
 
     cmp r8, [_mrfstr_mem_ntlimit]
-    ja NTSTORE
-
-    neg r8
+    jb NTLHEAD
 
 LHEAD:
     vmovdqa ymmword ptr [rcx+r8], ymm0
@@ -99,9 +116,6 @@ LHEAD:
 
     vzeroupper
     ret
-
-NTSTORE:
-    neg r8
 
 NTLHEAD:
     vmovntdq ymmword ptr [rcx+r8], ymm0
@@ -114,18 +128,41 @@ NTLHEAD:
     ret
 __mrfstr_avx_fill endp
 
+; void __mrfstr_avx_vfill(
+;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; chr = CHR
+; size = -SIZE
+
+__mrfstr_avx_vfill proc
+    imul edx, 01010101h
+    movd xmm0, edx
+    pshufd xmm0, xmm0, 0
+    vinsertf128 ymm0, ymm0, xmm0, 1
+
+LHEAD:
+    vmovdqa ymmword ptr [rcx+r8], ymm0
+
+    add r8, 32
+    jnz LHEAD
+
+    vzeroupper
+    ret
+__mrfstr_avx_vfill endp
+
 ; void __mrfstr_avx_ntfill(
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
-; size = SIZE
+; chr = CHR
+; size = -SIZE
 
 __mrfstr_avx_ntfill proc
     imul edx, 01010101h
     movd xmm0, edx
     pshufd xmm0, xmm0, 0
     vinsertf128 ymm0, ymm0, xmm0, 1
-    neg r8
 
 LHEAD:
     vmovntdq ymmword ptr [rcx+r8], ymm0
@@ -142,7 +179,8 @@ __mrfstr_avx_ntfill endp
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
-; size = SIZE
+; chr = CHR
+; size = -SIZE
 
 __mrfstr_sse2_fill proc
     imul edx, 01010101h
@@ -150,9 +188,7 @@ __mrfstr_sse2_fill proc
     pshufd xmm0, xmm0, 0
 
     cmp r8, [_mrfstr_mem_ntlimit]
-    ja NTSTORE
-
-    neg r8
+    jb NTLHEAD
 
 LHEAD:
     movdqa [rcx+r8], xmm0
@@ -161,9 +197,6 @@ LHEAD:
     jnz LHEAD
 
     ret
-
-NTSTORE:
-    neg r8
 
 NTLHEAD:
     movntdq [rcx+r8], xmm0
@@ -175,17 +208,38 @@ NTLHEAD:
     ret
 __mrfstr_sse2_fill endp
 
+; void __mrfstr_sse2_vfill(
+;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+;
+; dst = DST+SIZE
+; chr = CHR
+; size = SIZE
+
+__mrfstr_sse2_vfill proc
+    imul edx, 01010101h
+    movd xmm0, edx
+    pshufd xmm0, xmm0, 0
+
+LHEAD:
+    movdqa [rcx+r8], xmm0
+
+    add r8, 16
+    jnz LHEAD
+
+    ret
+__mrfstr_sse2_vfill endp
+
 ; void __mrfstr_sse2_ntfill(
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
+; chr = CHR
 ; size = SIZE
 
 __mrfstr_sse2_ntfill proc
     imul edx, 01010101h
     movd xmm0, edx
     pshufd xmm0, xmm0, 0
-    neg r8
 
 LHEAD:
     movntdq [rcx+r8], xmm0
@@ -201,14 +255,12 @@ __mrfstr_sse2_ntfill endp
 ;     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; dst = DST+SIZE
+; chr = CHR
 ; size = SIZE
 
 __mrfstr_i64_fill proc
-    imul edx, 01010101h
-    mov eax, edx
-    shl rdx, 32
-    or rdx, rax
-    neg r8
+    mov rax, 0101010101010101h
+    imul rdx, rax
 
 LHEAD:
     mov [rcx+r8], rdx

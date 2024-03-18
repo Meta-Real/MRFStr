@@ -25,14 +25,12 @@
 ; size = -SIZE
 
 __mrfstr_avx512bw_replchr proc
-    imul edx, 01010101h
-    vpbroadcastd zmm16, edx
-    imul r8d, 01010101h
-    vpbroadcastd zmm17, r8d
+    vpbroadcastb zmm16, edx
+    vpbroadcastb zmm17, r8d
 
 LHEAD:
-    vpcmpb k1, zmm16, [rcx+r9], 0
-    vmovdqu8 [rcx+r9]{k1}, zmm17
+    vpcmpeqb k0, zmm16, [rcx+r9]
+    vmovdqu8 [rcx+r9]{k0}, zmm17
 
     add r9, 64
     jnz LHEAD
@@ -52,18 +50,15 @@ __mrfstr_avx512bw_replchr endp
 ; size = -SIZE
 
 __mrfstr_avx512bw_replchr2 proc
-    imul r8d, 01010101h
-    vpbroadcastd zmm17, r8d
-    imul r9d, 01010101h
-    vpbroadcastd zmm18, r9d
-
+    vpbroadcastb zmm17, r8d
+    vpbroadcastb zmm18, r9d
     mov rax, [rsp+40]
 
 LHEAD:
     vmovdqu64 zmm16, [rdx+rax]
 
-    vpcmpb k1, zmm16, zmm17, 0
-    vpblendmb zmm16{k1}, zmm16, zmm18
+    vpcmpeqb k0, zmm16, zmm17
+    vpblendmb zmm16{k0}, zmm16, zmm18
 
     vmovdqa64 [rcx+rax], zmm16
 
@@ -72,6 +67,60 @@ LHEAD:
 
     ret
 __mrfstr_avx512bw_replchr2 endp
+
+; void __mrfstr_avx2_avx512bw_replchr(
+;     mrfstr_ptr_t str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_avx2_avx512bw_replchr proc
+    vpbroadcastb ymm16, edx
+    vpbroadcastb ymm17, r8d
+
+LHEAD:
+    vpcmpeqb k0, ymm16, [rcx+r9]
+    vmovdqu8 [rcx+r9]{k0}, ymm17
+
+    add r9, 32
+    jnz LHEAD
+
+    ret
+__mrfstr_avx2_avx512bw_replchr endp
+
+; void __mrfstr_avx2_avx512bw_replchr2(
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; res = RES+SIZE
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_avx2_avx512bw_replchr2 proc
+    vpbroadcastb ymm17, r8d
+    vpbroadcastb ymm18, r9d
+    mov rax, [rsp+40]
+
+LHEAD:
+    vmovdqu64 ymm16, [rdx+rax]
+
+    vpcmpeqb k0, ymm16, ymm17
+    vpblendmb ymm16{k0}, ymm16, ymm18
+
+    vmovdqa64 [rcx+rax], ymm16
+
+    add rax, 32
+    jnz LHEAD
+
+    ret
+__mrfstr_avx2_avx512bw_replchr2 endp
 
 ; void __mrfstr_avx2_replchr(
 ;     mrfstr_ptr_t str,
@@ -148,7 +197,7 @@ LHEAD:
     ret
 __mrfstr_avx2_replchr2 endp
 
-; void __mrfstr_sse4_1_replchr(
+; void __mrfstr_sse41_avx512bw_replchr(
 ;     mrfstr_ptr_t str,
 ;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
 ;     mrfstr_size_t size)
@@ -158,7 +207,61 @@ __mrfstr_avx2_replchr2 endp
 ; nchr = NCHR
 ; size = -SIZE
 
-__mrfstr_sse4_1_replchr proc
+__mrfstr_sse41_avx512bw_replchr proc
+    vpbroadcastb xmm0, edx
+    vpbroadcastb xmm1, r8d
+
+LHEAD:
+    vpcmpeqb k0, xmm0, [rcx+r9]
+    vmovdqu8 [rcx+r9]{k0}, xmm1
+
+    add r9, 16
+    jnz LHEAD
+
+    ret
+__mrfstr_sse41_avx512bw_replchr endp
+
+; void __mrfstr_sse41_avx512bw_replchr2(
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; res = RES+SIZE
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_sse41_avx512bw_replchr2 proc
+    vpbroadcastb xmm1, r8d
+    vpbroadcastb xmm2, r9d
+    mov rax, [rsp+40]
+
+LHEAD:
+    vmovdqu64 xmm0, [rdx+rax]
+
+    vpcmpeqb k0, xmm0, xmm1
+    vpblendmb xmm0{k0}, xmm0, xmm2
+
+    vmovdqa64 [rcx+rax], xmm0
+
+    add rax, 16
+    jnz LHEAD
+
+    ret
+__mrfstr_sse41_avx512bw_replchr2 endp
+
+; void __mrfstr_sse41_replchr(
+;     mrfstr_ptr_t str,
+;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+;     mrfstr_size_t size)
+;
+; str = STR+SIZE
+; ochr = OCHR
+; nchr = NCHR
+; size = -SIZE
+
+__mrfstr_sse41_replchr proc
     imul edx, 01010101h
     movd xmm2, edx
     pshufd xmm2, xmm2, 0
@@ -180,9 +283,9 @@ LHEAD:
     jnz LHEAD
 
     ret
-__mrfstr_sse4_1_replchr endp
+__mrfstr_sse41_replchr endp
 
-; void __mrfstr_sse4_1_replchr2(
+; void __mrfstr_sse41_replchr2(
 ;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
 ;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
 ;     mrfstr_size_t size)
@@ -193,7 +296,7 @@ __mrfstr_sse4_1_replchr endp
 ; nchr = NCHR
 ; size = -SIZE
 
-__mrfstr_sse4_1_replchr2 proc
+__mrfstr_sse41_replchr2 proc
     imul r8d, 01010101h
     movd xmm2, r8d
     pshufd xmm2, xmm2, 0
@@ -217,7 +320,7 @@ LHEAD:
     jnz LHEAD
 
     ret
-__mrfstr_sse4_1_replchr2 endp
+__mrfstr_sse41_replchr2 endp
 
 ; void __mrfstr_i64_replchr(
 ;     mrfstr_ptr_t str,

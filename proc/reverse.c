@@ -89,7 +89,6 @@ void __mrfstr_rev(
 
         rem = size & ((MRFSTR_ALIGN_SIZE << 1) - 1);
         size = (size - rem) >> 1;
-
         _mrfstr_config.rev_func(str, right, size);
         str += size;
         right -= size;
@@ -143,22 +142,19 @@ void __mrfstr_rev(
         data->right = right;
         data->size = size;
 
-        str += size;
-        right -= size;
         mrfstr_create_thread(__mrfstr_rev_threaded)
         {
-            str -= size;
-            right += size;
             free(data);
             break;
         }
 
+        str += size;
+        right -= size;
         mrfstr_thread_priority;
     }
 
     tcount -= i;
     size *= tcount;
-
     _mrfstr_config.rev_tfunc(str, right, size);
     str += size;
     right -= size;
@@ -203,7 +199,6 @@ void __mrfstr_rev2(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
         _mrfstr_config.rev2_func(left, right, size);
         left += size;
         right -= size;
@@ -247,23 +242,19 @@ void __mrfstr_rev2(
         data->right = (mrfstr_data_t)right;
         data->size = size;
 
-        left += size;
-        right -= size;
         mrfstr_create_thread(__mrfstr_rev2_threaded)
         {
-            left -= size;
-            right += size;
-
             free(data);
             break;
         }
 
+        left += size;
+        right -= size;
         mrfstr_thread_priority;
     }
 
     tcount -= i;
     size *= tcount;
-
     _mrfstr_config.rev2_tfunc(left, right, size);
     left += size;
     right -= size;

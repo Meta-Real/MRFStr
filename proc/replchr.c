@@ -97,10 +97,8 @@ void __mrfstr_replchr(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
-        str += size;
-        _mrfstr_config.replchr_func(str, ochr, nchr,
-            (mrfstr_size_t)-(mrfstr_slonglong_t)size);
+        _mrfstr_config.replchr_func(str += size, ochr, nchr,
+            (mrfstr_size_t)-(mrfstr_ssize_t)size);
 
         mrfstr_replchr_rem;
         return;
@@ -117,15 +115,14 @@ void __mrfstr_replchr(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_slonglong_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
-        str -= size;
-        _mrfstr_config.replchr_tfunc(str, ochr, nchr, size);
+        _mrfstr_config.replchr_tfunc(str -= size, ochr, nchr, size);
 
         mrfstr_replchr_rem;
         return;
@@ -154,10 +151,8 @@ void __mrfstr_replchr(
     }
 
     tcount -= i;
-
     size *= tcount;
-    str -= size;
-    _mrfstr_config.replchr_tfunc(str, ochr, nchr, size);
+    _mrfstr_config.replchr_tfunc(str -= size, ochr, nchr, size);
 
     mrfstr_replchr_rem;
 
@@ -195,11 +190,8 @@ void __mrfstr_replchr2(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
-        res += size;
-        str += size;
-        _mrfstr_config.replchr2_func(res, str, ochr, nchr,
-            (mrfstr_size_t)-(mrfstr_slonglong_t)size);
+        _mrfstr_config.replchr2_func(res += size, str += size, ochr, nchr,
+            (mrfstr_size_t)-(mrfstr_ssize_t)size);
 
         mrfstr_replchr2_rem;
         return;
@@ -216,16 +208,14 @@ void __mrfstr_replchr2(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_slonglong_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     factor = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
-        res -= size;
-        str -= size;
-        _mrfstr_config.replchr2_tfunc(res, str, ochr, nchr, size);
+        _mrfstr_config.replchr2_tfunc(res -= size, str -= size, ochr, nchr, size);
 
         mrfstr_replchr2_rem;
         return;
@@ -256,11 +246,8 @@ void __mrfstr_replchr2(
     }
 
     tcount -= i;
-
     size *= tcount;
-    res -= size;
-    str -= size;
-    _mrfstr_config.replchr2_tfunc(res, str, ochr, nchr, size);
+    _mrfstr_config.replchr2_tfunc(res -= size, str -= size, ochr, nchr, size);
 
     mrfstr_replchr2_rem;
 

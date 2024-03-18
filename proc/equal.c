@@ -67,11 +67,8 @@ mrfstr_bool_t __mrfstr_equal(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-
-        str1 += size;
-        str2 += size;
-        if (!_mrfstr_config.equal_func(str1, str2,
-                (mrfstr_size_t)-(mrfstr_slonglong_t)size))
+        if (!_mrfstr_config.equal_func(str1 += size, str2 += size,
+                (mrfstr_size_t)-(mrfstr_ssize_t)size))
             return MRFSTR_FALSE;
 
         mrfstr_equal_rem;
@@ -89,7 +86,7 @@ mrfstr_bool_t __mrfstr_equal(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_slonglong_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     res = MRFSTR_TRUE;
 
@@ -99,9 +96,7 @@ mrfstr_bool_t __mrfstr_equal(
     {
 single:
         size *= tcount;
-        str1 -= size;
-        str2 -= size;
-        if (!_mrfstr_config.equal_func(str1, str2, size))
+        if (!_mrfstr_config.equal_func(str1 -= size, str2 -= size, size))
             return MRFSTR_FALSE;
 
         mrfstr_equal_rem;
@@ -121,12 +116,9 @@ single:
             break;
         }
 
-        str1 -= size;
-        str2 -= size;
-
         data->res = &res;
-        data->str1 = str1;
-        data->str2 = str2;
+        data->str1 = str1 -= size;
+        data->str2 = str2 -= size;
         data->size = size;
 
         mrfstr_create_thread(__mrfstr_equal_threaded)
@@ -147,11 +139,8 @@ single:
     }
 
     tcount -= i;
-
     size *= tcount;
-    str1 -= size;
-    str2 -= size;
-    _mrfstr_config.equal_tfunc(&res, str1, str2, size);
+    _mrfstr_config.equal_tfunc(&res, str1 -= size, str2 -= size, size);
     if (!res)
     {
         mrfstr_close_threads;

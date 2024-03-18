@@ -78,6 +78,7 @@ typedef double mrfstr_double_t;
 
 typedef size_t mrfstr_idx_t;
 typedef size_t mrfstr_size_t;
+typedef intptr_t mrfstr_ssize_t;
 
 typedef char mrfstr_chr_t;
 typedef mrfstr_chr_t *mrfstr_data_t;

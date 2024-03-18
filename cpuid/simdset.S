@@ -85,10 +85,6 @@ mrfstr_cpuid_simdset:
 
     bt $30, %ebx
     jnc LASTINST
-    bt $17, %ebx
-    jnc LASTINST
-    bt $31, %ebx
-    jnc LASTINST
     inc %r8b                # AVX512BW, AVX512DQ, AVX512VL
 
     bt $1, %ecx

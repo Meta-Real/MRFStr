@@ -22,9 +22,9 @@ add_executable(TEqual equal.c)
 target_link_libraries(TEqual PRIVATE MRFStr)
 add_test(TEqual TEqual)
 
-#add_executable(TContainChr contain_chr.c)
-#target_link_libraries(TContainChr PRIVATE MRFStr)
-#add_test(TContainChr TContainChr)
+add_executable(TContainChr contain_chr.c)
+target_link_libraries(TContainChr PRIVATE MRFStr)
+add_test(TContainChr TContainChr)
 
 #add_executable(TFindChr find_chr.c)
 #target_link_libraries(TFindChr PRIVATE MRFStr)

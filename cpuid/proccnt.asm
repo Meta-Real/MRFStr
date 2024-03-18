@@ -16,8 +16,9 @@
 ;     mrfstr_byte_t *logical)
 ; PRE: mrfstr_cpuid_cputype
 
-.data
     extern _is_intel : db
+
+.data
     _corecnt db 0
     _logicnt db ?
 

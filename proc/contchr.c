@@ -45,7 +45,7 @@ DWORD WINAPI __mrfstr_contchr_threaded(
 mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc;
+    mrfstr_size_t tsize;
     mrfstr_short_t rem, factor;
     mrfstr_byte_t tcount, i;
     volatile mrfstr_bool_t res;
@@ -55,43 +55,39 @@ mrfstr_bool_t __mrfstr_contchr(
     if (size < MRFSTR_SLIMIT)
         return memchr(str, chr, size) != NULL;
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.search_tlimit)
     {
-        mrfstr_byte_t mask;
-
-        mask = _mrfstr_config.nsearch_size - 1;
-        rem = (uintptr_t)str & mask;
+        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nsearch_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_contchr_rem;
         }
 
-        rem = size & mask;
+        rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
-        if (_mrfstr_config.ncontchr_sub(str, chr, size / _mrfstr_config.nsearch_size))
-            return MRFSTR_TRUE;
         str += size;
+        if (_mrfstr_config.contchr_func(str, chr, (mrfstr_size_t)-(mrfstr_ssize_t)size))
+            return MRFSTR_TRUE;
 
         mrfstr_contchr_rem;
         return MRFSTR_FALSE;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.search_tlimit);
 
-    rem = (uintptr_t)str & (_mrfstr_config.tsearch_size - 1);
+    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.tsearch_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_contchr_rem;
     }
 
-    factor = _mrfstr_config.tsearch_size * tcount;
-    rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.tsearch_size;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     res = MRFSTR_FALSE;
 
@@ -100,10 +96,11 @@ mrfstr_bool_t __mrfstr_contchr(
     if (!threads)
     {
 single:
-        if (_mrfstr_config.ncontchr_sub(str, chr, size * tcount))
+        size *= tcount;
+        str -= size;
+        if (_mrfstr_config.contchr_func(str, chr, size))
             return MRFSTR_TRUE;
 
-        str += inc * tcount;
         mrfstr_contchr_rem;
         return MRFSTR_FALSE;
     }
@@ -122,14 +119,13 @@ single:
         }
 
         data->res = &res;
-        data->str = str;
+        data->str = str -= size;
         data->size = size;
         data->chr = chr;
 
-        str += inc;
         mrfstr_create_thread(__mrfstr_contchr_threaded)
         {
-            str -= inc;
+            str += size;
 
             free(data);
             if (!i)
@@ -144,8 +140,10 @@ single:
     }
 
     tcount -= i;
-    _mrfstr_config.tcontchr_sub(&res, str, chr, size * tcount);
-    str += inc * tcount;
+
+    size *= tcount;
+    str -= size;
+    _mrfstr_config.contchr_tfunc(&res, str, chr, size);
 
     while (rem--)
         if (chr == *str++)
@@ -170,7 +168,7 @@ DWORD WINAPI __mrfstr_contchr_threaded(
     mrfstr_contchr_t data;
 
     data = (mrfstr_contchr_t)args;
-    _mrfstr_config.tcontchr_sub(data->res, data->str, data->chr, data->size);
+    _mrfstr_config.contchr_tfunc(data->res, data->str, data->chr, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

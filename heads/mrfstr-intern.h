@@ -77,7 +77,7 @@ enum __MRFSTR_SIMD_ENUM
     MRFSTR_SIMD_INT64,
     MRFSTR_SIMD_SSE2,
     MRFSTR_SIMD_SSSE3,
-    MRFSTR_SIMD_SSE4_1,
+    MRFSTR_SIMD_SSE41,
     MRFSTR_SIMD_AVX,
     MRFSTR_SIMD_AVX2,
     MRFSTR_SIMD_AVX512F,
@@ -114,20 +114,6 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_size_t mem_tlimit;
 
-    /* rev functions */
-
-    void (*rev_func)(
-        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
-    void (*rev2_func)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
-
-    void (*rev_tfunc)(
-        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
-    void (*rev2_tfunc)(
-        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
-
-    mrfstr_size_t rev_tlimit;
-
     /* repl functions */
 
     void (*replchr_func)(
@@ -150,6 +136,20 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_size_t repl_tlimit;
 
+    /* rev functions */
+
+    void (*rev_func)(
+        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
+    void (*rev2_func)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+
+    void (*rev_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_t, mrfstr_size_t);
+    void (*rev2_tfunc)(
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
+
+    mrfstr_size_t rev_tlimit;
+
     /* cmp functions */
 
     mrfstr_bool_t (*equal_func)(
@@ -160,6 +160,17 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
 
     mrfstr_size_t cmp_tlimit;
+
+    /* search functions */
+
+    mrfstr_bool_t (*contchr_func)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+
+    void (*contchr_tfunc)(
+        volatile mrfstr_bool_t*,
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+
+    mrfstr_size_t search_tlimit;
 
     /* general */
 

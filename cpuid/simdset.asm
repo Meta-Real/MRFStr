@@ -24,8 +24,9 @@
 ; 7: AVX512BW, AVX512DQ, AVX512VL
 ; 8: AVX512VBMI
 
-.data
     extern _funccnt : db
+
+.data
     _simdset db 0
 
 .code
@@ -81,10 +82,6 @@ mrfstr_cpuid_simdset proc
     inc r8b             ; AVX512F
 
     bt ebx, 30
-    jnc LASTINST
-    bt ebx, 17
-    jnc LASTINST
-    bt ebx, 31
     jnc LASTINST
     inc r8b             ; AVX512BW, AVX512DQ, AVX512VL
 

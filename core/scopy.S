@@ -12,8 +12,6 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-    .extern _mrfstr_mem_ntlimit
-
 #ifdef WIN32
 #define dst %rcx
 #define src %rdx
@@ -24,6 +22,9 @@
 #define size %rcx
 #endif
 
+    .extern _mrfstr_mem_ntlimit
+    .extern _mrfstr_mem_ntrlimit
+
 .text
 
 # void __mrfstr_avx512f_copy(
@@ -31,14 +32,12 @@
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_avx512f_copy
 __mrfstr_avx512f_copy:
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE1
-
-    neg size
+    jb NTLHEAD1
 
 LHEAD1:
     vmovdqu64 (src, size), %zmm16
@@ -48,9 +47,6 @@ LHEAD1:
     jnz LHEAD1
 
     ret
-
-NTSTORE1:
-    neg size
 
 NTLHEAD1:
     vmovdqu64 (src, size), %zmm16
@@ -62,23 +58,39 @@ NTLHEAD1:
     sfence
     ret
 
+# void __mrfstr_avx512f_vcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# src = SRC+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_avx512f_vcopy
+__mrfstr_avx512f_vcopy:
+LHEAD2:
+    vmovdqu64 (src, size), %zmm16
+    vmovdqa64 %zmm16, (dst, size)
+
+    add $64, size
+    jnz LHEAD2
+
+    ret
+
 # void __mrfstr_avx512f_ntcopy(
 #     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_avx512f_ntcopy
 __mrfstr_avx512f_ntcopy:
-    neg size
-
-LHEAD2:
+LHEAD3:
     vmovdqu64 (src, size), %zmm16
     vmovntdq %zmm16, (dst, size)
 
     add $64, size
-    jnz LHEAD2
+    jnz LHEAD3
 
     sfence
     ret
@@ -95,26 +107,47 @@ __mrfstr_avx512f_rcopy:
     sub $64, dst
     sub $64, src
 
-    cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTLHEAD2
+    cmp _mrfstr_mem_ntrlimit(%rip), size
+    ja NTLHEAD4
 
-LHEAD3:
+LHEAD4:
     vmovdqu64 (src, size), %zmm16
     vmovdqa64 %zmm16, (dst, size)
 
     sub $64, size
-    jnz LHEAD3
+    jnz LHEAD4
 
     ret
 
-NTLHEAD2:
+NTLHEAD4:
     vmovdqu64 (src, size), %zmm16
     vmovntdq %zmm16, (dst, size)
 
     sub $64, size
-    jnz NTLHEAD2
+    jnz NTLHEAD4
 
     sfence
+    ret
+
+# void __mrfstr_avx512f_vrcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST
+# src = SRC
+# size = SIZE
+
+    .globl __mrfstr_avx512f_vrcopy
+__mrfstr_avx512f_vrcopy:
+    sub $64, dst
+    sub $64, src
+
+LHEAD5:
+    vmovdqu64 (src, size), %zmm16
+    vmovdqa64 %zmm16, (dst, size)
+
+    sub $64, size
+    jnz LHEAD5
+
     ret
 
 # void __mrfstr_avx512f_ntrcopy(
@@ -129,12 +162,12 @@ __mrfstr_avx512f_ntrcopy:
     sub $64, dst
     sub $64, src
 
-LHEAD4:
+LHEAD6:
     vmovdqu64 (src, size), %zmm16
     vmovntdq %zmm16, (dst, size)
 
     sub $64, size
-    jnz LHEAD4
+    jnz LHEAD6
 
     sfence
     ret
@@ -144,36 +177,50 @@ LHEAD4:
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_avx_copy
 __mrfstr_avx_copy:
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE2
+    jb NTLHEAD7
 
-    neg size
-
-LHEAD5:
+LHEAD7:
     vmovdqu (src, size), %ymm0
     vmovdqa %ymm0, (dst, size)
 
     add $32, size
-    jnz LHEAD5
+    jnz LHEAD7
 
     vzeroupper
     ret
 
-NTSTORE2:
-    neg size
-
-NTLHEAD3:
+NTLHEAD7:
     vmovdqu (src, size), %ymm0
     vmovntdq %ymm0, (dst, size)
 
     add $32, size
-    jnz NTLHEAD3
+    jnz NTLHEAD7
 
     sfence
+    vzeroupper
+    ret
+
+# void __mrfstr_avx_vcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# src = SRC+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_avx_vcopy
+__mrfstr_avx_vcopy:
+LHEAD8:
+    vmovdqu (src, size), %ymm0
+    vmovdqa %ymm0, (dst, size)
+
+    add $32, size
+    jnz LHEAD8
+
     vzeroupper
     ret
 
@@ -182,18 +229,16 @@ NTLHEAD3:
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_avx_ntcopy
 __mrfstr_avx_ntcopy:
-    neg size
-
-LHEAD6:
+LHEAD9:
     vmovdqu (src, size), %ymm0
     vmovntdq %ymm0, (dst, size)
 
     add $32, size
-    jnz LHEAD6
+    jnz LHEAD9
 
     sfence
     vzeroupper
@@ -211,27 +256,49 @@ __mrfstr_avx_rcopy:
     sub $32, dst
     sub $32, src
 
-    cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTLHEAD4
+    cmp _mrfstr_mem_ntrlimit(%rip), size
+    ja NTLHEAD10
 
-LHEAD7:
+LHEAD10:
     vmovdqu (src, size), %ymm0
     vmovdqa %ymm0, (dst, size)
 
     sub $32, size
-    jnz LHEAD7
+    jnz LHEAD10
 
     vzeroupper
     ret
 
-NTLHEAD4:
+NTLHEAD10:
     vmovdqu (src, size), %ymm0
     vmovntdq %ymm0, (dst, size)
 
     sub $32, size
-    jnz NTLHEAD4
+    jnz NTLHEAD10
 
     sfence
+    vzeroupper
+    ret
+
+# void __mrfstr_avx_vrcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST
+# src = SRC
+# size = SIZE
+
+    .globl __mrfstr_avx_vrcopy
+__mrfstr_avx_vrcopy:
+    sub $32, dst
+    sub $32, src
+
+LHEAD11:
+    vmovdqu (src, size), %ymm0
+    vmovdqa %ymm0, (dst, size)
+
+    sub $32, size
+    jnz LHEAD11
+
     vzeroupper
     ret
 
@@ -247,12 +314,12 @@ __mrfstr_avx_ntrcopy:
     sub $32, dst
     sub $32, src
 
-LHEAD8:
+LHEAD12:
     vmovdqu (src, size), %ymm0
     vmovntdq %ymm0, (dst, size)
 
     sub $32, size
-    jnz LHEAD8
+    jnz LHEAD12
 
     sfence
     vzeroupper
@@ -263,35 +330,48 @@ LHEAD8:
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_sse2_copy
 __mrfstr_sse2_copy:
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE3
+    jb NTLHEAD13
 
-    neg size
-
-LHEAD9:
+LHEAD13:
     movdqu (src, size), %xmm0
     movdqa %xmm0, (dst, size)
 
     add $16, size
-    jnz LHEAD9
+    jnz LHEAD13
 
     ret
 
-NTSTORE3:
-    neg size
-
-NTLHEAD5:
+NTLHEAD13:
     movdqu (src, size), %xmm0
     movntdq %xmm0, (dst, size)
 
     add $16, size
-    jnz NTLHEAD5
+    jnz NTLHEAD13
 
     sfence
+    ret
+
+# void __mrfstr_sse2_vcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# src = SRC+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_sse2_vcopy
+__mrfstr_sse2_vcopy:
+LHEAD14:
+    movdqu (src, size), %xmm0
+    movdqa %xmm0, (dst, size)
+
+    add $16, size
+    jnz LHEAD14
+
     ret
 
 # void __mrfstr_sse2_ntcopy(
@@ -299,18 +379,16 @@ NTLHEAD5:
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_sse2_ntcopy
 __mrfstr_sse2_ntcopy:
-    neg size
-
-LHEAD10:
+LHEAD15:
     movdqu (src, size), %xmm0
     movntdq %xmm0, (dst, size)
 
     add $16, size
-    jnz LHEAD10
+    jnz LHEAD15
 
     sfence
     ret
@@ -327,26 +405,47 @@ __mrfstr_sse2_rcopy:
     sub $16, dst
     sub $16, src
 
-    cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTLHEAD6
+    cmp _mrfstr_mem_ntrlimit(%rip), size
+    ja NTLHEAD16
 
-LHEAD11:
+LHEAD16:
     movdqu (src, size), %xmm0
     movdqa %xmm0, (dst, size)
 
     sub $16, size
-    jnz LHEAD11
+    jnz LHEAD16
 
     ret
 
-NTLHEAD6:
+NTLHEAD16:
     movdqu (src, size), %xmm0
     movntdq %xmm0, (dst, size)
 
     sub $16, size
-    jnz NTLHEAD6
+    jnz NTLHEAD16
 
     sfence
+    ret
+
+# void __mrfstr_sse2_vrcopy(
+#     mrfstr_ptr_t dst, mrfstr_ptr_ct src, mrfstr_size_t size)
+#
+# dst = DST
+# src = SRC
+# size = SIZE
+
+    .globl __mrfstr_sse2_vrcopy
+__mrfstr_sse2_vrcopy:
+    sub $16, dst
+    sub $16, src
+
+LHEAD17:
+    movdqu (src, size), %xmm0
+    movdqa %xmm0, (dst, size)
+
+    sub $16, size
+    jnz LHEAD17
+
     ret
 
 # void __mrfstr_sse2_ntrcopy(
@@ -361,12 +460,12 @@ __mrfstr_sse2_ntrcopy:
     sub $16, dst
     sub $16, src
 
-LHEAD12:
+LHEAD18:
     movdqu (src, size), %xmm0
     movntdq %xmm0, (dst, size)
 
     sub $16, size
-    jnz LHEAD12
+    jnz LHEAD18
 
     sfence
     ret
@@ -376,18 +475,16 @@ LHEAD12:
 #
 # dst = DST+SIZE
 # src = SRC+SIZE
-# size = SIZE
+# size = -SIZE
 
     .globl __mrfstr_i64_copy
 __mrfstr_i64_copy:
-    neg size
-
-LHEAD13:
+LHEAD19:
     mov (src, size), %rax
     mov %rax, (dst, size)
 
     add $8, size
-    jnz LHEAD13
+    jnz LHEAD19
 
     ret
 
@@ -403,11 +500,11 @@ __mrfstr_i64_rcopy:
     sub $8, dst
     sub $8, src
 
-LHEAD14:
+LHEAD20:
     mov (src, size), %rax
     mov %rax, (dst, size)
 
     add $8, size
-    jnz LHEAD14
+    jnz LHEAD20
 
     ret

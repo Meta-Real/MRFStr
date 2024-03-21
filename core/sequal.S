@@ -12,8 +12,6 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-    .extern _mrfstr_cmp_load
-
 #ifdef WIN32
 #define str1 %rcx
 #define str2 %rdx
@@ -34,6 +32,8 @@
 #define size2 %rdx
 #endif
 
+    .extern _mrfstr_cmp_load
+
 .text
 
 # mrfstr_bool_t __mrfstr_avx512dq_equal(
@@ -47,9 +47,9 @@
 __mrfstr_avx512dq_equal:
 LHEAD1:
     vmovdqu64 (str1, size), %zmm16
-    vpcmpq $4, (str2, size), %zmm16, %k1
+    vpcmpq $4, (str2, size), %zmm16, %k0
 
-    kortestb %k1, %k1
+    kortestb %k0, %k0
     jnz FALSE1
 
     add $64, size
@@ -73,14 +73,13 @@ FALSE1:
 
     .globl __mrfstr_avx512dq_tequal
 __mrfstr_avx512dq_tequal:
-    mov _mrfstr_cmp_load(%rip), %rax
-
-    cmp %rax, size2
-    jg LASTLOAD2
-
     mov (res2), %r10b
     test %r10b, %r10b
     jz RETURN2
+
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD2
 
 OLHEAD2:
     mov %r9, %r10
@@ -88,9 +87,9 @@ OLHEAD2:
 
 ILHEAD2:
     vmovdqu64 (str12, size2), %zmm16
-    vpcmpq $4, (str22, size2), %zmm16, %k1
+    vpcmpq $4, (str22, size2), %zmm16, %k0
 
-    kortestb %k1, %k1
+    kortestb %k0, %k0
     jnz FALSE2
 
     add $64, size2
@@ -102,13 +101,13 @@ ILHEAD2:
     jz RETURN2
 
     cmp %rax, %r9
-    jl OLHEAD2
+    ja OLHEAD2
 
 LASTLOAD2:
     vmovdqu64 (str12, size2), %zmm16
-    vpcmpq $4, (str22, size2), %zmm16, %k1
+    vpcmpq $4, (str22, size2), %zmm16, %k0
 
-    kortestb %k1, %k1
+    kortestb %k0, %k0
     jnz FALSE2
 
     add $64, size2
@@ -132,9 +131,9 @@ FALSE2:
 __mrfstr_avx512f_equal:
 LHEAD3:
     vmovdqu64 (str1, size), %zmm16
-    vpcmpq $4, (str2, size), %zmm16, %k1
+    vpcmpq $4, (str2, size), %zmm16, %k0
 
-    kmovw %k1, %eax
+    kmovw %k0, %eax
     test %al, %al
     jnz FALSE3
 
@@ -159,14 +158,13 @@ FALSE3:
 
     .globl __mrfstr_avx512f_tequal
 __mrfstr_avx512f_tequal:
-    mov _mrfstr_cmp_load(%rip), %rax
-
-    cmp %rax, size2
-    jg LASTLOAD4
-
     mov (res2), %r10b
     test %r10b, %r10b
     jz RETURN4
+
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD4
 
 OLHEAD4:
     mov %r9, %r10
@@ -174,9 +172,9 @@ OLHEAD4:
 
 ILHEAD4:
     vmovdqu64 (str12, size2), %zmm16
-    vpcmpq $4, (str22, size2), %zmm16, %k1
+    vpcmpq $4, (str22, size2), %zmm16, %k0
 
-    kmovw %k1, %r11d
+    kmovw %k0, %r11d
     test %r11b, %r11b
     jnz FALSE4
 
@@ -189,13 +187,13 @@ ILHEAD4:
     jz RETURN4
 
     cmp %rax, %r9
-    jl OLHEAD4
+    ja OLHEAD4
 
 LASTLOAD4:
     vmovdqu64 (str12, size2), %zmm16
-    vpcmpq $4, (str22, size2), %zmm16, %k1
+    vpcmpq $4, (str22, size2), %zmm16, %k0
 
-    kmovw %k1, %r11d
+    kmovw %k0, %r11d
     test %r11b, %r11b
     jnz FALSE4
 
@@ -209,6 +207,90 @@ FALSE4:
     movb $0, (res2)
     ret
 
+# mrfstr_bool_t __mrfstr_avx2_avx512vl_equal(
+#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#
+# str1 = STR1+SIZE
+# str2 = STR2+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_avx2_avx512vl_equal
+__mrfstr_avx2_avx512vl_equal:
+LHEAD5:
+    vmovdqu64 (str1, size), %ymm16
+    vpcmpq $4, (str2, size), %ymm16, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE5
+
+    add $32, size
+    jnz LHEAD5
+
+    mov $1, %al
+    ret
+
+FALSE5:
+    xor %al, %al
+    ret
+
+# void __mrfstr_avx2_avx512vl_tequal(
+#     volatile mrfstr_bool_t *res,
+#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#
+# res = RES
+# str1 = STR1+SIZE
+# str2 = STR2+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_avx2_avx512vl_tequal
+__mrfstr_avx2_avx512vl_tequal:
+    mov (res2), %r10b
+    test %r10b, %r10b
+    jz RETURN6
+
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD6
+
+OLHEAD6:
+    mov size2, %r10
+    sub %rax, %r10
+
+ILHEAD6:
+    vmovdqu64 (str12, size2), %ymm16
+    vpcmpq $4, (str22, size2), %ymm16, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE6
+
+    add $64, size2
+    cmp %r10, size2
+    jne ILHEAD6
+
+    mov (res2), %r10b
+    test %r10b, %r10b
+    jz RETURN6
+
+    cmp %rax, size2
+    ja OLHEAD6
+
+LASTLOAD6:
+    vmovdqu64 (str12, size2), %ymm16
+    vpcmpq $4, (str22, size2), %ymm16, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE6
+
+    add $32, size2
+    jnz LASTLOAD6
+
+RETURN6:
+    ret
+
+FALSE6:
+    movb $0, (res2)
+    ret
+
 # mrfstr_bool_t __mrfstr_avx2_equal(
 #     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
@@ -218,22 +300,22 @@ FALSE4:
 
     .globl __mrfstr_avx2_equal
 __mrfstr_avx2_equal:
-LHEAD5:
+LHEAD7:
     vmovdqu (str1, size), %ymm0
     vpcmpeqq (str2, size), %ymm0, %ymm0
 
     vpmovmskb %ymm0, %eax
     cmp $0xffffffff, %eax
-    jne FALSE5
+    jne FALSE7
 
     add $32, size
-    jnz LHEAD5
+    jnz LHEAD7
 
     mov $1, %al
     vzeroupper
     ret
 
-FALSE5:
+FALSE7:
     xor %al, %al
     vzeroupper
     ret
@@ -249,56 +331,139 @@ FALSE5:
 
     .globl __mrfstr_avx2_tequal
 __mrfstr_avx2_tequal:
-    mov _mrfstr_cmp_load(%rip), %rax
-
-    cmp %rax, size2
-    jg LASTLOAD6
-
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN6
+    jz RETURN8
 
-OLHEAD6:
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD8
+
+OLHEAD8:
     mov size2, %r10
     sub %rax, %r10
 
-ILHEAD6:
+ILHEAD8:
     vmovdqu (str12, size2), %ymm0
     vpcmpeqq (str22, size2), %ymm0, %ymm0
 
     vpmovmskb %ymm0, %r11d
     cmp $0xffffffff, %r11d
-    jne FALSE6
+    jne FALSE8
 
     add $32, size2
     cmp %r10, size2
-    jne ILHEAD6
+    jne ILHEAD8
 
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN6
+    jz RETURN8
 
     cmp %rax, size2
-    jl OLHEAD6
+    ja OLHEAD8
 
-LASTLOAD6:
+LASTLOAD8:
     vmovdqu (str12, size2), %ymm0
     vpcmpeqq (str22, size2), %ymm0, %ymm0
 
     vpmovmskb %ymm0, %r11d
     cmp $0xffffffff, %r11d
-    jne FALSE6
+    jne FALSE8
 
     add $32, size2
-    jnz LASTLOAD6
+    jnz LASTLOAD8
 
-RETURN6:
+RETURN8:
     vzeroupper
     ret
 
-FALSE6:
+FALSE8:
     movb $0, (res2)
     vzeroupper
+    ret
+
+# mrfstr_bool_t __mrfstr_sse2_avx512vl_equal(
+#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#
+# str1 = STR1+SIZE
+# str2 = STR2+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_sse2_avx512vl_equal
+__mrfstr_sse2_avx512vl_equal:
+LHEAD9:
+    vmovdqu64 (str1, size), %xmm0
+    vpcmpq $4, (str2, size), %xmm0, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE9
+
+    add $16, size
+    jnz LHEAD9
+
+    mov $1, %al
+    ret
+
+FALSE9:
+    xor %al, %al
+    ret
+
+# void __mrfstr_sse2_avx512vl_tequal(
+#     volatile mrfstr_bool_t *res,
+#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#
+# res = RES
+# str1 = STR1+SIZE
+# str2 = STR2+SIZE
+# size = -SIZE
+
+    .globl __mrfstr_sse2_avx512vl_tequal
+__mrfstr_sse2_avx512vl_tequal:
+    mov (res2), %r10b
+    test %r10b, %r10b
+    jz RETURN10
+
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD10
+
+OLHEAD10:
+    mov size2, %r10
+    sub %rax, %r10
+
+ILHEAD10:
+    vmovdqu64 (str12, size2), %xmm0
+    vpcmpq $4, (str22, size2), %xmm0, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE10
+
+    add $16, size2
+    cmp %r10, size2
+    jne ILHEAD10
+
+    mov (res2), %r10b
+    test %r10b, %r10b
+    jz RETURN10
+
+    cmp %rax, size2
+    ja OLHEAD10
+
+LASTLOAD10:
+    vmovdqu64 (str12, size2), %xmm0
+    vpcmpq $4, (str22, size2), %xmm0, %k0
+
+    kortestb %k0, %k0
+    jnz FALSE10
+
+    add $16, size2
+    jnz LASTLOAD10
+
+RETURN10:
+    ret
+
+FALSE10:
+    movb $0, (res2)
     ret
 
 # mrfstr_bool_t __mrfstr_sse2_equal(
@@ -310,21 +475,21 @@ FALSE6:
 
     .globl __mrfstr_sse2_equal
 __mrfstr_sse2_equal:
-LHEAD7:
+LHEAD11:
     movdqu (str1, size), %xmm0
     pcmpeqd (str2, size), %xmm0
 
     pmovmskb %xmm0, %eax
     cmp $0xffff, %ax
-    jne FALSE7
+    jne FALSE11
 
     add $16, size
-    jnz LHEAD7
+    jnz LHEAD11
 
     mov $1, %al
     ret
 
-FALSE7:
+FALSE11:
     xor %al, %al
     ret
 
@@ -339,53 +504,52 @@ FALSE7:
 
     .globl __mrfstr_sse2_tequal
 __mrfstr_sse2_tequal:
-    mov _mrfstr_cmp_load(%rip), %rax
-
-    cmp %rax, size2
-    jg LASTLOAD8
-
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN8
+    jz RETURN12
 
-OLHEAD8:
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD12
+
+OLHEAD12:
     mov size2, %r10
     sub %rax, %r10
 
-ILHEAD8:
+ILHEAD12:
     movdqu (str12, size2), %xmm0
     pcmpeqd (str22, size2), %xmm0
 
     pmovmskb %xmm0, %r11d
     cmp $0xffff, %r11w
-    jne FALSE8
+    jne FALSE12
 
     add $16, size2
     cmp %r10, size2
-    jne ILHEAD8
+    jne ILHEAD12
 
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN8
+    jz RETURN12
 
     cmp %rax, size2
-    jl OLHEAD8
+    ja OLHEAD12
 
-LASTLOAD8:
+LASTLOAD12:
     movdqu (str12, size2), %xmm0
     pcmpeqd (str22, size2), %xmm0
 
     pmovmskb %xmm0, %r11d
     cmp $0xffff, %r11w
-    jne FALSE8
+    jne FALSE12
 
     add $16, size2
-    jnz LASTLOAD8
+    jnz LASTLOAD12
 
-RETURN8:
+RETURN12:
     ret
 
-FALSE8:
+FALSE12:
     movb $0, (res2)
     ret
 
@@ -398,18 +562,18 @@ FALSE8:
 
     .globl __mrfstr_i64_equal
 __mrfstr_i64_equal:
-LHEAD9:
+LHEAD13:
     mov (str1, size), %rax
     cmp (str2, size), %rax
-    jne FALSE9
+    jne FALSE13
 
     add $8, size
-    jnz LHEAD9
+    jnz LHEAD13
 
     mov $1, %al
     ret
 
-FALSE9:
+FALSE13:
     xor %al, %al
     ret
 
@@ -424,46 +588,45 @@ FALSE9:
 
     .globl __mrfstr_i64_tequal
 __mrfstr_i64_tequal:
-    mov _mrfstr_cmp_load(%rip), %rax
-
-    cmp %rax, size2
-    jg LASTLOAD10
-
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN10
+    jz RETURN14
 
-OLHEAD10:
+    mov _mrfstr_cmp_load(%rip), %rax
+    cmp %rax, size2
+    jbe LASTLOAD14
+
+OLHEAD14:
     mov size2, %r10
     sub %rax, %r10
 
-ILHEAD10:
+ILHEAD14:
     mov (str12, size2), %r11
     cmp (str22, size2), %r11
-    jne FALSE10
+    jne FALSE14
 
     add $8, size2
     cmp %r10, size2
-    jne ILHEAD10
+    jne ILHEAD14
 
     mov (res2), %r10b
     test %r10b, %r10b
-    jz RETURN10
+    jz RETURN14
 
     cmp %rax, size2
-    jl OLHEAD10
+    ja OLHEAD14
 
-LASTLOAD10:
+LASTLOAD14:
     mov (str12, size2), %r11
     cmp (str22, size2), %r11
-    jne FALSE10
+    jne FALSE14
 
     add $8, size2
-    jnz LASTLOAD10
+    jnz LASTLOAD14
 
-RETURN10:
+RETURN14:
     ret
 
-FALSE10:
+FALSE14:
     movb $0, (res2)
     ret

@@ -100,9 +100,9 @@ __mrfstr_avx512f_ntfill endp
 ; size = -SIZE
 
 __mrfstr_avx_fill proc
-    imul edx, 01010101h
-    movd xmm0, edx
-    pshufd xmm0, xmm0, 0
+    vpxor xmm1, xmm1, xmm1
+    vmovd xmm0, edx
+    vpshufb xmm0, xmm0, xmm1
     vinsertf128 ymm0, ymm0, xmm0, 1
 
     cmp r8, [_mrfstr_mem_ntlimit]
@@ -136,9 +136,9 @@ __mrfstr_avx_fill endp
 ; size = -SIZE
 
 __mrfstr_avx_vfill proc
-    imul edx, 01010101h
-    movd xmm0, edx
-    pshufd xmm0, xmm0, 0
+    vpxor xmm1, xmm1, xmm1
+    vmovd xmm0, edx
+    vpshufb xmm0, xmm0, xmm1
     vinsertf128 ymm0, ymm0, xmm0, 1
 
 LHEAD:
@@ -159,9 +159,9 @@ __mrfstr_avx_vfill endp
 ; size = -SIZE
 
 __mrfstr_avx_ntfill proc
-    imul edx, 01010101h
-    movd xmm0, edx
-    pshufd xmm0, xmm0, 0
+    vpxor xmm1, xmm1, xmm1
+    vmovd xmm0, edx
+    vpshufb xmm0, xmm0, xmm1
     vinsertf128 ymm0, ymm0, xmm0, 1
 
 LHEAD:
@@ -183,8 +183,9 @@ __mrfstr_avx_ntfill endp
 ; size = -SIZE
 
 __mrfstr_sse2_fill proc
-    imul edx, 01010101h
     movd xmm0, edx
+    punpcklbw xmm0, xmm0
+    punpcklwd xmm0, xmm0
     pshufd xmm0, xmm0, 0
 
     cmp r8, [_mrfstr_mem_ntlimit]
@@ -213,11 +214,12 @@ __mrfstr_sse2_fill endp
 ;
 ; dst = DST+SIZE
 ; chr = CHR
-; size = SIZE
+; size = -SIZE
 
 __mrfstr_sse2_vfill proc
-    imul edx, 01010101h
     movd xmm0, edx
+    punpcklbw xmm0, xmm0
+    punpcklwd xmm0, xmm0
     pshufd xmm0, xmm0, 0
 
 LHEAD:
@@ -234,11 +236,12 @@ __mrfstr_sse2_vfill endp
 ;
 ; dst = DST+SIZE
 ; chr = CHR
-; size = SIZE
+; size = -SIZE
 
 __mrfstr_sse2_ntfill proc
-    imul edx, 01010101h
     movd xmm0, edx
+    punpcklbw xmm0, xmm0
+    punpcklwd xmm0, xmm0
     pshufd xmm0, xmm0, 0
 
 LHEAD:
@@ -256,10 +259,11 @@ __mrfstr_sse2_ntfill endp
 ;
 ; dst = DST+SIZE
 ; chr = CHR
-; size = SIZE
+; size = -SIZE
 
 __mrfstr_i64_fill proc
     mov rax, 0101010101010101h
+    movzx rdx, dl
     imul rdx, rax
 
 LHEAD:

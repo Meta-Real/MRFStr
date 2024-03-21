@@ -62,18 +62,11 @@
 
     .globl __mrfstr_avx512bw_replchr
 __mrfstr_avx512bw_replchr:
-#ifdef __clang__
-    and $255, ochr
-    and $255, nchr
-#endif
-
-    imul $0x01010101, ochr
-    vpbroadcastd ochr, %zmm16
-    imul $0x01010101, nchr
-    vpbroadcastd nchr, %zmm17
+    vpbroadcastb ochr, %zmm16
+    vpbroadcastb nchr, %zmm17
 
 LHEAD1:
-    vpcmpb $0, (str, size), %zmm16, %k1
+    vpcmpeqb (str, size), %zmm16, %k1
     vmovdqu8 %zmm17, (str, size){%k1}
 
     add $64, size
@@ -94,15 +87,8 @@ LHEAD1:
 
     .globl __mrfstr_avx512bw_replchr2
 __mrfstr_avx512bw_replchr2:
-#ifdef __clang__
-    and $255, ochr2
-    and $255, nchr2
-#endif
-
-    imul $0x01010101, ochr2
-    vpbroadcastd ochr2, %zmm17
-    imul $0x01010101, nchr2
-    vpbroadcastd nchr2, %zmm18
+    vpbroadcastb ochr2, %zmm17
+    vpbroadcastb nchr2, %zmm18
 
 #ifdef WIN32
     mov 40(%rsp), size2
@@ -111,13 +97,70 @@ __mrfstr_avx512bw_replchr2:
 LHEAD2:
     vmovdqu64 (str2, size2), %zmm16
 
-    vpcmpb $0, %zmm17, %zmm16, %k1
+    vpcmpeqb %zmm17, %zmm16, %k1
     vpblendmb %zmm18, %zmm16, %zmm16{%k1}
 
     vmovdqa64 %zmm16, (res2, size2)
 
     add $64, size2
     jnz LHEAD2
+
+    ret
+
+# void __mrfstr_avx2_avx512bw_replchr(
+#     mrfstr_ptr_t str,
+#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+#     mrfstr_size_t size)
+#
+# str = STR+SIZE
+# ochr = OCHR
+# nchr = NCHR
+# size = -SIZE
+
+    .globl __mrfstr_avx2_avx512bw_replchr
+__mrfstr_avx2_avx512bw_replchr:
+    vpbroadcastb ochr, %ymm16
+    vpbroadcastb nchr, %ymm17
+
+LHEAD3:
+    vpcmpeqb (str, size), %ymm16, %k1
+    vmovdqu8 %ymm17, (str, size){%k1}
+
+    add $32, size
+    jnz LHEAD3
+
+    ret
+
+# void __mrfstr_avx2_avx512bw_replchr2(
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
+#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+#     mrfstr_size_t size)
+#
+# res = RES+SIZE
+# str = STR+SIZE
+# ochr = OCHR
+# nchr = NCHR
+# size = -SIZE
+
+    .globl __mrfstr_avx2_avx512bw_replchr2
+__mrfstr_avx2_avx512bw_replchr2:
+    vpbroadcastb ochr2, %ymm17
+    vpbroadcastb nchr2, %ymm18
+
+#ifdef WIN32
+    mov 40(%rsp), size2
+#endif
+
+LHEAD4:
+    vmovdqu64 (str2, size2), %ymm16
+
+    vpcmpeqb %ymm17, %ymm16, %k1
+    vpblendmb %ymm18, %ymm16, %ymm16{%k1}
+
+    vmovdqa64 %ymm16, (res2, size2)
+
+    add $32, size2
+    jnz LHEAD4
 
     ret
 
@@ -133,22 +176,17 @@ LHEAD2:
 
     .globl __mrfstr_avx2_replchr
 __mrfstr_avx2_replchr:
-#ifdef __clang__
-    and $255, ochr
-    and $255, nchr
-#endif
+    vpxor %xmm3, %xmm3, %xmm3
 
-    imul $0x01010101, ochr
-    movd ochr, %xmm1
-    pshufd $0, %xmm1, %xmm1
+    vmovd ochr, %xmm1
+    vpshufb %xmm3, %xmm1, %xmm1
     vinsertf128 $1, %xmm1, %ymm1, %ymm1
 
-    imul $0x01010101, nchr
-    movd nchr, %xmm2
-    pshufd $0, %xmm2, %xmm2
+    vmovd nchr, %xmm2
+    vpshufb %xmm3, %xmm2, %xmm2
     vinsertf128 $1, %xmm2, %ymm2, %ymm2
 
-LHEAD3:
+LHEAD5:
     vmovdqa (str, size), %ymm0
 
     vpcmpeqb %ymm1, %ymm0, %ymm3
@@ -157,7 +195,7 @@ LHEAD3:
     vmovdqa %ymm0, (str, size)
 
     add $32, size
-    jnz LHEAD3
+    jnz LHEAD5
 
     vzeroupper
     ret
@@ -175,26 +213,21 @@ LHEAD3:
 
     .globl __mrfstr_avx2_replchr2
 __mrfstr_avx2_replchr2:
-#ifdef __clang__
-    and $255, ochr2
-    and $255, nchr2
-#endif
+    vpxor %xmm3, %xmm3, %xmm3
 
-    imul $0x01010101, ochr2
-    movd ochr2, %xmm1
-    pshufd $0, %xmm1, %xmm1
+    vmovd ochr, %xmm1
+    vpshufb %xmm3, %xmm1, %xmm1
     vinsertf128 $1, %xmm1, %ymm1, %ymm1
 
-    imul $0x01010101, nchr2
-    movd nchr2, %xmm2
-    pshufd $0, %xmm2, %xmm2
+    vmovd nchr, %xmm2
+    vpshufb %xmm3, %xmm2, %xmm2
     vinsertf128 $1, %xmm2, %ymm2, %ymm2
 
 #ifdef WIN32
     mov 40(%rsp), size2
 #endif
 
-LHEAD4:
+LHEAD6:
     vmovdqu (str2, size2), %ymm0
 
     vpcmpeqb %ymm1, %ymm0, %ymm3
@@ -203,12 +236,12 @@ LHEAD4:
     vmovdqa %ymm0, (str2, size2)
 
     add $32, size2
-    jnz LHEAD4
+    jnz LHEAD6
 
     vzeroupper
     ret
 
-# void __mrfstr_sse4_1_replchr(
+# void __mrfstr_sse41_avx512bw_replchr(
 #     mrfstr_ptr_t str,
 #     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
 #     mrfstr_size_t size)
@@ -218,36 +251,21 @@ LHEAD4:
 # nchr = NCHR
 # size = -SIZE
 
-    .globl __mrfstr_sse4_1_replchr
-__mrfstr_sse4_1_replchr:
-#ifdef __clang__
-    and $255, ochr
-    and $255, nchr
-#endif
+    .globl __mrfstr_sse41_avx512bw_replchr
+__mrfstr_sse41_avx512bw_replchr:
+    vpbroadcastb ochr, %xmm0
+    vpbroadcastb nchr, %xmm1
 
-    imul $0x01010101, ochr
-    movd ochr, %xmm2
-    pshufd $0, %xmm2, %xmm2
-
-    imul $0x01010101, nchr
-    movd nchr, %xmm3
-    pshufd $0, %xmm3, %xmm3
-
-LHEAD5:
-    movdqa (str, size), %xmm1
-    movdqa %xmm1, %xmm0
-
-    pcmpeqb %xmm2, %xmm0
-    pblendvb %xmm0, %xmm3, %xmm1
-
-    movdqa %xmm1, (str, size)
+LHEAD7:
+    vpcmpeqb (str, size), %xmm0, %k1
+    vmovdqu8 %xmm1, (str, size){%k1}
 
     add $16, size
-    jnz LHEAD5
+    jnz LHEAD7
 
     ret
 
-# void __mrfstr_sse4_1_replchr2(
+# void __mrfstr_sse41_avx512bw_replchr2(
 #     mrfstr_ptr_t res, mrfstr_ptr_ct str,
 #     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
 #     mrfstr_size_t size)
@@ -258,26 +276,92 @@ LHEAD5:
 # nchr = NCHR
 # size = -SIZE
 
-    .globl __mrfstr_sse4_1_replchr2
-__mrfstr_sse4_1_replchr2:
-#ifdef __clang__
-    and $255, ochr2
-    and $255, nchr2
+    .globl __mrfstr_sse41_avx512bw_replchr2
+__mrfstr_sse41_avx512bw_replchr2:
+    vpbroadcastb ochr2, %xmm1
+    vpbroadcastb nchr2, %xmm2
+
+#ifdef WIN32
+    mov 40(%rsp), size2
 #endif
 
-    imul $0x01010101, ochr2
-    movd ochr2, %xmm2
+LHEAD8:
+    vmovdqu64 (str2, size2), %xmm0
+
+    vpcmpeqb %xmm1, %xmm0, %k1
+    vpblendmb %xmm2, %xmm0, %xmm0{%k1}
+
+    vmovdqa64 %xmm0, (str2, size2)
+
+    add $16, size2
+    jnz LHEAD8
+
+    ret
+
+# void __mrfstr_sse41_replchr(
+#     mrfstr_ptr_t str,
+#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+#     mrfstr_size_t size)
+#
+# str = STR+SIZE
+# ochr = OCHR
+# nchr = NCHR
+# size = -SIZE
+
+    .globl __mrfstr_sse41_replchr
+__mrfstr_sse41_replchr:
+    movd ochr, %xmm2
+    punpcklbw %xmm2, %xmm2
+    punpcklwd %xmm2, %xmm2
     pshufd $0, %xmm2, %xmm2
 
-    imul $0x01010101, nchr2
+    movd nchr, %xmm3
+    punpcklbw %xmm3, %xmm3
+    punpcklwd %xmm3, %xmm3
+    pshufd $0, %xmm3, %xmm3
+
+LHEAD9:
+    movdqa (str, size), %xmm1
+    movdqa %xmm1, %xmm0
+
+    pcmpeqb %xmm2, %xmm0
+    pblendvb %xmm0, %xmm3, %xmm1
+
+    movdqa %xmm1, (str, size)
+
+    add $16, size
+    jnz LHEAD9
+
+    ret
+
+# void __mrfstr_sse41_replchr2(
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
+#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
+#     mrfstr_size_t size)
+#
+# res = RES+SIZE
+# str = STR+SIZE
+# ochr = OCHR
+# nchr = NCHR
+# size = -SIZE
+
+    .globl __mrfstr_sse41_replchr2
+__mrfstr_sse41_replchr2:
+    movd ochr2, %xmm2
+    punpcklbw %xmm2, %xmm2
+    punpcklwd %xmm2, %xmm2
+    pshufd $0, %xmm2, %xmm2
+
     movd nchr2, %xmm3
+    punpcklbw %xmm3, %xmm3
+    punpcklwd %xmm3, %xmm3
     pshufd $0, %xmm3, %xmm3
 
 #ifdef WIN32
     mov 40(%rsp), size2
 #endif
 
-LHEAD6:
+LHEAD10:
     movdqu (str2, size2), %xmm1
     movdqa %xmm1, %xmm0
 
@@ -287,7 +371,7 @@ LHEAD6:
     movdqa %xmm1, (res2, size2)
 
     add $16, size2
-    jnz LHEAD6
+    jnz LHEAD10
 
     ret
 
@@ -303,20 +387,23 @@ LHEAD6:
 
     .globl __mrfstr_i64_replchr
 __mrfstr_i64_replchr:
-#ifdef __clang__
-    and $255, ochr
-    and $255, rnchr
+    push %rbx
+    mov $0x7f7f7f7f7f7f7f7f, %rbx
+    mov $0x0101010101010101, %rax
+
+#ifdef WIN32
+    movzx %dl, %r11
+    imul %rax, %r11
+
+    movzx %r8b, rnchr
+#else
+    movzx %dil, %r11
+    imul %rax, %r11
+
+    movzx %cl, rnchr
 #endif
 
-    push %rbx
-
-    imul $0x01010101, ochr
-    mov ochr, %r11d
-    shl $32, %r11
-    or rochr, %r11
-    mov $0x7f7f7f7f7f7f7f7f, %rbx
-
-LHEAD7:
+LHEAD11:
     mov (str, size), %r10
     mov %r10, rochr
 
@@ -340,7 +427,7 @@ LHEAD7:
     mov %r10, (str, size)
 
     add $8, size
-    jnz LHEAD7
+    jnz LHEAD11
 
     pop %rbx
     ret
@@ -358,49 +445,48 @@ LHEAD7:
 
     .globl __mrfstr_i64_replchr2
 __mrfstr_i64_replchr2:
-#ifdef __clang__
-    and $255, ochr2
-    and $255, rnchr2
-#endif
-
     push %rbx
     push %rbp
-
-    imul $0x01010101, ochr2
-    mov ochr2, %eax
-    shl $32, rochr2
-    or %rax, rochr2
     mov $0x7f7f7f7f7f7f7f7f, %rbx
+    mov $0x0101010101010101, %rax
 
 #ifdef WIN32
-    mov 56(%rsp), %rbp
+    movzx %r8b, rochr2
+    imul %rax, rochr2
+    movzx %r9b, rnchr2
+
+    mov 56(%rsp), size2
+#else
+    movzx %cl, rochr2
+    imul %rax, rochr2
+    movzx %dl, rnchr2
 #endif
 
-LHEAD8:
-    mov (str2, %rbp), %r10
+LHEAD12:
+    mov (str2, size2), %r10
     mov %r10, %r11
 
     xor rochr2, %r11
-    mov %r11, %rax
+    mov %r11, %rbp
 
-    and %rbx, %rax
-    lea (%rax, %rbx), %rax
-    or %r11, %rax
-    or %rbx, %rax
-    not %rax
-    shr $7, %rax
+    and %rbx, %rbp
+    lea (%rbp, %rbx), %rbp
+    or %r11, %rbp
+    or %rbx, %rbp
+    not %rbp
+    shr $7, %rbp
 
-    mov %rax, %r11
+    mov %rbp, %r11
     imul $255, %r11
     not %r11
     and %r11, %r10
 
-    imul rnchr2, %rax
-    or %rax, %r10
-    mov %r10, (res2, %rbp)
+    imul rnchr2, %rbp
+    or %rbp, %r10
+    mov %r10, (res2, size2)
 
-    add $8, %rbp
-    jnz LHEAD8
+    add $8, size2
+    jnz LHEAD12
 
     pop %rbp
     pop %rbx

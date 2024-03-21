@@ -27,8 +27,7 @@ __mrfstr_avx512bw_contchr proc
     vpbroadcastb zmm16, edx
 
 LHEAD:
-    vmovdqa64 zmm17, [rcx+r8]
-    vpcmpeqb k0, zmm16, zmm17
+    vpcmpeqb k0, zmm16, [rcx+r8]
 
     kortestq k0, k0
     jnz TRUE
@@ -109,9 +108,9 @@ __mrfstr_avx512bw_tcontchr endp
 ; size = -SIZE
 
 __mrfstr_avx2_contchr proc
-    imul edx, 01010101h
-    movd xmm0, edx
-    pshufd xmm0, xmm0, 0
+    vpxor xmm1, xmm1, xmm1
+    vmovd xmm0, edx
+    vpshufb xmm0, xmm0, xmm1
     vinsertf128 ymm0, ymm0, xmm0, 1
 
 LHEAD:
@@ -148,9 +147,9 @@ __mrfstr_avx2_tcontchr proc
     test r10b, r10b
     jnz RETURN
 
-    imul r8d, 01010101h
-    movd xmm0, r8d
-    pshufd xmm0, xmm0, 0
+    vpxor xmm1, xmm1, xmm1
+    vmovd xmm0, r8d
+    vpshufb xmm0, xmm0, xmm1
     vinsertf128 ymm0, ymm0, xmm0, 1
 
     mov rax, [_mrfstr_search_load]
@@ -207,8 +206,9 @@ __mrfstr_avx2_tcontchr endp
 ; size = -SIZE
 
 __mrfstr_sse2_contchr proc
-    imul edx, 01010101h
     movd xmm1, edx
+    punpcklbw xmm1, xmm1
+    punpcklwd xmm1, xmm1
     pshufd xmm1, xmm1, 0
 
 LHEAD:
@@ -244,13 +244,14 @@ __mrfstr_sse2_tcontchr proc
     test r10b, r10b
     jnz RETURN
 
-    imul r8d, 01010101h
     movd xmm1, r8d
+    punpcklbw xmm1, xmm1
+    punpcklwd xmm1, xmm1
     pshufd xmm1, xmm1, 0
 
     mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jge LASTLOAD
+    jbe LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -273,7 +274,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     movdqa xmm0, [rdx+r9]
@@ -302,13 +303,11 @@ __mrfstr_sse2_tcontchr endp
 ; size = -SIZE
 
 __mrfstr_i64_contchr proc
-    imul edx, 01010101h
-    mov eax, edx
-    shl rdx, 32
-    or rdx, rax
-
     mov r10, 0101010101010101h
     mov r11, 8080808080808080h
+
+    movzx rdx, dl
+    imul rdx, r10
 
 LHEAD:
     mov rax, [rcx+r8]
@@ -347,22 +346,19 @@ __mrfstr_i64_tcontchr proc
     push rsi
     push rdi
 
-    mov bl, [rcx]
-    test bl, bl
+    mov bpl, [rcx]
+    test bpl, bpl
     jnz RETURN
-
-    imul r8d, 01010101h
-    mov eax, r8d
-    shl r8, 32
-    or r8, rax
-
-    mov rax, [_mrfstr_search_load]
 
     mov r10, 0101010101010101h
     mov r11, 8080808080808080h
 
+    movzx r8, r8b
+    imul r8, r10
+
+    mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jge LASTLOAD
+    jbe LASTLOAD
 
 OLHEAD:
     mov rbp, r9
@@ -388,7 +384,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    jl OLHEAD
+    ja OLHEAD
 
 LASTLOAD:
     mov rsi, [rdx+r9]

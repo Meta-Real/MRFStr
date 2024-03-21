@@ -12,8 +12,6 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-    .extern _mrfstr_mem_ntlimit
-
 #ifdef WIN32
 #define dst %rcx
 #define chr %edx
@@ -24,27 +22,25 @@
 #define size %rcx
 #endif
 
+    .extern _mrfstr_mem_ntlimit
+
 .text
 
 # void __mrfstr_avx512_fill(
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_avx512f_fill
 __mrfstr_avx512f_fill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
-    vpbroadcastd chr, %zmm16
+    vmovd chr, %xmm16
+    vpbroadcastb %xmm16, %ymm16
+    vinserti64x4 $1, %ymm16, %zmm16, %zmm16
 
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE1
-
-    neg size
+    jb NTLHEAD1
 
 LHEAD1:
     vmovdqa64 %zmm16, (dst, size)
@@ -53,9 +49,6 @@ LHEAD1:
     jnz LHEAD1
 
     ret
-
-NTSTORE1:
-    neg size
 
 NTLHEAD1:
     vmovntdq %zmm16, (dst, size)
@@ -66,27 +59,45 @@ NTLHEAD1:
     sfence
     ret
 
+# void __mrfstr_avx512f_vfill(
+#     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# chr = CHR
+# size = -SIZE
+
+    .globl __mrfstr_avx512f_vfill
+__mrfstr_avx512f_vfill:
+    vmovd chr, %xmm16
+    vpbroadcastb %xmm16, %ymm16
+    vinserti64x4 $1, %ymm16, %zmm16, %zmm16
+
+LHEAD2:
+    vmovdqa64 %zmm16, (dst, size)
+
+    add $64, size
+    jnz LHEAD2
+
+    ret
+
 # void __mrfstr_avx512f_ntfill(
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_avx512f_ntfill
 __mrfstr_avx512f_ntfill:
-#ifdef __clang__
-    and $255, chr
-#endif
+    vmovd chr, %xmm16
+    vpbroadcastb %xmm16, %ymm16
+    vinserti64x4 $1, %ymm16, %zmm16, %zmm16
 
-    imul $0x01010101, chr
-    vpbroadcastd chr, %zmm16
-    neg size
-
-LHEAD2:
+LHEAD3:
     vmovntdq %zmm16, (dst, size)
 
     add $64, size
-    jnz LHEAD2
+    jnz LHEAD3
 
     sfence
     ret
@@ -95,43 +106,58 @@ LHEAD2:
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_avx_fill
 __mrfstr_avx_fill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
-    movd chr, %xmm0
-    pshufd $0, %xmm0, %xmm0
+    vpxor %xmm1, %xmm1, %xmm1
+    vmovd chr, %xmm0
+    vpshufb %xmm1, %xmm0, %xmm0
     vinsertf128 $1, %xmm0, %ymm0, %ymm0
 
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE2
+    jb NTLHEAD4
 
-    neg size
-
-LHEAD3:
+LHEAD4:
     vmovdqa %ymm0, (dst, size)
 
     add $32, size
-    jnz LHEAD3
+    jnz LHEAD4
 
     vzeroupper
     ret
 
-NTSTORE2:
-    neg size
-
-NTLHEAD2:
+NTLHEAD4:
     vmovntdq %ymm0, (dst, size)
 
     add $32, size
-    jnz NTLHEAD2
+    jnz NTLHEAD4
 
     sfence
+    vzeroupper
+    ret
+
+# void __mrfstr_avx_vfill(
+#     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# chr = CHR
+# size = -SIZE
+
+    .globl __mrfstr_avx_vfill
+__mrfstr_avx_vfill:
+    vpxor %xmm1, %xmm1, %xmm1
+    vmovd chr, %xmm0
+    vpshufb %xmm1, %xmm0, %xmm0
+    vinsertf128 $1, %xmm0, %ymm0, %ymm0
+
+LHEAD5:
+    vmovdqa %ymm0, (dst, size)
+
+    add $32, size
+    jnz LHEAD5
+
     vzeroupper
     ret
 
@@ -139,25 +165,21 @@ NTLHEAD2:
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_avx_ntfill
 __mrfstr_avx_ntfill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
-    movd chr, %xmm0
-    pshufd $0, %xmm0, %xmm0
+    vpxor %xmm1, %xmm1, %xmm1
+    vmovd chr, %xmm0
+    vpshufb %xmm1, %xmm0, %xmm0
     vinsertf128 $1, %xmm0, %ymm0, %ymm0
-    neg size
 
-LHEAD4:
+LHEAD6:
     vmovntdq %ymm0, (dst, size)
 
     add $32, size
-    jnz LHEAD4
+    jnz LHEAD6
 
     sfence
     vzeroupper
@@ -167,65 +189,77 @@ LHEAD4:
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_sse2_fill
 __mrfstr_sse2_fill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
     movd chr, %xmm0
+    punpcklbw %xmm0, %xmm0
+    punpcklwd %xmm0, %xmm0
     pshufd $0, %xmm0, %xmm0
 
     cmp _mrfstr_mem_ntlimit(%rip), size
-    ja NTSTORE3
+    jb NTLHEAD7
 
-    neg size
-
-LHEAD5:
+LHEAD7:
     movdqa %xmm0, (dst, size)
 
     add $16, size
-    jnz LHEAD5
+    jnz LHEAD7
 
     ret
 
-NTSTORE3:
-    neg size
-
-NTLHEAD3:
+NTLHEAD7:
     movntdq %xmm0, (dst, size)
 
     add $16, size
-    jnz NTLHEAD3
+    jnz NTLHEAD7
 
     sfence
+    ret
+
+# void __mrfstr_sse2_vfill(
+#     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
+#
+# dst = DST+SIZE
+# chr = CHR
+# size = -SIZE
+
+    .globl __mrfstr_sse2_vfill
+__mrfstr_sse2_vfill:
+    movd chr, %xmm0
+    punpcklbw %xmm0, %xmm0
+    punpcklwd %xmm0, %xmm0
+    pshufd $0, %xmm0, %xmm0
+
+LHEAD8:
+    movdqa %xmm0, (dst, size)
+
+    add $16, size
+    jnz LHEAD8
+
     ret
 
 # void __mrfstr_sse2_ntfill(
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_sse2_ntfill
 __mrfstr_sse2_ntfill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
     movd chr, %xmm0
+    punpcklbw %xmm0, %xmm0
+    punpcklwd %xmm0, %xmm0
     pshufd $0, %xmm0, %xmm0
-    neg size
 
-LHEAD6:
+LHEAD9:
     movntdq %xmm0, (dst, size)
 
     add $16, size
-    jnz LHEAD6
+    jnz LHEAD9
 
     sfence
     ret
@@ -234,33 +268,28 @@ LHEAD6:
 #     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # dst = DST+SIZE
-# size = SIZE
+# chr = CHR
+# size = -SIZE
 
     .globl __mrfstr_i64_fill
 __mrfstr_i64_fill:
-#ifdef __clang__
-    and $255, chr
-#endif
-
-    imul $0x01010101, chr
-    mov chr, %eax
-    neg size
+    mov $0x0101010101010101, %rax
 
 #ifdef WIN32
-    shl $32, %rdx
-    or %rax, %rdx
+    movzx %dl, %rdx
+    imul %rax, %rdx
 
-LHEAD7:
+LHEAD10:
     mov %rdx, (dst, size)
 #else
-    shl $32, %rdi
-    or %rax, %rdi
+    movzx %dil, %rdi
+    imul %rax, %rdi
 
-LHEAD7:
+LHEAD10:
     mov %rdi, (dst, size)
 #endif
 
     add $8, size
-    jnz LHEAD7
+    jnz LHEAD10
 
     ret

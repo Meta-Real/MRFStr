@@ -263,7 +263,6 @@ __mrfstr_avx2_rev2 endp
 __mrfstr_ssse3_rev proc
     mov rax, r8
     neg rax
-
     sub rcx, 16
     movdqa xmm2, xmmword ptr [_ssse3]
 
@@ -294,7 +293,6 @@ __mrfstr_ssse3_rev endp
 __mrfstr_ssse3_rev2 proc
     mov rax, r8
     neg rax
-
     sub rcx, 16
     movdqa xmm1, xmmword ptr [_ssse3]
 
@@ -320,7 +318,6 @@ __mrfstr_ssse3_rev2 endp
 __mrfstr_i64_rev proc
     mov rax, r8
     neg rax
-
     sub rcx, 8
 
 LHEAD:

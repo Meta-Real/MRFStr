@@ -133,14 +133,14 @@ __mrfstr_avx2_avx512bw_replchr2 endp
 ; size = -SIZE
 
 __mrfstr_avx2_replchr proc
-    imul edx, 01010101h
-    movd xmm1, edx
-    pshufd xmm1, xmm1, 0
+    vpxor xmm3, xmm3, xmm3
+
+    vmovd xmm1, edx
+    vpshufb xmm1, xmm1, xmm3
     vinsertf128 ymm1, ymm1, xmm1, 1
 
-    imul r8d, 01010101h
-    movd xmm2, r8d
-    pshufd xmm2, xmm2, 0
+    vmovd xmm2, r8d
+    vpshufb xmm2, xmm2, xmm3
     vinsertf128 ymm2, ymm2, xmm2, 1
 
 LHEAD:
@@ -170,17 +170,16 @@ __mrfstr_avx2_replchr endp
 ; size = -SIZE
 
 __mrfstr_avx2_replchr2 proc
-    imul r8d, 01010101h
-    movd xmm1, r8d
-    pshufd xmm1, xmm1, 0
+    vpxor xmm3, xmm3, xmm3
+    mov rax, [rsp+40]
+
+    vmovd xmm1, edx
+    vpshufb xmm1, xmm1, xmm3
     vinsertf128 ymm1, ymm1, xmm1, 1
 
-    imul r9d, 01010101h
-    movd xmm2, r9d
-    pshufd xmm2, xmm2, 0
+    vmovd xmm2, r8d
+    vpshufb xmm2, xmm2, xmm3
     vinsertf128 ymm2, ymm2, xmm2, 1
-
-    mov rax, [rsp+40]
 
 LHEAD:
     vmovdqu ymm0, ymmword ptr [rdx+rax]
@@ -262,12 +261,14 @@ __mrfstr_sse41_avx512bw_replchr2 endp
 ; size = -SIZE
 
 __mrfstr_sse41_replchr proc
-    imul edx, 01010101h
     movd xmm2, edx
+    punpcklbw xmm2, xmm2
+    punpcklwd xmm2, xmm2
     pshufd xmm2, xmm2, 0
 
-    imul r8d, 01010101h
     movd xmm3, r8d
+    punpcklbw xmm3, xmm3
+    punpcklwd xmm3, xmm3
     pshufd xmm3, xmm3, 0
 
 LHEAD:
@@ -297,12 +298,14 @@ __mrfstr_sse41_replchr endp
 ; size = -SIZE
 
 __mrfstr_sse41_replchr2 proc
-    imul r8d, 01010101h
     movd xmm2, r8d
+    punpcklbw xmm2, xmm2
+    punpcklwd xmm2, xmm2
     pshufd xmm2, xmm2, 0
 
-    imul r9d, 01010101h
     movd xmm3, r9d
+    punpcklbw xmm3, xmm3
+    punpcklwd xmm3, xmm3
     pshufd xmm3, xmm3, 0
 
     mov rax, [rsp+40]
@@ -334,12 +337,12 @@ __mrfstr_sse41_replchr2 endp
 
 __mrfstr_i64_replchr proc
     push rbx
-
-    imul edx, 01010101h
-    mov r11d, edx
-    shl r11, 32
-    or r11, rdx
     mov rbx, 7f7f7f7f7f7f7f7fh
+
+    mov rax, 0101010101010101h
+    movzx r11, dl
+    imul r11, rax
+    movzx r8, r8b
 
 LHEAD:
     mov r10, [rcx+r9]
@@ -385,14 +388,13 @@ __mrfstr_i64_replchr endp
 __mrfstr_i64_replchr2 proc
     push rbx
     push rbp
-
-    imul r8d, 01010101h
-    mov eax, r8d
-    shl r8, 32
-    or r8, rax
     mov rbx, 7f7f7f7f7f7f7f7fh
-
     mov rbp, [rsp+56]
+
+    mov rax, 0101010101010101h
+    movzx r8, r8b
+    imul r8, rax
+    movzx r9, r9b
 
 LHEAD:
     mov r10, [rdx+rbp]

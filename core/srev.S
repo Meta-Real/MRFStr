@@ -27,19 +27,18 @@
 _avx512vbmi:
     .quad 0x38393a3b3c3d3e3f, 0x3031323334353637
     .quad 0x28292a2b2c2d2e2f, 0x2021222324252627
+_avx2_avx512vbmi:
     .quad 0x18191a1b1c1d1e1f, 0x1011121314151617
     .quad 0x08090a0b0c0d0e0f, 0x0001020304050607
 _avx512bw1:
-    .quad 0x0001020304050607, 0x08090a0b0c0d0e0f
-    .quad 0x0001020304050607, 0x08090a0b0c0d0e0f
-    .quad 0x0001020304050607, 0x08090a0b0c0d0e0f
-    .quad 0x0001020304050607, 0x08090a0b0c0d0e0f
-_avx512bw2:
-    .quad 7, 6, 5, 4, 3, 2, 1, 0
+    .quad 0x08090a0b0c0d0e0f, 0x0001020304050607
+    .quad 0x08090a0b0c0d0e0f, 0x0001020304050607
 _avx2:
     .quad 0x08090a0b0c0d0e0f, 0x0001020304050607
 _ssse3:
     .quad 0x08090a0b0c0d0e0f, 0x0001020304050607
+_avx512bw2:
+    .quad 6, 7, 4, 5, 2, 3, 0, 1
 
 # void __mrfstr_avx512vbmi_rev(
 #     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
@@ -56,11 +55,8 @@ __mrfstr_avx512vbmi_rev:
     vmovdqa64 _avx512vbmi(%rip), %zmm18
 
 LHEAD1:
-    vmovdqu64 (right, %rax), %zmm16
-    vmovdqa64 (left, size), %zmm17
-
-    vpermb %zmm16, %zmm18, %zmm16
-    vpermb %zmm17, %zmm18, %zmm17
+    vpermb (right, %rax), %zmm18, %zmm16
+    vpermb (left, size), %zmm18, %zmm17
 
     vmovdqu64 %zmm17, (right, %rax)
     vmovdqa64 %zmm16, (left, size)
@@ -86,8 +82,7 @@ __mrfstr_avx512vbmi_rev2:
     vmovdqa64 _avx512vbmi(%rip), %zmm17
 
 LHEAD2:
-    vmovdqu64 (right, %rax), %zmm16
-    vpermb %zmm16, %zmm17, %zmm16
+    vpermb (right, %rax), %zmm17, %zmm16
     vmovdqa64 %zmm16, (left, size)
 
     add $64, %rax
@@ -116,8 +111,8 @@ LHEAD3:
     vmovdqa64 (left, size), %zmm17
 
     vpshufb %zmm18, %zmm16, %zmm16
-    vpermq %zmm16, %zmm19, %zmm16
     vpshufb %zmm18, %zmm17, %zmm17
+    vpermq %zmm16, %zmm19, %zmm16
     vpermq %zmm17, %zmm19, %zmm17
 
     vmovdqu64 %zmm17, (right, %rax)
@@ -158,6 +153,57 @@ LHEAD4:
 
     ret
 
+# void __mrfstr_avx2_avx512vbmi_rev(
+#     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
+#
+# left = LEFT
+# right = RIGHT
+# size = SIZE
+
+    .globl __mrfstr_avx2_avx512vbmi_rev
+__mrfstr_avx2_avx512vbmi_rev:
+    mov size, %rax
+    neg %rax
+    sub $32, left
+    vmovdqa64 _avx2_avx512vbmi(%rip), %ymm18
+
+LHEAD5:
+    vpermb (right, %rax), %ymm18, %ymm16
+    vpermb (left, size), %ymm18, %ymm17
+
+    vmovdqu64 %ymm17, (right, %rax)
+    vmovdqa64 %ymm16, (left, size)
+
+    add $32, %rax
+    sub $32, size
+    jnz LHEAD5
+
+    ret
+
+# void __mrfstr_avx2_avx512vbmi_rev2(
+#     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size)
+#
+# left = LEFT
+# right = RIGHT
+# size = SIZE
+
+    .globl __mrfstr_avx2_avx512vbmi_rev2
+__mrfstr_avx2_avx512vbmi_rev2:
+    mov size, %rax
+    neg %rax
+    sub $32, left
+    vmovdqa64 _avx2_avx512vbmi(%rip), %ymm17
+
+LHEAD6:
+    vpermb (right, %rax), %ymm17, %ymm16
+    vmovdqa64 %ymm16, (left, size)
+
+    add $32, %rax
+    sub $32, size
+    jnz LHEAD6
+
+    ret
+
 # void __mrfstr_avx2_rev(
 #     mrfstr_ptr_t left, mrfstr_ptr_t right, mrfstr_size_t size)
 #
@@ -172,13 +218,13 @@ __mrfstr_avx2_rev:
     sub $32, left
     vmovdqa _avx2(%rip), %ymm2
 
-LHEAD5:
+LHEAD7:
     vmovdqu (right, %rax), %ymm0
     vmovdqa (left, size), %ymm1
 
     vpshufb %ymm2, %ymm0, %ymm0
-    vperm2i128 $1, %ymm0, %ymm0, %ymm0
     vpshufb %ymm2, %ymm1, %ymm1
+    vperm2i128 $1, %ymm0, %ymm0, %ymm0
     vperm2i128 $1, %ymm1, %ymm1, %ymm1
 
     vmovdqu %ymm1, (right, %rax)
@@ -186,7 +232,7 @@ LHEAD5:
 
     add $32, %rax
     sub $32, size
-    jnz LHEAD5
+    jnz LHEAD7
 
     vzeroupper
     ret
@@ -205,7 +251,7 @@ __mrfstr_avx2_rev2:
     sub $32, left
     vmovdqa _avx2(%rip), %ymm1
 
-LHEAD6:
+LHEAD8:
     vmovdqu (right, %rax), %ymm0
 
     vpshufb %ymm1, %ymm0, %ymm0
@@ -215,7 +261,7 @@ LHEAD6:
 
     add $32, %rax
     sub $32, size
-    jnz LHEAD6
+    jnz LHEAD8
 
     vzeroupper
     ret
@@ -234,7 +280,7 @@ __mrfstr_ssse3_rev:
     sub $16, left
     movdqa _ssse3(%rip), %xmm2
 
-LHEAD7:
+LHEAD9:
     movdqu (right, %rax), %xmm0
     movdqa (left, size), %xmm1
 
@@ -246,7 +292,7 @@ LHEAD7:
 
     add $16, %rax
     sub $16, size
-    jnz LHEAD7
+    jnz LHEAD9
 
     ret
 
@@ -264,14 +310,14 @@ __mrfstr_ssse3_rev2:
     sub $16, left
     movdqa _ssse3(%rip), %xmm1
 
-LHEAD8:
+LHEAD10:
     movdqu (right, %rax), %xmm0
     pshufb %xmm1, %xmm0
     movdqa %xmm0, (left, size)
 
     add $16, %rax
     sub $16, size
-    jnz LHEAD8
+    jnz LHEAD10
 
     ret
 
@@ -288,7 +334,7 @@ __mrfstr_i64_rev:
     neg %rax
     sub $8, left
 
-LHEAD9:
+LHEAD11:
     mov (right, %rax), %r9
     mov (left, size), %r10
 
@@ -300,7 +346,7 @@ LHEAD9:
 
     add $8, %rax
     sub $8, size
-    jnz LHEAD9
+    jnz LHEAD11
 
     ret
 
@@ -317,13 +363,13 @@ __mrfstr_i64_rev2:
     neg %rax
     sub $8, left
 
-LHEAD10:
+LHEAD12:
     mov (right, %rax), %r9
     bswap %r9
     mov %r9, (left, size)
 
     add $8, %rax
     sub $8, size
-    jnz LHEAD9
+    jnz LHEAD12
 
     ret

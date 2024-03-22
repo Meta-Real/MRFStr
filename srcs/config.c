@@ -40,6 +40,8 @@ mrfstr_config_t _mrfstr_config =
     __mrfstr_i64_contchr,
     __mrfstr_i64_tcontchr,
     (mrfstr_size_t)-1,
+    __mrfstr_i64_strlen,
+    (mrfstr_size_t)-1,
     1,
 #ifdef MRFSTR_BUILD_UNIX
     0,
@@ -625,6 +627,40 @@ mrfstr_res_t mrfstr_config_func(
             return MRFSTR_RES_TYPE_ERROR;
         }
         break;
+    case MRFSTR_CONFIG_FUNC_STRLEN:
+        switch (single)
+        {
+        case MRFSTR_CONFIG_SIMD_AVX512:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX512BW))
+            {
+                _mrfstr_config.strlen_func = __mrfstr_avx512bw_strlen;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_AVX:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX2))
+            {
+                _mrfstr_config.strlen_func = __mrfstr_avx2_strlen;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_SSE:
+            if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE2))
+            {
+                _mrfstr_config.strlen_func = __mrfstr_sse2_strlen;
+                break;
+            }
+
+            return MRFSTR_RES_SUPPORT_ERROR;
+        case MRFSTR_CONFIG_SIMD_INT64:
+            _mrfstr_config.strlen_func = __mrfstr_i64_strlen;
+            break;
+        default:
+            return MRFSTR_RES_TYPE_ERROR;
+        }
+        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -682,6 +718,10 @@ mrfstr_res_t mrfstr_config_limits(
             _mrfstr_search_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit - rem);
         }
         break;
+    case MRFSTR_CONFIG_FUNC_STRLEN:
+        if (tlimit)
+            _mrfstr_config.strlen_tlimit = tlimit;
+        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -721,6 +761,10 @@ mrfstr_res_t mrfstr_config_limits_get(
         if (limit)
             *limit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_search_load;
         break;
+    case MRFSTR_CONFIG_FUNC_STRLEN:
+        if (tlimit)
+            *tlimit = _mrfstr_config.strlen_tlimit;
+        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -746,6 +790,7 @@ void mrfstr_config_extreme(void)
     _mrfstr_config.repl_tlimit = 0x8000000;
     _mrfstr_config.cmp_tlimit = 0x8000000;
     _mrfstr_config.search_tlimit = 0x8000000;
+    _mrfstr_config.strlen_tlimit = 0x8000000;
 
     mrfstr_cpuid_funccnt(NULL);
     simdset = mrfstr_cpuid_simdset();
@@ -786,6 +831,8 @@ void mrfstr_config_extreme(void)
 
             _mrfstr_config.contchr_func = __mrfstr_avx512bw_contchr;
             _mrfstr_config.contchr_tfunc = __mrfstr_avx512bw_tcontchr;
+
+            _mrfstr_config.strlen_func = __mrfstr_avx512bw_strlen;
             return;
         }
 
@@ -804,6 +851,8 @@ void mrfstr_config_extreme(void)
 
         _mrfstr_config.contchr_func = __mrfstr_avx2_contchr;
         _mrfstr_config.contchr_tfunc = __mrfstr_avx2_tcontchr;
+
+        _mrfstr_config.strlen_func = __mrfstr_avx2_strlen;
         return;
     }
     if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX))
@@ -832,6 +881,8 @@ void mrfstr_config_extreme(void)
 
             _mrfstr_config.contchr_func = __mrfstr_avx2_contchr;
             _mrfstr_config.contchr_tfunc = __mrfstr_avx2_tcontchr;
+
+            _mrfstr_config.strlen_func = __mrfstr_avx2_strlen;
             return;
         }
 
@@ -847,6 +898,8 @@ void mrfstr_config_extreme(void)
 
         _mrfstr_config.contchr_func = __mrfstr_sse2_contchr;
         _mrfstr_config.contchr_tfunc = __mrfstr_sse2_tcontchr;
+
+        _mrfstr_config.strlen_func = __mrfstr_sse2_strlen;
         return;
     }
     if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_SSE2))
@@ -898,6 +951,8 @@ void mrfstr_config_extreme(void)
 
         _mrfstr_config.contchr_func = __mrfstr_sse2_contchr;
         _mrfstr_config.contchr_tfunc = __mrfstr_sse2_tcontchr;
+
+        _mrfstr_config.strlen_func = __mrfstr_sse2_strlen;
         return;
     }
 
@@ -923,6 +978,8 @@ void mrfstr_config_extreme(void)
 
     _mrfstr_config.contchr_func = __mrfstr_i64_contchr;
     _mrfstr_config.contchr_tfunc = __mrfstr_i64_tcontchr;
+
+    _mrfstr_config.strlen_func = __mrfstr_i64_strlen;
 }
 
 void mrfstr_config_off(void)
@@ -947,6 +1004,8 @@ void mrfstr_config_off(void)
         (mrfstr_size_t)-1,
         __mrfstr_i64_contchr,
         __mrfstr_i64_tcontchr,
+        (mrfstr_size_t)-1,
+        __mrfstr_i64_strlen,
         (mrfstr_size_t)-1,
         1,
     #ifdef MRFSTR_BUILD_UNIX

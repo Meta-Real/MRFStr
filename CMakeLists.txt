@@ -47,7 +47,7 @@ add_library(MRFStr
     srcs/equal.c
     srcs/contain.c #srcs/find.c srcs/count_chr.c
     srcs/io.c
-    #srcs/str.c
+    srcs/str.c
     srcs/config.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
@@ -72,6 +72,7 @@ elseif (MSVC)
         PRIVATE core/sreplchr.asm
         PRIVATE core/sequal.asm
         PRIVATE core/scontchr.asm
+        PRIVATE core/sstrlen.asm
         PRIVATE cpuid/cputype.asm
         PRIVATE cpuid/funccnt.asm
         PRIVATE cpuid/simdset.asm

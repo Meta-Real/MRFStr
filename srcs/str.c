@@ -25,14 +25,14 @@ mrfstr_size_t mrfstr_strlen(
     if (!str)
         return 0;
 
-    align = (uintptr_t)str % _mrfstr_config.strlen_size;
+    align = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (align)
     {
-        align = _mrfstr_config.strlen_size - align;
+        align = MRFSTR_ALIGN_SIZE - align;
         for (i = 0; i != align; i++)
             if (*str++ == '\0')
                 return i;
     }
 
-    return _mrfstr_config.strlen_sub(str) + align;
+    return _mrfstr_config.strlen_func(str) + align;
 }

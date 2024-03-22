@@ -55,7 +55,7 @@ mrfstr_bool_t mrfstr_startswith_str(
 {
     mrfstr_size_t size;
 
-    size = strlen(substr);//mrfstr_strlen(substr);
+    size = mrfstr_strlen(substr);
     if (size > MRFSTR_SIZE(str))
         return MRFSTR_FALSE;
 
@@ -95,7 +95,7 @@ mrfstr_bool_t mrfstr_endswith_str(
 {
     mrfstr_size_t size;
 
-    size = strlen(substr);//mrfstr_strlen(substr);
+    size = mrfstr_strlen(substr);
     if (size > MRFSTR_SIZE(str))
         return MRFSTR_FALSE;
 

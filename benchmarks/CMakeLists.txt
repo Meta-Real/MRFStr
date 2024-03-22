@@ -22,5 +22,5 @@ target_link_libraries(BContainChr PRIVATE MRFStr)
 #add_executable(BCountChr count_chr.c)
 #target_link_libraries(BCountChr PRIVATE MRFStr)
 
-#add_executable(BStrlen strlen.c)
-#target_link_libraries(BStrlen PRIVATE MRFStr)
+add_executable(BStrlen strlen.c)
+target_link_libraries(BStrlen PRIVATE MRFStr)

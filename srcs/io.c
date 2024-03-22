@@ -61,7 +61,7 @@ mrfstr_res_t mrfstr_import(
 
         if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
         {
-            MRFSTR_SIZE(str) += strlen(ptr) - 1; //mrfstr_strlen(ptr) - 1;
+            MRFSTR_SIZE(str) += mrfstr_strlen(ptr) - 1;
             return MRFSTR_RES_NOERROR;
         }
 
@@ -81,7 +81,7 @@ mrfstr_res_t mrfstr_import(
 
         if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
         {
-            MRFSTR_SIZE(str) += strlen(ptr) - 1; //mrfstr_strlen(ptr) - 1;
+            MRFSTR_SIZE(str) += mrfstr_strlen(ptr) - 1;
             return MRFSTR_RES_NOERROR;
         }
 

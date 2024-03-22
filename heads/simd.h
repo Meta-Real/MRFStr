@@ -249,4 +249,18 @@ void __mrfstr_i64_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
+/* strlen functions */
+
+mrfstr_size_t __mrfstr_avx512bw_strlen(
+    mrfstr_ptr_ct str);
+
+mrfstr_size_t __mrfstr_avx2_strlen(
+    mrfstr_ptr_ct str);
+
+mrfstr_size_t __mrfstr_sse2_strlen(
+    mrfstr_ptr_ct str);
+
+mrfstr_size_t __mrfstr_i64_strlen(
+    mrfstr_ptr_ct str);
+
 #endif

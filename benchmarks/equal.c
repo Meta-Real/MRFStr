@@ -39,7 +39,6 @@ int main(int argc, mrfstr_data_ct *argv)
 
     MRFSTR_BLIB_ARGS;
     MRFSTR_BLIB_FIRST;
-
     MRFSTR_BLIB_INIT_STR(cstr1,);
     MRFSTR_BLIB_INIT_STR(cstr2, free(cstr1));
     memset(cstr1, '0', end);

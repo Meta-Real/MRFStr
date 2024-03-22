@@ -172,6 +172,13 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_size_t search_tlimit;
 
+    /* strlen functions */
+
+    mrfstr_size_t (*strlen_func)(
+        mrfstr_ptr_ct);
+
+    mrfstr_size_t strlen_tlimit;
+
     /* general */
 
     mrfstr_byte_t tcount;

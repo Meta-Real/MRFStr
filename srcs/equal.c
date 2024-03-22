@@ -57,7 +57,7 @@ mrfstr_bool_t mrfstr_n_equal(
 mrfstr_bool_t mrfstr_equal_str(
     mrfstr_ct str1, mrfstr_data_ct str2)
 {
-    if (MRFSTR_SIZE(str1) != strlen(str2))//mrfstr_strlen(str2))
+    if (MRFSTR_SIZE(str1) != mrfstr_strlen(str2))
         return MRFSTR_FALSE;
 
     if (!MRFSTR_SIZE(str1))
@@ -72,12 +72,12 @@ mrfstr_bool_t mrfstr_n_equal_str(
 {
     if (MRFSTR_SIZE(str1) < size)
     {
-        if (MRFSTR_SIZE(str1) != strlen(str2))//mrfstr_strlen(str2))
+        if (MRFSTR_SIZE(str1) != mrfstr_strlen(str2))
             return MRFSTR_FALSE;
 
         size = MRFSTR_SIZE(str1);
     }
-    else if (strlen(str2) < size)//mrfstr_strlen(str2) < size)
+    else if (mrfstr_strlen(str2) < size)
         return MRFSTR_FALSE;
 
     if (!size)

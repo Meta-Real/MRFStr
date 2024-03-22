@@ -18,9 +18,9 @@ copies or substantial portions of the Software.
 
 #define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_FUNC_STRLEN
 
-#define MRFSTR_BLIB_CSTR_PRE(size)  \
-    mrfstr_size_t len;              \
-                                    \
+#define MRFSTR_BLIB_CSTR_PRE(size) \
+    mrfstr_size_t len;             \
+                                   \
     str[size - 1] = '\0'
 #define MRFSTR_BLIB_CSTR(size) len = strlen(str)
 #define MRFSTR_BLIB_CSTR_POST(size) \

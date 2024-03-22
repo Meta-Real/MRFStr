@@ -33,3 +33,7 @@ add_test(TContainChr TContainChr)
 #add_executable(TCountChr count_chr.c)
 #target_link_libraries(TCountChr PRIVATE MRFStr)
 #add_test(TCountChr TCountChr)
+
+add_executable(TStrlen strlen.c)
+target_link_libraries(TStrlen PRIVATE MRFStr)
+add_test(TStrlen TStrlen)

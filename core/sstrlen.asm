@@ -118,7 +118,7 @@ LHEAD:
 
     bsf rdx, rdx
     shr rdx, 3
-    lea rax, [rax+rdx]
+    lea rax, [rax+rdx-8]
     ret
 __mrfstr_i64_strlen endp
 

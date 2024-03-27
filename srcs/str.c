@@ -15,7 +15,6 @@ copies or substantial portions of the Software.
 */
 
 #include <mrfstr-intern.h>
-#include <binary.h>
 
 mrfstr_size_t mrfstr_strlen(
     mrfstr_data_ct str)

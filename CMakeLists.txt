@@ -60,6 +60,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         PRIVATE core/sequal.S
         PRIVATE core/scontchr.S
         PRIVATE core/sfindchr.S
+        PRIVATE core/scountchr.S
         PRIVATE core/sstrlen.S
         PRIVATE cpuid/cputype.S
         PRIVATE cpuid/funccnt.S
@@ -75,8 +76,8 @@ elseif (MSVC)
         PRIVATE core/sequal.asm
         PRIVATE core/scontchr.asm
         PRIVATE core/sfindchr.asm
-        PRIVATE core/sstrlen.asm
         PRIVATE core/scountchr.asm
+        PRIVATE core/sstrlen.asm
         PRIVATE cpuid/cputype.asm
         PRIVATE cpuid/funccnt.asm
         PRIVATE cpuid/simdset.asm

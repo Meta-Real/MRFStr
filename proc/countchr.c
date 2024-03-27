@@ -45,9 +45,9 @@ DWORD WINAPI __mrfstr_countchr_threaded(
 mrfstr_size_t __mrfstr_countchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_size_t tsize, inc, tmp;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t tcount, i;
+    mrfstr_size_t tmp;
+    mrfstr_short_t rem;
+    mrfstr_byte_t tcount, nthreads, i;
     volatile mrfstr_size_t count;
     mrfstr_thread_t *threads;
     mrfstr_countchr_t data;
@@ -63,63 +63,56 @@ mrfstr_size_t __mrfstr_countchr(
         return count;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.search_tlimit)
     {
-        mrfstr_byte_t mask;
-
         count = 0;
-        mask = _mrfstr_config.nsearch_size - 1;
-        rem = (uintptr_t)str & mask;
+        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
-            rem = _mrfstr_config.nsearch_size - rem;
+            rem = MRFSTR_ALIGN_SIZE - rem;
             size -= rem;
             mrfstr_countchr_rem;
         }
 
-        rem = size & mask;
-        size -= rem;
+        rem = size & MRFSTR_ALIGN_MASK;
+        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
 
-        count += _mrfstr_config.ncountchr_sub(
-            str, chr, size / _mrfstr_config.nsearch_size);
-        str += size;
+single:
+        count += _mrfstr_config.countchr_func(str -= size, chr, size);
 
         mrfstr_countchr_rem;
         return count;
     }
 
-    mrfstr_set_tcount;
+    mrfstr_set_tcount(_mrfstr_config.search_tlimit);
 
     count = 0;
-    rem = (uintptr_t)str & (_mrfstr_config.tsearch_size - 1);
+    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
-        rem = _mrfstr_config.tsearch_size - rem;
+        rem = MRFSTR_ALIGN_SIZE - rem;
         size -= rem;
         mrfstr_countchr_rem;
     }
 
-    factor = _mrfstr_config.tsearch_size * tcount;
-    rem = size % factor;
-    inc = (size /= factor) * _mrfstr_config.tsearch_size;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount);
+    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
     mrfstr_create_mutex(mutex)
     {
-single:
-        count += _mrfstr_config.ncountchr_sub(
-            str, chr, size * tcount);
-        str += inc * tcount;
-
-        mrfstr_countchr_rem;
-        return count;
+        size *= tcount;
+        goto single;
     }
 
-    factor = tcount - 1;
-    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    nthreads = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
+    {
+        size *= tcount;
         goto single;
+    }
 
-    for (i = 0; i != factor; i++)
+    for (i = 0; i != nthreads; i++)
     {
         data = (mrfstr_countchr_t)malloc(sizeof(struct __MRFSTR_COUNTCHR_T));
         if (!data)
@@ -127,14 +120,13 @@ single:
 
         data->count = &count;
         data->mutex = MRFSTR_CAST_MUTEX(mutex);
-        data->str = str;
+        data->str = str -= size;
         data->size = size;
         data->chr = chr;
 
-        str += inc;
         mrfstr_create_thread(__mrfstr_countchr_threaded)
         {
-            str -= inc;
+            str += size;
 
             free(data);
             break;
@@ -144,21 +136,19 @@ single:
     }
 
     tcount -= i;
-    tmp = _mrfstr_config.tcountchr_sub(str, chr, size * tcount);
-    str += inc * tcount;
+
+    size *= tcount;
+    tmp = _mrfstr_config.countchr_tfunc(str -= size, chr, size);
 
     while (rem--)
         if (*str++ == chr)
             tmp++;
 
-    mrfstr_lock_mutex(MRFSTR_CAST_MUTEX(mutex));
-    count += tmp;
-    mrfstr_unlock_mutex(MRFSTR_CAST_MUTEX(mutex));
-
     mrfstr_close_threads;
     free(threads);
     mrfstr_close_mutex(mutex);
-    return count;
+
+    return count + tmp;
 }
 
 #ifdef MRFSTR_BUILD_UNIX
@@ -173,7 +163,7 @@ DWORD WINAPI __mrfstr_countchr_threaded(
     mrfstr_countchr_t data;
 
     data = (mrfstr_countchr_t)args;
-    count = _mrfstr_config.tcountchr_sub(data->str, data->chr, data->size);
+    count = _mrfstr_config.countchr_tfunc(data->str, data->chr, data->size);
 
     mrfstr_lock_mutex(data->mutex);
     *data->count += count;

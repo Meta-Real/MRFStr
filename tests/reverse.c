@@ -55,10 +55,8 @@ int main(void)
     mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME);
     MRFSTR_TLIB_INIT(str1,);
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
-    MRFSTR_TLIB_INIT_STR(str,
-        mrfstr_free(str1); mrfstr_free(str2));
-    MRFSTR_TLIB_INIT_STR(strr,
-        mrfstr_free(str1); mrfstr_free(str2); free(str));
+    MRFSTR_TLIB_INIT_STR(str, mrfstr_free(str1); mrfstr_free(str2));
+    MRFSTR_TLIB_INIT_STR(strr, mrfstr_free(str1); mrfstr_free(str2); free(str));
 
     ptr = str;
     for (i = 0; i != MRFSTR_TEST4_SIZE; i += 0x100)

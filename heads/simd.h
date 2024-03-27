@@ -275,6 +275,26 @@ mrfstr_idx_t __mrfstr_i64_tfindchr(
     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
+/* count chr */
+
+mrfstr_size_t __mrfstr_avx512bw_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_size_t __mrfstr_avx2_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_size_t __mrfstr_sse42_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_size_t __mrfstr_sse2_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_size_t __mrfstr_i64_sse42_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_size_t __mrfstr_i64_countchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
 /* strlen functions */
 
 mrfstr_size_t __mrfstr_avx512bw_strlen(

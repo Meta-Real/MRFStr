@@ -39,7 +39,6 @@ int main(void)
     mrfstr_t str1, str2;
 
     mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME);
-
     MRFSTR_TLIB_INIT(str1,);
     MRFSTR_TLIB_INIT(str2, mrfstr_free(str1));
 

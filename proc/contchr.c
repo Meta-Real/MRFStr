@@ -65,9 +65,10 @@ mrfstr_bool_t __mrfstr_contchr(
         }
 
         rem = size & MRFSTR_ALIGN_MASK;
-        size -= rem;
+        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
 
-        if (_mrfstr_config.contchr_func(str += size, chr, (mrfstr_size_t)-(mrfstr_ssize_t)size))
+single:
+        if (_mrfstr_config.contchr_func(str -= size, chr, size))
             return MRFSTR_TRUE;
 
         mrfstr_contchr_rem;
@@ -93,14 +94,8 @@ mrfstr_bool_t __mrfstr_contchr(
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
-single:
         size *= tcount;
-        str -= size;
-        if (_mrfstr_config.contchr_func(str, chr, size))
-            return MRFSTR_TRUE;
-
-        mrfstr_contchr_rem;
-        return MRFSTR_FALSE;
+        goto single;
     }
 
     for (i = 0; i != nthreads; i++)
@@ -111,6 +106,8 @@ single:
             if (!i)
             {
                 free(threads);
+
+                size *= tcount;
                 goto single;
             }
             break;
@@ -129,6 +126,8 @@ single:
             if (!i)
             {
                 free(threads);
+
+                size *= tcount;
                 goto single;
             }
             break;

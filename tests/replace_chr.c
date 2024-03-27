@@ -52,8 +52,7 @@ int main(void)
     mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME);
     MRFSTR_TLIB_INIT(res1,);
     MRFSTR_TLIB_INIT(res2, mrfstr_free(res1));
-    MRFSTR_TLIB_INIT_STR(str,
-        mrfstr_free(res1); mrfstr_free(res2));
+    MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res1); mrfstr_free(res2));
     memset(str, '1', MRFSTR_TEST4_SIZE);
 
     if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,

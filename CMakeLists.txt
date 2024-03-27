@@ -40,12 +40,12 @@ add_library(MRFStr
     proc/copy.c proc/move.c proc/fill.c
     proc/reverse.c proc/replchr.c
     proc/equal.c
-    proc/contchr.c proc/findchr.c #proc/countchr.c
+    proc/contchr.c proc/findchr.c proc/countchr.c
     srcs/init.c srcs/set.c srcs/get.c
     srcs/concat.c srcs/remove.c srcs/repeat.c
     srcs/reverse.c srcs/replace_chr.c
     srcs/equal.c
-    srcs/contain.c srcs/find.c #srcs/count_chr.c
+    srcs/contain.c srcs/find.c srcs/count_chr.c
     srcs/io.c
     srcs/str.c
     srcs/config.c)
@@ -76,6 +76,7 @@ elseif (MSVC)
         PRIVATE core/scontchr.asm
         PRIVATE core/sfindchr.asm
         PRIVATE core/sstrlen.asm
+        PRIVATE core/scountchr.asm
         PRIVATE cpuid/cputype.asm
         PRIVATE cpuid/funccnt.asm
         PRIVATE cpuid/simdset.asm

@@ -52,7 +52,6 @@ int main(void)
     mrfstr_bool_t first;
 
     mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME);
-
     MRFSTR_TLIB_INIT(str,);
     MRFSTR_TLIB_MEMSET(str, '0', MRFSTR_TEST4_SIZE);
 

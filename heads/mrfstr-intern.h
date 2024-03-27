@@ -78,6 +78,7 @@ enum __MRFSTR_SIMD_ENUM
     MRFSTR_SIMD_SSE2,
     MRFSTR_SIMD_SSSE3,
     MRFSTR_SIMD_SSE41,
+    MRFSTR_SIMD_SSE42,
     MRFSTR_SIMD_AVX,
     MRFSTR_SIMD_AVX2,
     MRFSTR_SIMD_AVX512F,
@@ -167,6 +168,8 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*findchr_func)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_size_t (*countchr_func)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
     void (*contchr_tfunc)(
         volatile mrfstr_bool_t*,
@@ -174,6 +177,8 @@ struct __MRFSTR_CONFIG_T
     mrfstr_idx_t (*findchr_tfunc)(
         volatile mrfstr_idx_t*, mrfstr_idx_t,
         mrfstr_data_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_size_t (*countchr_tfunc)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
     mrfstr_size_t search_tlimit;
 

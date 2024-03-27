@@ -30,9 +30,9 @@ add_executable(TFindChr find_chr.c)
 target_link_libraries(TFindChr PRIVATE MRFStr)
 add_test(TFindChr TFindChr)
 
-#add_executable(TCountChr count_chr.c)
-#target_link_libraries(TCountChr PRIVATE MRFStr)
-#add_test(TCountChr TCountChr)
+add_executable(TCountChr count_chr.c)
+target_link_libraries(TCountChr PRIVATE MRFStr)
+add_test(TCountChr TCountChr)
 
 add_executable(TStrlen strlen.c)
 target_link_libraries(TStrlen PRIVATE MRFStr)

@@ -18,11 +18,12 @@
 ; 1: SSE2 (guaranteed on x64 processors)
 ; 2: SSSE3
 ; 3: SSE4.1
-; 4: AVX
-; 5: AVX2
-; 6: AVX512F
-; 7: AVX512BW, AVX512DQ, AVX512VL
-; 8: AVX512VBMI
+; 4: SSE4.2
+; 5: AVX
+; 6: AVX2
+; 7: AVX512F
+; 8: AVX512BW, AVX512DQ, AVX512VL
+; 9: AVX512VBMI
 
     extern _funccnt : db
 
@@ -47,6 +48,10 @@ mrfstr_cpuid_simdset proc
     bt ecx, 19
     jnc LASTINST
     inc r8b             ; SSE4.1
+
+    bt ecx, 20
+    jnc LASTINST
+    inc r8b             ; SSE4.2
 
     bt ecx, 28
     jnc LASTINST

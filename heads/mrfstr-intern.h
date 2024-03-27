@@ -165,10 +165,15 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_bool_t (*contchr_func)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_idx_t (*findchr_func)(
+        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
     void (*contchr_tfunc)(
         volatile mrfstr_bool_t*,
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+    mrfstr_idx_t (*findchr_tfunc)(
+        volatile mrfstr_idx_t*, mrfstr_idx_t,
+        mrfstr_data_ct, mrfstr_chr_t, mrfstr_size_t);
 
     mrfstr_size_t search_tlimit;
 
@@ -193,6 +198,8 @@ extern mrfstr_config_t _mrfstr_config;
 #define mrfstr_set_tcount(tlimit)                   \
     do                                              \
     {                                               \
+        mrfstr_size_t tsize;                        \
+                                                    \
         tsize = tlimit >> 1;                        \
         if (size > _mrfstr_config.tcount * tsize)   \
             tcount = _mrfstr_config.tcount;         \

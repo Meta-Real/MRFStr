@@ -41,9 +41,8 @@ void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t tcount, i;
+    mrfstr_short_t rem;
+    mrfstr_byte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_copy_t data;
 
@@ -85,8 +84,8 @@ void __mrfstr_copy(
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
     size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
-    factor = tcount - 1;
-    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    nthreads = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
@@ -96,7 +95,7 @@ void __mrfstr_copy(
         return;
     }
 
-    for (i = 0; i != factor; i++)
+    for (i = 0; i != nthreads; i++)
     {
         data = (mrfstr_copy_t)malloc(sizeof(struct __MRFSTR_COPY_T));
         if (!data)

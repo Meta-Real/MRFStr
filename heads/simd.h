@@ -91,7 +91,7 @@ void __mrfstr_sse2_ntfill(
 void __mrfstr_i64_fill(
     mrfstr_ptr_t dst, mrfstr_chr_t chr, mrfstr_size_t size);
 
-/* replace functions */
+/* replace chr functions */
 
 void __mrfstr_avx512bw_replchr(
     mrfstr_ptr_t str,
@@ -179,7 +179,7 @@ void __mrfstr_i64_rev(
 void __mrfstr_i64_rev2(
     mrfstr_ptr_t left, mrfstr_ptr_ct right, mrfstr_size_t size);
 
-/* compare functions */
+/* equal functions */
 
 mrfstr_bool_t __mrfstr_avx512dq_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
@@ -223,7 +223,7 @@ void __mrfstr_i64_tequal(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
-/* contain functions */
+/* contain chr functions */
 
 mrfstr_bool_t __mrfstr_avx512bw_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
@@ -248,6 +248,32 @@ mrfstr_bool_t __mrfstr_i64_contchr(
 void __mrfstr_i64_tcontchr(
     volatile mrfstr_bool_t *res,
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+/* find chr functions */
+
+mrfstr_idx_t __mrfstr_avx512bw_findchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_avx512bw_tfindchr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_idx_t __mrfstr_avx2_findchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_avx2_tfindchr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_idx_t __mrfstr_sse2_findchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_sse2_tfindchr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+
+mrfstr_idx_t __mrfstr_i64_findchr(
+    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+mrfstr_idx_t __mrfstr_i64_tfindchr(
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
+    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* strlen functions */
 

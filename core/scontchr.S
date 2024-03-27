@@ -81,7 +81,7 @@ __mrfstr_avx512bw_tcontchr:
     vpbroadcastb chr2, %zmm16
     mov _mrfstr_search_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD2
+    jae LASTLOAD2
 
 OLHEAD2:
     mov size2, %r10
@@ -102,7 +102,7 @@ ILHEAD2:
     jnz RETURN2
 
     cmp %rax, size2
-    ja OLHEAD2
+    jb OLHEAD2
 
 LASTLOAD2:
     vpcmpeqb (str2, size2), %zmm16, %k0
@@ -175,7 +175,7 @@ __mrfstr_avx2_tcontchr:
 
     mov _mrfstr_search_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD4
+    jae LASTLOAD4
 
 OLHEAD4:
     mov size2, %r10
@@ -197,7 +197,7 @@ ILHEAD4:
     jnz RETURN4
 
     cmp %rax, size2
-    ja OLHEAD4
+    jb OLHEAD4
 
 LASTLOAD4:
     vpcmpeqb (str2, size2), %ymm0, %ymm1
@@ -270,7 +270,7 @@ __mrfstr_sse2_tcontchr:
 
     mov _mrfstr_search_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD6
+    jae LASTLOAD6
 
 OLHEAD6:
     mov size2, %r10
@@ -293,7 +293,7 @@ ILHEAD6:
     jnz RETURN6
 
     cmp %rax, size2
-    ja OLHEAD6
+    jb OLHEAD6
 
 LASTLOAD6:
     movdqa (str2, size2), %xmm0
@@ -385,7 +385,7 @@ __mrfstr_i64_tcontchr:
 
     mov _mrfstr_search_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD8
+    jae LASTLOAD8
 
 OLHEAD8:
     mov size2, %rbp
@@ -422,7 +422,7 @@ ILHEAD8:
     jnz RETURN8
 
     cmp %rax, size2
-    ja OLHEAD8
+    jb OLHEAD8
 
 LASTLOAD8:
 #ifdef WIN32

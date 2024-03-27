@@ -45,9 +45,8 @@ DWORD WINAPI __mrfstr_contchr_threaded(
 mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_size_t tsize;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t tcount, i;
+    mrfstr_short_t rem;
+    mrfstr_byte_t tcount, nthreads, i;
     volatile mrfstr_bool_t res;
     mrfstr_thread_t *threads;
     mrfstr_contchr_t data;
@@ -68,8 +67,7 @@ mrfstr_bool_t __mrfstr_contchr(
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
 
-        str += size;
-        if (_mrfstr_config.contchr_func(str, chr, (mrfstr_size_t)-(mrfstr_ssize_t)size))
+        if (_mrfstr_config.contchr_func(str += size, chr, (mrfstr_size_t)-(mrfstr_ssize_t)size))
             return MRFSTR_TRUE;
 
         mrfstr_contchr_rem;
@@ -91,8 +89,8 @@ mrfstr_bool_t __mrfstr_contchr(
 
     res = MRFSTR_FALSE;
 
-    factor = tcount - 1;
-    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    nthreads = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
 single:
@@ -105,7 +103,7 @@ single:
         return MRFSTR_FALSE;
     }
 
-    for (i = 0; i != factor; i++)
+    for (i = 0; i != nthreads; i++)
     {
         data = (mrfstr_contchr_t)malloc(sizeof(struct __MRFSTR_CONTCHR_T));
         if (!data)
@@ -142,8 +140,7 @@ single:
     tcount -= i;
 
     size *= tcount;
-    str -= size;
-    _mrfstr_config.contchr_tfunc(&res, str, chr, size);
+    _mrfstr_config.contchr_tfunc(&res, str -= size, chr, size);
 
     while (rem--)
         if (chr == *str++)

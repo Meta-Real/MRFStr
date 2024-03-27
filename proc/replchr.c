@@ -71,9 +71,8 @@ void __mrfstr_replchr(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t tcount, i;
+    mrfstr_short_t rem;
+    mrfstr_byte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_replchr_t data;
 
@@ -117,8 +116,8 @@ void __mrfstr_replchr(
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
     size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
-    factor = tcount - 1;
-    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    nthreads = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
@@ -128,7 +127,7 @@ void __mrfstr_replchr(
         return;
     }
 
-    for (i = 0; i != factor; i++)
+    for (i = 0; i != nthreads; i++)
     {
         data = (mrfstr_replchr_t)malloc(sizeof(struct __MRFSTR_REPLCHR_T));
         if (!data)
@@ -165,9 +164,8 @@ void __mrfstr_replchr2(
     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
     mrfstr_size_t size)
 {
-    mrfstr_size_t tsize;
-    mrfstr_short_t rem, factor;
-    mrfstr_byte_t tcount, i;
+    mrfstr_short_t rem;
+    mrfstr_byte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_replchr2_t data;
 
@@ -210,8 +208,8 @@ void __mrfstr_replchr2(
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
     size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
 
-    factor = tcount - 1;
-    threads = (mrfstr_thread_t*)malloc(factor * sizeof(mrfstr_thread_t));
+    nthreads = tcount - 1;
+    threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
     if (!threads)
     {
         size *= tcount;
@@ -221,7 +219,7 @@ void __mrfstr_replchr2(
         return;
     }
 
-    for (i = 0; i != factor; i++)
+    for (i = 0; i != nthreads; i++)
     {
         data = (mrfstr_replchr2_t)malloc(sizeof(struct __MRFSTR_REPLCHR2_T));
         if (!data)

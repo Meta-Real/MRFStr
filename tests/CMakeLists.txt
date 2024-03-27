@@ -26,9 +26,9 @@ add_executable(TContainChr contain_chr.c)
 target_link_libraries(TContainChr PRIVATE MRFStr)
 add_test(TContainChr TContainChr)
 
-#add_executable(TFindChr find_chr.c)
-#target_link_libraries(TFindChr PRIVATE MRFStr)
-#add_test(TFindChr TFindChr)
+add_executable(TFindChr find_chr.c)
+target_link_libraries(TFindChr PRIVATE MRFStr)
+add_test(TFindChr TFindChr)
 
 #add_executable(TCountChr count_chr.c)
 #target_link_libraries(TCountChr PRIVATE MRFStr)

@@ -60,7 +60,7 @@ __mrfstr_avx512bw_tcontchr proc
     vpbroadcastb zmm16, r8d
     mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -81,7 +81,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vpcmpeqb k0, zmm16, [rdx+r9]
@@ -154,7 +154,7 @@ __mrfstr_avx2_tcontchr proc
 
     mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -176,7 +176,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vpcmpeqb ymm1, ymm0, [rdx+r9]
@@ -251,7 +251,7 @@ __mrfstr_sse2_tcontchr proc
 
     mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -274,7 +274,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     movdqa xmm0, [rdx+r9]
@@ -358,7 +358,7 @@ __mrfstr_i64_tcontchr proc
 
     mov rax, [_mrfstr_search_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov rbp, r9
@@ -384,7 +384,7 @@ ILHEAD:
     jnz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     mov rsi, [rdx+r9]

@@ -79,7 +79,7 @@ __mrfstr_avx512dq_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD2
+    jae LASTLOAD2
 
 OLHEAD2:
     mov %r9, %r10
@@ -101,7 +101,7 @@ ILHEAD2:
     jz RETURN2
 
     cmp %rax, %r9
-    ja OLHEAD2
+    jb OLHEAD2
 
 LASTLOAD2:
     vmovdqu64 (str12, size2), %zmm16
@@ -164,7 +164,7 @@ __mrfstr_avx512f_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD4
+    jae LASTLOAD4
 
 OLHEAD4:
     mov %r9, %r10
@@ -187,7 +187,7 @@ ILHEAD4:
     jz RETURN4
 
     cmp %rax, %r9
-    ja OLHEAD4
+    jb OLHEAD4
 
 LASTLOAD4:
     vmovdqu64 (str12, size2), %zmm16
@@ -250,7 +250,7 @@ __mrfstr_avx2_avx512vl_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD6
+    jae LASTLOAD6
 
 OLHEAD6:
     mov size2, %r10
@@ -272,7 +272,7 @@ ILHEAD6:
     jz RETURN6
 
     cmp %rax, size2
-    ja OLHEAD6
+    jb OLHEAD6
 
 LASTLOAD6:
     vmovdqu64 (str12, size2), %ymm16
@@ -337,7 +337,7 @@ __mrfstr_avx2_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD8
+    jae LASTLOAD8
 
 OLHEAD8:
     mov size2, %r10
@@ -360,7 +360,7 @@ ILHEAD8:
     jz RETURN8
 
     cmp %rax, size2
-    ja OLHEAD8
+    jb OLHEAD8
 
 LASTLOAD8:
     vmovdqu (str12, size2), %ymm0
@@ -425,7 +425,7 @@ __mrfstr_sse2_avx512vl_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD10
+    jae LASTLOAD10
 
 OLHEAD10:
     mov size2, %r10
@@ -447,7 +447,7 @@ ILHEAD10:
     jz RETURN10
 
     cmp %rax, size2
-    ja OLHEAD10
+    jb OLHEAD10
 
 LASTLOAD10:
     vmovdqu64 (str12, size2), %xmm0
@@ -510,7 +510,7 @@ __mrfstr_sse2_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD12
+    jae LASTLOAD12
 
 OLHEAD12:
     mov size2, %r10
@@ -533,7 +533,7 @@ ILHEAD12:
     jz RETURN12
 
     cmp %rax, size2
-    ja OLHEAD12
+    jb OLHEAD12
 
 LASTLOAD12:
     movdqu (str12, size2), %xmm0
@@ -594,7 +594,7 @@ __mrfstr_i64_tequal:
 
     mov _mrfstr_cmp_load(%rip), %rax
     cmp %rax, size2
-    jbe LASTLOAD14
+    jae LASTLOAD14
 
 OLHEAD14:
     mov size2, %r10
@@ -614,7 +614,7 @@ ILHEAD14:
     jz RETURN14
 
     cmp %rax, size2
-    ja OLHEAD14
+    jb OLHEAD14
 
 LASTLOAD14:
     mov (str12, size2), %r11

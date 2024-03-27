@@ -58,7 +58,7 @@ __mrfstr_avx512dq_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -80,7 +80,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vmovdqu64 zmm16, [rdx+r9]
@@ -143,7 +143,7 @@ __mrfstr_avx512f_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -166,7 +166,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vmovdqu64 zmm16, [rdx+r9]
@@ -229,7 +229,7 @@ __mrfstr_avx2_avx512vl_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -251,7 +251,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vmovdqu64 ymm16, [rdx+r9]
@@ -316,7 +316,7 @@ __mrfstr_avx2_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -339,7 +339,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vmovdqu ymm0, ymmword ptr [rdx+r9]
@@ -404,7 +404,7 @@ __mrfstr_sse2_avx512vl_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -426,7 +426,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     vmovdqu64 xmm0, [rdx+r9]
@@ -489,7 +489,7 @@ __mrfstr_sse2_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -512,7 +512,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     movdqu xmm0, [rdx+r9]
@@ -573,7 +573,7 @@ __mrfstr_i64_tequal proc
 
     mov rax, [_mrfstr_cmp_load]
     cmp r9, rax
-    jbe LASTLOAD
+    jae LASTLOAD
 
 OLHEAD:
     mov r10, r9
@@ -593,7 +593,7 @@ ILHEAD:
     jz RETURN
 
     cmp r9, rax
-    ja OLHEAD
+    jb OLHEAD
 
 LASTLOAD:
     mov r11, [rdx+r9]

@@ -5,9 +5,7 @@
 *.dll
 *.out
 *.exe
-heads/simddef.h
 
 build
-msvcsetup
 
 !.gitignore

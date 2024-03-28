@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -10,7 +10,7 @@ endif()
 
 project(MRFStr VERSION 1.2.0
     DESCRIPTION "MetaReal Fast String library version 1.2.0"
-    LANGUAGES C)
+    LANGUAGES C ASM)
 option(BUILD_SHARED_LIBS "Shared Library")
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
@@ -20,7 +20,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_C_FLAGS_MINSIZEREL "-Os")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-    enable_language(ASM)
+    enable_language(ASM-ATT)
 elseif (MSVC)
     set(CMAKE_C_FLAGS "/Wall /wd4324 /wd4710 /wd4711 /wd4820 /wd4996 /wd5045 /wd5105 /WX")
     set(CMAKE_C_FLAGS_DEBUG "/Od /Zi")

@@ -15,48 +15,45 @@ copies or substantial portions of the Software.
 */
 
 #include <mrfstr-intern.h>
+#include <stdarg.h>
 
-mrfstr_t mrfstr_init(void)
+void mrfstr_init(
+    mrfstr_t str)
 {
-    mrfstr_t str;
-
-    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
-    if (!str)
-        return NULL;
-
     MRFSTR_SIZE(str) = 0;
     MRFSTR_CAPA(str) = 0;
-    return str;
 }
 
-mrfstr_t mrfstr_init2(
-    mrfstr_data_t data)
+void mrfstr_inits(
+    mrfstr_p str, ...)
 {
-    mrfstr_t str;
+    va_list strs;
 
-    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
-    if (!str)
-        return NULL;
+    va_start(strs, str);
+    do
+    {
+        MRFSTR_SIZE(str) = 0;
+        MRFSTR_CAPA(str) = 0;
 
+        str = va_arg(strs, mrfstr_p);
+    } while (str);
+    va_end(strs);
+}
+
+void mrfstr_init2(
+    mrfstr_t str, mrfstr_data_t data)
+{
     MRFSTR_DATA(str) = data;
     MRFSTR_SIZE(str) = mrfstr_strlen(data);
     MRFSTR_CAPA(str) = MRFSTR_SIZE(str);
-    return str;
 }
 
-mrfstr_t mrfstr_init3(
-    mrfstr_data_t data, mrfstr_size_t size)
+void mrfstr_init3(
+    mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size)
 {
-    mrfstr_t str;
-
-    str = (mrfstr_t)malloc(sizeof(struct __MRFSTR_T));
-    if (!str)
-        return NULL;
-
     MRFSTR_DATA(str) = data;
     MRFSTR_SIZE(str) = size;
     MRFSTR_CAPA(str) = size;
-    return str;
 }
 
 mrfstr_res_t mrfstr_alloc(
@@ -74,13 +71,40 @@ void mrfstr_free(
 {
     if (MRFSTR_CAPA(str))
         free(MRFSTR_DATA(str));
-    free(str);
+}
+
+void mrfstr_frees(
+    mrfstr_p str, ...)
+{
+    va_list strs;
+
+    va_start(strs, str);
+    do
+    {
+        free(MRFSTR_DATA(str));
+        str = va_arg(strs, mrfstr_p);
+    } while (str);
+    va_end(strs);
 }
 
 void mrfstr_clear(
     mrfstr_t str)
 {
     MRFSTR_FREE(str);
+}
+
+void mrfstr_clears(
+    mrfstr_p str, ...)
+{
+    va_list strs;
+
+    va_start(strs, str);
+    do
+    {
+        MRFSTR_FREE(str);
+        str = va_arg(strs, mrfstr_p);
+    } while (str);
+    va_end(strs);
 }
 
 mrfstr_res_t mrfstr_realloc(

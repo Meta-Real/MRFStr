@@ -98,8 +98,10 @@ struct __MRFSTR_T
     mrfstr_size_t _size;
     mrfstr_size_t _capa;
 };
-typedef struct __MRFSTR_T *mrfstr_t;
-typedef const struct __MRFSTR_T *mrfstr_ct;
+typedef struct __MRFSTR_T mrfstr_t[1];
+typedef struct __MRFSTR_T *mrfstr_p;
+
+typedef const struct __MRFSTR_T mrfstr_ct[1];
 
 #define MRFSTR_DATA(x) ((x)->_data)
 #define MRFSTR_SIZE(x) ((x)->_size)
@@ -119,18 +121,28 @@ typedef mrfstr_byte_t mrfstr_res_t;
 
 /* init functions */
 
-__MRFSTR_DECLSPEC mrfstr_t mrfstr_init(void);
-__MRFSTR_DECLSPEC mrfstr_t mrfstr_init2(
-    mrfstr_data_t data);
-__MRFSTR_DECLSPEC mrfstr_t mrfstr_init3(
-    mrfstr_data_t data, mrfstr_size_t size);
+__MRFSTR_DECLSPEC void mrfstr_init(
+    mrfstr_t str);
+__MRFSTR_DECLSPEC void mrfstr_inits(
+    mrfstr_p str, ...);
+
+__MRFSTR_DECLSPEC void mrfstr_init2(
+    mrfstr_t str, mrfstr_data_t data);
+__MRFSTR_DECLSPEC void mrfstr_init3(
+    mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size);
+
 __MRFSTR_DECLSPEC void mrfstr_free(
     mrfstr_t str);
+__MRFSTR_DECLSPEC void mrfstr_frees(
+    mrfstr_p str, ...);
+
 __MRFSTR_DECLSPEC void mrfstr_clear(
     mrfstr_t str);
+__MRFSTR_DECLSPEC void mrfstr_clears(
+    mrfstr_p str, ...);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_realloc(
     mrfstr_t str, mrfstr_size_t size);

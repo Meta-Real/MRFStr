@@ -37,13 +37,7 @@ copies or substantial portions of the Software.
 #define MRFSTR_TLIB_INIT(x, fr)                 \
     do                                          \
     {                                           \
-        x = mrfstr_init();                      \
-        if (!x)                                 \
-        {                                       \
-            fr;                                 \
-            MRFSTR_TLIB_ERROR;                  \
-        }                                       \
-                                                \
+        mrfstr_init(x);                         \
         if (mrfstr_alloc(x, MRFSTR_TEST4_SIZE)) \
         {                                       \
             mrfstr_free(x);                     \

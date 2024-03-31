@@ -51,13 +51,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
 #define MRFSTR_BLIB_INIT(x, fr)   \
     do                            \
     {                             \
-        x = mrfstr_init();        \
-        if (!x)                   \
-        {                         \
-            fr;                   \
-            MRFSTR_BLIB_ERROR;    \
-        }                         \
-                                  \
+        mrfstr_init(x);           \
         if (mrfstr_alloc(x, end)) \
         {                         \
             mrfstr_free(x);       \

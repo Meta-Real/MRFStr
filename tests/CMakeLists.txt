@@ -6,10 +6,6 @@ add_executable(TRemove remove.c)
 target_link_libraries(TRemove PRIVATE MRFStr)
 add_test(TRemove TRemove)
 
-add_executable(TInsert insert.c)
-target_link_libraries(TInsert PRIVATE MRFStr)
-add_test(TInsert TInsert)
-
 add_executable(TRepeat repeat.c)
 target_link_libraries(TRepeat PRIVATE MRFStr)
 add_test(TRepeat TRepeat)

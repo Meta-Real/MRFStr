@@ -12,7 +12,7 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-    extern _mrfstr_search_load : dq
+    extern _mrfstr_searchchr_load : dq
 
 .code
 
@@ -66,7 +66,7 @@ __mrfstr_avx512bw_tfindchr proc
     vpbroadcastb zmm16, r9d
 
     mov r9, [rsp+40]
-    mov r11, [_mrfstr_search_load]
+    mov r11, [_mrfstr_searchchr_load]
     mov rax, r9
     neg rax
 
@@ -176,7 +176,7 @@ __mrfstr_avx2_tfindchr proc
     vinsertf128 ymm0, ymm0, xmm0, 1
 
     mov r9, [rsp+40]
-    mov r11, [_mrfstr_search_load]
+    mov r11, [_mrfstr_searchchr_load]
     cmp r9, r11
     jae LASTLOAD
 
@@ -287,7 +287,7 @@ __mrfstr_sse2_tfindchr proc
     pshufd xmm1, xmm1, 0
 
     mov r9, [rsp+40]
-    mov r11, [_mrfstr_search_load]
+    mov r11, [_mrfstr_searchchr_load]
     cmp r9, r11
     jae LASTLOAD
 
@@ -427,7 +427,7 @@ __mrfstr_i64_tfindchr proc
     imul r9, r10
 
     mov rbx, [rsp+72]
-    mov rbp, [_mrfstr_search_load]
+    mov rbp, [_mrfstr_searchchr_load]
     cmp rbx, rbp
     jae LASTLOAD
 

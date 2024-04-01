@@ -63,7 +63,7 @@ mrfstr_size_t __mrfstr_countchr(
         return count;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.search_tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.searchchr_tlimit)
     {
         count = 0;
         rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
@@ -84,7 +84,7 @@ single:
         return count;
     }
 
-    mrfstr_set_tcount(_mrfstr_config.search_tlimit);
+    mrfstr_set_tcount(_mrfstr_config.searchchr_tlimit);
 
     count = 0;
     rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;

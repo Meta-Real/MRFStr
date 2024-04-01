@@ -84,7 +84,7 @@ void __mrfstr_replchr(
         return;
     }
 
-    if (size < _mrfstr_config.repl_tlimit || _mrfstr_config.tcount == 1)
+    if (size < _mrfstr_config.replchr_tlimit || _mrfstr_config.tcount == 1)
     {
         rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
@@ -103,7 +103,7 @@ void __mrfstr_replchr(
         return;
     }
 
-    mrfstr_set_tcount(_mrfstr_config.repl_tlimit);
+    mrfstr_set_tcount(_mrfstr_config.replchr_tlimit);
 
     rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
@@ -176,7 +176,7 @@ void __mrfstr_replchr2(
         return;
     }
 
-    if (size < _mrfstr_config.repl_tlimit || _mrfstr_config.tcount == 1)
+    if (size < _mrfstr_config.replchr_tlimit || _mrfstr_config.tcount == 1)
     {
         rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
         if (rem)
@@ -195,7 +195,7 @@ void __mrfstr_replchr2(
         return;
     }
 
-    mrfstr_set_tcount(_mrfstr_config.repl_tlimit);
+    mrfstr_set_tcount(_mrfstr_config.replchr_tlimit);
 
     rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
     if (rem)

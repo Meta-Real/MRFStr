@@ -63,7 +63,7 @@ mrfstr_idx_t __mrfstr_findchr(
         return ptr ? (mrfstr_idx_t)(ptr - str) : MRFSTR_INVIDX;
     }
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.search_tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.searchchr_tlimit)
     {
         align = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (align)
@@ -90,7 +90,7 @@ single:
         return MRFSTR_INVIDX;
     }
 
-    mrfstr_set_tcount(_mrfstr_config.search_tlimit);
+    mrfstr_set_tcount(_mrfstr_config.searchchr_tlimit);
 
     align = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (align)

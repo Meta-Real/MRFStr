@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 #include "tlib.h"
 #include <time.h>
 
-#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_FUNC_SEARCH
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_FUNC_SEARCH_CHR
 
 #define MRFSTR_TLIB_OBJ(size)                               \
     do                                                      \

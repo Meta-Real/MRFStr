@@ -52,7 +52,7 @@
 #define bcopy2 %rbx
 #endif
 
-    .extern _mrfstr_search_load
+    .extern _mrfstr_searchchr_load
 
 .text
 
@@ -110,7 +110,7 @@ __mrfstr_avx512bw_tfindchr:
     mov 40(%rsp), size2
 #endif
 
-    mov _mrfstr_search_load(%rip), %r11
+    mov _mrfstr_searchchr_load(%rip), %r11
     mov size2, %rax
     neg %rax
 
@@ -226,7 +226,7 @@ __mrfstr_avx2_tfindchr:
     neg %rax
 #endif
 
-    mov _mrfstr_search_load(%rip), %r11
+    mov _mrfstr_searchchr_load(%rip), %r11
     cmp %r11, size2
     jae LASTLOAD4
 
@@ -360,7 +360,7 @@ __mrfstr_sse2_tfindchr:
     neg %rax
 #endif
 
-    mov _mrfstr_search_load(%rip), %r11
+    mov _mrfstr_searchchr_load(%rip), %r11
     cmp %r11, size2
     jae LASTLOAD6
 
@@ -542,7 +542,7 @@ __mrfstr_i64_tfindchr:
     mov size3, %r12
     neg %r12
 #endif
-    mov _mrfstr_search_load(%rip), %rbp
+    mov _mrfstr_searchchr_load(%rip), %rbp
     cmp %rbp, size3
     jae LASTLOAD8
 

@@ -116,7 +116,7 @@ struct __MRFSTR_CONFIG_T
     mrfstr_size_t mem_tlimit;
     mrfstr_size_t move_tlimit;
 
-    /* repl functions */
+    /* repl chr functions */
 
     void (*replchr_func)(
         mrfstr_ptr_t,
@@ -136,7 +136,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_chr_t, mrfstr_chr_t,
         mrfstr_size_t);
 
-    mrfstr_size_t repl_tlimit;
+    mrfstr_size_t replchr_tlimit;
 
     /* rev functions */
 
@@ -163,7 +163,7 @@ struct __MRFSTR_CONFIG_T
 
     mrfstr_size_t cmp_tlimit;
 
-    /* search functions */
+    /* search chr functions */
 
     mrfstr_bool_t (*contchr_func)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
@@ -181,7 +181,7 @@ struct __MRFSTR_CONFIG_T
     mrfstr_size_t (*countchr_tfunc)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
-    mrfstr_size_t search_tlimit;
+    mrfstr_size_t searchchr_tlimit;
 
     /* strlen functions */
 

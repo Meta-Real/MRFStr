@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include "tlib.h"
 
-#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_FUNC_REPLACE
+#define MRFSTR_TLIB_CONFIG MRFSTR_CONFIG_FUNC_REPLACE_CHR
 
 #define MRFSTR_TLIB_OBJ(size)                          \
     do                                                 \

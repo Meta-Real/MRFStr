@@ -21,7 +21,7 @@ copies or substantial portions of the Software.
 mrfstr_size_t _mrfstr_mem_ntlimit = 1;
 mrfstr_size_t _mrfstr_mem_ntrlimit = (mrfstr_size_t)-1;
 mrfstr_size_t _mrfstr_cmp_load = 1;
-mrfstr_size_t _mrfstr_search_load = 1;
+mrfstr_size_t _mrfstr_searchchr_load = 1;
 
 mrfstr_config_t _mrfstr_config =
 {
@@ -269,7 +269,7 @@ mrfstr_res_t mrfstr_config_func(
             return MRFSTR_RES_TYPE_ERROR;
         }
         break;
-    case MRFSTR_CONFIG_FUNC_REPLACE:
+    case MRFSTR_CONFIG_FUNC_REPLACE_CHR:
         switch (single)
         {
         case MRFSTR_CONFIG_SIMD_AVX512:
@@ -561,7 +561,7 @@ mrfstr_res_t mrfstr_config_func(
             return MRFSTR_RES_TYPE_ERROR;
         }
         break;
-    case MRFSTR_CONFIG_FUNC_SEARCH:
+    case MRFSTR_CONFIG_FUNC_SEARCH_CHR:
         switch (single)
         {
         case MRFSTR_CONFIG_SIMD_AVX512:
@@ -700,59 +700,23 @@ mrfstr_res_t mrfstr_config_func(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_t mrfstr_config_limits(
+mrfstr_res_t mrfstr_config_limits1(
     mrfstr_config_func_t type,
-    mrfstr_size_t tlimit, mrfstr_size_t limit)
+    mrfstr_size_t limit1)
 {
     switch (type)
     {
-    case MRFSTR_CONFIG_FUNC_MEMORY:
-        if (tlimit)
-            _mrfstr_config.mem_tlimit = tlimit;
-        if (limit)
-        {
-            mrfstr_byte_t rem;
-
-            rem = limit & MRFSTR_ALIGN_MASK;
-            limit -= rem;
-
-            _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)limit;
-            _mrfstr_mem_ntrlimit = limit;
-        }
-        break;
-    case MRFSTR_CONFIG_FUNC_REPLACE:
-        if (tlimit)
-            _mrfstr_config.repl_tlimit = tlimit;
+    case MRFSTR_CONFIG_FUNC_REPLACE_CHR:
+        if (limit1)
+            _mrfstr_config.replchr_tlimit = limit1;
         break;
     case MRFSTR_CONFIG_FUNC_REVERSE:
-        if (tlimit)
-            _mrfstr_config.rev_tlimit = tlimit;
-        break;
-    case MRFSTR_CONFIG_FUNC_COMPARE:
-        if (tlimit)
-            _mrfstr_config.cmp_tlimit = tlimit;
-        if (limit)
-        {
-            mrfstr_byte_t rem;
-
-            rem = limit & MRFSTR_ALIGN_MASK;
-            _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit - rem);
-        }
-        break;
-    case MRFSTR_CONFIG_FUNC_SEARCH:
-        if (tlimit)
-            _mrfstr_config.search_tlimit = tlimit;
-        if (limit)
-        {
-            mrfstr_byte_t rem;
-
-            rem = limit & MRFSTR_ALIGN_MASK;
-            _mrfstr_search_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit - rem);
-        }
+        if (limit1)
+            _mrfstr_config.rev_tlimit = limit1;
         break;
     case MRFSTR_CONFIG_FUNC_STRLEN:
-        if (tlimit)
-            _mrfstr_config.strlen_tlimit = tlimit;
+        if (limit1)
+            _mrfstr_config.strlen_tlimit = limit1;
         break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
@@ -761,41 +725,129 @@ mrfstr_res_t mrfstr_config_limits(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_t mrfstr_config_limits_get(
+mrfstr_res_t mrfstr_config_limits2(
     mrfstr_config_func_t type,
-    mrfstr_size_t *tlimit, mrfstr_size_t *limit)
+    mrfstr_size_t limit1, mrfstr_size_t limit2)
+{
+    switch (type)
+    {
+    case MRFSTR_CONFIG_FUNC_COMPARE:
+        if (limit1)
+            _mrfstr_config.cmp_tlimit = limit1;
+        if (limit2)
+        {
+            mrfstr_byte_t rem;
+
+            rem = limit2 & MRFSTR_ALIGN_MASK;
+            _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
+        }
+        break;
+    case MRFSTR_CONFIG_FUNC_SEARCH_CHR:
+        if (limit1)
+            _mrfstr_config.searchchr_tlimit = limit1;
+        if (limit2)
+        {
+            mrfstr_byte_t rem;
+
+            rem = limit2 & MRFSTR_ALIGN_MASK;
+            _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
+        }
+        break;
+    default:
+        return MRFSTR_RES_TYPE_ERROR;
+    }
+
+    return MRFSTR_RES_NOERROR;
+}
+
+mrfstr_res_t mrfstr_config_limits3(
+    mrfstr_config_func_t type,
+    mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3)
 {
     switch (type)
     {
     case MRFSTR_CONFIG_FUNC_MEMORY:
-        if (tlimit)
-            *tlimit = _mrfstr_config.mem_tlimit;
-        if (limit)
-            *limit = _mrfstr_mem_ntrlimit;
+        if (limit1)
+            _mrfstr_config.mem_tlimit = limit1;
+        if (limit2)
+            _mrfstr_config.move_tlimit = limit2;
+        if (limit3)
+        {
+            mrfstr_byte_t rem;
+
+            rem = limit3 & MRFSTR_ALIGN_MASK;
+            limit3 -= rem;
+
+            _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)limit3;
+            _mrfstr_mem_ntrlimit = limit3;
+        }
         break;
-    case MRFSTR_CONFIG_FUNC_REPLACE:
-        if (tlimit)
-            *tlimit = _mrfstr_config.repl_tlimit;
+    default:
+        return MRFSTR_RES_TYPE_ERROR;
+    }
+
+    return MRFSTR_RES_NOERROR;
+}
+
+mrfstr_res_t mrfstr_config_limits1_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1)
+{
+    switch (type)
+    {
+    case MRFSTR_CONFIG_FUNC_REPLACE_CHR:
+        if (limit1)
+            *limit1 = _mrfstr_config.replchr_tlimit;
         break;
     case MRFSTR_CONFIG_FUNC_REVERSE:
-        if (tlimit)
-            *tlimit = _mrfstr_config.rev_tlimit;
+        if (limit1)
+            *limit1 = _mrfstr_config.rev_tlimit;
         break;
+    default:
+        return MRFSTR_RES_TYPE_ERROR;
+    }
+
+    return MRFSTR_RES_NOERROR;
+}
+
+mrfstr_res_t mrfstr_config_limits2_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1, mrfstr_size_t *limit2)
+{
+    switch (type)
+    {
     case MRFSTR_CONFIG_FUNC_COMPARE:
-        if (tlimit)
-            *tlimit = _mrfstr_config.cmp_tlimit;
-        if (limit)
-            *limit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_cmp_load;
+        if (limit1)
+            *limit1 = _mrfstr_config.cmp_tlimit;
+        if (limit2)
+            *limit2 = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_cmp_load;
         break;
-    case MRFSTR_CONFIG_FUNC_SEARCH:
-        if (tlimit)
-            *tlimit = _mrfstr_config.search_tlimit;
-        if (limit)
-            *limit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_search_load;
+    case MRFSTR_CONFIG_FUNC_SEARCH_CHR:
+        if (limit1)
+            *limit1 = _mrfstr_config.searchchr_tlimit;
+        if (limit2)
+            *limit2 = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_searchchr_load;
         break;
-    case MRFSTR_CONFIG_FUNC_STRLEN:
-        if (tlimit)
-            *tlimit = _mrfstr_config.strlen_tlimit;
+    default:
+        return MRFSTR_RES_TYPE_ERROR;
+    }
+
+    return MRFSTR_RES_NOERROR;
+}
+
+mrfstr_res_t mrfstr_config_limits3_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3)
+{
+    switch (type)
+    {
+    case MRFSTR_CONFIG_FUNC_MEMORY:
+        if (limit1)
+            *limit1 = _mrfstr_config.mem_tlimit;
+        if (limit2)
+            *limit2 = _mrfstr_config.move_tlimit;
+        if (limit3)
+            *limit3 = _mrfstr_mem_ntrlimit;
         break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
@@ -816,13 +868,13 @@ void mrfstr_config_extreme(void)
     _mrfstr_mem_ntlimit = (mrfstr_size_t)-0x200000;
     _mrfstr_mem_ntrlimit = 0x200000;
     _mrfstr_cmp_load = (mrfstr_size_t)-0x100000;
-    _mrfstr_search_load = (mrfstr_size_t)-0x100000;
+    _mrfstr_searchchr_load = (mrfstr_size_t)-0x100000;
     _mrfstr_config.mem_tlimit = 0x8000000;
     _mrfstr_config.move_tlimit = 0x10000;
     _mrfstr_config.rev_tlimit = 0x8000000;
-    _mrfstr_config.repl_tlimit = 0x8000000;
+    _mrfstr_config.replchr_tlimit = 0x8000000;
     _mrfstr_config.cmp_tlimit = 0x8000000;
-    _mrfstr_config.search_tlimit = 0x8000000;
+    _mrfstr_config.searchchr_tlimit = 0x8000000;
     _mrfstr_config.strlen_tlimit = 0x8000000;
 
     mrfstr_cpuid_funccnt(NULL);
@@ -1050,7 +1102,7 @@ void mrfstr_config_off(void)
     _mrfstr_mem_ntlimit = 1;
     _mrfstr_mem_ntrlimit = (mrfstr_size_t)-1;
     _mrfstr_cmp_load = 1;
-    _mrfstr_search_load = 1;
+    _mrfstr_searchchr_load = 1;
 
     _mrfstr_config = (mrfstr_config_t){
         __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,

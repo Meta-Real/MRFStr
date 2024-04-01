@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 #include "blib.h"
 
-#define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_FUNC_SEARCH
+#define MRFSTR_BLIB_CONFIG MRFSTR_CONFIG_FUNC_SEARCH_CHR
 
 #define MRFSTR_BLIB_CSTR_PRE(size) mrfstr_size_t count = 0
 #define MRFSTR_BLIB_CSTR(size)     \

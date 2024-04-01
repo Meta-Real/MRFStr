@@ -389,11 +389,11 @@ typedef mrfstr_byte_t mrfstr_config_level_t;
 enum __MRFSTR_CONFIG_FUNC_ENUM
 {
     MRFSTR_CONFIG_FUNC_MEMORY,
-    MRFSTR_CONFIG_FUNC_REPLACE,
+    MRFSTR_CONFIG_FUNC_REPLACE_CHR,
     MRFSTR_CONFIG_FUNC_REVERSE,
 
     MRFSTR_CONFIG_FUNC_COMPARE,
-    MRFSTR_CONFIG_FUNC_SEARCH,
+    MRFSTR_CONFIG_FUNC_SEARCH_CHR,
 
     MRFSTR_CONFIG_FUNC_STRLEN
 };
@@ -443,13 +443,26 @@ __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_func(
     mrfstr_config_func_t type,
     mrfstr_config_simd_t single, mrfstr_config_simd_t multi);
-__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits(
-    mrfstr_config_func_t type,
-    mrfstr_size_t tlimit, mrfstr_size_t limit);
 
-__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits_get(
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits1(
     mrfstr_config_func_t type,
-    mrfstr_size_t *tlimit, mrfstr_size_t *limit);
+    mrfstr_size_t limit1);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits2(
+    mrfstr_config_func_t type,
+    mrfstr_size_t limit1, mrfstr_size_t limit2);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits3(
+    mrfstr_config_func_t type,
+    mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits1_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits2_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1, mrfstr_size_t *limit2);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits3_get(
+    mrfstr_config_func_t type,
+    mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3);
 
 #ifdef __cplusplus
 }

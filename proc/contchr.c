@@ -54,7 +54,7 @@ mrfstr_bool_t __mrfstr_contchr(
     if (size < MRFSTR_SLIMIT)
         return memchr(str, chr, size) != NULL;
 
-    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.search_tlimit)
+    if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.searchchr_tlimit)
     {
         rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
@@ -75,7 +75,7 @@ single:
         return MRFSTR_FALSE;
     }
 
-    mrfstr_set_tcount(_mrfstr_config.search_tlimit);
+    mrfstr_set_tcount(_mrfstr_config.searchchr_tlimit);
 
     rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
     if (rem)

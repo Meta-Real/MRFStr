@@ -32,7 +32,7 @@
 #define size2 %rdx
 #endif
 
-    .extern _mrfstr_search_load
+    .extern _mrfstr_searchchr_load
 
 .text
 
@@ -79,7 +79,7 @@ __mrfstr_avx512bw_tcontchr:
     jnz RETURN2
 
     vpbroadcastb chr2, %zmm16
-    mov _mrfstr_search_load(%rip), %rax
+    mov _mrfstr_searchchr_load(%rip), %rax
     cmp %rax, size2
     jae LASTLOAD2
 
@@ -173,7 +173,7 @@ __mrfstr_avx2_tcontchr:
     vpshufb %xmm1, %xmm0, %xmm0
     vinsertf128 $1, %xmm0, %ymm0, %ymm0
 
-    mov _mrfstr_search_load(%rip), %rax
+    mov _mrfstr_searchchr_load(%rip), %rax
     cmp %rax, size2
     jae LASTLOAD4
 
@@ -268,7 +268,7 @@ __mrfstr_sse2_tcontchr:
     punpcklwd %xmm1, %xmm1
     pshufd $0, %xmm1, %xmm1
 
-    mov _mrfstr_search_load(%rip), %rax
+    mov _mrfstr_searchchr_load(%rip), %rax
     cmp %rax, size2
     jae LASTLOAD6
 
@@ -383,7 +383,7 @@ __mrfstr_i64_tcontchr:
     imul %r10, %rdx
 #endif
 
-    mov _mrfstr_search_load(%rip), %rax
+    mov _mrfstr_searchchr_load(%rip), %rax
     cmp %rax, size2
     jae LASTLOAD8
 

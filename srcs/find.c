@@ -26,8 +26,7 @@ mrfstr_idx_t mrfstr_find_chr(
 }
 
 mrfstr_idx_t mrfstr_n_find_chr(
-    mrfstr_ct str, mrfstr_chr_t chr,
-    mrfstr_size_t size)
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (size > MRFSTR_SIZE(str))
         size = MRFSTR_SIZE(str);

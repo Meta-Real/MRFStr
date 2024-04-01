@@ -40,15 +40,7 @@ void mrfstr_inits(
     va_end(strs);
 }
 
-void mrfstr_init2(
-    mrfstr_t str, mrfstr_data_t data)
-{
-    MRFSTR_DATA(str) = data;
-    MRFSTR_SIZE(str) = mrfstr_strlen(data);
-    MRFSTR_CAPA(str) = MRFSTR_SIZE(str);
-}
-
-void mrfstr_init3(
+void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size)
 {
     MRFSTR_DATA(str) = data;

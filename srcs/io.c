@@ -119,8 +119,7 @@ void mrfstr_fexport(
 }
 
 void mrfstr_n_fexport(
-    FILE *stream,
-    mrfstr_ct str, mrfstr_size_t size)
+    FILE *stream, mrfstr_ct str, mrfstr_size_t size)
 {
     if (size > MRFSTR_SIZE(str))
         size = MRFSTR_SIZE(str);
@@ -132,8 +131,7 @@ void mrfstr_n_fexport(
 }
 
 mrfstr_res_t mrfstr_fimport(
-    mrfstr_t str,
-    FILE *stream)
+    mrfstr_t str, FILE *stream)
 {
     if (!stream || stream == stdin)
         return mrfstr_import(str);
@@ -157,8 +155,7 @@ mrfstr_res_t mrfstr_fimport(
 }
 
 mrfstr_res_t mrfstr_n_fimport(
-    mrfstr_t str,
-    FILE *stream, mrfstr_size_t size)
+    mrfstr_t str, FILE *stream, mrfstr_size_t size)
 {
     if (!size)
     {

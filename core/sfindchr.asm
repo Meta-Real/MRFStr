@@ -50,8 +50,7 @@ IDX:
 __mrfstr_avx512bw_findchr endp
 
 ; mrfstr_idx_t __mrfstr_avx512bw_tfindchr(
-;     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-;     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+;     volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; res = RES
 ; start = START
@@ -157,8 +156,7 @@ IDX:
 __mrfstr_avx2_findchr endp
 
 ; mrfstr_idx_t __mrfstr_avx2_tfindchr(
-;     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-;     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+;     volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; res = RES
 ; start = START
@@ -268,8 +266,7 @@ IDX:
 __mrfstr_sse2_findchr endp
 
 ; mrfstr_idx_t __mrfstr_sse2_tfindchr(
-;     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-;     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+;     volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; res = RES
 ; start = START
@@ -402,8 +399,7 @@ IDX:
 __mrfstr_i64_findchr endp
 
 ; mrfstr_idx_t __mrfstr_i64_tfindchr(
-;     volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-;     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+;     volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 ;
 ; res = RES
 ; start = START

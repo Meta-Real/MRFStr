@@ -51,9 +51,7 @@
 .text
 
 # void __mrfstr_avx512bw_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -75,9 +73,7 @@ LHEAD1:
     ret
 
 # void __mrfstr_avx512bw_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE
@@ -108,9 +104,7 @@ LHEAD2:
     ret
 
 # void __mrfstr_avx2_avx512bw_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -132,9 +126,7 @@ LHEAD3:
     ret
 
 # void __mrfstr_avx2_avx512bw_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE
@@ -165,9 +157,7 @@ LHEAD4:
     ret
 
 # void __mrfstr_avx2_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -201,9 +191,7 @@ LHEAD5:
     ret
 
 # void __mrfstr_avx2_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE
@@ -242,9 +230,7 @@ LHEAD6:
     ret
 
 # void __mrfstr_sse41_avx512bw_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -266,9 +252,7 @@ LHEAD7:
     ret
 
 # void __mrfstr_sse41_avx512bw_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE
@@ -299,9 +283,7 @@ LHEAD8:
     ret
 
 # void __mrfstr_sse41_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -335,9 +317,7 @@ LHEAD9:
     ret
 
 # void __mrfstr_sse41_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE
@@ -376,9 +356,7 @@ LHEAD10:
     ret
 
 # void __mrfstr_i64_replchr(
-#     mrfstr_ptr_t str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # str = STR+SIZE
 # ochr = OCHR
@@ -433,9 +411,7 @@ LHEAD11:
     ret
 
 # void __mrfstr_i64_replchr2(
-#     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-#     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-#     mrfstr_size_t size)
+#     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 #
 # res = RES+SIZE
 # str = STR+SIZE

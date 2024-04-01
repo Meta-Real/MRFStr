@@ -18,8 +18,7 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 mrfstr_res_t mrfstr_repeat(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_size_t count)
+    mrfstr_t res, mrfstr_ct str, mrfstr_size_t count)
 {
     mrfstr_size_t size, diff;
 
@@ -74,8 +73,7 @@ mrfstr_res_t mrfstr_repeat(
 }
 
 mrfstr_res_t mrfstr_repeat_chr(
-    mrfstr_t res, mrfstr_chr_t chr,
-    mrfstr_size_t count)
+    mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count)
 {
     MRFSTR_SIZE(res) = count;
     if (!count)
@@ -89,8 +87,7 @@ mrfstr_res_t mrfstr_repeat_chr(
 }
 
 mrfstr_res_t mrfstr_fill(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t chr, mrfstr_size_t size)
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (MRFSTR_SIZE(str) >= size)
     {
@@ -142,8 +139,7 @@ mrfstr_res_t mrfstr_fill(
 }
 
 mrfstr_res_t mrfstr_rfill(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t chr, mrfstr_size_t size)
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     if (MRFSTR_SIZE(str) >= size)
     {

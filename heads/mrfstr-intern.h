@@ -119,22 +119,14 @@ struct __MRFSTR_CONFIG_T
     /* repl chr functions */
 
     void (*replchr_func)(
-        mrfstr_ptr_t,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
     void (*replchr2_func)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
 
     void (*replchr_tfunc)(
-        mrfstr_ptr_t,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
     void (*replchr2_tfunc)(
-        mrfstr_ptr_t, mrfstr_ptr_ct,
-        mrfstr_chr_t, mrfstr_chr_t,
-        mrfstr_size_t);
+        mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
 
     mrfstr_size_t replchr_tlimit;
 
@@ -158,8 +150,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
 
     void (*equal_tfunc)(
-        volatile mrfstr_bool_t*,
-        mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
+        volatile mrfstr_bool_t*, mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
 
     mrfstr_size_t cmp_tlimit;
 
@@ -173,11 +164,9 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
     void (*contchr_tfunc)(
-        volatile mrfstr_bool_t*,
-        mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
+        volatile mrfstr_bool_t*, mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_idx_t (*findchr_tfunc)(
-        volatile mrfstr_idx_t*, mrfstr_idx_t,
-        mrfstr_data_ct, mrfstr_chr_t, mrfstr_size_t);
+        volatile mrfstr_idx_t*, mrfstr_idx_t, mrfstr_data_ct, mrfstr_chr_t, mrfstr_size_t);
     mrfstr_size_t (*countchr_tfunc)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
@@ -311,13 +300,9 @@ void __mrfstr_rev2(
     mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size);
 
 void __mrfstr_replchr(
-    mrfstr_data_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_data_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_replchr2(
-    mrfstr_data_t res, mrfstr_data_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_data_t res, mrfstr_data_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);

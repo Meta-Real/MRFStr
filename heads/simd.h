@@ -94,58 +94,34 @@ void __mrfstr_i64_fill(
 /* replace chr functions */
 
 void __mrfstr_avx512bw_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_avx512bw_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 void __mrfstr_avx2_avx512bw_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_avx2_avx512bw_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 void __mrfstr_avx2_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_avx2_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 void __mrfstr_sse41_avx512bw_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_sse41_avx512bw_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 void __mrfstr_sse41_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_sse41_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 void __mrfstr_i64_replchr(
-    mrfstr_ptr_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 void __mrfstr_i64_replchr2(
-    mrfstr_ptr_t res, mrfstr_ptr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 /* reverse functions */
 
@@ -184,52 +160,44 @@ void __mrfstr_i64_rev2(
 mrfstr_bool_t __mrfstr_avx512dq_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_avx512dq_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_avx512f_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_avx512f_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_avx2_avx512vl_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_avx2_avx512vl_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_avx2_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_avx2_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_sse2_avx512vl_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_sse2_avx512vl_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_sse2_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_sse2_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_i64_equal(
     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 void __mrfstr_i64_tequal(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size);
 
 /* contain chr functions */
 
 mrfstr_bool_t __mrfstr_avx512bw_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_avx512bw_tcontchr(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_avx2_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
@@ -240,40 +208,34 @@ void __mrfstr_avx2_tcontchr(
 mrfstr_bool_t __mrfstr_sse2_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_sse2_tcontchr(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_bool_t __mrfstr_i64_contchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 void __mrfstr_i64_tcontchr(
-    volatile mrfstr_bool_t *res,
-    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* find chr functions */
 
 mrfstr_idx_t __mrfstr_avx512bw_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_avx512bw_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_idx_t __mrfstr_avx2_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_avx2_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_idx_t __mrfstr_sse2_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_sse2_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 mrfstr_idx_t __mrfstr_i64_findchr(
     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 mrfstr_idx_t __mrfstr_i64_tfindchr(
-    volatile mrfstr_idx_t *res, mrfstr_idx_t start,
-    mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
+    volatile mrfstr_idx_t *res, mrfstr_idx_t start, mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* count chr */
 

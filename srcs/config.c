@@ -178,9 +178,7 @@ mrfstr_size_t mrfstr_config_get(
 
 
 mrfstr_res_t mrfstr_config_func(
-    mrfstr_config_func_t type,
-    mrfstr_config_simd_t single,
-    mrfstr_config_simd_t multi)
+    mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi)
 {
     mrfstr_cpuid_funccnt(NULL);
     mrfstr_byte_t simdset = mrfstr_cpuid_simdset();
@@ -701,8 +699,7 @@ mrfstr_res_t mrfstr_config_func(
 }
 
 mrfstr_res_t mrfstr_config_limits1(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1)
+    mrfstr_config_func_t type, mrfstr_size_t limit1)
 {
     switch (type)
     {
@@ -726,8 +723,7 @@ mrfstr_res_t mrfstr_config_limits1(
 }
 
 mrfstr_res_t mrfstr_config_limits2(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1, mrfstr_size_t limit2)
+    mrfstr_config_func_t type, mrfstr_size_t limit1, mrfstr_size_t limit2)
 {
     switch (type)
     {
@@ -761,8 +757,7 @@ mrfstr_res_t mrfstr_config_limits2(
 }
 
 mrfstr_res_t mrfstr_config_limits3(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3)
+    mrfstr_config_func_t type, mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3)
 {
     switch (type)
     {
@@ -790,8 +785,7 @@ mrfstr_res_t mrfstr_config_limits3(
 }
 
 mrfstr_res_t mrfstr_config_limits1_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1)
+    mrfstr_config_func_t type, mrfstr_size_t *limit1)
 {
     switch (type)
     {
@@ -811,8 +805,7 @@ mrfstr_res_t mrfstr_config_limits1_get(
 }
 
 mrfstr_res_t mrfstr_config_limits2_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1, mrfstr_size_t *limit2)
+    mrfstr_config_func_t type, mrfstr_size_t *limit1, mrfstr_size_t *limit2)
 {
     switch (type)
     {
@@ -836,8 +829,7 @@ mrfstr_res_t mrfstr_config_limits2_get(
 }
 
 mrfstr_res_t mrfstr_config_limits3_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3)
+    mrfstr_config_func_t type, mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3)
 {
     switch (type)
     {

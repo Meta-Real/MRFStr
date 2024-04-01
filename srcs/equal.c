@@ -32,8 +32,7 @@ mrfstr_bool_t mrfstr_equal(
 }
 
 mrfstr_bool_t mrfstr_n_equal(
-    mrfstr_ct str1, mrfstr_ct str2,
-    mrfstr_size_t size)
+    mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size)
 {
     if (str1 == str2)
         return MRFSTR_TRUE;
@@ -54,21 +53,8 @@ mrfstr_bool_t mrfstr_n_equal(
     return __mrfstr_equal(MRFSTR_DATA(str1), MRFSTR_DATA(str2), size);
 }
 
-mrfstr_bool_t mrfstr_equal_str(
-    mrfstr_ct str1, mrfstr_data_ct str2)
-{
-    if (MRFSTR_SIZE(str1) != mrfstr_strlen(str2))
-        return MRFSTR_FALSE;
-
-    if (!MRFSTR_SIZE(str1))
-        return MRFSTR_TRUE;
-
-    return __mrfstr_equal(MRFSTR_DATA(str1), str2, MRFSTR_SIZE(str1));
-}
-
 mrfstr_bool_t mrfstr_n_equal_str(
-    mrfstr_ct str1, mrfstr_data_ct str2,
-    mrfstr_size_t size)
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
     if (MRFSTR_SIZE(str1) < size)
     {
@@ -87,20 +73,19 @@ mrfstr_bool_t mrfstr_n_equal_str(
 }
 
 mrfstr_bool_t mrfstr_equal_nstr(
-    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2)
 {
-    if (MRFSTR_SIZE(str1) != size)
+    if (MRFSTR_SIZE(str1) != size2)
         return MRFSTR_FALSE;
 
-    if (!size)
+    if (!size2)
         return MRFSTR_TRUE;
 
-    return __mrfstr_equal(MRFSTR_DATA(str1), str2, size);
+    return __mrfstr_equal(MRFSTR_DATA(str1), str2, size2);
 }
 
 mrfstr_bool_t mrfstr_n_equal_nstr(
-    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2,
-    mrfstr_size_t size)
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2, mrfstr_size_t size)
 {
     if (MRFSTR_SIZE(str1) < size)
     {

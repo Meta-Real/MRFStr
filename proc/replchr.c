@@ -67,9 +67,7 @@ DWORD WINAPI __mrfstr_replchr2_threaded(
 #endif
 
 void __mrfstr_replchr(
-    mrfstr_data_t str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size)
+    mrfstr_data_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 {
     mrfstr_short_t rem;
     mrfstr_byte_t tcount, nthreads, i;
@@ -160,9 +158,7 @@ void __mrfstr_replchr(
 }
 
 void __mrfstr_replchr2(
-    mrfstr_data_t res, mrfstr_data_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size)
+    mrfstr_data_t res, mrfstr_data_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 {
     mrfstr_short_t rem;
     mrfstr_byte_t tcount, nthreads, i;

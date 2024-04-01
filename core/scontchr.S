@@ -64,8 +64,7 @@ TRUE1:
     ret
 
 # void __mrfstr_avx512bw_tcontchr(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # res = RES
 # str = STR+SIZE
@@ -154,8 +153,7 @@ TRUE3:
     ret
 
 # void __mrfstr_avx2_tcontchr(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # res = RES
 # str = STR+SIZE
@@ -249,8 +247,7 @@ TRUE5:
     ret
 
 # void __mrfstr_sse2_tcontchr(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # res = RES
 # str = STR+SIZE
@@ -350,8 +347,7 @@ TRUE7:
     ret
 
 # void __mrfstr_i64_tcontchr(
-#    volatile mrfstr_bool_t *res,
-#    mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
+#    volatile mrfstr_bool_t *res, mrfstr_ptr_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 #
 # res = RES
 # str = STR+SIZE

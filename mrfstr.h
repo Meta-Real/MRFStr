@@ -126,9 +126,9 @@ __MRFSTR_DECLSPEC void mrfstr_init(
 __MRFSTR_DECLSPEC void mrfstr_inits(
     mrfstr_p str, ...);
 
-__MRFSTR_DECLSPEC void mrfstr_init2(
-    mrfstr_t str, mrfstr_data_t data);
-__MRFSTR_DECLSPEC void mrfstr_init3(
+#define mrfstr_init_str(str, data) \
+    mrfstr_init_nstr((str), (data), mrfstr_strlen(data))
+__MRFSTR_DECLSPEC void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_alloc(
@@ -167,11 +167,10 @@ __MRFSTR_DECLSPEC void mrfstr_swap(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src);
 
-__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_str(
-    mrfstr_t dst, mrfstr_data_ct src);
+#define mrfstr_set_str(dst, src) \
+    mrfstr_set_nstr((dst), (src), mrfstr_strlen(src))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_nstr(
-    mrfstr_t dst, mrfstr_data_ct src,
-    mrfstr_size_t size);
+    mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_chr(
     mrfstr_t dst, mrfstr_chr_t src);
@@ -188,38 +187,48 @@ __MRFSTR_DECLSPEC mrfstr_data_t mrfstr_n_get_str(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_concat(
-    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
-    mrfstr_size_t size);
+    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size);
+
+#define mrfstr_concat_str(res, str1, str2) \
+    mrfstr_concat_nstr((res), (str1), (str2), mrfstr_strlen(str2));
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat_nstr(
+    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat_chr(
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert(
-    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2,
-    mrfstr_idx_t idx);
+    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2, mrfstr_idx_t idx);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_insert(
+    mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2, mrfstr_idx_t idx, mrfstr_size_t size);
+
+#define mrfstr_insert_str(res, str1, str2, idx) \
+    mrfstr_insert_nstr((res), (str1), (str2), mrfstr_strlen(str2), (idx))
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert_nstr(
+    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2, mrfstr_idx_t idx);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert_chr(
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_idx_t idx);
 
 /* remove functions */
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_remove(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_idx_t idx);
+    mrfstr_t res, mrfstr_ct str, mrfstr_idx_t idx);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_remove(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_idx_t idx, mrfstr_size_t count);
+    mrfstr_t res, mrfstr_ct str, mrfstr_idx_t idx, mrfstr_size_t count);
 
 /* repeat functions */
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_repeat(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_size_t count);
+    mrfstr_t res, mrfstr_ct str, mrfstr_size_t count);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_repeat_chr(
-    mrfstr_t res, mrfstr_chr_t chr,
-    mrfstr_size_t count);
+    mrfstr_t res, mrfstr_chr_t chr, mrfstr_size_t count);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_fill(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t chr, mrfstr_size_t size);
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_rfill(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t chr, mrfstr_size_t size);
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* reverse functions */
 
@@ -229,32 +238,26 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_reverse(
 /* replace functions */
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_replace_chr(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr);
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_replace_chr(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-    mrfstr_size_t size);
+    mrfstr_t res, mrfstr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size);
 
 /* cmp functions */
 
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal(
     mrfstr_ct str1, mrfstr_ct str2);
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal(
-    mrfstr_ct str1, mrfstr_ct str2,
-    mrfstr_size_t size);
+    mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size);
 
-__MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal_str(
-    mrfstr_ct str1, mrfstr_data_ct str2);
+#define mrfstr_equal_str(str1, str2) \
+    mrfstr_equal_nstr((str1), (str2), mrfstr_strlen(str2));
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal_str(
-    mrfstr_ct str1, mrfstr_data_ct str2,
-    mrfstr_size_t size);
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal_nstr(
-    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2);
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal_nstr(
-    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2,
-    mrfstr_size_t size);
+    mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal_chr(
     mrfstr_ct str, mrfstr_chr_t chr);
@@ -264,8 +267,7 @@ __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal_chr(
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_contain_chr(
     mrfstr_ct str, mrfstr_chr_t chr);
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_contain_chr(
-    mrfstr_ct str, mrfstr_chr_t chr,
-    mrfstr_size_t size);
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_startswith(
     mrfstr_ct str, mrfstr_ct substr);
@@ -286,16 +288,14 @@ __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_endswith_nstr(
 __MRFSTR_DECLSPEC mrfstr_idx_t mrfstr_find_chr(
     mrfstr_ct str, mrfstr_chr_t chr);
 __MRFSTR_DECLSPEC mrfstr_idx_t mrfstr_n_find_chr(
-    mrfstr_ct str, mrfstr_chr_t chr,
-    mrfstr_size_t size);
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* count functions */
 
 __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_count_chr(
     mrfstr_ct str, mrfstr_chr_t chr);
 __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_n_count_chr(
-    mrfstr_ct str, mrfstr_chr_t chr,
-    mrfstr_size_t size);
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t size);
 
 /* data functions */
 
@@ -321,8 +321,7 @@ inline void mrfstr_resize(
 }
 
 inline mrfstr_res_t mrfstr_get_chr(
-    mrfstr_chr_t *chr,
-    mrfstr_ct str, mrfstr_size_t idx)
+    mrfstr_chr_t *chr, mrfstr_ct str, mrfstr_size_t idx)
 {
     if (idx >= MRFSTR_SIZE(str))
         return MRFSTR_RES_IDXOUT_ERROR;
@@ -355,18 +354,14 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_import(
 
 #ifndef MRFSTR_DONT_INCLUDE_STDIO
 __MRFSTR_DECLSPEC void mrfstr_fexport(
-    FILE *stream,
-    mrfstr_ct str);
+    FILE *stream, mrfstr_ct str);
 __MRFSTR_DECLSPEC void mrfstr_n_fexport(
-    FILE *stream,
-    mrfstr_ct str, mrfstr_size_t size);
+    FILE *stream, mrfstr_ct str, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_fimport(
-    mrfstr_t str,
-    FILE *stream);
+    mrfstr_t str, FILE *stream);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_fimport(
-    mrfstr_t str,
-    FILE *stream, mrfstr_size_t size);
+    mrfstr_t str, FILE *stream, mrfstr_size_t size);
 #endif
 
 /* str functions */
@@ -441,28 +436,21 @@ __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
     mrfstr_config_data_t type);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_func(
-    mrfstr_config_func_t type,
-    mrfstr_config_simd_t single, mrfstr_config_simd_t multi);
+    mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits1(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1);
+    mrfstr_config_func_t type, mrfstr_size_t limit1);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits2(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1, mrfstr_size_t limit2);
+    mrfstr_config_func_t type, mrfstr_size_t limit1, mrfstr_size_t limit2);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits3(
-    mrfstr_config_func_t type,
-    mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3);
+    mrfstr_config_func_t type, mrfstr_size_t limit1, mrfstr_size_t limit2, mrfstr_size_t limit3);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits1_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1);
+    mrfstr_config_func_t type, mrfstr_size_t *limit1);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits2_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1, mrfstr_size_t *limit2);
+    mrfstr_config_func_t type, mrfstr_size_t *limit1, mrfstr_size_t *limit2);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_limits3_get(
-    mrfstr_config_func_t type,
-    mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3);
+    mrfstr_config_func_t type, mrfstr_size_t *limit1, mrfstr_size_t *limit2, mrfstr_size_t *limit3);
 
 #ifdef __cplusplus
 }

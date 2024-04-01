@@ -34,23 +34,8 @@ mrfstr_res_t mrfstr_set(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_res_t mrfstr_set_str(
-    mrfstr_t dst, mrfstr_data_ct src)
-{
-    MRFSTR_SIZE(dst) = mrfstr_strlen(src);
-    if (!MRFSTR_SIZE(dst))
-        return MRFSTR_RES_NOERROR;
-
-    if (MRFSTR_CAPA(dst) < MRFSTR_SIZE(dst))
-        MRFSTR_CLEAR_REALLOC(dst, MRFSTR_SIZE(dst));
-
-    __mrfstr_copy(MRFSTR_DATA(dst), src, MRFSTR_SIZE(dst));
-    return MRFSTR_RES_NOERROR;
-}
-
 mrfstr_res_t mrfstr_set_nstr(
-    mrfstr_t dst, mrfstr_data_ct src,
-    mrfstr_size_t size)
+    mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
     MRFSTR_SIZE(dst) = size;
     if (!size)

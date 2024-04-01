@@ -17,8 +17,7 @@ copies or substantial portions of the Software.
 #include <mrfstr-intern.h>
 
 mrfstr_res_t mrfstr_remove(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_idx_t idx)
+    mrfstr_t res, mrfstr_ct str, mrfstr_idx_t idx)
 {
     mrfstr_size_t size;
 
@@ -55,8 +54,7 @@ mrfstr_res_t mrfstr_remove(
 }
 
 mrfstr_res_t mrfstr_n_remove(
-    mrfstr_t res, mrfstr_ct str,
-    mrfstr_idx_t idx, mrfstr_size_t count)
+    mrfstr_t res, mrfstr_ct str, mrfstr_idx_t idx, mrfstr_size_t count)
 {
     if (idx >= MRFSTR_SIZE(str))
         return MRFSTR_RES_IDXOUT_ERROR;

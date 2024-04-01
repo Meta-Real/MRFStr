@@ -63,8 +63,7 @@ FALSE1:
     ret
 
 # void __mrfstr_avx512dq_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -148,8 +147,7 @@ FALSE3:
     ret
 
 # void __mrfstr_avx512f_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -234,8 +232,7 @@ FALSE5:
     ret
 
 # void __mrfstr_avx2_avx512vl_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -321,8 +318,7 @@ FALSE7:
     ret
 
 # void __mrfstr_avx2_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -409,8 +405,7 @@ FALSE9:
     ret
 
 # void __mrfstr_sse2_avx512vl_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -494,8 +489,7 @@ FALSE11:
     ret
 
 # void __mrfstr_sse2_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE
@@ -578,8 +572,7 @@ FALSE13:
     ret
 
 # void __mrfstr_i64_tequal(
-#     volatile mrfstr_bool_t *res,
-#     mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
+#     volatile mrfstr_bool_t *res, mrfstr_ptr_ct str1, mrfstr_ptr_ct str2, mrfstr_size_t size)
 #
 # res = RES
 # str1 = STR1+SIZE

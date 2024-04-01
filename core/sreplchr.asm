@@ -15,9 +15,7 @@
 .code
 
 ; void __mrfstr_avx512bw_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -39,9 +37,7 @@ LHEAD:
 __mrfstr_avx512bw_replchr endp
 
 ; void __mrfstr_avx512bw_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE
@@ -69,9 +65,7 @@ LHEAD:
 __mrfstr_avx512bw_replchr2 endp
 
 ; void __mrfstr_avx2_avx512bw_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -93,9 +87,7 @@ LHEAD:
 __mrfstr_avx2_avx512bw_replchr endp
 
 ; void __mrfstr_avx2_avx512bw_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE
@@ -123,9 +115,7 @@ LHEAD:
 __mrfstr_avx2_avx512bw_replchr2 endp
 
 ; void __mrfstr_avx2_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -159,9 +149,7 @@ LHEAD:
 __mrfstr_avx2_replchr endp
 
 ; void __mrfstr_avx2_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE
@@ -197,9 +185,7 @@ LHEAD:
 __mrfstr_avx2_replchr2 endp
 
 ; void __mrfstr_sse41_avx512bw_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -221,9 +207,7 @@ LHEAD:
 __mrfstr_sse41_avx512bw_replchr endp
 
 ; void __mrfstr_sse41_avx512bw_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE
@@ -251,9 +235,7 @@ LHEAD:
 __mrfstr_sse41_avx512bw_replchr2 endp
 
 ; void __mrfstr_sse41_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -287,9 +269,7 @@ LHEAD:
 __mrfstr_sse41_replchr endp
 
 ; void __mrfstr_sse41_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE
@@ -326,9 +306,7 @@ LHEAD:
 __mrfstr_sse41_replchr2 endp
 
 ; void __mrfstr_i64_replchr(
-;     mrfstr_ptr_t str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; str = STR+SIZE
 ; ochr = OCHR
@@ -375,9 +353,7 @@ LHEAD:
 __mrfstr_i64_replchr endp
 
 ; void __mrfstr_i64_replchr2(
-;     mrfstr_ptr_t res, mrfstr_ptr_ct str,
-;     mrfstr_chr_t ochr, mrfstr_chr_t nchr,
-;     mrfstr_size_t size)
+;     mrfstr_ptr_t res, mrfstr_ptr_ct str, mrfstr_chr_t ochr, mrfstr_chr_t nchr, mrfstr_size_t size)
 ;
 ; res = RES+SIZE
 ; str = STR+SIZE

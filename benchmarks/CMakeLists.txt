@@ -1,6 +1,9 @@
 add_executable(BSet set.c)
 target_link_libraries(BSet PRIVATE MRFStr)
 
+add_executable(BRemove remove.c)
+target_link_libraries(BRemove PRIVATE MRFStr)
+
 add_executable(BRepeat repeat.c)
 target_link_libraries(BRepeat PRIVATE MRFStr)
 

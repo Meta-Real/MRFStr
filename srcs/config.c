@@ -27,7 +27,7 @@ mrfstr_config_t _mrfstr_config =
 {
     __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
     __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-    (mrfstr_size_t)-1,
+    (mrfstr_size_t)-1, (mrfstr_size_t)-1,
     __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
     __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
     (mrfstr_size_t)-1,
@@ -818,6 +818,7 @@ void mrfstr_config_extreme(void)
     _mrfstr_cmp_load = (mrfstr_size_t)-0x100000;
     _mrfstr_search_load = (mrfstr_size_t)-0x100000;
     _mrfstr_config.mem_tlimit = 0x8000000;
+    _mrfstr_config.move_tlimit = 0x10000;
     _mrfstr_config.rev_tlimit = 0x8000000;
     _mrfstr_config.repl_tlimit = 0x8000000;
     _mrfstr_config.cmp_tlimit = 0x8000000;
@@ -1054,7 +1055,7 @@ void mrfstr_config_off(void)
     _mrfstr_config = (mrfstr_config_t){
         __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
         __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-        (mrfstr_size_t)-1,
+        (mrfstr_size_t)-1, (mrfstr_size_t)-1,
         __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
         __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
         (mrfstr_size_t)-1,

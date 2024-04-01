@@ -170,8 +170,7 @@ void __mrfstr_rev(
 }
 
 void __mrfstr_rev2(
-    mrfstr_data_t left, mrfstr_data_ct right,
-    mrfstr_size_t size)
+    mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size)
 {
     mrfstr_short_t rem;
     mrfstr_byte_t tcount, nthreads, i;

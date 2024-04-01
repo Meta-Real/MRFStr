@@ -114,6 +114,7 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
 
     mrfstr_size_t mem_tlimit;
+    mrfstr_size_t move_tlimit;
 
     /* repl functions */
 
@@ -295,8 +296,7 @@ typedef HANDLE mrfstr_mutex_p;
 #endif
 
 void __mrfstr_copy(
-    mrfstr_data_t dst, mrfstr_data_ct src,
-    mrfstr_size_t size);
+    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 void __mrfstr_move(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 void __mrfstr_rmove(
@@ -308,8 +308,7 @@ void __mrfstr_fill(
 void __mrfstr_rev(
     mrfstr_data_t str, mrfstr_size_t size);
 void __mrfstr_rev2(
-    mrfstr_data_t left, mrfstr_data_ct right,
-    mrfstr_size_t size);
+    mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size);
 
 void __mrfstr_replchr(
     mrfstr_data_t str,

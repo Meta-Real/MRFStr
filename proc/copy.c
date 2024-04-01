@@ -38,8 +38,7 @@ DWORD WINAPI __mrfstr_copy_threaded(
 #endif
 
 void __mrfstr_copy(
-    mrfstr_data_t dst, mrfstr_data_ct src,
-    mrfstr_size_t size)
+    mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
     mrfstr_short_t rem;
     mrfstr_byte_t tcount, nthreads, i;
@@ -63,9 +62,10 @@ void __mrfstr_copy(
         }
 
         rem = size & MRFSTR_ALIGN_MASK;
-        size -= rem;
-        _mrfstr_config.copy_func(dst += size, src += size,
-            (mrfstr_size_t)-(mrfstr_ssize_t)size);
+        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
+
+single:
+        _mrfstr_config.copy_func(dst -= size, src -= size, size);
 
         mrfstr_copy_rem;
         return;
@@ -89,10 +89,7 @@ void __mrfstr_copy(
     if (!threads)
     {
         size *= tcount;
-        _mrfstr_config.copy_tfunc(dst -= size, src -= size, size);
-
-        mrfstr_copy_rem;
-        return;
+        goto single;
     }
 
     for (i = 0; i != nthreads; i++)

@@ -41,17 +41,17 @@ mrfstr_cpuid_cputype proc
     cmp ecx, 444d4163h  ; cAMD
     je VAMD
 
-    xor r8b, r8b        ; Set vendor id to 0 (unknown vendor)
+    xor r8b, r8b        ; unknown vendor
     mov byte ptr [_is_intel], 0
     jmp FAMILY_MODEL
 
 VINTEL:
-    mov r8b, 1          ; Set vendor id to 1 (Intel)
+    mov r8b, 1          ; Intel
     mov byte ptr [_is_intel], 1
     jmp FAMILY_MODEL
 
 VAMD:
-    mov r8b, 2          ; Set vendor id to 2 (AMD)
+    mov r8b, 2          ; AMD
     mov byte ptr [_is_intel], 0
     jmp FAMILY_MODEL
 
@@ -64,9 +64,9 @@ FAMILY_MODEL:
     mov ebx, eax
     mov edi, eax
     shr ebx, 8
-    and ebx, 0fh        ; FamilyID
-    shr edi, 20         ; ExtendedFamilyID
-    lea ebx, [ebx+edi]  ; FamilyID + ExtendedFamilyID
+    and ebx, 15
+    shr edi, 20
+    lea ebx, [ebx+edi]  ; family id
 
     test r9, r9
     jz _FAMILY_ 

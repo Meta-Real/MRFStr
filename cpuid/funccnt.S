@@ -15,6 +15,14 @@
 # mrfstr_byte_t mrfstr_cpuid_funccnt(
 #     mrfstr_byte_t *ext)
 
+#ifdef WIN32
+#define ext1 %rcx
+#define ext2 %r8
+#else
+#define ext1 %rsi
+#define ext2 %rsi
+#endif
+
 .bss
     .globl _funccnt
     .globl _extcnt
@@ -31,21 +39,15 @@ mrfstr_cpuid_funccnt:
 
     push %rbx
 #ifdef WIN32
-    mov %rcx, %r8
+    mov ext1, ext2
 #endif
 
     mov $0x80000000, %eax
     cpuid
 
-#ifdef WIN32
-    test %r8, %r8
+    test ext2, ext2
     jz _EXTCNT_
-    mov %al, (%r8)          # extended function count
-#else
-    test %rsi, %rsi
-    jz _EXTCNT_
-    mov %al, (%rsi)
-#endif
+    mov %al, (ext2)         # extended function count
 
 _EXTCNT_:
     mov %al, _extcnt(%rip)
@@ -59,19 +61,11 @@ _EXTCNT_:
     ret
 
 SAVED:
-#ifdef WIN32
-    test %rcx, %rcx
+    test ext1, ext1
     jz _FUNCCNT_S
 
     mov _extcnt(%rip), %al
-    mov %al, (%rcx)
-#else
-    test %rsi, %rsi
-    jz _FUNCCNT_S
-
-    mov _extcnt(%rip), %al
-    mov %al, (%rsi)
-#endif
+    mov %al, (ext1)
 
 _FUNCCNT_S:
     mov _funccnt(%rip), %al

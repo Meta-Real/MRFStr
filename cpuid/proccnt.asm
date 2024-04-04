@@ -39,10 +39,10 @@ mrfstr_cpuid_proccnt proc
 
     test r8, r8
     jz _CORECNT_
-    mov [r8], bl        ; logical processors (on Intel)
+    mov [r8], bl        ; logical processors (Intel)
 
 _CORECNT_:
-    mov [_corecnt], al  ; cores (on Intel)
+    mov [_corecnt], al  ; cores (Intel)
     mov [_logicnt], bl
 
     pop rbx
@@ -56,7 +56,7 @@ AMD:
 
     test r8, r8
     jz _LOGICNT_
-    mov [r8], bl        ; logical processors (on AMD)
+    mov [r8], bl        ; logical processors (AMD)
 
 _LOGICNT_:
     mov [_logicnt], bl
@@ -64,7 +64,7 @@ _LOGICNT_:
     mov eax, 80000008h
     cpuid
 
-    lea eax, [ecx+1]    ; cores (on AMD)
+    lea eax, [ecx+1]    ; cores (AMD)
     mov [_corecnt], al
 
     pop rbx

@@ -16,6 +16,14 @@
 #     mrfstr_byte_t *logical)
 # PRE: mrfstr_cpuid_cputype
 
+#ifdef WIN32
+#define logi1 %rcx
+#define logi2 %r8
+#else
+#define logi1 %rsi
+#define logi2 %rsi
+#endif
+
     .extern _is_intel
 
 .bss
@@ -32,7 +40,7 @@ mrfstr_cpuid_proccnt:
 
     push %rbx
 #ifdef WIN32
-    mov %rcx, %r8
+    mov logi1, logi2
 #endif
 
     btw $0, _is_intel(%rip)
@@ -42,18 +50,12 @@ mrfstr_cpuid_proccnt:
     mov $1, %ecx
     cpuid
 
-#ifdef WIN32
-    test %r8, %r8
+    test logi2, logi2
     jz _CORECNT_
-    mov %bl, (%r8)
-#else
-    test %rsi, %rsi
-    jz _CORECNT_
-    mov %bl, (%rsi)         # logical processors (on Intel)
-#endif
+    mov %bl, (logi2)        # logical processors (Intel)
 
 _CORECNT_:
-    mov %al, _corecnt(%rip) # cores (on Intel)
+    mov %al, _corecnt(%rip) # cores (Intel)
     mov %bl, _logicnt(%rip)
 
     pop %rbx
@@ -65,15 +67,9 @@ AMD:
 
     shr $16, %ebx
 
-#ifdef WIN32
-    test %r8, %r8
+    test logi2, logi2
     jz _LOGICNT_
-    mov %bl, (%r8)
-#else
-    test %rsi, %rsi
-    jz _LOGICNT_
-    mov %bl, (%rsi)         # logical processors (on AMD)
-#endif
+    mov %bl, (logi2)        # logical processors (AMD)
 
 _LOGICNT_:
     mov %bl, _logicnt(%rip)
@@ -81,26 +77,18 @@ _LOGICNT_:
     mov $0x80000008, %eax
     cpuid
 
-    lea 1(%ecx), %eax       # cores (on AMD)
+    lea 1(%ecx), %eax       # cores (AMD)
     mov %al, _corecnt(%rip)
 
     pop %rbx
     ret
 
 SAVED:
-#ifdef WIN32
-    test %rcx, %rcx
+    test logi1, logi1
     jz _CORECNT_S
 
     mov _logicnt(%rip), %al
-    mov %al, (%rcx)
-#else
-    test %rsi, %rsi
-    jz _CORECNT_S
-
-    mov _logicnt(%rip), %al
-    mov %al, (%rsi)
-#endif
+    mov %al, (logi1)
 
 _CORECNT_S:
     mov _corecnt(%rip), %al

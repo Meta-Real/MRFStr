@@ -80,6 +80,9 @@ LHEAD:
     inc ebx             ; cache line size
     imul rcx, rbx
 
+    cmp rcx, 1
+    je IINC
+
     cmp al, 1
     je IL1
 

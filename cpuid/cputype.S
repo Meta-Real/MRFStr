@@ -15,6 +15,18 @@
 # mrfstr_byte_t mrfstr_cpuid_cputype(
 #     mrfstr_byte_t *family, mrfstr_byte_t *model)
 
+#ifdef WIN32
+#define family1 %rcx
+#define model1 %rdx
+#define family2 %r10
+#define model2 %r11
+#else
+#define family1 %rsi
+#define model1 %rdi
+#define family2 %rsi
+#define model2 %rdi
+#endif
+
 .data
     .globl _is_intel
 _is_intel:
@@ -36,8 +48,8 @@ mrfstr_cpuid_cputype:
 
     push %rbx
 #ifdef WIN32
-    mov %rcx, %r10
-    mov %rdx, %r11
+    mov family1, family2
+    mov model1, model2
 #endif
 
     xor %eax, %eax
@@ -49,17 +61,17 @@ mrfstr_cpuid_cputype:
     cmp $0x444d4163, %ecx   # cAMD
     je VAMD
 
-    xor %r8b, %r8b          # Set vendor id to 0 (unknown vendor)
+    xor %r8b, %r8b          # unknown vendor
     movb $0, _is_intel(%rip)
     jmp FAMILY_MODEL
 
 VINTEL:
-    mov $1, %r8b            # Set vendor id to 1 (Intel)
+    mov $1, %r8b            # Intel
     movb $1, _is_intel(%rip)
     jmp FAMILY_MODEL
 
 VAMD:
-    mov $2, %r8b            # Set vendor id to 2 (AMD)
+    mov $2, %r8b            # AMD
     movb $0, _is_intel(%rip)
     jmp FAMILY_MODEL
 
@@ -72,39 +84,27 @@ FAMILY_MODEL:
     mov %eax, %ebx
     mov %eax, %r9d
     shr $8, %ebx
-    and $0xf, %ebx          # FamilyID
+    and $15, %ebx
     shr $20, %r9d
-    and $0xff, %r9d         # ExtendedFamilyID
-    lea (%ebx, %r9d), %ebx  # FamilyID + ExtendedFamilyID
+    and $0xff, %r9d
+    lea (%ebx, %r9d), %ebx  # family id
 
-#ifdef WIN32
-    test %r10, %r10
+    test model2, model2
     jz _FAMILY_
-    mov %bl, (%r10)
-#else
-    test %rsi, %rsi
-    jz _FAMILY_
-    mov %bl, (%rsi)
-#endif
+    mov %bl, (model2)
 
 _FAMILY_:
     mov %bl, _family(%rip)
 
     mov %al, %bl
-    shr $4, %bl             # Model
+    shr $4, %bl
     shr $12, %eax
-    and $0xf0, %al          # ExtendedModelId << 8
-    or %bl, %al             # (ExtendedModelId << 8) | Model
+    and $0xf0, %al
+    or %bl, %al             # model
 
-#ifdef WIN32
-    test %r11, %r11
+    test family2, family2
     jz _MODEL_
-    mov %al, (%r11)
-#else
-    test %rdi, %rdi
-    jz _MODEL_
-    mov %al, (%rdi)
-#endif
+    mov %al, (family2)
 
 _MODEL_:
     mov %al, _model(%rip)
@@ -114,33 +114,18 @@ _MODEL_:
     ret
 
 SAVED:
-#ifdef WIN32
-    test %rcx, %rcx
+    test family1, family1
     jz _MODEL_S
 
     mov _family(%rip), %al
-    mov %al, (%rcx)
+    mov %al, (family1)
 
 _MODEL_S:
-    test %rdx, %rdx
+    test model1, model1
     jz _VENDOR_S
 
     mov _model(%rip), %al
-    mov %al, (%rdx)
-#else
-    test %rsi, %rsi
-    jz _MODEL_S
-
-    mov _family(%rip), %al
-    mov %al, (%rsi)
-
-_MODEL_S:
-    test %rdi, %rdi
-    jz _VENDOR_S
-
-    mov _model(%rip), %al
-    mov %al, (%rdi)
-#endif
+    mov %al, (model1)
 
 _VENDOR_S:
     mov _vendor(%rip), %al

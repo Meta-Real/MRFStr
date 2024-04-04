@@ -131,6 +131,9 @@ __MRFSTR_DECLSPEC void mrfstr_inits(
 __MRFSTR_DECLSPEC void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size);
 
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_init_alloc(
+    mrfstr_t str, mrfstr_size_t size);
+
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size);
 

@@ -53,36 +53,18 @@ target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_sources(MRFStr
-        PRIVATE core/scopy.S
-        PRIVATE core/sfill.S
-        PRIVATE core/srev.S
-        PRIVATE core/sreplchr.S
-        PRIVATE core/sequal.S
-        PRIVATE core/scontchr.S
-        PRIVATE core/sfindchr.S
-        PRIVATE core/scountchr.S
-        PRIVATE core/sstrlen.S
-        PRIVATE cpuid/cputype.S
-        PRIVATE cpuid/funccnt.S
-        PRIVATE cpuid/simdset.S
-        PRIVATE cpuid/proccnt.S
-        PRIVATE cpuid/cacheline.S)
+        PRIVATE core/scopy.S PRIVATE core/sfill.S PRIVATE core/srev.S
+        PRIVATE core/sreplchr.S PRIVATE core/sequal.S PRIVATE core/scontchr.S
+        PRIVATE core/sfindchr.S PRIVATE core/scountchr.S PRIVATE core/sstrlen.S
+        PRIVATE cpuid/cputype.S PRIVATE cpuid/funccnt.S PRIVATE cpuid/simdset.S
+        PRIVATE cpuid/proccnt.S)
 elseif (MSVC)
     target_sources(MRFStr
-        PRIVATE core/scopy.asm
-        PRIVATE core/sfill.asm
-        PRIVATE core/srev.asm
-        PRIVATE core/sreplchr.asm
-        PRIVATE core/sequal.asm
-        PRIVATE core/scontchr.asm
-        PRIVATE core/sfindchr.asm
-        PRIVATE core/scountchr.asm
-        PRIVATE core/sstrlen.asm
-        PRIVATE cpuid/cputype.asm
-        PRIVATE cpuid/funccnt.asm
-        PRIVATE cpuid/simdset.asm
-        PRIVATE cpuid/proccnt.asm
-        PRIVATE cpuid/cacheline.asm)
+        PRIVATE core/scopy.asm PRIVATE core/sfill.asm PRIVATE core/srev.asm
+        PRIVATE core/sreplchr.asm PRIVATE core/sequal.asm PRIVATE core/scontchr.asm
+        PRIVATE core/sfindchr.asm PRIVATE core/scountchr.asm PRIVATE core/sstrlen.asm
+        PRIVATE cpuid/cputype.asm PRIVATE cpuid/funccnt.asm PRIVATE cpuid/simdset.asm
+        PRIVATE cpuid/proccnt.asm PRIVATE cpuid/cachesize.asm)
 endif()
 
 enable_testing()

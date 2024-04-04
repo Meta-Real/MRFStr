@@ -48,6 +48,20 @@ void mrfstr_init_nstr(
     MRFSTR_CAPA(str) = size;
 }
 
+mrfstr_res_t mrfstr_init_alloc(
+    mrfstr_t str, mrfstr_size_t size)
+{
+    MRFSTR_SIZE(str) = 0;
+    if (!size)
+    {
+        MRFSTR_CAPA(str) = 0;
+        return MRFSTR_RES_NOERROR;
+    }
+
+    MRFSTR_ALLOC(str, size);
+    return MRFSTR_RES_NOERROR;
+}
+
 mrfstr_res_t mrfstr_alloc(
     mrfstr_t str,  mrfstr_size_t size)
 {

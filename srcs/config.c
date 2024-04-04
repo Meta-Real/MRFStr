@@ -850,27 +850,59 @@ mrfstr_res_t mrfstr_config_limits3_get(
 
 void mrfstr_config_extreme(void)
 {
+    mrfstr_size_t l1, l2, l3;
     mrfstr_byte_t simdset;
 
     mrfstr_cpuid_cputype(NULL, NULL);
     mrfstr_cpuid_proccnt(&_mrfstr_config.tcount);
     mrfstr_config_thread_priority(MRFSTR_CONFIG_PRIORITY_HIGHEST);
 
-    /* temporary */
-    _mrfstr_mem_ntlimit = (mrfstr_size_t)-0x200000;
-    _mrfstr_mem_ntrlimit = 0x200000;
-    _mrfstr_cmp_load = (mrfstr_size_t)-0x100000;
-    _mrfstr_searchchr_load = (mrfstr_size_t)-0x100000;
-    _mrfstr_config.mem_tlimit = 0x8000000;
-    _mrfstr_config.move_tlimit = 0x10000;
-    _mrfstr_config.rev_tlimit = 0x8000000;
-    _mrfstr_config.replchr_tlimit = 0x8000000;
-    _mrfstr_config.cmp_tlimit = 0x8000000;
-    _mrfstr_config.searchchr_tlimit = 0x8000000;
-    _mrfstr_config.strlen_tlimit = 0x8000000;
-
     mrfstr_cpuid_funccnt(NULL);
     simdset = mrfstr_cpuid_simdset();
+    l1 = mrfstr_cpuid_cachesize(&l2, &l3);
+
+    if (l3)
+    {
+        _mrfstr_mem_ntrlimit = l3 >> 1;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)l2;
+        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)l2;
+        _mrfstr_config.move_tlimit = l1;
+        _mrfstr_config.mem_tlimit = l3 << 3;
+    }
+    else if (l2)
+    {
+        _mrfstr_mem_ntrlimit = l2 >> 1;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)l1;
+        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)l1;
+        _mrfstr_config.move_tlimit = l1 >> 1;
+        _mrfstr_config.mem_tlimit = l2 << 3;
+    }
+    else if (l1)
+    {
+        _mrfstr_mem_ntrlimit = l1 >> 1;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_cmp_load = 1;
+        _mrfstr_searchchr_load = 1;
+        _mrfstr_config.move_tlimit = l1 >> 2;
+        _mrfstr_config.mem_tlimit = l1 << 3;
+    }
+    else
+    {
+        _mrfstr_mem_ntlimit = 1;
+        _mrfstr_mem_ntrlimit = (mrfstr_size_t)-1;
+        _mrfstr_cmp_load = 1;
+        _mrfstr_searchchr_load = 1;
+        _mrfstr_config.move_tlimit = 1024;
+        _mrfstr_config.mem_tlimit = (mrfstr_size_t)-1;
+    }
+
+    _mrfstr_config.rev_tlimit = _mrfstr_config.mem_tlimit;
+    _mrfstr_config.replchr_tlimit = _mrfstr_config.mem_tlimit;
+    _mrfstr_config.cmp_tlimit = _mrfstr_config.mem_tlimit;
+    _mrfstr_config.searchchr_tlimit = _mrfstr_config.mem_tlimit;
+    _mrfstr_config.strlen_tlimit = _mrfstr_config.mem_tlimit;
 
     if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX512F))
     {

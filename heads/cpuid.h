@@ -36,6 +36,7 @@ mrfstr_byte_t mrfstr_cpuid_simdset(void);
 mrfstr_byte_t mrfstr_cpuid_proccnt(
     mrfstr_byte_t *logical);
 
-mrfstr_short_t mrfstr_cpuid_cacheline(void);
+mrfstr_size_t mrfstr_cpuid_cachesize(
+    mrfstr_size_t *l2, mrfstr_size_t *l3);
 
 #endif

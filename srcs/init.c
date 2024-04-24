@@ -87,7 +87,9 @@ void mrfstr_frees(
     va_start(strs, str);
     do
     {
-        free(MRFSTR_DATA(str));
+        if (MRFSTR_CAPA(str))
+            free(MRFSTR_DATA(str));
+
         str = va_arg(strs, mrfstr_p);
     } while (str);
     va_end(strs);

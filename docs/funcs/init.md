@@ -111,7 +111,7 @@ Version 1.3.0:
 mrfstr_res_t mrfstr_alloc(mrfstr_t str,  mrfstr_size_t size)
 ```
 
-Allocates `size` bytes from memory for the `str`. The value of `str` should be empty or it will lead to memory leakage. \
+Allocates `size` bytes from memory for the `str`. The value of `str` should be empty or it leads to memory leakage. \
 This function only serves for performance purposes since the MRFStr library handles memory allocation internally. \
 
 **Error codes**:

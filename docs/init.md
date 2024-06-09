@@ -7,8 +7,8 @@ void mrfstr_init(mrfstr_t str)
 Initializes the `str` structure with `NULL` value. \
 This function (or other init functions) must be called before any usage of the structure.
 
-**First version**: 1.0.0
-**Last change**: 1.3.0
+**First version**: 1.0.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -36,8 +36,8 @@ mrfstr_t str1, str2, str3;
 mrfstr_inits(str1, str2, str3, NULL);
 ```
 
-**First version**: 1.3.0
-**Last change**: 1.3.0
+**First version**: 1.3.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.3.0:
@@ -53,8 +53,8 @@ Version 1.3.0:
 Initializes the `str` structure with a given data. The data must be null-terminated. \
 This function (or other init functions) must be called before any usage of the structure.
 
-**First version**: 1.0.0
-**Last change**: 1.3.0
+**First version**: 1.0.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -75,8 +75,8 @@ void mrfstr_init_nstr(mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size)
 Initializes the `str` structure with a given data and its length in bytes. The data doesn't need to be null-terminated. \
 This function (or other init functions) must be called before any usage of the structure.
 
-**First version**: 1.0.0
-**Last change**: 1.3.0
+**First version**: 1.0.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -97,8 +97,8 @@ Initializes the `str` structure with empty value and allocates `size` bytes from
 This function only serves for performance purposes since the MRFStr library handles memory allocation internally. \
 This function (or other init functions) must be called before any usage of the structure.
 
-**First version**: 1.3.0
-**Last change**: 1.3.0
+**First version**: 1.3.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.3.0:
@@ -118,8 +118,8 @@ This function only serves for performance purposes since the MRFStr library hand
 
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -134,8 +134,8 @@ void mrfstr_free(mrfstr_t str)
 
 Frees the `str` from memory. If this function is called, the `str` must be initialized again for reuse.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -161,8 +161,8 @@ mrfstr_inits(str1, str2, str3, NULL);
 mrfstr_frees(str1, str2, str3, NULL);
 ```
 
-**First version**: 1.3.0
-**Last change**: 1.3.0
+**First version**: 1.3.0 \
+**Last change**: 1.3.0 \
 **Changelog**:
 
 Version 1.3.0:
@@ -177,8 +177,8 @@ void mrfstr_clear(mrfstr_t str)
 
 Clears value of the `str` structure but unlike `mrfstr_free` function, the structure can be used again.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -199,8 +199,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, the value of `str` stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -222,8 +222,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, it's not guaranteed that the value of `str` stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -244,8 +244,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, the value of `str` stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -267,8 +267,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, it's not guaranteed that the value of `str` stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -289,8 +289,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, the value of `str` (all of it) stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -312,8 +312,8 @@ This function only serves for performance purposes since the MRFStr library hand
 1. `MRFSTR_RES_MEM_ERROR`: The function failed to allocate `size` bytes from memory. \
 In this case, it's not guaranteed that the value of `str` stays the same.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:
@@ -328,8 +328,8 @@ void mrfstr_swap(mrfstr_t str1, mrfstr_t str2)
 
 Swaps all of the data of `str1` and `str2`.
 
-**First version**: 1.0.0
-**Last change**: 1.0.0
+**First version**: 1.0.0 \
+**Last change**: 1.0.0 \
 **Changelog**:
 
 Version 1.0.0:

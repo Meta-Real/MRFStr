@@ -12,8 +12,8 @@
 ; The above copyright notice and this permission notice shall be included in all
 ; copies or substantial portions of the Software.
 
-; mrfstr_byte_t mrfstr_cpuid_proccnt(
-;     mrfstr_byte_t *logical)
+; mrfstr_ubyte_t mrfstr_cpuid_proccnt(
+;     mrfstr_ubyte_t *logical)
 ; PRE: mrfstr_cpuid_cputype
 
     extern _is_intel : db

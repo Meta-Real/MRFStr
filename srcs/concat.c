@@ -276,7 +276,7 @@ mrfstr_res_t mrfstr_insert(
         size = MRFSTR_SIZE(res) - idx;
         MRFSTR_SIZE(res) += MRFSTR_SIZE(str2);
         if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
-            MRFSTR_REALLOC(res, MRFSTR_SIZE(res));
+            MRFSTR_SAFE_REALLOC(res, MRFSTR_SIZE(res));
 
         ptr = MRFSTR_DATA(res) + idx;
         if (res == str2)
@@ -311,7 +311,7 @@ mrfstr_res_t mrfstr_insert(
 
         size = MRFSTR_SIZE(str1) + MRFSTR_SIZE(res);
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_REALLOC(res, size);
+            MRFSTR_SAFE_REALLOC(res, size);
 
         if (!MRFSTR_SIZE(res))
         {
@@ -381,7 +381,7 @@ mrfstr_res_t mrfstr_n_insert(
         rsize = MRFSTR_SIZE(res) - idx;
         MRFSTR_SIZE(res) += size;
         if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
-            MRFSTR_REALLOC(res, MRFSTR_SIZE(res));
+            MRFSTR_SAFE_REALLOC(res, MRFSTR_SIZE(res));
 
         ptr = MRFSTR_DATA(res) + idx;
         if (res == str2)
@@ -416,7 +416,7 @@ mrfstr_res_t mrfstr_n_insert(
 
         rsize = MRFSTR_SIZE(str1) + MRFSTR_SIZE(res);
         if (MRFSTR_CAPA(res) < rsize)
-            MRFSTR_REALLOC(res, rsize);
+            MRFSTR_SAFE_REALLOC(res, rsize);
 
         if (!MRFSTR_SIZE(res))
         {
@@ -483,7 +483,7 @@ mrfstr_res_t mrfstr_insert_nstr(
         size = MRFSTR_SIZE(res) - idx;
         MRFSTR_SIZE(res) += size2;
         if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
-            MRFSTR_REALLOC(res, MRFSTR_SIZE(res));
+            MRFSTR_SAFE_REALLOC(res, MRFSTR_SIZE(res));
 
         ptr = MRFSTR_DATA(res) + idx;
         if (size)
@@ -540,7 +540,7 @@ mrfstr_res_t mrfstr_insert_chr(
         size = MRFSTR_SIZE(res) - idx;
         MRFSTR_SIZE(res)++;
         if (MRFSTR_CAPA(res) < MRFSTR_SIZE(res))
-            MRFSTR_REALLOC(res, MRFSTR_SIZE(res));
+            MRFSTR_SAFE_REALLOC(res, MRFSTR_SIZE(res));
 
         ptr = MRFSTR_DATA(res) + idx;
         if (size)

@@ -19,7 +19,7 @@ copies or substantial portions of the Software.
 mrfstr_size_t mrfstr_strlen(
     mrfstr_data_ct str)
 {
-    mrfstr_byte_t align, i;
+    mrfstr_ubyte_t align, i;
 
     if (!str)
         return 0;

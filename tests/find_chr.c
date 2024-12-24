@@ -28,7 +28,7 @@ copies or substantial portions of the Software.
         else                                                  \
         {                                                     \
             mrfstr_size_t idx;                                \
-            mrfstr_byte_t i;                                  \
+            mrfstr_ubyte_t i;                                  \
                                                               \
             for (i = 0; i != 100; i++)                        \
             {                                                 \

@@ -12,8 +12,8 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-# mrfstr_byte_t mrfstr_cpuid_funccnt(
-#     mrfstr_byte_t *ext)
+# mrfstr_ubyte_t mrfstr_cpuid_funccnt(
+#     mrfstr_ubyte_t *ext)
 
 #ifdef WIN32
 #define ext1 %rcx

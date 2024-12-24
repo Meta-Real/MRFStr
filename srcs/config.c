@@ -73,7 +73,7 @@ mrfstr_res_t mrfstr_config(
 }
 
 void mrfstr_config_thread_count(
-    mrfstr_byte_t tcount)
+    mrfstr_ubyte_t tcount)
 {
     if (tcount)
         _mrfstr_config.tcount = tcount;
@@ -91,7 +91,7 @@ void mrfstr_config_thread_count_max(
 }
 
 void mrfstr_config_stdalloc(
-    mrfstr_short_t stdalloc)
+    mrfstr_ushort_t stdalloc)
 {
     if (stdalloc)
         _mrfstr_config.stdalloc = stdalloc;
@@ -102,7 +102,7 @@ mrfstr_res_t mrfstr_config_thread_priority(
 {
 #ifdef MRFSTR_BUILD_UNIX
     int policy;
-    mrfstr_byte_t pmax, pmin;
+    mrfstr_ubyte_t pmax, pmin;
     pthread_attr_t attr;
 
     if (priority == MRFSTR_CONFIG_PRIORITY_NORMAL)
@@ -127,12 +127,12 @@ mrfstr_res_t mrfstr_config_thread_priority(
         _mrfstr_config.tprior = pmin;
         break;
     case MRFSTR_CONFIG_PRIORITY_LOW:
-        _mrfstr_config.tprior = (mrfstr_byte_t)
-            ((((mrfstr_short_t)pmin << 1) + pmax) / 3);
+        _mrfstr_config.tprior = (mrfstr_ubyte_t)
+            ((((mrfstr_ushort_t)pmin << 1) + pmax) / 3);
         break;
     case MRFSTR_CONFIG_PRIORITY_HIGH:
-        _mrfstr_config.tprior = (mrfstr_byte_t)
-            ((pmin + ((mrfstr_short_t)pmax << 1)) / 3);
+        _mrfstr_config.tprior = (mrfstr_ubyte_t)
+            ((pmin + ((mrfstr_ushort_t)pmax << 1)) / 3);
         break;
     case MRFSTR_CONFIG_PRIORITY_HIGHEST:
         _mrfstr_config.tprior = pmax;
@@ -181,7 +181,7 @@ mrfstr_res_t mrfstr_config_func(
     mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi)
 {
     mrfstr_cpuid_funccnt(NULL);
-    mrfstr_byte_t simdset = mrfstr_cpuid_simdset();
+    mrfstr_ubyte_t simdset = mrfstr_cpuid_simdset();
 
     switch (type)
     {
@@ -732,7 +732,7 @@ mrfstr_res_t mrfstr_config_limits2(
             _mrfstr_config.cmp_tlimit = limit1;
         if (limit2)
         {
-            mrfstr_byte_t rem;
+            mrfstr_ubyte_t rem;
 
             rem = limit2 & MRFSTR_ALIGN_MASK;
             _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
@@ -743,7 +743,7 @@ mrfstr_res_t mrfstr_config_limits2(
             _mrfstr_config.searchchr_tlimit = limit1;
         if (limit2)
         {
-            mrfstr_byte_t rem;
+            mrfstr_ubyte_t rem;
 
             rem = limit2 & MRFSTR_ALIGN_MASK;
             _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
@@ -768,7 +768,7 @@ mrfstr_res_t mrfstr_config_limits3(
             _mrfstr_config.move_tlimit = limit2;
         if (limit3)
         {
-            mrfstr_byte_t rem;
+            mrfstr_ubyte_t rem;
 
             rem = limit3 & MRFSTR_ALIGN_MASK;
             limit3 -= rem;
@@ -851,7 +851,7 @@ mrfstr_res_t mrfstr_config_limits3_get(
 void mrfstr_config_extreme(void)
 {
     mrfstr_size_t l1, l2, l3;
-    mrfstr_byte_t simdset;
+    mrfstr_ubyte_t simdset;
 
     mrfstr_cpuid_cputype(NULL, NULL);
     mrfstr_cpuid_proccnt(&_mrfstr_config.tcount);

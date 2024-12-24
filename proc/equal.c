@@ -45,8 +45,8 @@ DWORD WINAPI __mrfstr_equal_threaded(
 mrfstr_bool_t __mrfstr_equal(
     mrfstr_data_ct str1, mrfstr_data_ct str2, mrfstr_size_t size)
 {
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     volatile mrfstr_bool_t res;
     mrfstr_thread_t *threads;
     mrfstr_equal_t data;

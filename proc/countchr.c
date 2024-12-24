@@ -46,8 +46,8 @@ mrfstr_size_t __mrfstr_countchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     mrfstr_size_t tmp;
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     volatile mrfstr_size_t count;
     mrfstr_thread_t *threads;
     mrfstr_countchr_t data;

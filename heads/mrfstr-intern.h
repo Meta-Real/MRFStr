@@ -43,6 +43,15 @@ copies or substantial portions of the Software.
         MRFSTR_CAPA(x) = size;                                                       \
     } while (0)
 
+#define MRFSTR_SAFE_REALLOC(x, size) \
+    do                               \
+    {                                \
+        if (MRFSTR_CAPA(x))          \
+            MRFSTR_REALLOC(x, size); \
+        else                         \
+            MRFSTR_ALLOC(x, size);   \
+    } while (0)
+
 #define MRFSTR_CLEAR_REALLOC(x, size)                                        \
     do                                                                       \
     {                                                                        \
@@ -181,10 +190,10 @@ struct __MRFSTR_CONFIG_T
 
     /* general */
 
-    mrfstr_byte_t tcount;
+    mrfstr_ubyte_t tcount;
 
-    mrfstr_sbyte_t tprior;
-    mrfstr_short_t stdalloc;
+    mrfstr_byte_t tprior;
+    mrfstr_ushort_t stdalloc;
 };
 #pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
@@ -199,7 +208,7 @@ extern mrfstr_config_t _mrfstr_config;
         if (size > _mrfstr_config.tcount * tsize)   \
             tcount = _mrfstr_config.tcount;         \
         else                                        \
-            tcount = (mrfstr_byte_t)(size / tsize); \
+            tcount = (mrfstr_ubyte_t)(size / tsize); \
     } while (0)
 
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))

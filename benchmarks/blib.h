@@ -76,7 +76,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     {                                                                           \
         mrfstr_data_t ptr;                                                      \
         mrfstr_size_t start, step;                                              \
-        mrfstr_short_t i;                                                       \
+        mrfstr_ushort_t i;                                                       \
         mrfstr_bool_t exponential;                                              \
                                                                                 \
         start = 64;                                                             \
@@ -176,7 +176,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                                                                                 \
             if (!memcmp(ptr, "time=", 5))                                       \
             {                                                                   \
-                ntime = (mrfstr_short_t)strtoull(ptr + 5, &ptr, 10);            \
+                ntime = (mrfstr_ushort_t)strtoull(ptr + 5, &ptr, 10);            \
                 switch (*ptr)                                                   \
                 {                                                               \
                 case '\0':                                                      \
@@ -197,7 +197,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                                                                                 \
             if (!memcmp(ptr, "count=", 6))                                      \
             {                                                                   \
-                ncount = (mrfstr_short_t)strtoull(ptr + 6, NULL, 10);           \
+                ncount = (mrfstr_ushort_t)strtoull(ptr + 6, NULL, 10);           \
                 continue;                                                       \
             }                                                                   \
                                                                                 \
@@ -215,10 +215,10 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         }                                                                       \
                                                                                 \
         if (exponential)                                                        \
-            nsec = (mrfstr_short_t)(log2((mrfstr_double_t)end / start) /        \
+            nsec = (mrfstr_ushort_t)(log2((mrfstr_double_t)end / start) /        \
                 log2((mrfstr_double_t)step) + 1);                               \
         else                                                                    \
-            nsec = (mrfstr_short_t)((end - start) / step + 1);                  \
+            nsec = (mrfstr_ushort_t)((end - start) / step + 1);                  \
                                                                                 \
         tests = (mrfstr_blib_test_t*)malloc(nsec * sizeof(mrfstr_blib_test_t)); \
         if (!tests)                                                             \
@@ -273,8 +273,8 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
 
 #define MRFSTR_BLIB_VARS                \
     mrfstr_size_t end;                  \
-    mrfstr_short_t nsec, ntime, ncount; \
-    mrfstr_byte_t format;               \
+    mrfstr_ushort_t nsec, ntime, ncount; \
+    mrfstr_ubyte_t format;               \
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
@@ -284,9 +284,9 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     do                                                                     \
     {                                                                      \
         struct timeval _start, _end;                                       \
-        mrfstr_longlong_t _total;                                          \
+        mrfstr_ulong_t _total;                                          \
         mrfstr_size_t _count;                                              \
-        mrfstr_byte_t _i;                                                  \
+        mrfstr_ubyte_t _i;                                                  \
                                                                            \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                              \
         {                                                                  \
@@ -336,9 +336,9 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     do                                                              \
     {                                                               \
         struct timeval _start, _end;                                \
-        mrfstr_longlong_t _total;                                   \
+        mrfstr_ulong_t _total;                                   \
         mrfstr_size_t _count;                                       \
-        mrfstr_byte_t _i;                                           \
+        mrfstr_ubyte_t _i;                                           \
         mrfstr_double_t _msc;                                       \
                                                                     \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                       \
@@ -388,8 +388,8 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
 #define MRFSTR_BLIB_VARS                \
     LARGE_INTEGER freq;                 \
     mrfstr_size_t end;                  \
-    mrfstr_short_t nsec, ntime, ncount; \
-    mrfstr_byte_t format;               \
+    mrfstr_ushort_t nsec, ntime, ncount; \
+    mrfstr_ubyte_t format;               \
     FILE *file;                         \
     mrfstr_blib_test_t *tests
 
@@ -405,7 +405,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
     {                                                                          \
         LARGE_INTEGER _start, _end, _total;                                    \
         mrfstr_size_t _count;                                                  \
-        mrfstr_byte_t _i;                                                      \
+        mrfstr_ubyte_t _i;                                                      \
                                                                                \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
         {                                                                      \
@@ -457,7 +457,7 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
         LARGE_INTEGER _start, _end, _total;                                    \
         mrfstr_size_t _count;                                                  \
         mrfstr_double_t _msc;                                                  \
-        mrfstr_byte_t _i;                                                      \
+        mrfstr_ubyte_t _i;                                                      \
                                                                                \
         if (format == MRFSTR_BLIB_FORMAT_CSV)                                  \
             fprintf(file, "%s\t", name);                                       \

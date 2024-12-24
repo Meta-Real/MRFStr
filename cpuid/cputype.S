@@ -12,8 +12,8 @@
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
-# mrfstr_byte_t mrfstr_cpuid_cputype(
-#     mrfstr_byte_t *family, mrfstr_byte_t *model)
+# mrfstr_ubyte_t mrfstr_cpuid_cputype(
+#     mrfstr_ubyte_t *family, mrfstr_ubyte_t *model)
 
 #ifdef WIN32
 #define family1 %rcx

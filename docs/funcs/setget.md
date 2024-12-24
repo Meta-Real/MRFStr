@@ -1,4 +1,6 @@
-# MRFStr version 1.2.0 documentation
+# MRFStr version 1.3.0 documentation
+
+<br></br>
 
 ```c
 mrfstr_res_t mrfstr_set(mrfstr_t dst, mrfstr_ct src)

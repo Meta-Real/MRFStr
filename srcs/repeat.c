@@ -110,7 +110,7 @@ mrfstr_res_t mrfstr_fill(
         mrfstr_size_t diff;
 
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_REALLOC(res, size);
+            MRFSTR_SAFE_REALLOC(res, size);
 
         diff = size - MRFSTR_SIZE(res);
         if (MRFSTR_SIZE(res))
@@ -160,7 +160,7 @@ mrfstr_res_t mrfstr_rfill(
     if (res == str)
     {
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_REALLOC(res, size);
+            MRFSTR_SAFE_REALLOC(res, size);
 
         __mrfstr_fill(MRFSTR_DATA(res) + MRFSTR_SIZE(res), chr, size - MRFSTR_SIZE(res));
         MRFSTR_SIZE(res) = size;

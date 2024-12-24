@@ -26,15 +26,15 @@ enum __MRFSTR_CPUID_VENDOR_ENUM
     MRFSTR_CPUID_VENDOR_AMD
 };
 
-mrfstr_byte_t mrfstr_cpuid_cputype(
-    mrfstr_byte_t *family, mrfstr_byte_t *model);
-mrfstr_byte_t mrfstr_cpuid_funccnt(
-    mrfstr_byte_t *ext);
+mrfstr_ubyte_t mrfstr_cpuid_cputype(
+    mrfstr_ubyte_t *family, mrfstr_ubyte_t *model);
+mrfstr_ubyte_t mrfstr_cpuid_funccnt(
+    mrfstr_ubyte_t *ext);
 
-mrfstr_byte_t mrfstr_cpuid_simdset(void);
+mrfstr_ubyte_t mrfstr_cpuid_simdset(void);
 
-mrfstr_byte_t mrfstr_cpuid_proccnt(
-    mrfstr_byte_t *logical);
+mrfstr_ubyte_t mrfstr_cpuid_proccnt(
+    mrfstr_ubyte_t *logical);
 
 mrfstr_size_t mrfstr_cpuid_cachesize(
     mrfstr_size_t *l2, mrfstr_size_t *l3);

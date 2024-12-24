@@ -45,8 +45,8 @@ DWORD WINAPI __mrfstr_contchr_threaded(
 mrfstr_bool_t __mrfstr_contchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     volatile mrfstr_bool_t res;
     mrfstr_thread_t *threads;
     mrfstr_contchr_t data;

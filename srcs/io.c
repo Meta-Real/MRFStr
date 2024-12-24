@@ -42,50 +42,60 @@ mrfstr_res_t mrfstr_import(
 {
     mrfstr_data_t ptr;
     mrfstr_size_t capa;
-    mrfstr_long_t alloc;
-    mrfstr_short_t newline_idx;
+    mrfstr_uint_t alloc;
+    mrfstr_ushort_t newline_idx;
 
     MRFSTR_SIZE(str) = 0;
     capa = MRFSTR_CAPA(str);
     ptr = MRFSTR_DATA(str);
 
-    alloc = (mrfstr_long_t)_mrfstr_config.stdalloc + 1;
+    alloc = (mrfstr_uint_t)_mrfstr_config.stdalloc + 1;
     newline_idx = _mrfstr_config.stdalloc - 1;
     while (capa > alloc)
     {
-        capa -= alloc;
-
         ptr[_mrfstr_config.stdalloc] = EOF;
-        if (!fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin))
+        if (!fgets(ptr, alloc, stdin))
             return MRFSTR_RES_READ_ERROR;
 
-        if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
+        if (ptr[_mrfstr_config.stdalloc] == EOF)
         {
             MRFSTR_SIZE(str) += mrfstr_strlen(ptr) - 1;
+            return MRFSTR_RES_NOERROR;
+        }
+        if (ptr[newline_idx] == '\n')
+        {
+            MRFSTR_SIZE(str) += newline_idx;
             return MRFSTR_RES_NOERROR;
         }
 
         ptr += _mrfstr_config.stdalloc;
+        capa -= _mrfstr_config.stdalloc;
         MRFSTR_SIZE(str) += _mrfstr_config.stdalloc;
     }
 
+    MRFSTR_SAFE_REALLOC(str, alloc);
     while (1)
     {
-        MRFSTR_CAPA(str) += alloc;
-        MRFSTR_REALLOC(str, MRFSTR_CAPA(str));
         ptr = MRFSTR_DATA(str) + MRFSTR_SIZE(str);
-
         ptr[_mrfstr_config.stdalloc] = EOF;
-        if (!fgets(ptr, alloc * sizeof(mrfstr_chr_t), stdin))
+
+        if (!fgets(ptr, alloc, stdin))
             return MRFSTR_RES_READ_ERROR;
 
-        if (ptr[_mrfstr_config.stdalloc] == EOF || ptr[newline_idx] == '\n')
+        if (ptr[_mrfstr_config.stdalloc] == EOF)
         {
             MRFSTR_SIZE(str) += mrfstr_strlen(ptr) - 1;
             return MRFSTR_RES_NOERROR;
         }
+        if (ptr[newline_idx] == '\n')
+        {
+            MRFSTR_SIZE(str) += newline_idx;
+            return MRFSTR_RES_NOERROR;
+        }
 
+        MRFSTR_CAPA(str) += _mrfstr_config.stdalloc;
         MRFSTR_SIZE(str) += _mrfstr_config.stdalloc;
+        MRFSTR_REALLOC(str, MRFSTR_CAPA(str));
     }
 }
 

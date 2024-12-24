@@ -1,4 +1,6 @@
-# MRFStr version 1.2.0 documentation
+# MRFStr version 1.3.0 documentation
+
+<br></br>
 
 ```c
 void mrfstr_init(mrfstr_t str)

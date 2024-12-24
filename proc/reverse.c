@@ -59,8 +59,8 @@ void __mrfstr_rev(
 {
     mrfstr_data_t right;
     mrfstr_chr_t chr;
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_rev_t data;
 
@@ -172,8 +172,8 @@ void __mrfstr_rev(
 void __mrfstr_rev2(
     mrfstr_data_t left, mrfstr_data_ct right, mrfstr_size_t size)
 {
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_rev_t data;
 

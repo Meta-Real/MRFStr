@@ -50,7 +50,7 @@ int main(void)
     mrfstr_t res, str;
     mrfstr_data_t cstr, ptr;
     mrfstr_size_t i;
-    mrfstr_short_t j;
+    mrfstr_ushort_t j;
     mrfstr_bool_t first;
 
     mrfstr_config(MRFSTR_CONFIG_LEVEL_EXTREME);

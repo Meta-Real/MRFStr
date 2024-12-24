@@ -20,7 +20,7 @@ copies or substantial portions of the Software.
 #define mrfstr_findchr_rem    \
     for (; rem; rem--, str++) \
         if (chr == *str)      \
-            return (mrfstr_short_t)(str - base)
+            return (mrfstr_ushort_t)(str - base)
 
 #pragma pack(push, 1)
 struct __MRFSTR_FINDCHR_T
@@ -48,8 +48,8 @@ mrfstr_idx_t __mrfstr_findchr(
     mrfstr_data_ct str, mrfstr_chr_t chr, mrfstr_size_t size)
 {
     mrfstr_idx_t idx, start;
-    mrfstr_short_t rem, i;
-    mrfstr_byte_t align, tcount, nthreads;
+    mrfstr_ushort_t rem, i;
+    mrfstr_ubyte_t align, tcount, nthreads;
     volatile mrfstr_idx_t res;
     mrfstr_thread_t *threads;
     mrfstr_findchr_t data;
@@ -165,7 +165,7 @@ single:
         mrfstr_thread_priority;
     }
 
-    tcount -= (mrfstr_byte_t)i;
+    tcount -= (mrfstr_ubyte_t)i;
 
     size *= tcount;
     idx = _mrfstr_config.findchr_tfunc(&res, start, str -= size, chr, size);

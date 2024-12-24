@@ -64,14 +64,14 @@ extern "C"
 /* data types */
 
 typedef uint8_t mrfstr_bool_t;
-typedef int8_t mrfstr_sbyte_t;
-typedef uint8_t mrfstr_byte_t;
-typedef int16_t mrfstr_sshort_t;
-typedef uint16_t mrfstr_short_t;
-typedef int32_t mrfstr_slong_t;
-typedef uint32_t mrfstr_long_t;
-typedef int64_t mrfstr_slonglong_t;
-typedef uint64_t mrfstr_longlong_t;
+typedef int8_t mrfstr_byte_t;
+typedef uint8_t mrfstr_ubyte_t;
+typedef int16_t mrfstr_short_t;
+typedef uint16_t mrfstr_ushort_t;
+typedef int32_t mrfstr_int_t;
+typedef uint32_t mrfstr_uint_t;
+typedef int64_t mrfstr_long_t;
+typedef uint64_t mrfstr_ulong_t;
 
 typedef float mrfstr_float_t;
 typedef double mrfstr_double_t;
@@ -117,7 +117,7 @@ enum __MRFSTR_RES_ENUM
     MRFSTR_RES_TYPE_ERROR,
     MRFSTR_RES_SUPPORT_ERROR
 };
-typedef mrfstr_byte_t mrfstr_res_t;
+typedef mrfstr_ubyte_t mrfstr_res_t;
 
 /* init functions */
 
@@ -382,7 +382,7 @@ enum __MRFSTR_CONFIG_LEVEL_ENUM
     MRFSTR_CONFIG_LEVEL_LIMITED,
     MRFSTR_CONFIG_LEVEL_OFF
 };
-typedef mrfstr_byte_t mrfstr_config_level_t;
+typedef mrfstr_ubyte_t mrfstr_config_level_t;
 
 enum __MRFSTR_CONFIG_FUNC_ENUM
 {
@@ -395,14 +395,14 @@ enum __MRFSTR_CONFIG_FUNC_ENUM
 
     MRFSTR_CONFIG_FUNC_STRLEN
 };
-typedef mrfstr_byte_t mrfstr_config_func_t;
+typedef mrfstr_ubyte_t mrfstr_config_func_t;
 
 enum __MRFSTR_CONFIG_DATA_ENUM
 {
     MRFSTR_CONFIG_DATA_THREAD_COUNT,
     MRFSTR_CONFIG_DATA_STDALLOC
 };
-typedef mrfstr_byte_t mrfstr_config_data_t; 
+typedef mrfstr_ubyte_t mrfstr_config_data_t; 
 
 enum __MRFSTR_CONFIG_SIMD_ENUM
 {
@@ -411,7 +411,7 @@ enum __MRFSTR_CONFIG_SIMD_ENUM
     MRFSTR_CONFIG_SIMD_SSE,
     MRFSTR_CONFIG_SIMD_INT64
 };
-typedef mrfstr_byte_t mrfstr_config_simd_t;
+typedef mrfstr_ubyte_t mrfstr_config_simd_t;
 
 enum __MRFSTR_CONFIG_PRIORITY_ENUM
 {
@@ -421,17 +421,17 @@ enum __MRFSTR_CONFIG_PRIORITY_ENUM
     MRFSTR_CONFIG_PRIORITY_HIGH,
     MRFSTR_CONFIG_PRIORITY_HIGHEST
 };
-typedef mrfstr_byte_t mrfstr_config_priority_t;
+typedef mrfstr_ubyte_t mrfstr_config_priority_t;
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config(
     mrfstr_config_level_t type);
 
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count(
-    mrfstr_byte_t tcount);
+    mrfstr_ubyte_t tcount);
 __MRFSTR_DECLSPEC void mrfstr_config_thread_count_max(
     mrfstr_bool_t use_logical);
 __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
-    mrfstr_short_t stdalloc);
+    mrfstr_ushort_t stdalloc);
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_thread_priority(
     mrfstr_config_priority_t priority);
 

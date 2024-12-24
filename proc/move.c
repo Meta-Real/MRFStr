@@ -50,8 +50,8 @@ void __mrfstr_move(
 {
     mrfstr_data_t tmp, dstc;
     mrfstr_size_t diff, tmpptr;
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_move_t data;
 
@@ -155,8 +155,8 @@ void __mrfstr_rmove(
 {
     mrfstr_data_t tmp, dstc;
     mrfstr_size_t diff, tmpptr;
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_move_t data;
 

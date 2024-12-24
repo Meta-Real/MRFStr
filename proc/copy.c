@@ -40,8 +40,8 @@ DWORD WINAPI __mrfstr_copy_threaded(
 void __mrfstr_copy(
     mrfstr_data_t dst, mrfstr_data_ct src, mrfstr_size_t size)
 {
-    mrfstr_short_t rem;
-    mrfstr_byte_t tcount, nthreads, i;
+    mrfstr_ushort_t rem;
+    mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_copy_t data;
 

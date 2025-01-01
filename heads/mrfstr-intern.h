@@ -99,11 +99,10 @@ enum __MRFSTR_SIMD_ENUM
 
 #define MRFSTR_SUPPORTS_SIMD(x) (simdset >= x)
 
-#define MRFSTR_SLIMIT 0x800
-#define MRFSTR_ALIGN_SIZE 64
+#define MRFSTR_SLIMIT ((mrfstr_size_t)0x800)
+#define MRFSTR_ALIGN_SIZE ((mrfstr_ushort_t)64)
 #define MRFSTR_ALIGN_MASK (MRFSTR_ALIGN_SIZE - 1)
 
-#pragma pack(push, 1)
 struct __MRFSTR_CONFIG_T
 {
     /* mem functions */
@@ -122,9 +121,6 @@ struct __MRFSTR_CONFIG_T
     void (*fill_tfunc)(
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_size_t);
 
-    mrfstr_size_t mem_tlimit;
-    mrfstr_size_t move_tlimit;
-
     /* repl chr functions */
 
     void (*replchr_func)(
@@ -136,8 +132,6 @@ struct __MRFSTR_CONFIG_T
         mrfstr_ptr_t, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
     void (*replchr2_tfunc)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_chr_t, mrfstr_size_t);
-
-    mrfstr_size_t replchr_tlimit;
 
     /* rev functions */
 
@@ -151,8 +145,6 @@ struct __MRFSTR_CONFIG_T
     void (*rev2_tfunc)(
         mrfstr_ptr_t, mrfstr_ptr_ct, mrfstr_size_t);
 
-    mrfstr_size_t rev_tlimit;
-
     /* cmp functions */
 
     mrfstr_bool_t (*equal_func)(
@@ -160,8 +152,6 @@ struct __MRFSTR_CONFIG_T
 
     void (*equal_tfunc)(
         volatile mrfstr_bool_t*, mrfstr_ptr_ct, mrfstr_ptr_ct, mrfstr_size_t);
-
-    mrfstr_size_t cmp_tlimit;
 
     /* search chr functions */
 
@@ -179,35 +169,37 @@ struct __MRFSTR_CONFIG_T
     mrfstr_size_t (*countchr_tfunc)(
         mrfstr_ptr_ct, mrfstr_chr_t, mrfstr_size_t);
 
-    mrfstr_size_t searchchr_tlimit;
-
     /* strlen functions */
 
     mrfstr_size_t (*strlen_func)(
         mrfstr_ptr_ct);
 
-    mrfstr_size_t strlen_tlimit;
-
     /* general */
 
-    mrfstr_ubyte_t tcount;
+    mrfstr_size_t mem_tlimit;
+    mrfstr_size_t move_tlimit;
+    mrfstr_size_t replchr_tlimit;
+    mrfstr_size_t rev_tlimit;
+    mrfstr_size_t cmp_tlimit;
+    mrfstr_size_t searchchr_tlimit;
 
-    mrfstr_byte_t tprior;
     mrfstr_ushort_t stdalloc;
+
+    mrfstr_ubyte_t tcount;
+    mrfstr_byte_t tprior;
 };
-#pragma pack(pop)
 typedef struct __MRFSTR_CONFIG_T mrfstr_config_t;
 extern mrfstr_config_t _mrfstr_config;
 
-#define mrfstr_set_tcount(tlimit)                   \
-    do                                              \
-    {                                               \
-        mrfstr_size_t tsize;                        \
-                                                    \
-        tsize = tlimit >> 1;                        \
-        if (size > _mrfstr_config.tcount * tsize)   \
-            tcount = _mrfstr_config.tcount;         \
-        else                                        \
+#define mrfstr_set_tcount(tlimit)                    \
+    do                                               \
+    {                                                \
+        mrfstr_size_t tsize;                         \
+                                                     \
+        tsize = tlimit >> 1;                         \
+        if (size > _mrfstr_config.tcount * tsize)    \
+            tcount = _mrfstr_config.tcount;          \
+        else                                         \
             tcount = (mrfstr_ubyte_t)(size / tsize); \
     } while (0)
 
@@ -268,10 +260,9 @@ typedef HANDLE mrfstr_mutex_p;
 
 #define mrfstr_thread_priority                                    \
     do                                                            \
-    {                                                             \
         if (_mrfstr_config.tprior != THREAD_PRIORITY_NORMAL)      \
             SetThreadPriority(threads[i], _mrfstr_config.tprior); \
-    } while (0)
+    while (0)
 
 #define mrfstr_close_threads                                \
     do                                                      \

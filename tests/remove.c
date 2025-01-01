@@ -63,8 +63,7 @@ int main(void)
         for (j = 0; j != 0x100; j++)
             *ptr++ = (mrfstr_chr_t)j;
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
     {
         first = MRFSTR_TRUE;
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
@@ -78,8 +77,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
     {
         first = MRFSTR_TRUE;
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
@@ -93,8 +91,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
     {
         first = MRFSTR_TRUE;
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
@@ -108,8 +105,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
+    mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
 
     first = MRFSTR_TRUE;
     MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);

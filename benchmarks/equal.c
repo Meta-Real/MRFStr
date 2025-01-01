@@ -31,7 +31,8 @@ copies or substantial portions of the Software.
 #define MRFSTR_BLIB_OBJ(size) mrfstr_equal(str1, str2)
 #define MRFSTR_BLIB_POST(size)
 
-int main(int argc, mrfstr_data_ct *argv)
+int main(
+    int argc, mrfstr_data_ct *argv)
 {
     mrfstr_t str1, str2;
     mrfstr_data_t cstr1, cstr2;
@@ -53,20 +54,14 @@ int main(int argc, mrfstr_data_ct *argv)
     mrfstr_repeat_chr(str1, '0', end);
     mrfstr_repeat_chr(str2, '0', end);
 
-    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
         MRFSTR_BLIB_ROUND("AVX512");
-
-    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
         MRFSTR_BLIB_ROUND("AVX   ");
-
-    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG,
-            MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_BLIB_CONFIG, MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
         MRFSTR_BLIB_ROUND("SSE   ");
 
-    mrfstr_config_func(MRFSTR_BLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
+    mrfstr_config_func(MRFSTR_BLIB_CONFIG, MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
     MRFSTR_BLIB_ROUND("INT64 ");
 
     mrfstr_free(str1);

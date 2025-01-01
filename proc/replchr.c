@@ -25,7 +25,6 @@ copies or substantial portions of the Software.
     for (; rem; rem--, str++) \
         *res++ = *str == ochr ? nchr : *str
 
-#pragma pack(push, 1)
 struct __MRFSTR_REPLCHR_T
 {
     mrfstr_data_t str;
@@ -34,10 +33,8 @@ struct __MRFSTR_REPLCHR_T
     mrfstr_chr_t ochr;
     mrfstr_chr_t nchr;
 };
-#pragma pack(pop)
 typedef struct __MRFSTR_REPLCHR_T *mrfstr_replchr_t;
 
-#pragma pack(push, 1)
 struct __MRFSTR_REPLCHR2_T
 {
     mrfstr_data_t res;
@@ -47,7 +44,6 @@ struct __MRFSTR_REPLCHR2_T
     mrfstr_chr_t ochr;
     mrfstr_chr_t nchr;
 };
-#pragma pack(pop)
 typedef struct __MRFSTR_REPLCHR2_T *mrfstr_replchr2_t;
 
 #ifdef MRFSTR_BUILD_UNIX
@@ -84,7 +80,7 @@ void __mrfstr_replchr(
 
     if (size < _mrfstr_config.replchr_tlimit || _mrfstr_config.tcount == 1)
     {
-        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -94,8 +90,7 @@ void __mrfstr_replchr(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-        _mrfstr_config.replchr_func(str += size, ochr, nchr,
-            (mrfstr_size_t)-(mrfstr_ssize_t)size);
+        _mrfstr_config.replchr_func(str += size, ochr, nchr, (mrfstr_size_t)-(mrfstr_long_t)size);
 
         mrfstr_replchr_rem;
         return;
@@ -103,7 +98,7 @@ void __mrfstr_replchr(
 
     mrfstr_set_tcount(_mrfstr_config.replchr_tlimit);
 
-    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
@@ -112,7 +107,7 @@ void __mrfstr_replchr(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -174,7 +169,7 @@ void __mrfstr_replchr2(
 
     if (size < _mrfstr_config.replchr_tlimit || _mrfstr_config.tcount == 1)
     {
-        rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)res & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -184,8 +179,7 @@ void __mrfstr_replchr2(
 
         rem = size & MRFSTR_ALIGN_MASK;
         size -= rem;
-        _mrfstr_config.replchr2_func(res += size, str += size, ochr, nchr,
-            (mrfstr_size_t)-(mrfstr_ssize_t)size);
+        _mrfstr_config.replchr2_func(res += size, str += size, ochr, nchr, (mrfstr_size_t)-(mrfstr_long_t)size);
 
         mrfstr_replchr2_rem;
         return;
@@ -193,7 +187,7 @@ void __mrfstr_replchr2(
 
     mrfstr_set_tcount(_mrfstr_config.replchr_tlimit);
 
-    rem = (uintptr_t)res & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)res & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
@@ -202,7 +196,7 @@ void __mrfstr_replchr2(
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));

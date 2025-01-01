@@ -21,7 +21,6 @@ copies or substantial portions of the Software.
         if (*str++ == chr)  \
             count++
 
-#pragma pack(push, 1)
 struct __MRFSTR_COUNTCHR_T
 {
     volatile mrfstr_size_t *count;
@@ -31,7 +30,6 @@ struct __MRFSTR_COUNTCHR_T
     mrfstr_size_t size;
     mrfstr_chr_t chr;
 };
-#pragma pack(pop)
 typedef struct __MRFSTR_COUNTCHR_T *mrfstr_countchr_t;
 
 #ifdef MRFSTR_BUILD_UNIX
@@ -66,7 +64,7 @@ mrfstr_size_t __mrfstr_countchr(
     if (_mrfstr_config.tcount == 1 || size < _mrfstr_config.searchchr_tlimit)
     {
         count = 0;
-        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -75,7 +73,7 @@ mrfstr_size_t __mrfstr_countchr(
         }
 
         rem = size & MRFSTR_ALIGN_MASK;
-        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
+        size = (mrfstr_size_t)-(mrfstr_long_t)(size - rem);
 
 single:
         count += _mrfstr_config.countchr_func(str -= size, chr, size);
@@ -87,7 +85,7 @@ single:
     mrfstr_set_tcount(_mrfstr_config.searchchr_tlimit);
 
     count = 0;
-    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
@@ -96,7 +94,7 @@ single:
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
     mrfstr_create_mutex(mutex)
     {

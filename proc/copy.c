@@ -53,7 +53,7 @@ void __mrfstr_copy(
 
     if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1)
     {
-        rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -62,7 +62,7 @@ void __mrfstr_copy(
         }
 
         rem = size & MRFSTR_ALIGN_MASK;
-        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
+        size = (mrfstr_size_t)-(mrfstr_long_t)(size - rem);
 
 single:
         _mrfstr_config.copy_func(dst -= size, src -= size, size);
@@ -73,7 +73,7 @@ single:
 
     mrfstr_set_tcount(_mrfstr_config.mem_tlimit);
 
-    rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
@@ -82,7 +82,7 @@ single:
     }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));

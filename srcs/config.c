@@ -25,30 +25,29 @@ mrfstr_size_t _mrfstr_searchchr_load = 1;
 
 mrfstr_config_t _mrfstr_config =
 {
-    __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-    __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-    (mrfstr_size_t)-1, (mrfstr_size_t)-1,
-    __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
-    __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
-    (mrfstr_size_t)-1,
-    __mrfstr_i64_rev, __mrfstr_i64_rev2,
-    __mrfstr_i64_rev, __mrfstr_i64_rev2,
-    (mrfstr_size_t)-1,
-    __mrfstr_i64_equal,
-    __mrfstr_i64_tequal,
-    (mrfstr_size_t)-1,
-    __mrfstr_i64_contchr, __mrfstr_i64_findchr, __mrfstr_i64_countchr,
-    __mrfstr_i64_tcontchr, __mrfstr_i64_tfindchr, __mrfstr_i64_countchr,
-    (mrfstr_size_t)-1,
-    __mrfstr_i64_strlen,
-    (mrfstr_size_t)-1,
-    1,
+    .copy_func=__mrfstr_i64_copy, .rcopy_func=__mrfstr_i64_rcopy, .fill_func=__mrfstr_i64_fill,
+    .copy_tfunc=__mrfstr_i64_copy, .rcopy_tfunc=__mrfstr_i64_rcopy, .fill_tfunc=__mrfstr_i64_fill,
+    .mem_tlimit=(mrfstr_size_t)-1, .move_tlimit=(mrfstr_size_t)-1,
+    .replchr_func=__mrfstr_i64_replchr, .replchr2_func=__mrfstr_i64_replchr2,
+    .replchr_tfunc=__mrfstr_i64_replchr, .replchr2_tfunc=__mrfstr_i64_replchr2,
+    .replchr_tlimit=(mrfstr_size_t)-1,
+    .rev_func=__mrfstr_i64_rev, .rev2_func=__mrfstr_i64_rev2,
+    .rev_tfunc=__mrfstr_i64_rev, .rev2_tfunc=__mrfstr_i64_rev2,
+    .rev_tlimit=(mrfstr_size_t)-1,
+    .equal_func=__mrfstr_i64_equal,
+    .equal_tfunc=__mrfstr_i64_tequal,
+    .cmp_tlimit=(mrfstr_size_t)-1,
+    .contchr_func=__mrfstr_i64_contchr, .findchr_func=__mrfstr_i64_findchr, .countchr_func=__mrfstr_i64_countchr,
+    .contchr_tfunc=__mrfstr_i64_tcontchr, .findchr_tfunc=__mrfstr_i64_tfindchr, .countchr_tfunc=__mrfstr_i64_countchr,
+    .searchchr_tlimit=(mrfstr_size_t)-1,
+    .strlen_func=__mrfstr_i64_strlen,
+    .tcount=1,
 #ifdef MRFSTR_BUILD_UNIX
-    0,
+    .tprior=0,
 #elif defined(_WIN32)
-    THREAD_PRIORITY_NORMAL,
+    .tprior=THREAD_PRIORITY_NORMAL,
 #endif
-    64
+    .stdalloc=64
 };
 
 void mrfstr_config_extreme(void);
@@ -127,12 +126,10 @@ mrfstr_res_t mrfstr_config_thread_priority(
         _mrfstr_config.tprior = pmin;
         break;
     case MRFSTR_CONFIG_PRIORITY_LOW:
-        _mrfstr_config.tprior = (mrfstr_ubyte_t)
-            ((((mrfstr_ushort_t)pmin << 1) + pmax) / 3);
+        _mrfstr_config.tprior = (mrfstr_ubyte_t)((((mrfstr_ushort_t)pmin << 1) + pmax) / 3);
         break;
     case MRFSTR_CONFIG_PRIORITY_HIGH:
-        _mrfstr_config.tprior = (mrfstr_ubyte_t)
-            ((pmin + ((mrfstr_ushort_t)pmax << 1)) / 3);
+        _mrfstr_config.tprior = (mrfstr_ubyte_t)((pmin + ((mrfstr_ushort_t)pmax << 1)) / 3);
         break;
     case MRFSTR_CONFIG_PRIORITY_HIGHEST:
         _mrfstr_config.tprior = pmax;
@@ -180,8 +177,10 @@ mrfstr_size_t mrfstr_config_get(
 mrfstr_res_t mrfstr_config_func(
     mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi)
 {
+    mrfstr_ubyte_t simdset;
+
     mrfstr_cpuid_funccnt(NULL);
-    mrfstr_ubyte_t simdset = mrfstr_cpuid_simdset();
+    simdset = mrfstr_cpuid_simdset();
 
     switch (type)
     {
@@ -711,10 +710,6 @@ mrfstr_res_t mrfstr_config_limits1(
         if (limit1)
             _mrfstr_config.rev_tlimit = limit1;
         break;
-    case MRFSTR_CONFIG_FUNC_STRLEN:
-        if (limit1)
-            _mrfstr_config.strlen_tlimit = limit1;
-        break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
     }
@@ -735,7 +730,7 @@ mrfstr_res_t mrfstr_config_limits2(
             mrfstr_ubyte_t rem;
 
             rem = limit2 & MRFSTR_ALIGN_MASK;
-            _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
+            _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_long_t)(limit2 - rem);
         }
         break;
     case MRFSTR_CONFIG_FUNC_SEARCH_CHR:
@@ -746,7 +741,7 @@ mrfstr_res_t mrfstr_config_limits2(
             mrfstr_ubyte_t rem;
 
             rem = limit2 & MRFSTR_ALIGN_MASK;
-            _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)(limit2 - rem);
+            _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_long_t)(limit2 - rem);
         }
         break;
     default:
@@ -773,7 +768,7 @@ mrfstr_res_t mrfstr_config_limits3(
             rem = limit3 & MRFSTR_ALIGN_MASK;
             limit3 -= rem;
 
-            _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)limit3;
+            _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_long_t)limit3;
             _mrfstr_mem_ntrlimit = limit3;
         }
         break;
@@ -813,13 +808,13 @@ mrfstr_res_t mrfstr_config_limits2_get(
         if (limit1)
             *limit1 = _mrfstr_config.cmp_tlimit;
         if (limit2)
-            *limit2 = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_cmp_load;
+            *limit2 = (mrfstr_size_t)-(mrfstr_long_t)_mrfstr_cmp_load;
         break;
     case MRFSTR_CONFIG_FUNC_SEARCH_CHR:
         if (limit1)
             *limit1 = _mrfstr_config.searchchr_tlimit;
         if (limit2)
-            *limit2 = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_searchchr_load;
+            *limit2 = (mrfstr_size_t)-(mrfstr_long_t)_mrfstr_searchchr_load;
         break;
     default:
         return MRFSTR_RES_TYPE_ERROR;
@@ -864,25 +859,25 @@ void mrfstr_config_extreme(void)
     if (l3)
     {
         _mrfstr_mem_ntrlimit = l3 >> 1;
-        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
-        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)l2;
-        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)l2;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_long_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_long_t)l2;
+        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_long_t)l2;
         _mrfstr_config.move_tlimit = l1;
         _mrfstr_config.mem_tlimit = l3 << 3;
     }
     else if (l2)
     {
         _mrfstr_mem_ntrlimit = l2 >> 1;
-        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
-        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_ssize_t)l1;
-        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_ssize_t)l1;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_long_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_cmp_load = (mrfstr_size_t)-(mrfstr_long_t)l1;
+        _mrfstr_searchchr_load = (mrfstr_size_t)-(mrfstr_long_t)l1;
         _mrfstr_config.move_tlimit = l1 >> 1;
         _mrfstr_config.mem_tlimit = l2 << 3;
     }
     else if (l1)
     {
         _mrfstr_mem_ntrlimit = l1 >> 1;
-        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_ssize_t)_mrfstr_mem_ntrlimit;
+        _mrfstr_mem_ntlimit = (mrfstr_size_t)-(mrfstr_long_t)_mrfstr_mem_ntrlimit;
         _mrfstr_cmp_load = 1;
         _mrfstr_searchchr_load = 1;
         _mrfstr_config.move_tlimit = l1 >> 2;
@@ -902,7 +897,6 @@ void mrfstr_config_extreme(void)
     _mrfstr_config.replchr_tlimit = _mrfstr_config.mem_tlimit;
     _mrfstr_config.cmp_tlimit = _mrfstr_config.mem_tlimit;
     _mrfstr_config.searchchr_tlimit = _mrfstr_config.mem_tlimit;
-    _mrfstr_config.strlen_tlimit = _mrfstr_config.mem_tlimit;
 
     if (MRFSTR_SUPPORTS_SIMD(MRFSTR_SIMD_AVX512F))
     {
@@ -1129,29 +1123,28 @@ void mrfstr_config_off(void)
     _mrfstr_searchchr_load = 1;
 
     _mrfstr_config = (mrfstr_config_t){
-        __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-        __mrfstr_i64_copy, __mrfstr_i64_rcopy, __mrfstr_i64_fill,
-        (mrfstr_size_t)-1, (mrfstr_size_t)-1,
-        __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
-        __mrfstr_i64_replchr, __mrfstr_i64_replchr2,
-        (mrfstr_size_t)-1,
-        __mrfstr_i64_rev, __mrfstr_i64_rev2,
-        __mrfstr_i64_rev, __mrfstr_i64_rev2,
-        (mrfstr_size_t)-1,
-        __mrfstr_i64_equal,
-        __mrfstr_i64_tequal,
-        (mrfstr_size_t)-1,
-        __mrfstr_i64_contchr, __mrfstr_i64_findchr, __mrfstr_i64_countchr,
-        __mrfstr_i64_tcontchr, __mrfstr_i64_tfindchr, __mrfstr_i64_countchr,
-        (mrfstr_size_t)-1,
-        __mrfstr_i64_strlen,
-        (mrfstr_size_t)-1,
-        1,
+        .copy_func=__mrfstr_i64_copy, .rcopy_func=__mrfstr_i64_rcopy, .fill_func=__mrfstr_i64_fill,
+        .copy_tfunc=__mrfstr_i64_copy, .rcopy_tfunc=__mrfstr_i64_rcopy, .fill_tfunc=__mrfstr_i64_fill,
+        .mem_tlimit=(mrfstr_size_t)-1, .move_tlimit=(mrfstr_size_t)-1,
+        .replchr_func=__mrfstr_i64_replchr, .replchr2_func=__mrfstr_i64_replchr2,
+        .replchr_tfunc=__mrfstr_i64_replchr, .replchr2_tfunc=__mrfstr_i64_replchr2,
+        .replchr_tlimit=(mrfstr_size_t)-1,
+        .rev_func=__mrfstr_i64_rev, .rev2_func=__mrfstr_i64_rev2,
+        .rev_tfunc=__mrfstr_i64_rev, .rev2_tfunc=__mrfstr_i64_rev2,
+        .rev_tlimit=(mrfstr_size_t)-1,
+        .equal_func=__mrfstr_i64_equal,
+        .equal_tfunc=__mrfstr_i64_tequal,
+        .cmp_tlimit=(mrfstr_size_t)-1,
+        .contchr_func=__mrfstr_i64_contchr, .findchr_func=__mrfstr_i64_findchr, .countchr_func=__mrfstr_i64_countchr,
+        .contchr_tfunc=__mrfstr_i64_tcontchr, .findchr_tfunc=__mrfstr_i64_tfindchr, .countchr_tfunc=__mrfstr_i64_countchr,
+        .searchchr_tlimit=(mrfstr_size_t)-1,
+        .strlen_func=__mrfstr_i64_strlen,
+        .tcount=1,
     #ifdef MRFSTR_BUILD_UNIX
-        0,
+        .tprior=0,
     #elif defined(_WIN32)
-        THREAD_PRIORITY_NORMAL,
+        .tprior=THREAD_PRIORITY_NORMAL,
     #endif
-        64
+        .stdalloc=64
     };
 }

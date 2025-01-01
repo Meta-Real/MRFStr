@@ -28,14 +28,12 @@ copies or substantial portions of the Software.
     while (rem--)       \
         *left++ = *--right
 
-#pragma pack(push, 1)
 struct __MRFSTR_REV_T
 {
     mrfstr_data_t left;
     mrfstr_data_t right;
     mrfstr_size_t size;
 };
-#pragma pack(pop)
 typedef struct __MRFSTR_REV_T *mrfstr_rev_t;
 
 #ifdef MRFSTR_BUILD_UNIX
@@ -78,7 +76,7 @@ void __mrfstr_rev(
 
     if (size < _mrfstr_config.rev_tlimit || _mrfstr_config.tcount == 1)
     {
-        rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -103,7 +101,7 @@ void __mrfstr_rev(
 
     mrfstr_set_tcount(_mrfstr_config.rev_tlimit);
 
-    rem = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
@@ -186,7 +184,7 @@ void __mrfstr_rev2(
 
     if (size < _mrfstr_config.rev_tlimit || _mrfstr_config.tcount == 1)
     {
-        rem = (uintptr_t)left & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)left & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -206,7 +204,7 @@ void __mrfstr_rev2(
 
     mrfstr_set_tcount(_mrfstr_config.rev_tlimit);
 
-    rem = (uintptr_t)left & MRFSTR_ALIGN_MASK;
+    rem = (mrfstr_ulong_t)left & MRFSTR_ALIGN_MASK;
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;

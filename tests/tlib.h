@@ -21,10 +21,10 @@ copies or substantial portions of the Software.
 #include <string.h>
 #include <stdlib.h>
 
-#define MRFSTR_TEST1_SIZE 0x100
-#define MRFSTR_TEST2_SIZE 0x100000
-#define MRFSTR_TEST3_SIZE 0x1000000
-#define MRFSTR_TEST4_SIZE 0x10000000
+#define MRFSTR_TEST1_SIZE ((mrfstr_size_t)0x100)
+#define MRFSTR_TEST2_SIZE ((mrfstr_size_t)0x100000)
+#define MRFSTR_TEST3_SIZE ((mrfstr_size_t)0x1000000)
+#define MRFSTR_TEST4_SIZE ((mrfstr_size_t)0x10000000)
 
 #define MRFSTR_TLIB_ERROR                                     \
     do                                                        \
@@ -71,16 +71,9 @@ copies or substantial portions of the Software.
         }                       \
     } while (0)
 
-#define MRFSTR_TLIB_MEMCPY(x, str, size) \
-    memcpy(MRFSTR_DATA(x), str, size)
-
-#define MRFSTR_TLIB_MEMSET(x, chr, size) \
-    memset(MRFSTR_DATA(x), chr, size)
-
-#define MRFSTR_TLIB_MEMCMP(x, str, size) \
-    (MRFSTR_SIZE(x) == size && !memcmp(MRFSTR_DATA(x), str, size))
-
-#define MRFSTR_GENERATE_RAND \
-    (((mrfstr_size_t)rand() << 16) + rand())
+#define MRFSTR_TLIB_MEMCPY(x, str, size) (memcpy(MRFSTR_DATA(x), str, size))
+#define MRFSTR_TLIB_MEMSET(x, chr, size) (memset(MRFSTR_DATA(x), chr, size))
+#define MRFSTR_TLIB_MEMCMP(x, str, size) (MRFSTR_SIZE(x) == size && !memcmp(MRFSTR_DATA(x), str, size))
+#define MRFSTR_GENERATE_RAND (((mrfstr_size_t)rand() << 16) + rand())
 
 #endif

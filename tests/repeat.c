@@ -22,7 +22,7 @@ copies or substantial portions of the Software.
     do                                            \
     {                                             \
         MRFSTR_SIZE(res) = 8;                     \
-        mrfstr_repeat(res, res, size / 8);        \
+        mrfstr_repeat(res, res, size >> 3);       \
                                                   \
         obj = MRFSTR_TLIB_MEMCMP(res, str, size); \
     } while (0)
@@ -45,8 +45,7 @@ int main(void)
     MRFSTR_TLIB_INIT_STR(str, mrfstr_free(res));
     memset(str, '0', MRFSTR_TEST4_SIZE);
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX512, MRFSTR_CONFIG_SIMD_AVX512) == MRFSTR_RES_NOERROR)
     {
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
         MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
@@ -54,8 +53,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_AVX, MRFSTR_CONFIG_SIMD_AVX) == MRFSTR_RES_NOERROR)
     {
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
         MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
@@ -63,8 +61,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
+    if (mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_SSE, MRFSTR_CONFIG_SIMD_SSE) == MRFSTR_RES_NOERROR)
     {
         MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
         MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);
@@ -72,8 +69,7 @@ int main(void)
         MRFSTR_TLIB_ROUND(MRFSTR_TEST4_SIZE);
     }
 
-    mrfstr_config_func(MRFSTR_TLIB_CONFIG,
-        MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
+    mrfstr_config_func(MRFSTR_TLIB_CONFIG, MRFSTR_CONFIG_SIMD_INT64, MRFSTR_CONFIG_SIMD_INT64);
 
     MRFSTR_TLIB_ROUND(MRFSTR_TEST1_SIZE);
     MRFSTR_TLIB_ROUND(MRFSTR_TEST2_SIZE);

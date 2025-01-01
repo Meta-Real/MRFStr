@@ -119,8 +119,7 @@ mrfstr_res_t mrfstr_n_import(
 }
 
 void mrfstr_fexport(
-    FILE *stream,
-    mrfstr_ct str)
+    FILE *stream, mrfstr_ct str)
 {
     if (!MRFSTR_SIZE(str))
         return;

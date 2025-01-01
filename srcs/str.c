@@ -24,7 +24,7 @@ mrfstr_size_t mrfstr_strlen(
     if (!str)
         return 0;
 
-    align = (uintptr_t)str & MRFSTR_ALIGN_MASK;
+    align = (mrfstr_ulong_t)str & MRFSTR_ALIGN_MASK;
     if (align)
     {
         align = MRFSTR_ALIGN_SIZE - align;

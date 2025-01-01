@@ -18,11 +18,11 @@ copies or substantial portions of the Software.
 #include <string.h>
 
 #define mrfstr_move_rem \
-    while (rem--)        \
+    while (rem--)       \
         *dst++ = *src++
 
 #define mrfstr_rmove_rem \
-    while (rem--)         \
+    while (rem--)        \
         *--dst = *--src
 
 struct __MRFSTR_MOVE_T
@@ -62,10 +62,9 @@ void __mrfstr_move(
     }
 
     diff = src - dst;
-    if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1 ||
-        diff > _mrfstr_config.move_tlimit)
+    if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1 || diff > _mrfstr_config.move_tlimit)
     {
-        rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             rem = MRFSTR_ALIGN_SIZE - rem;
@@ -74,7 +73,7 @@ void __mrfstr_move(
         }
 
         rem = size & MRFSTR_ALIGN_MASK;
-        size = (mrfstr_size_t)-(mrfstr_ssize_t)(size - rem);
+        size = (mrfstr_size_t)-(mrfstr_long_t)(size - rem);
 
 single:
         _mrfstr_config.copy_func(dst -= size, src -= size, size);
@@ -86,7 +85,7 @@ single:
     mrfstr_set_tcount(_mrfstr_config.mem_tlimit);
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
-    size = (mrfstr_size_t)-(mrfstr_ssize_t)((size - rem) / tcount);
+    size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -170,10 +169,9 @@ void __mrfstr_rmove(
     src += size;
 
     diff = dst - src;
-    if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1 ||
-        diff > _mrfstr_config.move_tlimit)
+    if (size < _mrfstr_config.mem_tlimit || _mrfstr_config.tcount == 1 || diff > _mrfstr_config.move_tlimit)
     {
-        rem = (uintptr_t)dst & MRFSTR_ALIGN_MASK;
+        rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
         if (rem)
         {
             size -= rem;

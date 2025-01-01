@@ -25,40 +25,50 @@ extern "C"
 #include <inttypes.h>
 #include <stddef.h>
 
-#ifndef MRFSTR_DONT_INCLUDE_STDIO
-#   if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-#       define __USE_LARGEFILE64
-#   endif
-
-#include <stdio.h>
-#endif
-
 #define MRFSTR_VERSION "1.2.0"
 #define MRFSTR_VERSION_MAJOR 1
 #define MRFSTR_VERSION_MINOR 2
 #define MRFSTR_VERSION_PATCH 0
 
-#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
-#   ifdef _WIN32
-#       define __MRFSTR_DECLSPEC_EXPORT __declspec(dllexport)
-#       define __MRFSTR_DECLSPEC_IMPORT __declspec(dllimport)
-#   else
-#       define __MRFSTR_DECLSPEC_EXPORT
-#       define __MRFSTR_DECLSPEC_IMPORT
-#   endif
+#ifdef __GNUC__
+#define __MRFSTR_DECLSPEC_EXPORT __declspec(__dllexport__)
+#define __MRFSTR_DECLSPEC_IMPORT
+#elif defined(_MSC_VER)
+#define __MRFSTR_DECLSPEC_EXPORT __declspec(dllexport)
+#define __MRFSTR_DECLSPEC_IMPORT __declspec(dllimport)
 #else
-#   define __MRFSTR_DECLSPEC_EXPORT
-#   define __MRFSTR_DECLSPEC_IMPORT
+#define __MRFSTR_DECLSPEC_EXPORT
+#define __MRFSTR_DECLSPEC_IMPORT
 #endif
 
 #ifdef __MRFSTR_SHARED__
-#   ifdef __MRFSTR_COMPILE_TIME__
-#       define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_EXPORT
-#   else
-#       define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_IMPORT
-#   endif
+#ifdef __MRFSTR_COMPILE_TIME__
+#define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_EXPORT
 #else
-#   define __MRFSTR_DECLSPEC
+#define __MRFSTR_DECLSPEC __MRFSTR_DECLSPEC_IMPORT
+#endif
+#else
+#define __MRFSTR_DECLSPEC
+#endif
+
+#ifndef MRFSTR_DONT_INCLUDE_STDIO
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#define __USE_LARGEFILE64
+#endif
+
+#include <stdio.h>
+#endif
+
+#if defined(FILE) || defined(H_STDIO) || defined(_STDIO_H) || defined(_FILE_DEFINED)
+#define MRFSTR_HAVE_FILE
+#endif
+
+#ifdef __GNUC__
+#define extern __inline__
+#elif defined(_MSC_VER)
+#define __MRFSTR_INLINE __inline
+#elif defined(__cplusplus)
+#define __MRFSTR_INLINE inline
 #endif
 
 /* data types */
@@ -73,12 +83,8 @@ typedef uint32_t mrfstr_uint_t;
 typedef int64_t mrfstr_long_t;
 typedef uint64_t mrfstr_ulong_t;
 
-typedef float mrfstr_float_t;
-typedef double mrfstr_double_t;
-
 typedef size_t mrfstr_idx_t;
 typedef size_t mrfstr_size_t;
-typedef intptr_t mrfstr_ssize_t;
 
 typedef char mrfstr_chr_t;
 typedef mrfstr_chr_t *mrfstr_data_t;
@@ -126,8 +132,7 @@ __MRFSTR_DECLSPEC void mrfstr_init(
 __MRFSTR_DECLSPEC void mrfstr_inits(
     mrfstr_p str, ...);
 
-#define mrfstr_init_str(str, data) \
-    mrfstr_init_nstr((str), (data), mrfstr_strlen(data))
+#define mrfstr_init_str(str, data) mrfstr_init_nstr((str), (data), mrfstr_strlen(data))
 __MRFSTR_DECLSPEC void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size);
 
@@ -170,8 +175,7 @@ __MRFSTR_DECLSPEC void mrfstr_swap(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set(
     mrfstr_t dst, mrfstr_ct src);
 
-#define mrfstr_set_str(dst, src) \
-    mrfstr_set_nstr((dst), (src), mrfstr_strlen(src))
+#define mrfstr_set_str(dst, src) mrfstr_set_nstr((dst), (src), mrfstr_strlen(src))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_set_nstr(
     mrfstr_t dst, mrfstr_data_ct src, mrfstr_size_t size);
 
@@ -192,8 +196,7 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_concat(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size);
 
-#define mrfstr_concat_str(res, str1, str2) \
-    mrfstr_concat_nstr((res), (str1), (str2), mrfstr_strlen(str2));
+#define mrfstr_concat_str(res, str1, str2) mrfstr_concat_nstr((res), (str1), (str2), mrfstr_strlen(str2))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat_nstr(
     mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2);
 
@@ -205,8 +208,7 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_insert(
     mrfstr_t res, mrfstr_ct str1, mrfstr_ct str2, mrfstr_idx_t idx, mrfstr_size_t size);
 
-#define mrfstr_insert_str(res, str1, str2, idx) \
-    mrfstr_insert_nstr((res), (str1), (str2), mrfstr_strlen(str2), (idx))
+#define mrfstr_insert_str(res, str1, str2, idx) mrfstr_insert_nstr((res), (str1), (str2), mrfstr_strlen(str2), (idx))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert_nstr(
     mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2, mrfstr_idx_t idx);
 
@@ -252,8 +254,7 @@ __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal(
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal(
     mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size);
 
-#define mrfstr_equal_str(str1, str2) \
-    mrfstr_equal_nstr((str1), (str2), mrfstr_strlen(str2));
+#define mrfstr_equal_str(str1, str2) mrfstr_equal_nstr((str1), (str2), mrfstr_strlen(str2));
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal_str(
     mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
@@ -302,19 +303,20 @@ __MRFSTR_DECLSPEC mrfstr_size_t mrfstr_n_count_chr(
 
 /* data functions */
 
-inline mrfstr_data_t mrfstr_get_data(
+#ifdef __MRFSTR_INLINE
+__MRFSTR_INLINE mrfstr_data_t mrfstr_get_data(
     mrfstr_ct str)
 {
     return MRFSTR_DATA(str);
 }
 
-inline mrfstr_size_t mrfstr_get_size(
+__MRFSTR_INLINE mrfstr_size_t mrfstr_get_size(
     mrfstr_ct str)
 {
     return MRFSTR_SIZE(str);
 }
 
-inline void mrfstr_resize(
+__MRFSTR_INLINE void mrfstr_resize(
     mrfstr_t str, mrfstr_size_t size)
 {
     if (size > MRFSTR_CAPA(str))
@@ -323,7 +325,7 @@ inline void mrfstr_resize(
     MRFSTR_SIZE(str) = size;
 }
 
-inline mrfstr_res_t mrfstr_get_chr(
+__MRFSTR_INLINE mrfstr_res_t mrfstr_get_chr(
     mrfstr_chr_t *chr, mrfstr_ct str, mrfstr_size_t idx)
 {
     if (idx >= MRFSTR_SIZE(str))
@@ -333,7 +335,7 @@ inline mrfstr_res_t mrfstr_get_chr(
     return MRFSTR_RES_NOERROR;
 }
 
-inline mrfstr_res_t mrfstr_modify_chr(
+__MRFSTR_INLINE mrfstr_res_t mrfstr_modify_chr(
     mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx)
 {
     if (idx >= MRFSTR_SIZE(str))
@@ -342,6 +344,7 @@ inline mrfstr_res_t mrfstr_modify_chr(
     MRFSTR_DATA(str)[idx] = chr;
     return MRFSTR_RES_NOERROR;
 }
+#endif
 
 /* io functions */
 
@@ -355,7 +358,7 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_import(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_import(
     mrfstr_t str, mrfstr_size_t size);
 
-#ifndef MRFSTR_DONT_INCLUDE_STDIO
+#ifdef MRFSTR_HAVE_FILE
 __MRFSTR_DECLSPEC void mrfstr_fexport(
     FILE *stream, mrfstr_ct str);
 __MRFSTR_DECLSPEC void mrfstr_n_fexport(

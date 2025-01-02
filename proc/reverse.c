@@ -57,7 +57,7 @@ void __mrfstr_rev(
 {
     mrfstr_data_t right;
     mrfstr_chr_t chr;
-    mrfstr_ushort_t rem;
+    mrfstr_ushort_t rem, tcount2;
     mrfstr_ubyte_t tcount, nthreads, i;
     mrfstr_thread_t *threads;
     mrfstr_rev_t data;
@@ -105,11 +105,13 @@ void __mrfstr_rev(
     if (rem)
     {
         rem = MRFSTR_ALIGN_SIZE - rem;
-        size -= rem;
+        size -= rem << 1;
         mrfstr_rev_rem;
     }
 
-    size = (size - rem) / (tcount << 1);
+    tcount2 = (mrfstr_ushort_t)tcount << 1;
+    rem = size % (MRFSTR_ALIGN_SIZE * tcount2);
+    size = (size - rem) / tcount2;
 
     nthreads = tcount - 1;
     threads = (mrfstr_thread_t*)malloc(nthreads * sizeof(mrfstr_thread_t));
@@ -135,10 +137,7 @@ void __mrfstr_rev(
         if (!data)
             break;
 
-        data->left = str;
-        data->right = right;
-        data->size = size;
-
+        *data = (struct __MRFSTR_REV_T){.left=str, .right=right, .size=size};
         mrfstr_create_thread(__mrfstr_rev_threaded)
         {
             free(data);
@@ -233,10 +232,7 @@ void __mrfstr_rev2(
         if (!data)
             break;
 
-        data->left = left;
-        data->right = (mrfstr_data_t)right;
-        data->size = size;
-
+        *data = (struct __MRFSTR_REV_T){.left=left, .right=(mrfstr_data_t)right, .size=size};
         mrfstr_create_thread(__mrfstr_rev2_threaded)
         {
             free(data);

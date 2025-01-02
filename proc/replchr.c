@@ -126,11 +126,7 @@ void __mrfstr_replchr(
         if (!data)
             break;
 
-        data->str = str -= size;
-        data->size = size;
-        data->ochr = ochr;
-        data->nchr = nchr;
-
+        *data = (struct __MRFSTR_REPLCHR_T){.str=str -= size, .size=size, .ochr=ochr, .nchr=nchr};
         mrfstr_create_thread(__mrfstr_replchr_threaded)
         {
             str += size;
@@ -215,12 +211,7 @@ void __mrfstr_replchr2(
         if (!data)
             break;
 
-        data->res = res -= size;
-        data->str = str -= size;
-        data->size = size;
-        data->ochr = ochr;
-        data->nchr = nchr;
-
+        *data = (struct __MRFSTR_REPLCHR2_T){.res=res -= size, .str=str -= size, .size=size, .ochr=ochr, .nchr=nchr};
         mrfstr_create_thread(__mrfstr_replchr2_threaded)
         {
             res += size;

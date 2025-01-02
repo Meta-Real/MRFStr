@@ -116,12 +116,8 @@ single:
         if (!data)
             break;
 
-        data->count = &count;
-        data->mutex = MRFSTR_CAST_MUTEX(mutex);
-        data->str = str -= size;
-        data->size = size;
-        data->chr = chr;
-
+        *data = (struct __MRFSTR_COUNTCHR_T){.count=&count, .mutex=MRFSTR_CAST_MUTEX(mutex),
+            .str=str -= size, .size = size, .chr=chr};
         mrfstr_create_thread(__mrfstr_countchr_threaded)
         {
             str += size;

@@ -112,11 +112,7 @@ single:
             break;
         }
 
-        data->res = &res;
-        data->str1 = str1 -= size;
-        data->str2 = str2 -= size;
-        data->size = size;
-
+        *data = (struct __MRFSTR_EQUAL_T){.res=&res, .str1=str1 -= size, .str2=str2 -= size, .size=size};
         mrfstr_create_thread(__mrfstr_equal_threaded)
         {
             str1 += size;

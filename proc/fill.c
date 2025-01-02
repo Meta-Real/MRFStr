@@ -99,10 +99,7 @@ void __mrfstr_fill(
         if (!data)
             break;
 
-        data->res = res -= size;
-        data->size = size;
-        data->chr = chr;
-
+        *data = (struct __MRFSTR_FILL_T){.res=res -= size, .size=size, .chr=chr};
         mrfstr_create_thread(__mrfstr_fill_threaded)
         {
             res += size;

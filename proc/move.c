@@ -109,10 +109,7 @@ single:
         if (!data)
             break;
 
-        data->dst = dst -= size;
-        data->src = src -= size;
-        data->size = size;
-
+        *data = (struct __MRFSTR_MOVE_T){.dst=dst -= size, .src=src -= size, .size=size};
         memcpy(tmp + tmpptr, src - diff, diff);
         tmpptr += diff;
 
@@ -215,10 +212,7 @@ single:
         if (!data)
             break;
 
-        data->dst = dst -= size;
-        data->src = src -= size;
-        data->size = size;
-
+        *data = (struct __MRFSTR_MOVE_T){.dst=dst -= size, .src=src -= size, .size=size};
         memcpy(tmp + tmpptr, src, diff);
         tmpptr += diff;
 

@@ -111,11 +111,7 @@ single:
             break;
         }
 
-        data->res = &res;
-        data->str = str -= size;
-        data->size = size;
-        data->chr = chr;
-
+        *data = (struct __MRFSTR_CONTCHR_T){.res=&res, .str=str -= size, .size=size, .chr=chr};
         mrfstr_create_thread(__mrfstr_contchr_threaded)
         {
             str += size;

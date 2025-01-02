@@ -136,13 +136,8 @@ single:
             break;
         }
 
-        data->res = &res;
-        data->mutex = MRFSTR_CAST_MUTEX(mutex);
-        data->start = start;
-        data->str = str -= size;
-        data->size = size;
-        data->chr = chr;
-
+        *data = (struct __MRFSTR_FINDCHR_T){.res=&res, .mutex=MRFSTR_CAST_MUTEX(mutex), .start=start,
+            .str=str -= size, .size=size, .chr=chr};
         mrfstr_create_thread(__mrfstr_findchr_threaded)
         {
             str += size;

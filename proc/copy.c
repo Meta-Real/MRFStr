@@ -98,10 +98,7 @@ single:
         if (!data)
             break;
 
-        data->dst = dst -= size;
-        data->src = src -= size;
-        data->size = size;
-
+        *data = (struct __MRFSTR_COPY_T){.dst=dst -= size, .src=src -= size, .size=size};
         mrfstr_create_thread(__mrfstr_copy_threaded)
         {
             dst += size;

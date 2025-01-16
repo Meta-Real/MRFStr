@@ -159,20 +159,70 @@ mrfstr_res_t mrfstr_config_thread_priority(
     return MRFSTR_RES_NOERROR;
 }
 
-mrfstr_size_t mrfstr_config_get(
-    mrfstr_config_data_t type)
+mrfstr_res_t mrfstr_config_get_ushort(
+    mrfstr_ushort_t *value, mrfstr_config_data_t type)
 {
     switch (type)
     {
-    case MRFSTR_CONFIG_DATA_THREAD_COUNT:
-        return _mrfstr_config.tcount;
     case MRFSTR_CONFIG_DATA_STDALLOC:
-        return _mrfstr_config.stdalloc;
+        if (value)
+            *value = _mrfstr_config.stdalloc;
+        return MRFSTR_RES_NOERROR;
     default:
-        return 0;
+        return MRFSTR_RES_TYPE_ERROR;
     }
 }
 
+mrfstr_res_t mrfstr_config_get_ubyte(
+    mrfstr_ubyte_t *value, mrfstr_config_data_t type)
+{
+    if (type == MRFSTR_CONFIG_DATA_THREAD_COUNT)
+    {
+        if (value)
+            *value = _mrfstr_config.tcount;
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (type != MRFSTR_CONFIG_DATA_THREAD_PRIORITY)
+        return MRFSTR_RES_TYPE_ERROR;
+    if (!value)
+        return MRFSTR_RES_NOERROR;
+
+#ifdef MRFSTR_BUILD_UNIX
+#elif defined(_WIN32)
+    switch (_mrfstr_config.tprior)
+    {
+    case THREAD_PRIORITY_LOWEST:
+        *value = MRFSTR_CONFIG_PRIORITY_LOWEST;
+        break;
+    case THREAD_PRIORITY_BELOW_NORMAL:
+        *value = MRFSTR_CONFIG_PRIORITY_LOW;
+        break;
+    case THREAD_PRIORITY_NORMAL:
+        *value = MRFSTR_CONFIG_PRIORITY_NORMAL;
+        break;
+    case THREAD_PRIORITY_ABOVE_NORMAL:
+        *value = MRFSTR_CONFIG_PRIORITY_HIGH;
+        break;
+    case THREAD_PRIORITY_HIGHEST:
+        *value = MRFSTR_CONFIG_PRIORITY_HIGHEST;
+        break;
+    }
+#endif
+
+    return MRFSTR_RES_NOERROR;
+}
+
+mrfstr_res_t mrfstr_config_get_byte(
+    mrfstr_byte_t *value, mrfstr_config_data_t type)
+{
+    if (type != MRFSTR_CONFIG_DATA_THREAD_PRIORITY)
+        return MRFSTR_RES_TYPE_ERROR;
+
+    if (value)
+        *value = _mrfstr_config.tprior;
+    return MRFSTR_RES_NOERROR;
+}
 
 mrfstr_res_t mrfstr_config_func(
     mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi)

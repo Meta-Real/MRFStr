@@ -84,6 +84,14 @@ single:
 
     mrfstr_set_tcount(_mrfstr_config.mem_tlimit);
 
+    rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
+    if (rem)
+    {
+        rem = MRFSTR_ALIGN_SIZE - rem;
+        size -= rem;
+        mrfstr_move_rem;
+    }
+
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
     size = (mrfstr_size_t)-(mrfstr_long_t)((size - rem) / tcount);
 
@@ -186,6 +194,13 @@ single:
     }
 
     mrfstr_set_tcount(_mrfstr_config.mem_tlimit);
+
+    rem = (mrfstr_ulong_t)dst & MRFSTR_ALIGN_MASK;
+    if (rem)
+    {
+        size -= rem;
+        mrfstr_rmove_rem;
+    }
 
     rem = size % (MRFSTR_ALIGN_SIZE * tcount);
     size = (size - rem) / tcount;

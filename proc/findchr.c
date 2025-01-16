@@ -172,9 +172,13 @@ single:
     mrfstr_close_mutex(mutex);
 
     if (res == MRFSTR_INVIDX)
+    {
         for (i = 0; i != rem; i++)
             if (*str++ == chr)
                 return i - size + start + align;
+        return MRFSTR_INVIDX;
+    }
+
     return res + align;
 }
 

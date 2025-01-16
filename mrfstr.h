@@ -403,7 +403,8 @@ typedef mrfstr_ubyte_t mrfstr_config_func_t;
 enum __MRFSTR_CONFIG_DATA_ENUM
 {
     MRFSTR_CONFIG_DATA_THREAD_COUNT,
-    MRFSTR_CONFIG_DATA_STDALLOC
+    MRFSTR_CONFIG_DATA_STDALLOC,
+    MRFSTR_CONFIG_DATA_THREAD_PRIORITY
 };
 typedef mrfstr_ubyte_t mrfstr_config_data_t; 
 
@@ -438,8 +439,12 @@ __MRFSTR_DECLSPEC void mrfstr_config_stdalloc(
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_thread_priority(
     mrfstr_config_priority_t priority);
 
-__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_config_get(
-    mrfstr_config_data_t type);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_get_ushort(
+    mrfstr_ushort_t *value, mrfstr_config_data_t type);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_get_ubyte(
+    mrfstr_ubyte_t *value, mrfstr_config_data_t type);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_get_byte(
+    mrfstr_byte_t *value, mrfstr_config_data_t type);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_config_func(
     mrfstr_config_func_t type, mrfstr_config_simd_t single, mrfstr_config_simd_t multi);

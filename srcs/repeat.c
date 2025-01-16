@@ -48,14 +48,16 @@ mrfstr_res_t mrfstr_repeat(
     if (size / count != MRFSTR_SIZE(str))
         return MRFSTR_RES_OVERFLOW_ERROR;
 
-    if (MRFSTR_CAPA(res) < size)
-        MRFSTR_CLEAR_REALLOC(res, size);
-
     if (res != str)
     {
+        if (MRFSTR_CAPA(res) < size)
+            MRFSTR_CLEAR_REALLOC(res, size);
+
         __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str), MRFSTR_SIZE(str));
         MRFSTR_SIZE(res) = MRFSTR_SIZE(str);
     }
+    else if (MRFSTR_CAPA(res) < size)
+        MRFSTR_REALLOC(res, size);
 
     diff = size - MRFSTR_SIZE(res);
     while (MRFSTR_SIZE(res) <= diff)

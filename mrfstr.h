@@ -132,9 +132,12 @@ __MRFSTR_DECLSPEC void mrfstr_init(
 __MRFSTR_DECLSPEC void mrfstr_inits(
     mrfstr_p str, ...);
 
-#define mrfstr_init_str(str, data) mrfstr_init_nstr((str), (data), mrfstr_strlen(data))
+__MRFSTR_DECLSPEC void mrfstr_init_str(
+    mrfstr_t str, mrfstr_data_t data);
 __MRFSTR_DECLSPEC void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size);
+__MRFSTR_DECLSPEC void mrfstr_init_nstr2(
+    mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size, mrfstr_size_t capa);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_init_alloc(
     mrfstr_t str, mrfstr_size_t size);
@@ -254,7 +257,7 @@ __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_equal(
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal(
     mrfstr_ct str1, mrfstr_ct str2, mrfstr_size_t size);
 
-#define mrfstr_equal_str(str1, str2) mrfstr_equal_nstr((str1), (str2), mrfstr_strlen(str2));
+#define mrfstr_equal_str(str1, str2) mrfstr_equal_nstr((str1), (str2), mrfstr_strlen(str2))
 __MRFSTR_DECLSPEC mrfstr_bool_t mrfstr_n_equal_str(
     mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
@@ -316,6 +319,12 @@ __MRFSTR_INLINE mrfstr_size_t mrfstr_get_size(
     return MRFSTR_SIZE(str);
 }
 
+__MRFSTR_INLINE mrfstr_size_t mrfstr_get_capa(
+    mrfstr_ct str)
+{
+    return MRFSTR_CAPA(str);
+}
+
 __MRFSTR_INLINE void mrfstr_resize(
     mrfstr_t str, mrfstr_size_t size)
 {
@@ -344,6 +353,21 @@ __MRFSTR_INLINE mrfstr_res_t mrfstr_modify_chr(
     MRFSTR_DATA(str)[idx] = chr;
     return MRFSTR_RES_NOERROR;
 }
+#else
+__MRFSTR_DECLSPEC mrfstr_data_t mrfstr_get_data(
+    mrfstr_ct str);
+__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_get_size(
+    mrfstr_ct str);
+__MRFSTR_DECLSPEC mrfstr_size_t mrfstr_get_capa(
+    mrfstr_ct str);
+
+__MRFSTR_DECLSPEC void mrfstr_resize(
+    mrfstr_t str, mrfstr_size_t size);
+
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_get_chr(
+    mrfstr_chr_t *chr, mrfstr_ct str, mrfstr_size_t idx);
+__MRFSTR_DECLSPEC mrfstr_res_t mrfstr_modify_chr(
+    mrfstr_ct str, mrfstr_chr_t chr, mrfstr_size_t idx);
 #endif
 
 /* io functions */

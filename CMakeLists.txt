@@ -46,8 +46,7 @@ add_library(MRFStr
     srcs/reverse.c srcs/replace_chr.c
     srcs/equal.c
     srcs/contain.c srcs/find.c srcs/count_chr.c
-    srcs/io.c
-    srcs/str.c
+    srcs/data.c srcs/io.c srcs/str.c
     srcs/config.c)
 target_include_directories(MRFStr PUBLIC heads PUBLIC .)
 

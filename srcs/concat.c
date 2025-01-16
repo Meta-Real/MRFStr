@@ -41,7 +41,7 @@ mrfstr_res_t mrfstr_concat(
             return MRFSTR_RES_OVERFLOW_ERROR;
 
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_CLEAR_REALLOC(res, size);
+            MRFSTR_REALLOC(res, size);
 
         __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), MRFSTR_SIZE(str2));
         MRFSTR_SIZE(res) = size;
@@ -68,14 +68,12 @@ mrfstr_res_t mrfstr_concat(
             return MRFSTR_RES_OVERFLOW_ERROR;
 
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_CLEAR_REALLOC(res, size);
+            MRFSTR_REALLOC(res, size);
 
         if (MRFSTR_SIZE(str1) >= MRFSTR_SIZE(res))
-            __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1),
-                MRFSTR_DATA(res), MRFSTR_SIZE(res));
+            __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(res), MRFSTR_SIZE(res));
         else
-            __mrfstr_rmove(MRFSTR_DATA(res) + MRFSTR_SIZE(str1),
-                MRFSTR_DATA(res), MRFSTR_SIZE(res));
+            __mrfstr_rmove(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(res), MRFSTR_SIZE(res));
 
         __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
         MRFSTR_SIZE(res) = size;
@@ -132,9 +130,44 @@ mrfstr_res_t mrfstr_n_concat(
             return MRFSTR_RES_OVERFLOW_ERROR;
 
         if (MRFSTR_CAPA(res) < nsize)
-            MRFSTR_CLEAR_REALLOC(res, nsize);
+            MRFSTR_REALLOC(res, nsize);
 
         __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), MRFSTR_DATA(str2), size);
+        MRFSTR_SIZE(res) = nsize;
+        return MRFSTR_RES_NOERROR;
+    }
+
+    if (res == str2)
+    {
+        if (!MRFSTR_SIZE(str1))
+        {
+            MRFSTR_SIZE(res) = size;
+            return MRFSTR_RES_NOERROR;
+        }
+
+        if (!size)
+        {
+            if (MRFSTR_CAPA(res) < MRFSTR_SIZE(str1))
+                MRFSTR_CLEAR_REALLOC(res, MRFSTR_SIZE(str1));
+
+            __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
+            MRFSTR_SIZE(res) = MRFSTR_SIZE(str1);
+            return MRFSTR_RES_NOERROR;
+        }
+
+        nsize = MRFSTR_SIZE(str1) + size;
+        if (nsize < size)
+            return MRFSTR_RES_OVERFLOW_ERROR;
+
+        if (MRFSTR_CAPA(res) < nsize)
+            MRFSTR_REALLOC(res, nsize);
+
+        if (MRFSTR_SIZE(str1) >= size)
+            __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(res), size);
+        else
+            __mrfstr_rmove(MRFSTR_DATA(res) + MRFSTR_SIZE(str1), MRFSTR_DATA(res), size);
+
+        __mrfstr_copy(MRFSTR_DATA(res), MRFSTR_DATA(str1), MRFSTR_SIZE(str1));
         MRFSTR_SIZE(res) = nsize;
         return MRFSTR_RES_NOERROR;
     }
@@ -186,7 +219,7 @@ mrfstr_res_t mrfstr_concat_nstr(
             return MRFSTR_RES_OVERFLOW_ERROR;
 
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_CLEAR_REALLOC(res, size);
+            MRFSTR_REALLOC(res, size);
 
         __mrfstr_copy(MRFSTR_DATA(res) + MRFSTR_SIZE(res), str2, size2);
         MRFSTR_SIZE(res) = size;
@@ -224,8 +257,8 @@ mrfstr_res_t mrfstr_concat_chr(
     {
         if (!MRFSTR_SIZE(res))
         {
-            if (MRFSTR_CAPA(res) < 1)
-                MRFSTR_CLEAR_REALLOC(res, 1);
+            if (!MRFSTR_CAPA(res))
+                MRFSTR_ALLOC(res, 1);
 
             *MRFSTR_DATA(res) = chr;
             MRFSTR_SIZE(res) = 1;
@@ -237,9 +270,9 @@ mrfstr_res_t mrfstr_concat_chr(
             return MRFSTR_RES_OVERFLOW_ERROR;
 
         if (MRFSTR_CAPA(res) < size)
-            MRFSTR_CLEAR_REALLOC(res, size);
+            MRFSTR_REALLOC(res, size);
 
-        *MRFSTR_DATA(res) = chr;
+        MRFSTR_DATA(res)[MRFSTR_SIZE(res)] = chr;
         MRFSTR_SIZE(res) = size;
         return MRFSTR_RES_NOERROR;
     }

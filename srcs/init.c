@@ -40,12 +40,28 @@ void mrfstr_inits(
     va_end(strs);
 }
 
+void mrfstr_init_str(
+    mrfstr_t str, mrfstr_data_t data)
+{
+    MRFSTR_DATA(str) = data;
+    MRFSTR_SIZE(str) = mrfstr_strlen(data);
+    MRFSTR_CAPA(str) = MRFSTR_SIZE(str) + 1;
+}
+
 void mrfstr_init_nstr(
     mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size)
 {
     MRFSTR_DATA(str) = data;
     MRFSTR_SIZE(str) = size;
     MRFSTR_CAPA(str) = size;
+}
+
+void mrfstr_init_nstr2(
+    mrfstr_t str, mrfstr_data_t data, mrfstr_size_t size, mrfstr_size_t capa)
+{
+    MRFSTR_DATA(str) = data;
+    MRFSTR_SIZE(str) = size;
+    MRFSTR_CAPA(str) = capa;
 }
 
 mrfstr_res_t mrfstr_init_alloc(

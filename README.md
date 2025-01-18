@@ -1,4 +1,4 @@
-# MRFStr Library version 1.2.0
+# MRFStr Library version 1.3.0
 
 MRFStr, short for MetaReal Fast String Library, is a high-performance C library designed to significantly improve the speed of various string operations, including search, copy, compare, and more. \
 This library stands out by harnessing the power of SIMD (Single Instruction, Multiple Data) instructions such as AVX512, AVX, and SSE that ensures optimal performance on modern processors.

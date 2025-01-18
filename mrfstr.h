@@ -96,6 +96,7 @@ typedef const void *mrfstr_ptr_ct;
 #define MRFSTR_TRUE ((mrfstr_bool_t)1)
 #define MRFSTR_FALSE ((mrfstr_bool_t)0)
 
+#define MRFSTR_SIZEMAX ((mrfstr_size_t)-1)
 #define MRFSTR_INVIDX ((mrfstr_idx_t)-1)
 
 struct __MRFSTR_T
@@ -201,7 +202,7 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_concat(
 
 #define mrfstr_concat_str(res, str1, str2) mrfstr_concat_nstr((res), (str1), (str2), mrfstr_strlen(str2))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat_nstr(
-    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2);
+    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_concat_chr(
     mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr);
@@ -213,7 +214,7 @@ __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_n_insert(
 
 #define mrfstr_insert_str(res, str1, str2, idx) mrfstr_insert_nstr((res), (str1), (str2), mrfstr_strlen(str2), (idx))
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert_nstr(
-    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size2, mrfstr_idx_t idx);
+    mrfstr_t res, mrfstr_ct str1, mrfstr_data_ct str2, mrfstr_size_t size, mrfstr_idx_t idx);
 
 __MRFSTR_DECLSPEC mrfstr_res_t mrfstr_insert_chr(
     mrfstr_t res, mrfstr_ct str, mrfstr_chr_t chr, mrfstr_idx_t idx);

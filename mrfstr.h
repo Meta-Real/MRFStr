@@ -64,7 +64,7 @@ extern "C"
 #endif
 
 #ifdef __GNUC__
-#define extern __inline__
+#define __MRFSTR_INLINE inline
 #elif defined(_MSC_VER)
 #define __MRFSTR_INLINE __inline
 #elif defined(__cplusplus)

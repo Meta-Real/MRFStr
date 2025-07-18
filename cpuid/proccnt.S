@@ -20,8 +20,8 @@
 #define logi1 %rcx
 #define logi2 %r8
 #else
-#define logi1 %rsi
-#define logi2 %rsi
+#define logi1 %rdi
+#define logi2 %rdi
 #endif
 
     .extern _is_intel

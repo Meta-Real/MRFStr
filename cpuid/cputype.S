@@ -21,10 +21,10 @@
 #define family2 %r10
 #define model2 %r11
 #else
-#define family1 %rsi
-#define model1 %rdi
-#define family2 %rsi
-#define model2 %rdi
+#define family1 %rdi
+#define model1 %rsi
+#define family2 %rdi
+#define model2 %rsi
 #endif
 
 .data

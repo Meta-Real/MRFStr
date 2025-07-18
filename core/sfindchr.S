@@ -32,21 +32,21 @@
 #define limit2 %rsi
 #define bcopy2 %rdi
 #else
-#define str %rsi
-#define chr %edi
-#define size %rcx
+#define str %rdi
+#define chr %esi
+#define size %rdx
 
-#define rchr %rdi
-#define block %rdx
+#define rchr %rsi
+#define block %rcx
 #define num %r8
 
-#define res2 %rsi
-#define start2 %rdi
-#define str2 %rcx
-#define chr2 %edx
+#define res2 %rdi
+#define start2 %rsi
+#define str2 %rdx
+#define chr2 %ecx
 #define size2 %r8
 
-#define rchr2 %rdx
+#define rchr2 %rcx
 #define size3 %r8
 #define limit2 %r9
 #define bcopy2 %rbx

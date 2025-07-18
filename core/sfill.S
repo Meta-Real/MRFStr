@@ -17,9 +17,9 @@
 #define chr %edx
 #define size %r8
 #else
-#define dst %rsi
-#define chr %edi
-#define size %rcx
+#define dst %rdi
+#define chr %esi
+#define size %rdx
 #endif
 
     .extern _mrfstr_mem_ntlimit

@@ -17,9 +17,9 @@
 #define src %rdx
 #define size %r8
 #else
-#define dst %rsi
-#define src %rdi
-#define size %rcx
+#define dst %rdi
+#define src %rsi
+#define size %rdx
 #endif
 
     .extern _mrfstr_mem_ntlimit

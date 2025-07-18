@@ -17,9 +17,9 @@
 #define right %rdx
 #define size %r8
 #else
-#define left %rsi
-#define right %rdi
-#define size %rcx
+#define left %rdi
+#define right %rsi
+#define size %rdx
 #endif
 
 .text

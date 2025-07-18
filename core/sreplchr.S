@@ -30,22 +30,22 @@
 #define rochr2 %r8
 #define rnchr2 %r9
 #else
-#define str %rsi
-#define ochr %edi
-#define nchr %ecx
-#define size %rdx
+#define str %rdi
+#define ochr %esi
+#define nchr %edx
+#define size %rcx
 
-#define rochr %rdi
-#define rnchr %rcx
+#define rochr %rsi
+#define rnchr %rdx
 
-#define res2 %rsi
-#define str2 %rdi
-#define ochr2 %ecx
-#define nchr2 %edx
+#define res2 %rdi
+#define str2 %rsi
+#define ochr2 %edx
+#define nchr2 %ecx
 #define size2 %r8
 
-#define rochr2 %rcx
-#define rnchr2 %rdx
+#define rochr2 %rdx
+#define rnchr2 %rcx
 #endif
 
 .text

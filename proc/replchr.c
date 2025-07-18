@@ -262,8 +262,7 @@ DWORD WINAPI __mrfstr_replchr2_threaded(
     mrfstr_replchr2_t data;
 
     data = (mrfstr_replchr2_t)args;
-    _mrfstr_config.replchr2_tfunc(
-        data->res, data->str, data->ochr, data->nchr, data->size);
+    _mrfstr_config.replchr2_tfunc(data->res, data->str, data->ochr, data->nchr, data->size);
 
     free(data);
     return MRFSTR_TFUNC_RET;

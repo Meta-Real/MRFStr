@@ -19,8 +19,8 @@
 #define ext1 %rcx
 #define ext2 %r8
 #else
-#define ext1 %rsi
-#define ext2 %rsi
+#define ext1 %rdi
+#define ext2 %rdi
 #endif
 
 .bss

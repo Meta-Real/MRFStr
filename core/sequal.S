@@ -22,14 +22,14 @@
 #define str22 %r8
 #define size2 %r9
 #else
-#define str1 %rsi
-#define str2 %rdi
-#define size %rcx
+#define str1 %rdi
+#define str2 %rsi
+#define size %rdx
 
-#define res2 %rsi
-#define str12 %rdi
-#define str22 %rcx
-#define size2 %rdx
+#define res2 %rdi
+#define str12 %rsi
+#define str22 %rdx
+#define size2 %rcx
 #endif
 
     .extern _mrfstr_cmp_load

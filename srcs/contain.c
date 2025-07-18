@@ -85,8 +85,7 @@ mrfstr_bool_t mrfstr_endswith(
     if (!MRFSTR_SIZE(substr) || str == substr)
         return MRFSTR_TRUE;
 
-    return __mrfstr_equal(MRFSTR_DATA(str) + MRFSTR_SIZE(str) - MRFSTR_SIZE(substr),
-        MRFSTR_DATA(substr), MRFSTR_SIZE(substr));
+    return __mrfstr_equal(MRFSTR_DATA(str) + MRFSTR_SIZE(str) - MRFSTR_SIZE(substr), MRFSTR_DATA(substr), MRFSTR_SIZE(substr));
 }
 
 mrfstr_bool_t mrfstr_endswith_str(

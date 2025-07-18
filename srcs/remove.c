@@ -112,7 +112,6 @@ mrfstr_res_t mrfstr_n_remove(
     if (MRFSTR_SIZE(res) == idx)
         return MRFSTR_RES_NOERROR;
 
-    __mrfstr_copy(MRFSTR_DATA(res) + idx, MRFSTR_DATA(str) + idx + count,
-        MRFSTR_SIZE(res) - idx);
+    __mrfstr_copy(MRFSTR_DATA(res) + idx, MRFSTR_DATA(str) + idx + count, MRFSTR_SIZE(res) - idx);
     return MRFSTR_RES_NOERROR;
 }

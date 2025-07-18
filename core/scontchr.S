@@ -22,14 +22,14 @@
 #define chr2 %r8d
 #define size2 %r9
 #else
-#define str %rsi
-#define chr %edi
-#define size %rcx
+#define str %rdi
+#define chr %esi
+#define size %rdx
 
-#define res2 %rsi
-#define str2 %rdi
-#define chr2 %ecx
-#define size2 %rdx
+#define res2 %rdi
+#define str2 %rsi
+#define chr2 %edx
+#define size2 %rcx
 #endif
 
     .extern _mrfstr_searchchr_load

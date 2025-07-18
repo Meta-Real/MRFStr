@@ -15,7 +15,7 @@
 #ifdef WIN32
 #define str %rcx
 #else
-#define str %rsi
+#define str %rdi
 #endif
 
 .text

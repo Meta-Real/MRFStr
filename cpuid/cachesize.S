@@ -22,10 +22,10 @@
 #define l22 %r8
 #define l32 %r9
 #else
-#define l21 %rsi
-#define l31 %rdi
-#define l22 %rsi
-#define l32 %rdi
+#define l21 %rdi
+#define l31 %rsi
+#define l22 %rdi
+#define l32 %rsi
 #endif
 
     .extern _is_intel

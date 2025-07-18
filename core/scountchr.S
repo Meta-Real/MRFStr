@@ -21,12 +21,12 @@
 #define mask1 %rsi
 #define mask2 %rdi
 #else
-#define str %rsi
-#define chr %edi
-#define size %rcx
+#define str %rdi
+#define chr %esi
+#define size %rdx
 
-#define rchr %rdi
-#define mask1 %rdx
+#define rchr %rsi
+#define mask1 %rcx
 #define mask2 %r8
 #endif
 

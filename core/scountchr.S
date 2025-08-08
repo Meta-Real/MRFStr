@@ -20,6 +20,8 @@
 #define rchr %rdx
 #define mask1 %rsi
 #define mask2 %rdi
+
+#define chrl %dl
 #else
 #define str %rdi
 #define chr %esi
@@ -28,6 +30,8 @@
 #define rchr %rsi
 #define mask1 %rcx
 #define mask2 %r8
+
+#define chrl %sil
 #endif
 
 .text
@@ -47,9 +51,9 @@ __mrfstr_avx512bw_countchr:
 LHEAD1:
     vpcmpeqb (str, size), %zmm16, %k0
 
-    kmovq %k0, %rdx
-    popcnt %rdx, %rdx
-    lea (%rax, %rdx), %rax
+    kmovq %k0, rchr
+    popcnt rchr, rchr
+    lea (%rax, rchr), %rax
 
     add $64, size
     jnz LHEAD1
@@ -74,9 +78,9 @@ __mrfstr_avx2_countchr:
 LHEAD2:
     vpcmpeqb (str, size), %ymm0, %ymm1
 
-    vpmovmskb %ymm1, %edx
-    popcnt %edx, %edx
-    lea (%rax, %rdx), %rax
+    vpmovmskb %ymm1, chr
+    popcnt chr, chr
+    lea (%rax, rchr), %rax
 
     add $32, size
     jnz LHEAD2
@@ -103,9 +107,13 @@ LHEAD3:
     movdqa (str, size), %xmm0
     pcmpeqb %xmm1, %xmm0
 
-    pmovmskb %xmm0, %edx
+    pmovmskb %xmm0, chr
+#ifdef WIN32
     popcnt %dx, %dx
-    lea (%rax, %rdx), %rax
+#else
+    popcnt %si, %si
+#endif
+    lea (%rax, rchr), %rax
 
     add $16, size
     jnz LHEAD3
@@ -131,25 +139,25 @@ LHEAD4:
     movdqa (str, size), %xmm0
     pcmpeqb %xmm1, %xmm0
 
-    pmovmskb %xmm0, %edx
-    mov %edx, %r9d
+    pmovmskb %xmm0, chr
+    mov chr, %r9d
     shr $1, %r9d
     and $0x55555555, %r9d
-    sub %r9d, %edx
+    sub %r9d, chr
 
-    mov %edx, %r9d
+    mov chr, %r9d
     and $0x33333333, %r9d
-    and $0x33333333, %edx
-    lea (%edx, %r9d), %edx
+    and $0x33333333, chr
+    lea (chr, %r9d), chr
 
-    mov %edx, %r9d
+    mov chr, %r9d
     shr $4, %r9d
-    lea (%edx, %r9d), %edx
-    and $0x0f0f0f0f, %edx
+    lea (chr, %r9d), chr
+    and $0x0f0f0f0f, chr
 
-    imul $0x01010101, %edx
-    shr $24, %edx
-    lea (%rdx, %rax), %rax
+    imul $0x01010101, chr
+    shr $24, chr
+    lea (rchr, %rax), %rax
 
     add $16, size
     jnz LHEAD4
@@ -168,12 +176,7 @@ __mrfstr_i64_sse42_countchr:
     mov $0x0101010101010101, %rax
     mov $0x7f7f7f7f7f7f7f7f, %r11
 
-#ifdef WIN32
-    movzx %dl, rchr
-#else
-    movzx %dil, rchr
-#endif
-
+    movzx chrl, rchr
     imul %rax, rchr
     xor %rax, %rax
 
@@ -218,12 +221,7 @@ __mrfstr_i64_countchr:
     mov $0x3333333333333333, mask1
     mov $0x0f0f0f0f0f0f0f0f, mask2
 
-#ifdef WIN32
-    movzx %dl, rchr
-#else
-    movzx %dil, rchr
-#endif
-
+    movzx chrl, rchr
     imul %rbx, rchr
     xor %rax, %rax
 

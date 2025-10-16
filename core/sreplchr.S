@@ -371,15 +371,12 @@ __mrfstr_i64_replchr:
 
 #ifdef WIN32
     movzx %dl, %r11
-    imul %rax, %r11
-
     movzx %r8b, rnchr
 #else
-    movzx %dil, %r11
-    imul %rax, %r11
-
-    movzx %cl, rnchr
+    movzx %sil, %r11
+    movzx %dl, rnchr
 #endif
+    imul %rax, %r11
 
 LHEAD11:
     mov (str, size), %r10
@@ -428,15 +425,14 @@ __mrfstr_i64_replchr2:
 
 #ifdef WIN32
     movzx %r8b, rochr2
-    imul %rax, rochr2
     movzx %r9b, rnchr2
 
     mov 56(%rsp), size2
 #else
-    movzx %cl, rochr2
-    imul %rax, rochr2
-    movzx %dl, rnchr2
+    movzx %dl, rochr2
+    movzx %cl, rnchr2
 #endif
+    imul %rax, rochr2
 
 LHEAD12:
     mov (str2, size2), %r10

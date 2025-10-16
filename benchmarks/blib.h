@@ -95,14 +95,18 @@ enum __MRFSTR_BLIB_FORMAT_ENUM
                 {                                                                         \
                 case '\0':                                                                \
                 case 'B':                                                                 \
+                case 'b':                                                                 \
                     break;                                                                \
                 case 'K':                                                                 \
+                case 'k':                                                                 \
                     start *= 1024;                                                        \
                     break;                                                                \
                 case 'M':                                                                 \
+                case 'm':                                                                 \
                     start *= 0x100000;                                                    \
                     break;                                                                \
                 case 'G':                                                                 \
+                case 'g':                                                                 \
                     start *= 0x40000000;                                                  \
                     break;                                                                \
                 }                                                                         \

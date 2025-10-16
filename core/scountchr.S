@@ -18,20 +18,20 @@
 #define size %r8
 
 #define rchr %rdx
+#define chrl %dl
+
 #define mask1 %rsi
 #define mask2 %rdi
-
-#define chrl %dl
 #else
 #define str %rdi
 #define chr %esi
 #define size %rdx
 
 #define rchr %rsi
+#define chrl %sil
+
 #define mask1 %rcx
 #define mask2 %r8
-
-#define chrl %sil
 #endif
 
 .text

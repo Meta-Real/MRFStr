@@ -16,10 +16,14 @@
 #define dst %rcx
 #define chr %edx
 #define size %r8
+
+#define rchr %rdx
 #else
 #define dst %rdi
 #define chr %esi
 #define size %rdx
+
+#define rchr %rsi
 #endif
 
     .extern _mrfstr_mem_ntlimit
@@ -276,18 +280,14 @@ __mrfstr_i64_fill:
     mov $0x0101010101010101, %rax
 
 #ifdef WIN32
-    movzx %dl, %rdx
-    imul %rax, %rdx
-
-LHEAD10:
-    mov %rdx, (dst, size)
+    movzx %dl, rchr
 #else
-    movzx %dil, %rdi
-    imul %rax, %rdi
+    movzx %sil, rchr
+#endif
+    imul %rax, rchr
 
 LHEAD10:
-    mov %rdi, (dst, size)
-#endif
+    mov rchr, (dst, size)
 
     add $8, size
     jnz LHEAD10

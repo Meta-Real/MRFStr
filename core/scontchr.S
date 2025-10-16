@@ -17,19 +17,31 @@
 #define chr %edx
 #define size %r8
 
+#define rchr %rdx
+
 #define res2 %rcx
 #define str2 %rdx
 #define chr2 %r8d
 #define size2 %r9
+
+#define rchr2 %r8
+#define reg1 %rsi
+#define reg2 %rdi
 #else
 #define str %rdi
 #define chr %esi
 #define size %rdx
 
+#define rchr %rsi
+
 #define res2 %rdi
 #define str2 %rsi
 #define chr2 %edx
 #define size2 %rcx
+
+#define rchr2 %rdx
+#define reg1 %r8
+#define reg2 %r9
 #endif
 
     .extern _mrfstr_searchchr_load
@@ -322,12 +334,16 @@ __mrfstr_i64_contchr:
     mov $0x0101010101010101, %r10
     mov $0x8080808080808080, %r11
 
-    movzx %dl, %rdx
-    imul %r10, %rdx
+#ifdef WIN32
+    movzx %dl, rchr
+#else
+    movzx %sil, rchr
+#endif
+    imul %r10, rchr
 
 LHEAD7:
     mov (str, size), %rax
-    xor %rdx, %rax
+    xor rchr, %rax
 
     mov %rax, %r9
     sub %r10, %rax
@@ -358,7 +374,6 @@ TRUE7:
 __mrfstr_i64_tcontchr:
     push %rbx
     push %rbp
-
 #ifdef WIN32
     push %rsi
     push %rdi
@@ -372,12 +387,11 @@ __mrfstr_i64_tcontchr:
     mov $0x8080808080808080, %r11
 
 #ifdef WIN32
-    movzx %r8b, %r8
-    imul %r10, %r8
+    movzx %r8b, rchr2
 #else
-    movzx %dl, %rdx
-    imul %r10, %rdx
+    movzx %dl, rchr2
 #endif
+    imul %r10, rchr2
 
     mov _mrfstr_searchchr_load(%rip), %rax
     cmp %rax, size2
@@ -388,25 +402,14 @@ OLHEAD8:
     sub %rax, %rbp
 
 ILHEAD8:
-#ifdef WIN32
-    mov (str2, size2), %rsi
-    xor %r8, %rsi
+    mov (str2, size2), reg1
+    xor rchr2, reg1
 
-    mov %rsi, %rdi
-    sub %r10, %rsi
-    not %rdi
-    and %rdi, %rsi
-    and %r11, %rsi
-#else
-    mov (str2, size2), %r8
-    xor %rdx, %r8
-
-    mov %r8, %r9
-    sub %r10, %r8
-    not %r9
-    and %r9, %r8
-    and %r11, %r8
-#endif
+    mov reg1, reg2
+    sub %r10, reg1
+    not reg2
+    and reg2, reg1
+    and %r11, reg1
     jnz TRUE8
 
     add $8, size2
@@ -421,25 +424,14 @@ ILHEAD8:
     jb OLHEAD8
 
 LASTLOAD8:
-#ifdef WIN32
-    mov (str2, size2), %rsi
-    xor %r8, %rsi
+    mov (str2, size2), reg1
+    xor rchr2, reg1
 
-    mov %rsi, %rdi
-    sub %r10, %rsi
-    not %rdi
-    and %rdi, %rsi
-    and %r11, %rsi
-#else
-    mov (str2, size2), %r8
-    xor %rdx, %r8
-
-    mov %r8, %r9
-    sub %r10, %r8
-    not %r9
-    and %r9, %r8
-    and %r11, %r8
-#endif
+    mov reg1, reg2
+    sub %r10, reg1
+    not reg2
+    and reg2, reg1
+    and %r11, reg1
     jnz TRUE8
 
     add $8, size2
